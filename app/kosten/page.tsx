@@ -28,6 +28,11 @@ export default function CostsPage() {
     <>
       <section className="contentHero">
         <div className="shell">
+          <nav className="visibleBreadcrumbs" aria-label="Breadcrumb">
+            <Link href="/">Startseite</Link>
+            <span aria-hidden="true">›</span>
+            <span aria-current="page">Preise</span>
+          </nav>
           <span className="eyebrow">Preisspiegel Deutschland - Stand August 2026</span>
           <h1>Handwerker Kosten 2026</h1>
           <p>{services.length} Kostenbereiche mit {priceCount} aktuellen Preispositionen für Renovierung, Sanierung und Haustechnik.</p>
