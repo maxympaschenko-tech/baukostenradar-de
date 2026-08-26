@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { priceItemSlug } from "@/lib/price-slug";
 import { regions, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
 
@@ -62,6 +63,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly" as const,
       priority: 0.85,
     })),
+    ...services.flatMap((service) =>
+      service.priceItems.map((item) => ({
+        url: `${base}/kosten/${service.slug}/leistung/${priceItemSlug(item.name)}`,
+        lastModified: now,
+        changeFrequency: "weekly" as const,
+        priority: 0.82,
+      })),
+    ),
     ...cities.map((region) => ({
       url: `${base}/staedte/${region.slug}`,
       lastModified: now,
