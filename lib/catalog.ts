@@ -3,8 +3,8 @@ import {
   regions,
   renovationModel,
   services as baseServices,
-  type PriceItem,
-  type Service,
+  type PriceItem as BasePriceItem,
+  type Service as BaseService,
 } from "./pricing";
 
 export const priceSources = {
@@ -47,10 +47,12 @@ export const priceSources = {
 } as const;
 
 type CatalogSourceKey = keyof typeof priceSources;
-export type CatalogPriceItem = Omit<PriceItem, "sourceKey"> & { sourceKey: CatalogSourceKey };
-export type CatalogService = Omit<Service, "priceItems"> & { priceItems: CatalogPriceItem[] };
+export type PriceItem = Omit<BasePriceItem, "sourceKey"> & { sourceKey: CatalogSourceKey };
+export type Service = Omit<BaseService, "priceItems"> & { priceItems: PriceItem[] };
+export type CatalogPriceItem = PriceItem;
+export type CatalogService = Service;
 
-export const extraServices: CatalogService[] = [
+export const extraServices: Service[] = [
   {
     slug: "tueren",
     title: "Türen Kosten 2026",
@@ -132,8 +134,8 @@ export const extraServices: CatalogService[] = [
   },
 ];
 
-export const services: CatalogService[] = [
-  ...(baseServices as unknown as CatalogService[]),
+export const services: Service[] = [
+  ...(baseServices as unknown as Service[]),
   ...extraServices,
 ];
 
