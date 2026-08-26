@@ -6,6 +6,7 @@ const nav = [
   ["Startseite", "/"],
   ["Preise", "/kosten"],
   ["Rechner", "/rechner"],
+  ["Ratgeber", "/ratgeber"],
   ["Städte", "/staedte"],
 ] as const;
 
