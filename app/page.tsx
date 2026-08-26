@@ -30,7 +30,7 @@ export default function HomePage() {
             </p>
             <div className="heroActions">
               <Link className="primaryButton" href="/kosten">Preise vergleichen</Link>
-              <Link className="ghostButton" href="/rechner/renovierungskosten">Kosten berechnen</Link>
+              <Link className="ghostButton" href="/rechner">Kostenrechner öffnen</Link>
             </div>
             <div className="trustRow">
               <div><strong>{priceCount} Preispositionen</strong><span>Strukturierte Richtwerte statt langer Fließtexte.</span></div>
@@ -88,7 +88,7 @@ export default function HomePage() {
               <div><strong>1</strong><span><b>Leistung wählen</b> - zum Beispiel Maler, Bad oder Dach.</span></div>
               <div><strong>2</strong><span><b>Richtwert prüfen</b> - Preisspanne und Einheit vergleichen.</span></div>
               <div><strong>3</strong><span><b>Region einordnen</b> - lokale Preisunterschiede berücksichtigen.</span></div>
-              <div><strong>4</strong><span><b>Projekt kalkulieren</b> - Gesamtbudget im Rechner abschätzen.</span></div>
+              <div><strong>4</strong><span><b>Projekt kalkulieren</b> - Einzelarbeit oder Gesamtbudget im Rechner abschätzen.</span></div>
             </div>
             <Link className="primaryButton" href="/methodik">Unsere Methodik</Link>
           </div>
@@ -100,7 +100,7 @@ export default function HomePage() {
               <div><strong>{services.length}</strong><span>Kostenbereiche</span></div>
               <div><strong>{priceCount}</strong><span>Preispositionen</span></div>
               <div><strong>{regions.length}</strong><span>Regionen</span></div>
-              <div><strong>€</strong><span>Richtwerte</span></div>
+              <div><strong>2</strong><span>Kostenrechner</span></div>
             </div>
           </div>
         </div>
@@ -131,10 +131,13 @@ export default function HomePage() {
         <div className="shell ctaPanel">
           <div>
             <span className="eyebrow">Projekt planen</span>
-            <h2>Vom Einzelpreis zum Renovierungsbudget</h2>
-            <p>Wohnfläche, Umfang, Standard und Region auswählen und sofort eine grobe Kostenspanne erhalten.</p>
+            <h2>Einzelarbeit oder komplette Renovierung kalkulieren</h2>
+            <p>Nutzen Sie den passenden Rechner für eine konkrete Handwerkerleistung oder für das gesamte Renovierungsbudget.</p>
           </div>
-          <Link className="secondaryButton" href="/rechner/renovierungskosten">Jetzt berechnen</Link>
+          <div className="heroActions">
+            <Link className="secondaryButton" href="/rechner/handwerkerkosten">Handwerkerkosten</Link>
+            <Link className="ghostButton" href="/rechner/renovierungskosten">Renovierungskosten</Link>
+          </div>
         </div>
       </section>
     </>
