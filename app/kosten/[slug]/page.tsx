@@ -52,7 +52,46 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
   const technicalRenovationSlugs = new Set(["elektriker", "sanitaer", "heizung", "fenster", "dachsanierung", "daemmung", "fassade"]);
   const houseProjectSlugs = new Set(["fenster", "dachsanierung", "daemmung", "fassade", "heizung", "waermepumpe", "photovoltaik"]);
   const hasHourlyPrice = service.priceItems.some((item) => item.unit.toLowerCase().includes("stunde"));
+  const tradeGuideByService: Record<string, { label: string; href: string; description: string }> = {
+    dachsanierung: {
+      label: "Dach sanieren Kosten pro m² 2026",
+      href: "/ratgeber/dach-sanieren-kosten-pro-qm",
+      description: "Neueindeckung, Dämmung und Beispielbudgets nach Dachfläche vertiefen.",
+    },
+    fenster: {
+      label: "Fenster austauschen beim Haus 2026",
+      href: "/ratgeber/fenster-austauschen-kosten-haus",
+      description: "Kosten pro Fenster und Beispielbudgets für 10 oder 15 Fenster vergleichen.",
+    },
+    elektriker: {
+      label: "Elektrik im Altbau erneuern 2026",
+      href: "/ratgeber/elektrik-erneuern-altbau",
+      description: "Komplettinstallation, Sicherungskasten und typische Altbau-Kostentreiber einordnen.",
+    },
+    heizung: {
+      label: "Heizung erneuern Kosten 2026",
+      href: "/ratgeber/heizung-erneuern-kosten",
+      description: "Gasheizung, Wärmepumpe und Wärmeverteilung im Gesamtbudget vergleichen.",
+    },
+    waermepumpe: {
+      label: "Heizung erneuern Kosten 2026",
+      href: "/ratgeber/heizung-erneuern-kosten",
+      description: "Wärmepumpe mit anderen Heizungsmaßnahmen und der Wärmeverteilung vergleichen.",
+    },
+    badsanierung: {
+      label: "Bad komplett sanieren Kosten 2026",
+      href: "/ratgeber/bad-komplett-sanieren-kosten",
+      description: "Komplettbad, 8-m²-Beispiel und einzelne Kostenblöcke vertiefen.",
+    },
+    sanitaer: {
+      label: "Bad komplett sanieren Kosten 2026",
+      href: "/ratgeber/bad-komplett-sanieren-kosten",
+      description: "Sanitärarbeiten im Budget einer vollständigen Badsanierung einordnen.",
+    },
+  };
+  const directTradeGuide = tradeGuideByService[service.slug];
   const relatedGuides = [
+    ...(directTradeGuide ? [directTradeGuide] : []),
     {
       label: "Sanierungskosten pro m² 2026",
       href: "/ratgeber/sanierungskosten-pro-qm",
