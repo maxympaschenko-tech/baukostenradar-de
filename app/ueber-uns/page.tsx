@@ -51,7 +51,10 @@ export default function AboutPage() {
             Regionale Stadtfaktoren sind beispielsweise Modellwerte zur groben Einordnung und werden nicht als lokal
             beobachtete Marktaufschläge dargestellt.
           </p>
-          <Link className="primaryButton" href="/methodik">Methodik und Quellen ansehen</Link>
+          <div className="heroActions">
+            <Link className="primaryButton" href="/methodik">Methodik ansehen</Link>
+            <Link className="ghostButton" href="/quellen">Alle Quellen ansehen</Link>
+          </div>
         </section>
 
         <section className="contentCard proseCard">
@@ -70,6 +73,20 @@ export default function AboutPage() {
           <p>
             <strong>Keine Preisgarantie:</strong> BauKostenRadar veröffentlicht Orientierungswerte. Ein tatsächliches
             Handwerkerangebot kann je nach Objekt, Material, Region, Auslastung und Leistungsumfang deutlich abweichen.
+          </p>
+        </section>
+
+        <section className="contentCard proseCard">
+          <h2>Finanzierung und redaktionelle Unabhängigkeit</h2>
+          <p>
+            BauKostenRadar soll sich künftig unter anderem durch klar erkennbare Werbung finanzieren. Werbeanzeigen
+            haben keinen Einfluss darauf, welche Preiswerte, Quellen, Kostenbereiche oder Modellfaktoren veröffentlicht
+            werden. Redaktionelle Inhalte und Kostendaten werden unabhängig von Werbekunden erstellt und gepflegt.
+          </p>
+          <p>
+            Sollte BauKostenRadar später bezahlte Kooperationen, Affiliate-Links oder gesponserte Platzierungen nutzen,
+            werden diese als solche kenntlich gemacht. Eine kommerzielle Zusammenarbeit ändert nicht die auf der
+            <Link className="textLink" href="/methodik"> Methodik-Seite</Link> beschriebenen Regeln für die Preisdaten.
           </p>
         </section>
 
