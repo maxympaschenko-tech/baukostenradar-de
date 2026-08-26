@@ -1,0 +1,54 @@
+/*
+Theme Name: BauKostenRadar Child
+Description: GeneratePress child theme for BauKostenRadar.de
+Author: BauKostenRadar
+Template: generatepress
+Version: 0.1.0
+Text Domain: baukostenradar
+*/
+
+:root {
+  --bkr-primary: #153d5c;
+  --bkr-primary-2: #1f587f;
+  --bkr-accent: #f3a712;
+  --bkr-bg: #f5f7f9;
+  --bkr-card: #ffffff;
+  --bkr-text: #17212b;
+  --bkr-muted: #667481;
+  --bkr-border: #dfe5ea;
+  --bkr-success: #1c7c54;
+  --bkr-radius: 16px;
+  --bkr-shadow: 0 12px 32px rgba(26, 44, 60, .08);
+}
+
+body { background: var(--bkr-bg); color: var(--bkr-text); }
+.site-header { border-bottom: 1px solid var(--bkr-border); }
+.main-navigation .main-nav ul li a { font-weight: 600; }
+.bkr-container { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
+.bkr-hero { padding: 72px 0 48px; background: radial-gradient(circle at top right, rgba(243,167,18,.16), transparent 35%), linear-gradient(180deg, #fff, #f7f9fb); }
+.bkr-hero-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 48px; align-items: center; }
+.bkr-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: #eef4f8; color: var(--bkr-primary); border-radius: 999px; padding: 8px 12px; font-size: 14px; font-weight: 700; }
+.bkr-hero h1 { font-size: clamp(42px, 6vw, 68px); line-height: 1.02; margin: 18px 0; letter-spacing: -0.03em; }
+.bkr-hero p { font-size: 20px; color: var(--bkr-muted); max-width: 720px; }
+.bkr-card { background: var(--bkr-card); border: 1px solid var(--bkr-border); border-radius: var(--bkr-radius); box-shadow: var(--bkr-shadow); }
+.bkr-hero-card { padding: 24px; }
+.bkr-trust-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 30px; }
+.bkr-trust-item { padding: 16px; background: #fff; border: 1px solid var(--bkr-border); border-radius: 14px; }
+.bkr-trust-item strong { display: block; font-size: 17px; }
+.bkr-section { padding: 64px 0; }
+.bkr-section h2 { font-size: clamp(30px, 4vw, 44px); line-height: 1.1; margin-bottom: 12px; }
+.bkr-section-intro { max-width: 760px; color: var(--bkr-muted); font-size: 18px; }
+.bkr-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 28px; }
+.bkr-category-card { display: block; padding: 22px; color: inherit; text-decoration: none; transition: transform .18s ease, box-shadow .18s ease; }
+.bkr-category-card:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(26,44,60,.12); }
+.bkr-category-card h3 { margin: 0 0 6px; font-size: 21px; }
+.bkr-category-card p { margin: 0; color: var(--bkr-muted); }
+.bkr-price-badge { display: inline-block; margin-top: 12px; color: var(--bkr-success); font-weight: 800; }
+.bkr-cta { padding: 28px; background: var(--bkr-primary); color: #fff; border-radius: var(--bkr-radius); }
+.bkr-cta h2, .bkr-cta p { color: #fff; }
+.bkr-button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 20px; border-radius: 12px; background: var(--bkr-accent); color: #1b252d !important; font-weight: 800; text-decoration: none; border: 0; cursor: pointer; }
+
+@media (max-width: 850px) {
+  .bkr-hero-grid, .bkr-grid-3, .bkr-trust-row { grid-template-columns: 1fr; }
+  .bkr-hero { padding-top: 42px; }
+}
