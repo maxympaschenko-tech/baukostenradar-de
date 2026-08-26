@@ -6,6 +6,24 @@ import { siteConfig } from "@/lib/site";
 
 export const dynamicParams = false;
 
+function headingId(value: string) {
+  return value
+    .toLowerCase()
+    .replaceAll("ä", "ae")
+    .replaceAll("ö", "oe")
+    .replaceAll("ü", "ue")
+    .replaceAll("ß", "ss")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function relatedType(href: string) {
+  if (href.startsWith("/rechner")) return "Rechner";
+  if (href.startsWith("/kosten")) return "Preisübersicht";
+  if (href.startsWith("/ratgeber")) return "Ratgeber";
+  return "Weiterführend";
+}
+
 export function generateStaticParams() {
   return allGuides.map((guide) => ({ slug: guide.slug }));
 }
@@ -35,6 +53,10 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 
   const base = siteConfig.url.replace(/\/$/, "");
   const canonicalUrl = `${base}/ratgeber/${guide.slug}`;
+  const tocItems = guide.sections.map((section) => ({
+    label: section.heading,
+    id: headingId(section.heading),
+  }));
 
   const structuredData = [
     {
@@ -82,6 +104,14 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 
       <section className="contentHero">
         <div className="shell">
+          <nav className="visibleBreadcrumbs" aria-label="Breadcrumb">
+            <Link href="/">Startseite</Link>
+            <span aria-hidden="true">›</span>
+            <Link href="/ratgeber">Ratgeber</Link>
+            <span aria-hidden="true">›</span>
+            <span aria-current="page">{guide.title.replace(" 2026", "")}</span>
+          </nav>
+
           <span className="eyebrow">{guide.eyebrow}</span>
           <h1>{guide.h1}</h1>
           <p>{guide.intro}</p>
@@ -99,18 +129,36 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
       </section>
 
       <article className="shell articleShell">
-        <section className="contentCard proseCard">
-          <span className="eyebrow">Kurz zusammengefasst</span>
-          <h2>{guide.keyFact}</h2>
-          <p>{guide.intro}</p>
+        <section className="contentCard proseCard guideSummary" aria-labelledby="guide-summary-title">
+          <span className="eyebrow">Das Wichtigste in Kürze</span>
+          <h2 id="guide-summary-title">{guide.keyFact}</h2>
+          <ul className="summaryFacts">
+            <li><strong>Orientierung:</strong> {guide.keyFact}</li>
+            <li><strong>Einordnung:</strong> Die veröffentlichten Spannen sind Richtwerte und kein verbindliches Angebot.</li>
+            <li><strong>Genauer planen:</strong> Fläche, Stückzahl, Zustand, Ausstattung und Region können das konkrete Budget deutlich verändern.</li>
+          </ul>
           <div className="heroActions">
             <Link className="primaryButton" href="/rechner/renovierungskosten">Renovierung berechnen</Link>
             <Link className="ghostButton" href="/kosten">Handwerkerpreise vergleichen</Link>
           </div>
         </section>
 
+        <nav className="contentCard proseCard guideToc" aria-labelledby="guide-toc-title">
+          <span className="eyebrow">Auf dieser Seite</span>
+          <h2 id="guide-toc-title">Inhalt</h2>
+          <ol>
+            {tocItems.map((item) => (
+              <li key={item.id}>
+                <a href={`#${item.id}`}>{item.label}</a>
+              </li>
+            ))}
+            <li><a href="#haeufige-fragen">Häufige Fragen</a></li>
+            <li><a href="#weiter-planen">Passende Preise und Rechner</a></li>
+          </ol>
+        </nav>
+
         {guide.sections.map((section) => (
-          <section className="contentCard proseCard" key={section.heading}>
+          <section className="contentCard proseCard articleSection" id={headingId(section.heading)} key={section.heading}>
             <h2>{section.heading}</h2>
             {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
 
@@ -145,7 +193,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
           </section>
         ))}
 
-        <section className="contentCard proseCard">
+        <section className="contentCard proseCard articleSection" id="haeufige-fragen">
           <span className="eyebrow">Häufige Fragen</span>
           <h2>FAQ zu {guide.title.replace(" 2026", "")}</h2>
           <div className="faqList">
@@ -158,12 +206,14 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
           </div>
         </section>
 
-        <section className="contentCard proseCard">
+        <section className="contentCard proseCard articleSection relatedGuideSection" id="weiter-planen">
           <span className="eyebrow">Weiter planen</span>
-          <h2>Passende Preise und Rechner</h2>
-          <div className="sourceList">
+          <h2>Passende Preise, Rechner und Ratgeber</h2>
+          <p>Vertiefen Sie die Kostenfrage mit den nächsten passenden Seiten, statt wieder bei der allgemeinen Suche zu beginnen.</p>
+          <div className="sourceList relatedGuideList">
             {guide.related.map((item) => (
               <Link href={item.href} key={item.href}>
+                <span className="relatedType">{relatedType(item.href)}</span>
                 <strong>{item.label}</strong>
                 <span>Weiterlesen →</span>
               </Link>
