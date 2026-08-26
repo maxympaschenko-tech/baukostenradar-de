@@ -5,6 +5,7 @@ import { siteConfig } from "@/lib/site";
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = siteConfig.url.replace(/\/$/, "");
   const now = new Date();
+  const cities = regions.filter((region) => region.value !== "de");
 
   return [
     {
@@ -37,17 +38,31 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.6,
     },
+    {
+      url: `${base}/kontakt`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
     ...services.map((service) => ({
       url: `${base}/kosten/${service.slug}`,
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.85,
     })),
-    ...regions.filter((region) => region.value !== "de").map((region) => ({
+    ...cities.map((region) => ({
       url: `${base}/staedte/${region.slug}`,
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.75,
     })),
+    ...services.flatMap((service) =>
+      cities.map((region) => ({
+        url: `${base}/kosten/${service.slug}/${region.slug}`,
+        lastModified: now,
+        changeFrequency: "weekly" as const,
+        priority: 0.8,
+      })),
+    ),
   ];
 }
