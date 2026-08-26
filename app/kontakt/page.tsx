@@ -4,7 +4,7 @@ import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Kontakt",
-  description: "Kontakt zu BauKostenRadar für Hinweise, Datenkorrekturen, Kooperationen und Projektanfragen.",
+  description: "Kontakt zu BauKostenRadar für Datenkorrekturen, Quellenhinweise, redaktionelle Fragen und Kooperationen.",
   alternates: { canonical: "/kontakt" },
 };
 
@@ -15,7 +15,7 @@ export default function ContactPage() {
         <div className="shell">
           <span className="eyebrow">Kontakt</span>
           <h1>BauKostenRadar kontaktieren</h1>
-          <p>Für Hinweise zu Preisen, Datenkorrekturen, Kooperationen und Projektanfragen erreichen Sie uns per E-Mail oder Telefon.</p>
+          <p>Für Datenkorrekturen, Quellenhinweise, redaktionelle Fragen und Kooperationen erreichen Sie uns per E-Mail oder Telefon.</p>
         </div>
       </section>
 
@@ -30,16 +30,22 @@ export default function ContactPage() {
             Bei einer Datenkorrektur nennen Sie bitte möglichst die betroffene URL, die konkrete Preisposition
             und - falls vorhanden - eine nachvollziehbare Quelle. So können wir Hinweise schneller prüfen.
           </p>
+          <div className="heroActions">
+            <Link className="primaryButton" href="/quellen">Unsere Quellen</Link>
+            <Link className="ghostButton" href="/methodik">Methodik ansehen</Link>
+          </div>
         </section>
 
         <section className="contentCard proseCard">
-          <h2>Renovierungs- oder Handwerkerprojekt?</h2>
+          <h2>Keine Handwerkervermittlung</h2>
           <p>
-            In der Pilotphase können Sie Ihr Vorhaben bereits strukturiert erfassen. Die Anfrage wird zunächst
-            manuell durch BauKostenRadar geprüft. Eine Vermittlung an einen Fachbetrieb oder ein verbindliches
-            Handwerkerangebot ist aktuell nicht garantiert.
+            BauKostenRadar ist derzeit ein Informations- und Preisportal. Wir vermitteln aktuell keine
+            Handwerksbetriebe und nehmen über die Website keine Renovierungs- oder Handwerkerprojekte zur
+            Vermittlung entgegen. Die veröffentlichten Preise und Rechner dienen der Budgetorientierung.
           </p>
-          <Link className="primaryButton" href="/angebot">Projektanfrage starten</Link>
+          <p>
+            Für ein verbindliches Angebot wenden Sie sich bitte direkt an geeignete Fachbetriebe in Ihrer Region.
+          </p>
         </section>
       </div>
     </>
