@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { RenovationCalculator } from "@/components/renovation-calculator";
+import { guides } from "@/lib/guides";
 import { regions, services } from "@/lib/pricing";
 
 function euro(value: number) {
@@ -25,6 +26,7 @@ const heroCategories = [
 export default function HomePage() {
   const priceCount = services.reduce((sum, service) => sum + service.priceItems.length, 0);
   const featuredServices = services.slice(0, 6);
+  const featuredGuides = guides.slice(0, 4);
 
   return (
     <>
@@ -140,6 +142,34 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="section premiumCitiesSection">
+        <div className="shell">
+          <div className="premiumSectionHeading">
+            <div>
+              <span className="eyebrow">Ratgeber</span>
+              <h2>Kostenfragen ausführlich erklärt</h2>
+              <p>Evergreen-Ratgeber mit Rechenbeispielen, Tabellen und klarer Trennung zwischen Quellen und Modellwerten.</p>
+            </div>
+            <Link className="premiumTextArrow" href="/ratgeber">Alle Ratgeber ansehen</Link>
+          </div>
+
+          <div className="directoryGrid">
+            {featuredGuides.map((guide) => (
+              <article className="directoryCard" key={guide.slug}>
+                <span className="eyebrow">{guide.eyebrow}</span>
+                <h2>{guide.title}</h2>
+                <p>{guide.description}</p>
+                <div className="miniPrice">
+                  <span>Wichtigster Richtwert</span>
+                  <strong>{guide.keyFact}</strong>
+                </div>
+                <Link className="textLink" href={`/ratgeber/${guide.slug}`}>Ratgeber lesen →</Link>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="section premiumDarkSection">
         <div className="shell premiumHowGrid">
           <div>
@@ -156,7 +186,7 @@ export default function HomePage() {
             <div><span>01</span><strong>Leistung wählen</strong><p>Zum Beispiel Bad, Dach, Fenster oder Elektrik.</p></div>
             <div><span>02</span><strong>Preis einordnen</strong><p>Richtwerte und Einheiten transparent vergleichen.</p></div>
             <div><span>03</span><strong>Region berücksichtigen</strong><p>Stadtfaktoren als Modellhilfe für die Budgetplanung nutzen.</p></div>
-            <div><span>04</span><strong>Details vertiefen</strong><p>Einzelpreise, Rechner, Quellen und Methodik miteinander abgleichen.</p></div>
+            <div><span>04</span><strong>Details vertiefen</strong><p>Einzelpreise, Rechner, Ratgeber, Quellen und Methodik miteinander abgleichen.</p></div>
           </div>
         </div>
       </section>
