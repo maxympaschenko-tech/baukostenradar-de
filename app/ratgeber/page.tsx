@@ -4,7 +4,7 @@ import { allGuides } from "@/lib/all-guides";
 
 export const metadata: Metadata = {
   title: "Ratgeber zu Sanierung, Renovierung & Handwerkerkosten 2026",
-  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Badsanierung und konkreten Projektgrößen mit Richtwerten, Beispielbudgets und Rechnern.",
+  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Türen, Estrich, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
   alternates: { canonical: "/ratgeber" },
 };
 
@@ -43,6 +43,18 @@ const guideGroups = [
       "elektrik-erneuern-100-qm-kosten",
       "bad-10-qm-sanieren-kosten",
       "fussbodenheizung-100-qm-kosten",
+    ],
+  },
+  {
+    eyebrow: "Innenausbau & Modernisierung",
+    title: "Türen, Estrich, Mauern, Treppen und Küche konkret kalkulieren",
+    description: "Weitere typische Renovierungsszenarien mit klarer Rechenbasis statt pauschaler Durchschnittswerte.",
+    slugs: [
+      "6-innentueren-austauschen-kosten",
+      "estrich-100-qm-kosten",
+      "innenwand-mauern-kosten",
+      "14-treppenstufen-renovieren-kosten",
+      "kueche-10-qm-renovieren-kosten",
     ],
   },
   {
