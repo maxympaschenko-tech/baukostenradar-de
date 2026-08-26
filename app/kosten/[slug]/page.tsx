@@ -49,7 +49,7 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
   const serviceCalculatorLabel = service.slug === "badsanierung"
     ? "Badsanierungskosten berechnen"
     : "Handwerkerkosten berechnen";
-  const technicalRenovationSlugs = new Set(["elektriker", "sanitaer", "heizung", "fenster", "dachsanierung", "daemmung", "fassade"]);
+  const technicalRenovationSlugs = new Set(["elektriker", "sanitaer", "heizung", "fenster", "dachsanierung", "daemmung", "fassade", "estrich", "maurer"]);
   const houseProjectSlugs = new Set(["fenster", "dachsanierung", "daemmung", "fassade", "heizung", "waermepumpe", "photovoltaik"]);
   const hasHourlyPrice = service.priceItems.some((item) => item.unit.toLowerCase().includes("stunde"));
   const tradeGuideByService: Record<string, { label: string; href: string; description: string }> = {
@@ -119,6 +119,31 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
       label: "Bad 10 m² sanieren Kosten 2026",
       href: "/ratgeber/bad-10-qm-sanieren-kosten",
       description: "Sanitärarbeiten im konkreten Beispiel eines 10-m²-Bads einordnen.",
+    },
+    tueren: {
+      label: "6 Innentüren austauschen Kosten 2026",
+      href: "/ratgeber/6-innentueren-austauschen-kosten",
+      description: "Sechs Standard-Innentüren inklusive Zargen konkret durchrechnen.",
+    },
+    estrich: {
+      label: "Estrich 100 m² Kosten 2026",
+      href: "/ratgeber/estrich-100-qm-kosten",
+      description: "Zement-, Anhydrit-, Trocken- und Sichtestrich für 100 m² vergleichen.",
+    },
+    maurer: {
+      label: "Innenwand mauern Kosten 2026",
+      href: "/ratgeber/innenwand-mauern-kosten",
+      description: "Kosten pro Quadratmeter und Beispielbudgets für 10, 20 und 30 m² Wandfläche vergleichen.",
+    },
+    treppen: {
+      label: "14 Treppenstufen renovieren Kosten 2026",
+      href: "/ratgeber/14-treppenstufen-renovieren-kosten",
+      description: "Stufenaufarbeitung und komplette Treppenrenovierung sauber voneinander unterscheiden.",
+    },
+    kueche: {
+      label: "Küche 10 m² renovieren Kosten 2026",
+      href: "/ratgeber/kueche-10-qm-renovieren-kosten",
+      description: "Eine 10-m²-Küche ohne Möbel kalkulieren und weitere Küchenpositionen einordnen.",
     },
   };
   const directTradeGuide = tradeGuideByService[service.slug];
