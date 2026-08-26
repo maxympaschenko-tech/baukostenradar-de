@@ -79,9 +79,9 @@ export const guides: Guide[] = [
         ],
       },
       {
-        heading: "So nutzt du den Richtwert sinnvoll",
+        heading: "So nutzen Sie den Richtwert sinnvoll",
         paragraphs: [
-          "Nutze den Quadratmeterpreis zuerst für die Budgetgröße und zerlege das Projekt danach in einzelne Gewerke. Für Bad, Elektrik, Boden, Dach, Fenster oder Heizung stehen auf BauKostenRadar eigene Preisverzeichnisse zur Verfügung.",
+          "Nutzen Sie den Quadratmeterpreis zuerst für die Budgetgröße und zerlegen Sie das Projekt danach in einzelne Gewerke. Für Bad, Elektrik, Boden, Dach, Fenster oder Heizung stehen auf BauKostenRadar eigene Preisverzeichnisse zur Verfügung.",
           "Der Renovierungskosten-Rechner berücksichtigt zusätzlich Qualitätsstandard und Region. Dadurch lässt sich die erste Spanne besser an das konkrete Vorhaben anpassen, ohne einen verbindlichen Angebotspreis vorzutäuschen.",
         ],
       },
@@ -141,13 +141,13 @@ export const guides: Guide[] = [
         heading: "Stundensatz oder Pauschalpreis: Was ist besser?",
         paragraphs: [
           "Für klar definierte Standardarbeiten ist ein Pauschalpreis oft leichter vergleichbar. Bei Fehlersuche, Reparaturen oder schwer vorhersehbaren Bestandsarbeiten wird dagegen häufig nach Zeit abgerechnet.",
-          "Vergleiche deshalb nicht nur den Stundenpreis. Entscheidend sind auch Anfahrt, Mindestberechnung, Materialaufschläge, Anzahl der eingesetzten Personen und der geschätzte Zeitbedarf.",
+          "Vergleichen Sie deshalb nicht nur den Stundenpreis. Entscheidend sind auch Anfahrt, Mindestberechnung, Materialaufschläge, Anzahl der eingesetzten Personen und der geschätzte Zeitbedarf.",
         ],
       },
       {
-        heading: "So vergleichst du Angebote sinnvoll",
+        heading: "So vergleichen Sie Angebote sinnvoll",
         paragraphs: [
-          "Bitte bei mehreren Angeboten um eine möglichst ähnliche Leistungsbeschreibung. Ein niedriger Stundenpreis kann durch mehr berechnete Stunden oder zusätzliche Nebenkosten relativiert werden.",
+          "Bitten Sie bei mehreren Angeboten um eine möglichst ähnliche Leistungsbeschreibung. Ein niedriger Stundenpreis kann durch mehr berechnete Stunden oder zusätzliche Nebenkosten relativiert werden.",
           "Für viele Arbeiten zeigt BauKostenRadar neben Stundenpreisen auch Stück-, Quadratmeter- oder Projektpreise. Diese Werte sind häufig besser geeignet, um ein komplettes Vorhaben zu vergleichen.",
         ],
       },
@@ -156,7 +156,7 @@ export const guides: Guide[] = [
       { question: "Was kostet eine Handwerkerstunde 2026?", answer: "In der aktuellen BauKostenRadar-Datenbasis liegen ausgewählte Gewerke grob zwischen 35 und 90 Euro pro Stunde. Der konkrete Satz hängt stark von Gewerk, Region und Betrieb ab." },
       { question: "Ist die Anfahrt im Stundensatz enthalten?", answer: "Nicht zwingend. Viele Betriebe rechnen Anfahrt, Fahrzeug oder eine Servicepauschale separat ab. Das sollte vor Auftragserteilung geklärt werden." },
       { question: "Warum sind Meisterstunden teurer?", answer: "Qualifikation, Verantwortung und betriebliche Kosten können zu höheren Verrechnungssätzen führen. Für viele Arbeiten ist aber nicht zwingend jede Stunde eine Meisterstunde." },
-      { question: "Wie kann ich Handwerkerkosten besser vergleichen?", answer: "Vergleiche möglichst identische Leistungsumfänge und berücksichtige neben dem Stundensatz auch Material, Anfahrt, Mindestzeiten und die geschätzte Arbeitsdauer." },
+      { question: "Wie kann ich Handwerkerkosten besser vergleichen?", answer: "Vergleichen Sie möglichst identische Leistungsumfänge und berücksichtigen Sie neben dem Stundensatz auch Material, Anfahrt, Mindestzeiten und die geschätzte Arbeitsdauer." },
     ],
     related: [
       { label: "Handwerkerkosten-Rechner", href: "/rechner/handwerkerkosten" },
@@ -221,7 +221,7 @@ export const guides: Guide[] = [
         heading: "Vor der Sanierung: Zustand statt Baujahr prüfen",
         paragraphs: [
           "Ein seriöses Budget beginnt mit einer Bestandsaufnahme. Besonders wichtig sind Feuchte, Dach, Fenster, Leitungen, Elektroverteilung und Heizung. Erst danach lässt sich entscheiden, ob eine Teilmodernisierung oder eine Kernsanierung realistisch ist.",
-          "Auf BauKostenRadar kannst du die wichtigsten Gewerke einzeln öffnen und die dort dokumentierten Preispositionen mit dem Gesamtmodell kombinieren.",
+          "Auf BauKostenRadar können Sie die wichtigsten Gewerke einzeln öffnen und die dort dokumentierten Preispositionen mit dem Gesamtmodell kombinieren.",
         ],
       },
     ],
@@ -285,7 +285,7 @@ export const guides: Guide[] = [
       {
         heading: "Budget Schritt für Schritt aufbauen",
         paragraphs: [
-          "Beginne mit der Wohnfläche und dem Renovierungsumfang. Prüfe danach die größten Einzelgewerke und ergänze regionale Unterschiede. So entsteht ein deutlich belastbareres Budget als mit einer einzigen Pauschalzahl.",
+          "Beginnen Sie mit der Wohnfläche und dem Renovierungsumfang. Prüfen Sie danach die größten Einzelgewerke und ergänzen Sie regionale Unterschiede. So entsteht ein deutlich belastbareres Budget als mit einer einzigen Pauschalzahl.",
           "Der Renovierungskosten-Rechner kombiniert Fläche, Umfang, Standard und Region. Für konkrete Einzelarbeiten steht zusätzlich der Handwerkerkosten-Rechner zur Verfügung.",
         ],
       },
@@ -294,7 +294,7 @@ export const guides: Guide[] = [
       { question: "Was kostet es, eine 60-m²-Wohnung zu renovieren?", answer: "Für eine leichte Renovierung ergibt das BauKostenRadar-Modell etwa 3.900 bis 10.800 Euro. Für eine normale Renovierung mit mehreren Gewerken etwa 15.000 bis 39.000 Euro, jeweils vor regionaler und qualitativer Anpassung." },
       { question: "Was kostet eine 80-m²-Wohnung komplett zu renovieren?", answer: "Das hängt vom Umfang ab. Eine leichte Renovierung liegt im Modell bei etwa 5.200 bis 14.400 Euro, eine normale Renovierung bei etwa 20.000 bis 52.000 Euro. Eine umfangreiche Sanierung kann deutlich höher liegen." },
       { question: "Welche Arbeiten sind bei einer Wohnungsrenovierung am teuersten?", answer: "Hohe Einzelposten entstehen häufig durch komplette Bäder, Elektroarbeiten, größere Bodenarbeiten, Fenster sowie technische Erneuerungen." },
-      { question: "Wie kann ich Renovierungskosten genauer berechnen?", answer: "Nutze Fläche und Umfang als Basis und ergänze Qualitätsstandard, Region und die wichtigsten Einzelgewerke. Der BauKostenRadar-Rechner bildet genau diese Schritte ab." },
+      { question: "Wie kann ich Renovierungskosten genauer berechnen?", answer: "Nutzen Sie Fläche und Umfang als Basis und ergänzen Sie Qualitätsstandard, Region und die wichtigsten Einzelgewerke. Der BauKostenRadar-Rechner bildet genau diese Schritte ab." },
     ],
     related: [
       { label: "Renovierungskosten-Rechner", href: "/rechner/renovierungskosten" },
