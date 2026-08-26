@@ -14,15 +14,16 @@ export default function ContactPage() {
         <div className="shell">
           <span className="eyebrow">Kontakt</span>
           <h1>BauKostenRadar kontaktieren</h1>
-          <p>Für Hinweise zu Preisen, Datenkorrekturen, Kooperationen und allgemeine Anfragen erreichen Sie uns per E-Mail.</p>
+          <p>Für Hinweise zu Preisen, Datenkorrekturen, Kooperationen und allgemeine Anfragen erreichen Sie uns per E-Mail oder Telefon.</p>
         </div>
       </section>
 
       <div className="shell articleShell">
         <section className="contentCard proseCard">
-          <h2>E-Mail</h2>
+          <h2>Kontaktmöglichkeiten</h2>
           <p>
-            Schreiben Sie an <a className="textLink" href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>.
+            E-Mail: <a className="textLink" href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a><br />
+            Telefon: <a className="textLink" href={`tel:${siteConfig.phone}`}>{siteConfig.phoneDisplay}</a>
           </p>
           <p>
             Bei einer Datenkorrektur nennen Sie bitte möglichst die betroffene URL, die konkrete Preisposition
