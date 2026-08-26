@@ -115,6 +115,15 @@ export default async function LocalCostPage({
 
       <section className="contentHero">
         <div className="shell">
+          <nav className="visibleBreadcrumbs" aria-label="Breadcrumb">
+            <Link href="/">Startseite</Link>
+            <span aria-hidden="true">›</span>
+            <Link href="/kosten">Handwerker Kosten</Link>
+            <span aria-hidden="true">›</span>
+            <Link href={`/kosten/${service.slug}`}>{service.shortTitle}</Link>
+            <span aria-hidden="true">›</span>
+            <span aria-current="page">{region.label}</span>
+          </nav>
           <span className="eyebrow">{region.label} - Preisstand August 2026</span>
           <h1>{service.shortTitle} Kosten in {region.label} 2026</h1>
           <p>
