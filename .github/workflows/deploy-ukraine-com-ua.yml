@@ -15,7 +15,7 @@ jobs:
     env:
       REMOTE_HOST: uageek.ftp.tools
       REMOTE_USER: uageek
-      REMOTE_PORT: '22'
+      REMOTE_PATH: /home/uageek/baukostenradar.de/www
 
     steps:
       - name: Checkout
@@ -30,14 +30,13 @@ jobs:
         id: deploy_config
         env:
           REMOTE_KEY: ${{ secrets.REMOTE_KEY }}
-          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
         shell: bash
         run: |
-          if [[ -n "$REMOTE_KEY" && -n "$REMOTE_PATH" ]]; then
+          if [[ -n "$REMOTE_KEY" ]]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
           else
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "Deployment key/path are not configured yet. Build will be verified, deploy will be skipped."
+            echo "REMOTE_KEY is not configured yet. Build will be verified, remote deploy will be skipped."
           fi
 
       - name: Install dependencies
@@ -49,7 +48,7 @@ jobs:
       - name: Build production bundle
         run: npm run build
         env:
-          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_SITE_URL: https://baukostenradar.de
 
       - name: Assemble standalone bundle
         shell: bash
@@ -76,18 +75,16 @@ jobs:
           REMOTE_KEY: ${{ secrets.REMOTE_KEY }}
         run: |
           mkdir -p ~/.ssh
-          printf '%s\n' "$REMOTE_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -p "$REMOTE_PORT" -H "$REMOTE_HOST" >> ~/.ssh/known_hosts
+          printf '%s\n' "$REMOTE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p 22 -H "$REMOTE_HOST" >> ~/.ssh/known_hosts
 
       - name: Deploy standalone bundle
         if: steps.deploy_config.outputs.ready == 'true'
         shell: bash
-        env:
-          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
         run: |
-          ssh -p "$REMOTE_PORT" "$REMOTE_USER@$REMOTE_HOST" "mkdir -p '$REMOTE_PATH'"
-          rsync -az --delete -e "ssh -p $REMOTE_PORT" --exclude='.env*' .next/standalone/ "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/"
+          ssh -p 22 "$REMOTE_USER@$REMOTE_HOST" "mkdir -p '$REMOTE_PATH'"
+          rsync -az --delete -e 'ssh -p 22' --exclude='.env*' .next/standalone/ "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/"
 
       - name: Restart Node.js application through adm.tools API
         if: steps.deploy_config.outputs.ready == 'true'
