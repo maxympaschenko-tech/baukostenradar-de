@@ -50,6 +50,7 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
     ? "Badsanierungskosten berechnen"
     : "Handwerkerkosten berechnen";
   const technicalRenovationSlugs = new Set(["elektriker", "sanitaer", "heizung", "fenster", "dachsanierung", "daemmung", "fassade"]);
+  const houseProjectSlugs = new Set(["fenster", "dachsanierung", "daemmung", "fassade", "heizung", "waermepumpe", "photovoltaik"]);
   const hasHourlyPrice = service.priceItems.some((item) => item.unit.toLowerCase().includes("stunde"));
   const relatedGuides = [
     {
@@ -59,15 +60,22 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
     },
     technicalRenovationSlugs.has(service.slug)
       ? {
-          label: "Altbausanierung Kosten 2026",
-          href: "/ratgeber/altbausanierung-kosten",
-          description: "Technische Gewerke und typische Budgetstufen im Altbau verstehen.",
+          label: "Kernsanierung Kosten 2026",
+          href: "/ratgeber/kernsanierung-kosten",
+          description: "Technische Gewerke im Gesamtbudget einer umfassenden Sanierung einordnen.",
         }
       : {
           label: "Wohnung renovieren Kosten 2026",
           href: "/ratgeber/wohnung-renovieren-kosten",
           description: "Beispielbudgets für 60, 80 und 100 m² Wohnfläche vergleichen.",
         },
+    ...(houseProjectSlugs.has(service.slug)
+      ? [{
+          label: "Sanierungskosten Einfamilienhaus 2026",
+          href: "/ratgeber/sanierungskosten-einfamilienhaus",
+          description: "Gebäudehülle, Haustechnik und Innenausbau im Hausbudget zusammenführen.",
+        }]
+      : []),
     ...(hasHourlyPrice
       ? [{
           label: "Handwerker-Stundensätze 2026",
