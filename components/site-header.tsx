@@ -1,11 +1,10 @@
 import Link from "next/link";
 
 const nav = [
-  ["Kosten", "/kosten/badsanierung"],
+  ["Kosten", "/kosten"],
   ["Rechner", "/rechner/renovierungskosten"],
-  ["Städte", "/#staedte"],
-  ["Förderung", "/#foerderung"],
-  ["Ratgeber", "/#ratgeber"],
+  ["Städte", "/staedte"],
+  ["Methodik", "/methodik"],
 ] as const;
 
 export function SiteHeader() {
