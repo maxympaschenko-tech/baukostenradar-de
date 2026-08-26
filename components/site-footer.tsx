@@ -23,6 +23,7 @@ export function SiteFooter() {
           <Link href="/angebot">Projekt anfragen</Link>
           <Link href="/staedte">Städte</Link>
           <Link href="/methodik">Methodik & Quellen</Link>
+          <Link href="/ueber-uns">Über BauKostenRadar</Link>
           <Link href="/kontakt">Kontakt</Link>
         </div>
         <div>
