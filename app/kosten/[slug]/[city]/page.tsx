@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { priceItemSlug } from "@/lib/price-slug";
 import { getRegion, getService, priceSources, regions, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
 
@@ -147,7 +148,9 @@ export default async function LocalCostPage({
                   {service.priceItems.map((item) => (
                     <tr key={item.name}>
                       <td>
-                        <strong>{item.name}</strong>
+                        <Link className="priceItemLink" href={`/kosten/${service.slug}/leistung/${priceItemSlug(item.name)}`}>
+                          {item.name}
+                        </Link>
                         {item.note ? <small>{item.note}</small> : null}
                       </td>
                       <td><strong>{priceRange(item.low * region.factor, item.high * region.factor)}</strong></td>
