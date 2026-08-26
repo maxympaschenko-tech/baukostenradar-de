@@ -37,9 +37,17 @@ export default function RenovationCalculatorPage() {
               <strong>Sanierungskosten pro m² 2026</strong>
               <span>Alle vier Kostenstufen mit Beispielen vergleichen</span>
             </Link>
-            <Link href="/ratgeber/wohnung-renovieren-kosten">
-              <strong>Wohnung renovieren: Kosten 2026</strong>
-              <span>Beispiele für 60, 80 und 100 m²</span>
+            <Link href="/ratgeber/kernsanierung-kosten">
+              <strong>Kernsanierung Kosten 2026</strong>
+              <span>1.500 bis 3.500 €/m² und konkrete Flächenbeispiele</span>
+            </Link>
+            <Link href="/ratgeber/renovierungskosten-100-qm">
+              <strong>Renovierungskosten 100 m²</strong>
+              <span>Budgetspannen für 100 m² nach Sanierungsumfang</span>
+            </Link>
+            <Link href="/ratgeber/sanierungskosten-einfamilienhaus">
+              <strong>Sanierungskosten Einfamilienhaus</strong>
+              <span>Gebäudehülle, Haustechnik und Innenausbau getrennt einordnen</span>
             </Link>
             <Link href="/ratgeber/altbausanierung-kosten">
               <strong>Altbausanierung Kosten 2026</strong>
