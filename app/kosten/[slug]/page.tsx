@@ -89,9 +89,43 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
       description: "Sanitärarbeiten im Budget einer vollständigen Badsanierung einordnen.",
     },
   };
+  const scenarioGuideByService: Record<string, { label: string; href: string; description: string }> = {
+    dachsanierung: {
+      label: "Dach 150 m² Kosten 2026",
+      href: "/ratgeber/dach-150-qm-kosten",
+      description: "Konkretes Beispielbudget für 150 m² Dachfläche berechnen.",
+    },
+    fenster: {
+      label: "20 Fenster austauschen Kosten 2026",
+      href: "/ratgeber/20-fenster-austauschen-kosten",
+      description: "Zwei- und Dreifachverglasung für 20 Standardfenster inklusive Einbau vergleichen.",
+    },
+    elektriker: {
+      label: "Elektrik bei 100 m² erneuern 2026",
+      href: "/ratgeber/elektrik-erneuern-100-qm-kosten",
+      description: "Projektkosten für eine 100-m²-Größe ohne erfundenen Quadratmeterpreis einordnen.",
+    },
+    heizung: {
+      label: "Fußbodenheizung 100 m² Kosten 2026",
+      href: "/ratgeber/fussbodenheizung-100-qm-kosten",
+      description: "Das Nachrüsten von 100 m² Fußbodenheizung konkret durchrechnen.",
+    },
+    badsanierung: {
+      label: "Bad 10 m² sanieren Kosten 2026",
+      href: "/ratgeber/bad-10-qm-sanieren-kosten",
+      description: "Quadratmeter-Richtwert und Komplettspanne für ein 10-m²-Bad vergleichen.",
+    },
+    sanitaer: {
+      label: "Bad 10 m² sanieren Kosten 2026",
+      href: "/ratgeber/bad-10-qm-sanieren-kosten",
+      description: "Sanitärarbeiten im konkreten Beispiel eines 10-m²-Bads einordnen.",
+    },
+  };
   const directTradeGuide = tradeGuideByService[service.slug];
+  const directScenarioGuide = scenarioGuideByService[service.slug];
   const relatedGuides = [
     ...(directTradeGuide ? [directTradeGuide] : []),
+    ...(directScenarioGuide ? [directScenarioGuide] : []),
     {
       label: "Sanierungskosten pro m² 2026",
       href: "/ratgeber/sanierungskosten-pro-qm",
