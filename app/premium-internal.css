@@ -33,6 +33,35 @@
 
 .contentHero p { max-width: 850px; color: #60717f; }
 
+.visibleBreadcrumbs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0 0 22px;
+  color: #71828e;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.visibleBreadcrumbs a {
+  color: #315c7b;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.visibleBreadcrumbs a:hover {
+  color: #07518d;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.visibleBreadcrumbs [aria-current="page"] {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: #71828e;
+}
+
 .guideMeta {
   display: flex;
   flex-wrap: wrap;
@@ -54,6 +83,89 @@
 
 .contentGrid,
 .articleShell { position: relative; }
+
+.articleSection {
+  scroll-margin-top: 92px;
+}
+
+.guideSummary {
+  border-top: 4px solid #f2b400;
+  background: linear-gradient(135deg, #fff 0%, #fbfcf7 100%);
+}
+
+.summaryFacts {
+  display: grid;
+  gap: 10px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.summaryFacts li {
+  position: relative;
+  padding: 12px 14px 12px 42px;
+  border: 1px solid #e0e7dc;
+  border-radius: 10px;
+  background: rgba(255,255,255,.78);
+  color: #465966;
+}
+
+.summaryFacts li::before {
+  content: "✓";
+  position: absolute;
+  left: 15px;
+  top: 12px;
+  color: #167049;
+  font-weight: 900;
+}
+
+.summaryFacts strong { color: #243846; }
+
+.guideToc {
+  background: #f7fafc;
+}
+
+.guideToc ol {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 28px;
+  margin: 18px 0 0;
+  padding-left: 22px;
+}
+
+.guideToc li {
+  padding-left: 4px;
+  color: #6b7c88;
+}
+
+.guideToc a {
+  color: #123e61;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.guideToc a:hover {
+  color: #07518d;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.relatedGuideList a {
+  align-items: flex-start;
+}
+
+.relatedType {
+  display: inline-flex;
+  width: fit-content;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #e9f3f9;
+  color: #07518d !important;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
 
 .contentCard,
 .directoryCard,
@@ -261,6 +373,10 @@
   .contentHero { padding: 48px 0 30px; }
   .contentHero::after { right: 0; width: 120px; }
   .contentCard { padding: 21px; }
+  .visibleBreadcrumbs { margin-bottom: 18px; font-size: 12px; }
   .guideMeta { display: grid; gap: 6px; }
-  .guideBullets li { padding-left: 38px; }
+  .guideBullets li,
+  .summaryFacts li { padding-left: 38px; }
+  .guideToc ol { grid-template-columns: 1fr; gap: 9px; padding-left: 20px; }
+  .articleSection { scroll-margin-top: 76px; }
 }
