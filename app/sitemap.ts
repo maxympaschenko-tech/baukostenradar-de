@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { guides } from "@/lib/guides";
 import { priceItemSlug } from "@/lib/price-slug";
 import { regions, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
@@ -27,6 +28,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: contentUpdatedAt,
       changeFrequency: "weekly",
       priority: 0.92,
+    },
+    {
+      url: `${base}/ratgeber`,
+      lastModified: contentUpdatedAt,
+      changeFrequency: "weekly",
+      priority: 0.9,
     },
     {
       url: `${base}/rechner/renovierungskosten`,
@@ -70,6 +77,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.5,
     },
+    ...guides.map((guide) => ({
+      url: `${base}/ratgeber/${guide.slug}`,
+      lastModified: contentUpdatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.86,
+    })),
     ...services.map((service) => ({
       url: `${base}/kosten/${service.slug}`,
       lastModified: contentUpdatedAt,
