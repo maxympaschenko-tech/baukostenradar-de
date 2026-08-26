@@ -48,6 +48,33 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
   const serviceCalculatorLabel = service.slug === "badsanierung"
     ? "Badsanierungskosten berechnen"
     : "Handwerkerkosten berechnen";
+  const technicalRenovationSlugs = new Set(["elektriker", "sanitaer", "heizung", "fenster", "dachsanierung", "daemmung", "fassade"]);
+  const hasHourlyPrice = service.priceItems.some((item) => item.unit.toLowerCase().includes("stunde"));
+  const relatedGuides = [
+    {
+      label: "Sanierungskosten pro m² 2026",
+      href: "/ratgeber/sanierungskosten-pro-qm",
+      description: "Gesamtbudgets von leichter Renovierung bis Kernsanierung einordnen.",
+    },
+    technicalRenovationSlugs.has(service.slug)
+      ? {
+          label: "Altbausanierung Kosten 2026",
+          href: "/ratgeber/altbausanierung-kosten",
+          description: "Technische Gewerke und typische Budgetstufen im Altbau verstehen.",
+        }
+      : {
+          label: "Wohnung renovieren Kosten 2026",
+          href: "/ratgeber/wohnung-renovieren-kosten",
+          description: "Beispielbudgets für 60, 80 und 100 m² Wohnfläche vergleichen.",
+        },
+    ...(hasHourlyPrice
+      ? [{
+          label: "Handwerker-Stundensätze 2026",
+          href: "/ratgeber/handwerker-stundensaetze",
+          description: "Stundensätze ausgewählter Gewerke und ihre Bestandteile vergleichen.",
+        }]
+      : []),
+  ];
 
   const faqs = [
     {
@@ -176,6 +203,24 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
                 </div>
               ))}
             </div>
+          </section>
+
+          <section className="contentCard">
+            <span className="eyebrow">Ratgeber</span>
+            <h2>{service.shortTitle} im Gesamtbudget einordnen</h2>
+            <p>
+              Einzelpreise werden aussagekräftiger, wenn sie mit dem gesamten Renovierungsumfang verglichen werden.
+              Diese Ratgeber vertiefen die wichtigsten übergeordneten Kostenfragen.
+            </p>
+            <div className="sourceList">
+              {relatedGuides.map((guide) => (
+                <Link key={guide.href} href={guide.href}>
+                  <strong>{guide.label}</strong>
+                  <span>{guide.description}</span>
+                </Link>
+              ))}
+            </div>
+            <Link className="textLink" href="/ratgeber">Alle Ratgeber ansehen →</Link>
           </section>
 
           <section className="contentCard">
