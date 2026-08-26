@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 
 type Option = { value: string; label: string };
+type SubmitStatus = "idle" | "sending" | "success" | "fallback";
 
 type Props = {
   services: Option[];
@@ -47,6 +48,9 @@ export function ProjectRequestForm({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [website, setWebsite] = useState("");
+  const [startedAt] = useState(() => Date.now());
+  const [status, setStatus] = useState<SubmitStatus>("idle");
 
   const serviceLabel = useMemo(
     () => services.find((item) => item.value === service)?.label ?? service,
@@ -57,9 +61,7 @@ export function ProjectRequestForm({
     [city, cities],
   );
 
-  function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
+  function mailtoFallback() {
     const subject = `Projektanfrage: ${serviceLabel} - ${cityLabel}`;
     const body = [
       "Neue Projektanfrage über BauKostenRadar",
@@ -72,7 +74,7 @@ export function ProjectRequestForm({
       `Quelle: ${source || "direkter Aufruf"}`,
       "",
       "Projektbeschreibung:",
-      details || "Keine zusätzliche Beschreibung.",
+      details,
       "",
       "Kontaktdaten:",
       `Name: ${name}`,
@@ -94,6 +96,70 @@ export function ProjectRequestForm({
     });
 
     window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (status === "sending") return;
+    setStatus("sending");
+
+    try {
+      const response = await fetch("/api/project-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          service,
+          city,
+          postcode,
+          budget,
+          timing,
+          details,
+          name,
+          email,
+          phone,
+          source: source || "direct",
+          website,
+          startedAt,
+        }),
+      });
+
+      if (!response.ok) throw new Error("request_failed");
+      const result = (await response.json()) as { ok?: boolean };
+      if (!result.ok) throw new Error("request_failed");
+
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "bkr_generate_lead",
+        project_service: service,
+        project_city: city,
+        project_source: source || "direct",
+      });
+      window.gtag?.("event", "generate_lead", {
+        project_service: service,
+        project_city: city,
+        project_source: source || "direct",
+      });
+      setStatus("success");
+    } catch {
+      setStatus("fallback");
+      mailtoFallback();
+    }
+  }
+
+  if (status === "success") {
+    return (
+      <div className="requestSuccess" role="status">
+        <span className="eyebrow">Anfrage gesendet</span>
+        <h3>Vielen Dank für Ihre Projektanfrage.</h3>
+        <p>
+          Die Angaben wurden an BauKostenRadar übermittelt und werden in der Pilotphase manuell geprüft.
+          Eine Vermittlung oder ein verbindliches Handwerkerangebot ist damit noch nicht garantiert.
+        </p>
+        <button className="ghostButton requestResetButton" type="button" onClick={() => setStatus("idle")}>
+          Weitere Anfrage senden
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -124,6 +190,7 @@ export function ProjectRequestForm({
             onChange={(event) => setPostcode(event.target.value)}
             inputMode="numeric"
             autoComplete="postal-code"
+            pattern="[0-9]{5}"
             placeholder="z. B. 80331"
           />
         </label>
@@ -157,6 +224,7 @@ export function ProjectRequestForm({
             value={details}
             onChange={(event) => setDetails(event.target.value)}
             rows={6}
+            maxLength={2500}
             placeholder="Was soll gemacht werden? Fläche, Zustand, Materialwünsche oder Besonderheiten helfen bei der Einordnung."
             required
           />
@@ -164,7 +232,7 @@ export function ProjectRequestForm({
 
         <label>
           <span>Name</span>
-          <input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" required />
+          <input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" maxLength={120} required />
         </label>
 
         <label>
@@ -174,6 +242,7 @@ export function ProjectRequestForm({
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             autoComplete="email"
+            maxLength={254}
             required
           />
         </label>
@@ -185,20 +254,39 @@ export function ProjectRequestForm({
             value={phone}
             onChange={(event) => setPhone(event.target.value)}
             autoComplete="tel"
+            maxLength={80}
             placeholder="Für Rückfragen"
+          />
+        </label>
+
+        <label className="formHoneypot" aria-hidden="true">
+          <span>Website</span>
+          <input
+            value={website}
+            onChange={(event) => setWebsite(event.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
           />
         </label>
       </div>
 
+      {status === "fallback" ? (
+        <p className="requestFallback" role="status">
+          Die direkte Übermittlung war nicht möglich. Deshalb wurde als Ersatz Ihr E-Mail-Programm geöffnet.
+        </p>
+      ) : null}
+
       <div className="requestSubmitRow">
         <div>
-          <strong>Datenschutzfreundlicher Pilot</strong>
+          <strong>Direkte Übermittlung an BauKostenRadar</strong>
           <p>
-            Beim Klick wird eine vorbereitete E-Mail in Ihrem Mailprogramm geöffnet. Die Formulardaten werden nicht
-            automatisch an unseren Server übertragen. Erst wenn Sie die E-Mail absenden, erhalten wir Ihre Anfrage.
+            Ihre Angaben werden verschlüsselt an unseren Server übertragen und als E-Mail an BauKostenRadar zugestellt.
+            Eine automatische Weitergabe an Handwerksbetriebe findet in der Pilotphase nicht statt.
           </p>
         </div>
-        <button className="primaryButton requestSubmitButton" type="submit">Anfrage als E-Mail vorbereiten</button>
+        <button className="primaryButton requestSubmitButton" type="submit" disabled={status === "sending"}>
+          {status === "sending" ? "Wird gesendet..." : "Projektanfrage senden"}
+        </button>
       </div>
     </form>
   );
