@@ -85,6 +85,11 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
           <span className="eyebrow">{guide.eyebrow}</span>
           <h1>{guide.h1}</h1>
           <p>{guide.intro}</p>
+          <div className="guideMeta" aria-label="Redaktionelle Angaben">
+            <span><strong>Redaktion:</strong> <Link href="/ueber-uns">BauKostenRadar</Link></span>
+            <span><strong>Aktualisiert:</strong> 26. August 2026</span>
+            <span><strong>Datenbasis:</strong> Quellen + transparentes Kostenmodell</span>
+          </div>
           <div className="heroFacts">
             <span><strong>2026</strong> Datenstand</span>
             <span><strong>Richtwerte</strong> statt Preisversprechen</span>
