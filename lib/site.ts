@@ -6,6 +6,7 @@ export const siteConfig = {
   email: "info@baukostenradar.de",
   phone: "+380986274067",
   phoneDisplay: "+380 98 627 40 67",
+  googleTagManagerId: "GTM-WCPZ9WFT",
   operator: {
     name: "Maksym Pashchenko",
     addressLine: "Mazepy Street 13a/210",
