@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import type { FormEvent } from "react";
 
 type Option = { value: string; label: string };
 
@@ -8,6 +9,8 @@ type Props = {
   services: Option[];
   cities: Option[];
   recipient: string;
+  initialService?: string;
+  initialCity?: string;
 };
 
 declare global {
@@ -16,9 +19,16 @@ declare global {
   }
 }
 
-export function ProjectRequestForm({ services, cities, recipient }: Props) {
-  const [service, setService] = useState(services[0]?.value ?? "");
-  const [city, setCity] = useState(cities[0]?.value ?? "");
+export function ProjectRequestForm({ services, cities, recipient, initialService, initialCity }: Props) {
+  const validInitialService = services.some((item) => item.value === initialService)
+    ? initialService
+    : services[0]?.value;
+  const validInitialCity = cities.some((item) => item.value === initialCity)
+    ? initialCity
+    : cities[0]?.value;
+
+  const [service, setService] = useState(validInitialService ?? "");
+  const [city, setCity] = useState(validInitialCity ?? "");
   const [postcode, setPostcode] = useState("");
   const [budget, setBudget] = useState("Noch offen");
   const [timing, setTiming] = useState("In den nächsten 3 Monaten");
