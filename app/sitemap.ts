@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { guides } from "@/lib/guides";
+import { allGuides } from "@/lib/all-guides";
 import { priceItemSlug } from "@/lib/price-slug";
 import { regions, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
@@ -77,7 +77,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.5,
     },
-    ...guides.map((guide) => ({
+    ...allGuides.map((guide) => ({
       url: `${base}/ratgeber/${guide.slug}`,
       lastModified: contentUpdatedAt,
       changeFrequency: "monthly" as const,
