@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { priceSources } from "@/lib/pricing";
+import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Methodik und Datenquellen",
@@ -67,6 +68,14 @@ export default function MethodologyPage() {
             Renovierungsumfänge und wendet Qualitäts- und Regionalfaktoren an. Die Aufteilung in Arbeit,
             Material und Reserve ist eine Modellierung für die Budgetplanung und keine Aussage über ein
             konkretes Handwerkerangebot.
+          </p>
+        </section>
+
+        <section className="contentCard proseCard">
+          <h2>6. Fehler oder aktuellere Daten gefunden?</h2>
+          <p>
+            Hinweise zu veralteten Preisen, fehlerhaften Einheiten oder besseren Primärquellen sind willkommen.
+            Schreiben Sie mit der betroffenen URL und Quelle an <a className="textLink" href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>.
           </p>
         </section>
       </div>
