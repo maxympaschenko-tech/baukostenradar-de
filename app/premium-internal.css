@@ -1,0 +1,202 @@
+/* Premium styling for internal pages without changing their structure */
+.contentHero {
+  position: relative;
+  overflow: hidden;
+  padding: 64px 0 42px;
+  background:
+    radial-gradient(circle at 82% 18%, rgba(115,184,230,.18), transparent 28%),
+    linear-gradient(180deg,#fff 0%,#f6f9fb 100%);
+  border-bottom: 1px solid #e6edf2;
+}
+
+.contentHero::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 8%;
+  width: 220px;
+  height: 4px;
+  background: #f2b400;
+}
+
+.contentHero .eyebrow {
+  background: #e9f3f9;
+  color: #07518d;
+}
+
+.contentHero h1 {
+  max-width: 900px;
+  color: #101b2d;
+  font-weight: 850;
+  letter-spacing: -.045em;
+}
+
+.contentHero p { max-width: 850px; color: #60717f; }
+
+.contentGrid,
+.articleShell { position: relative; }
+
+.contentCard,
+.directoryCard,
+.cityServiceCard {
+  border-color: #dfe7ec;
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(25,45,61,.035);
+}
+
+.contentCard h2,
+.directoryCard h2,
+.cityServiceCard h2 { color: #172333; letter-spacing: -.025em; }
+
+.contentCard .eyebrow,
+.directoryCard .eyebrow {
+  background: #eef5fa;
+  color: #07518d;
+}
+
+.calculator {
+  border-color: #dce5eb;
+  border-radius: 16px;
+  box-shadow: 0 15px 45px rgba(25,45,61,.075);
+}
+
+.calculatorHeading h2 {
+  color: #172333;
+  font-weight: 850;
+  letter-spacing: -.035em;
+}
+
+.formGrid input,
+.formGrid select,
+.projectRequestForm .formGrid textarea {
+  border-color: #cbd8e1;
+  border-radius: 8px;
+}
+
+.formGrid input:focus,
+.formGrid select:focus,
+.projectRequestForm .formGrid textarea:focus {
+  border-color: #0b5d99;
+  outline: 3px solid rgba(11,93,153,.10);
+}
+
+.resultBox {
+  border-color: #bcd9cb;
+  border-radius: 12px;
+  background: #eff8f3;
+}
+
+.resultBox strong { color: #167049; }
+
+.primaryButton,
+.secondaryButton,
+.ghostButton,
+.requestSubmitButton {
+  min-height: 50px;
+  border-radius: 7px;
+  font-weight: 850;
+}
+
+.primaryButton,
+.requestSubmitButton {
+  background: #06447d;
+  color: #fff;
+}
+
+.primaryButton:hover,
+.requestSubmitButton:hover { background: #053968; }
+
+.secondaryButton {
+  background: #f2b400;
+  color: #172333;
+}
+
+.ghostButton {
+  border-color: #cbd8e1;
+  color: #123e61;
+}
+
+.priceTableWrap {
+  border: 1px solid #e0e7ec;
+  border-radius: 11px;
+  overflow-x: auto;
+}
+
+.priceTable th {
+  background: #f3f7fa;
+  color: #526674;
+}
+
+.priceTable th,
+.priceTable td { padding: 15px 14px; }
+.priceTable tbody tr:last-child td { border-bottom: 0; }
+.priceTable tbody tr:hover { background: #fbfcfd; }
+.priceTable td:nth-child(2) strong { color: #167049; }
+
+.regionChips .regionChip,
+.regionChips span {
+  border-color: #d9e4ea;
+  border-radius: 8px;
+  background: #f6f9fb;
+}
+
+.regionChips .regionChip:hover {
+  border-color: #adc4d3;
+  color: #07518d;
+}
+
+.sourceList a,
+.faqItem {
+  border-color: #dfe7ec;
+  border-radius: 10px;
+  background: #fafcfd;
+}
+
+.sourceList a:hover {
+  border-color: #bdd0dc;
+  background: #fff;
+}
+
+.directoryCard {
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+
+.directoryCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 42px rgba(25,45,61,.08);
+}
+
+.serviceIcon {
+  border-radius: 10px;
+  background: #edf5fa;
+  color: #07518d;
+}
+
+.cityCard,
+.cityServiceCard {
+  border-color: #dfe7ec;
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+
+.cityCard:hover,
+.cityServiceCard:hover {
+  transform: translateY(-2px);
+  border-color: #c1d3df;
+  box-shadow: 0 14px 34px rgba(25,45,61,.07);
+}
+
+.ctaPanel {
+  border-radius: 15px;
+  background: linear-gradient(115deg,#083a68,#0b568f);
+  box-shadow: 0 22px 50px rgba(6,68,125,.16);
+}
+
+.notice {
+  border-radius: 10px;
+}
+
+@media (max-width: 620px) {
+  .contentHero { padding: 48px 0 30px; }
+  .contentHero::after { right: 0; width: 120px; }
+  .contentCard { padding: 21px; }
+}
