@@ -231,6 +231,13 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
 
       <section className="contentHero">
         <div className="shell">
+          <nav className="visibleBreadcrumbs" aria-label="Breadcrumb">
+            <Link href="/">Startseite</Link>
+            <span aria-hidden="true">›</span>
+            <Link href="/kosten">Handwerker Kosten</Link>
+            <span aria-hidden="true">›</span>
+            <span aria-current="page">{service.shortTitle}</span>
+          </nav>
           <span className="eyebrow">Preisstand August 2026</span>
           <h1>{service.title}</h1>
           <p>{service.description}</p>
