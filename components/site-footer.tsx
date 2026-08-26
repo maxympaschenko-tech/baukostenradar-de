@@ -27,7 +27,6 @@ export function SiteFooter() {
           <Link href="/rechner">Kostenrechner</Link>
           <Link href="/rechner/badsanierungskosten">Badsanierungskosten-Rechner</Link>
           <Link href="/rechner/renovierungskosten">Renovierungskosten-Rechner</Link>
-          <Link href="/angebot">Projekt anfragen</Link>
           <Link href="/staedte">Städte</Link>
           <Link href="/methodik">Methodik & Quellen</Link>
           <Link href="/ueber-uns">Über BauKostenRadar</Link>
