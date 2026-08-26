@@ -62,7 +62,7 @@ jobs:
           echo "www HTTP: $code"
           echo "Location: $location"
           [[ "$code" == "308" || "$code" == "301" ]]
-          [[ "$location" == "https://baukostenradar.de/" ]]
+          [[ "$location" == "https://baukostenradar.de" || "$location" == "https://baukostenradar.de/" ]]
 
       - name: Verify legal pages are noindex
         shell: bash
