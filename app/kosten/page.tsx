@@ -3,8 +3,8 @@ import Link from "next/link";
 import { services } from "@/lib/pricing";
 
 export const metadata: Metadata = {
-  title: "Handwerker Kosten 2026 - Preisspiegel Deutschland",
-  description: "Aktuelle Richtwerte für Maler, Fliesenleger, Elektriker, Badsanierung, Dachsanierung und Bodenarbeiten in Deutschland.",
+  title: "Handwerker Kosten 2026 - Preise für 11 Gewerke",
+  description: "Aktuelle Handwerkerpreise 2026 für Maler, Fliesenleger, Elektriker, Trockenbau, Sanitär, Wärmepumpe, Photovoltaik, Dämmung und weitere Gewerke in Deutschland.",
   alternates: { canonical: "/kosten" },
 };
 
@@ -16,14 +16,25 @@ function euro(value: number) {
   }).format(value);
 }
 
+function priceRange(low: number, high: number) {
+  return low === high ? euro(low) : `${euro(low)} - ${euro(high)}`;
+}
+
 export default function CostsPage() {
+  const priceCount = services.reduce((sum, service) => sum + service.priceItems.length, 0);
+
   return (
     <>
       <section className="contentHero">
         <div className="shell">
-          <span className="eyebrow">Preisspiegel Deutschland</span>
+          <span className="eyebrow">Preisspiegel Deutschland - Stand August 2026</span>
           <h1>Handwerker Kosten 2026</h1>
-          <p>Aktuelle Richtwerte für häufige Renovierungs- und Sanierungsarbeiten, strukturiert nach Leistung und Einheit.</p>
+          <p>{services.length} Kostenbereiche mit {priceCount} aktuellen Preispositionen für Renovierung, Sanierung und Haustechnik.</p>
+          <div className="heroFacts">
+            <span><strong>{services.length}</strong> Gewerke</span>
+            <span><strong>{priceCount}</strong> Preispositionen</span>
+            <span><strong>2026</strong> aktuelle Richtwerte</span>
+          </div>
         </div>
       </section>
 
@@ -43,7 +54,7 @@ export default function CostsPage() {
                   {service.priceItems.slice(0, 3).map((item) => (
                     <div key={item.name}>
                       <span>{item.name}</span>
-                      <strong>{euro(item.low)} - {euro(item.high)}</strong>
+                      <strong>{priceRange(item.low, item.high)}</strong>
                       <small>{item.unit}</small>
                     </div>
                   ))}
