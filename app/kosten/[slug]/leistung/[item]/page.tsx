@@ -66,7 +66,6 @@ export default async function PriceItemPage({
   const canonicalUrl = `${base}/kosten/${service.slug}/leistung/${itemSlug}`;
   const cityRegions = regions.filter((region) => region.value !== "de");
   const relatedItems = service.priceItems.filter((candidate) => candidate.name !== item.name).slice(0, 5);
-  const requestUrl = `/angebot?leistung=${encodeURIComponent(service.slug)}&position=${encodeURIComponent(item.name)}&quelle=${encodeURIComponent(`preisposition:${service.slug}:${itemSlug}`)}`;
 
   const faqs = [
     {
@@ -144,20 +143,8 @@ export default async function PriceItemPage({
           </p>
           <div className="heroActions">
             <Link className="primaryButton" href="/rechner/handwerkerkosten">Eigene Kosten berechnen</Link>
-            <Link className="secondaryButton" href={requestUrl}>{item.name} anfragen</Link>
             <Link className="ghostButton" href={`/kosten/${service.slug}`}>Alle {service.shortTitle}-Preise</Link>
           </div>
-        </section>
-
-        <section className="contentCard proseCard">
-          <span className="eyebrow">Projektanfrage</span>
-          <h2>{item.name} konkret geplant?</h2>
-          <p>
-            Die Projektanfrage übernimmt diese konkrete Arbeit bereits in die Beschreibung. Sie ergänzen nur noch
-            Standort, Budget, Zeitraum und die projektspezifischen Details. So bleibt der ursprüngliche Preisvergleich
-            bis zur Anfrage nachvollziehbar.
-          </p>
-          <Link className="primaryButton" href={requestUrl}>Projektanfrage vorbereiten</Link>
         </section>
 
         <section className="contentCard proseCard">
