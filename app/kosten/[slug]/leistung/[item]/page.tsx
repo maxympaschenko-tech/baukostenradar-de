@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getCalculationExample, getOfferChecks } from "@/lib/price-guidance";
 import { getPriceItem, priceItemSlug } from "@/lib/price-slug";
 import { getService, priceSources, regions, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
@@ -66,6 +67,8 @@ export default async function PriceItemPage({
   const canonicalUrl = `${base}/kosten/${service.slug}/leistung/${itemSlug}`;
   const cityRegions = regions.filter((region) => region.value !== "de");
   const relatedItems = service.priceItems.filter((candidate) => candidate.name !== item.name).slice(0, 5);
+  const calculationExample = getCalculationExample(item);
+  const offerChecks = getOfferChecks(item);
 
   const faqs = [
     {
@@ -156,6 +159,25 @@ export default async function PriceItemPage({
           </div>
         </section>
 
+        {calculationExample && (
+          <section className="contentCard proseCard">
+            <span className="eyebrow">Beispielrechnung</span>
+            <h2>{item.name}: Beispiel für {calculationExample.quantityLabel}</h2>
+            <p>
+              Wird der bundesweite Richtwert direkt auf <strong>{calculationExample.quantityLabel}</strong> hochgerechnet,
+              ergibt sich eine rechnerische Spanne von <strong>{priceRange(calculationExample.low, calculationExample.high)}</strong>.
+            </p>
+            <div className="heroFacts">
+              <span><strong>{calculationExample.quantityLabel}</strong> Beispielmenge</span>
+              <span><strong>{priceRange(item.low, item.high)}</strong> {item.unit}</span>
+              <span><strong>{priceRange(calculationExample.low, calculationExample.high)}</strong> rechnerisch gesamt</span>
+            </div>
+            <p className="tableNote">
+              Rechenbeispiel ohne regionalen Faktor und ohne zusätzliche Leistungen. Es ist kein Angebot und ersetzt keine konkrete Aufmaß- oder Projektkalkulation.
+            </p>
+          </section>
+        )}
+
         <section className="contentCard proseCard">
           <span className="eyebrow">Regionalmodell</span>
           <h2>{item.name} nach Stadt</h2>
@@ -206,6 +228,23 @@ export default async function PriceItemPage({
             <div className="faqItem"><h3>Bestand und Vorarbeiten</h3><p>Demontage, Ausgleich, Reparaturen, Schutzmaßnahmen oder Entsorgung können zusätzliche Kosten verursachen.</p></div>
             <div className="faqItem"><h3>Material und Ausführung</h3><p>Standardprodukte und einfache Ausführung liegen meist niedriger als Premium-Materialien oder Sonderlösungen.</p></div>
             <div className="faqItem"><h3>Region und Verfügbarkeit</h3><p>Lokales Lohnniveau, Auftragslage und Anfahrtswege können den Endpreis spürbar verändern.</p></div>
+          </div>
+        </section>
+
+        <section className="contentCard proseCard">
+          <span className="eyebrow">Angebote vergleichen</span>
+          <h2>Was sollte bei {item.name} im Angebot klar sein?</h2>
+          <p>
+            Ein niedriger Endpreis allein sagt wenig aus. Für einen fairen Vergleich sollten mehrere Angebote dieselbe
+            Menge, denselben Leistungsumfang und dieselben Nebenarbeiten abdecken. Diese Punkte helfen bei der Prüfung:
+          </p>
+          <div className="faqList">
+            {offerChecks.map((check) => (
+              <div className="faqItem" key={check.title}>
+                <h3>{check.title}</h3>
+                <p>{check.text}</p>
+              </div>
+            ))}
           </div>
         </section>
 
