@@ -1,0 +1,177 @@
+"use client";
+
+import { FormEvent, useMemo, useState } from "react";
+
+type Option = { value: string; label: string };
+
+type Props = {
+  services: Option[];
+  cities: Option[];
+  recipient: string;
+};
+
+declare global {
+  interface Window {
+    dataLayer?: unknown[];
+  }
+}
+
+export function ProjectRequestForm({ services, cities, recipient }: Props) {
+  const [service, setService] = useState(services[0]?.value ?? "");
+  const [city, setCity] = useState(cities[0]?.value ?? "");
+  const [postcode, setPostcode] = useState("");
+  const [budget, setBudget] = useState("Noch offen");
+  const [timing, setTiming] = useState("In den nächsten 3 Monaten");
+  const [details, setDetails] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
+  const serviceLabel = useMemo(
+    () => services.find((item) => item.value === service)?.label ?? service,
+    [service, services],
+  );
+  const cityLabel = useMemo(
+    () => cities.find((item) => item.value === city)?.label ?? city,
+    [city, cities],
+  );
+
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const subject = `Projektanfrage: ${serviceLabel} - ${cityLabel}`;
+    const body = [
+      "Neue Projektanfrage über BauKostenRadar",
+      "",
+      `Leistung: ${serviceLabel}`,
+      `Ort: ${cityLabel}`,
+      `PLZ: ${postcode || "nicht angegeben"}`,
+      `Budget: ${budget}`,
+      `Zeitrahmen: ${timing}`,
+      "",
+      "Projektbeschreibung:",
+      details || "Keine zusätzliche Beschreibung.",
+      "",
+      "Kontaktdaten:",
+      `Name: ${name}`,
+      `E-Mail: ${email}`,
+      `Telefon: ${phone || "nicht angegeben"}`,
+    ].join("\n");
+
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: "project_request_email",
+      project_service: service,
+      project_city: city,
+    });
+
+    window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+
+  return (
+    <form className="projectRequestForm" onSubmit={submit}>
+      <div className="formGrid">
+        <label>
+          <span>Gewünschte Leistung</span>
+          <select value={service} onChange={(event) => setService(event.target.value)} required>
+            {services.map((item) => (
+              <option key={item.value} value={item.value}>{item.label}</option>
+            ))}
+          </select>
+        </label>
+
+        <label>
+          <span>Stadt / Region</span>
+          <select value={city} onChange={(event) => setCity(event.target.value)} required>
+            {cities.map((item) => (
+              <option key={item.value} value={item.value}>{item.label}</option>
+            ))}
+          </select>
+        </label>
+
+        <label>
+          <span>Postleitzahl</span>
+          <input
+            value={postcode}
+            onChange={(event) => setPostcode(event.target.value)}
+            inputMode="numeric"
+            autoComplete="postal-code"
+            placeholder="z. B. 80331"
+          />
+        </label>
+
+        <label>
+          <span>Budget</span>
+          <select value={budget} onChange={(event) => setBudget(event.target.value)}>
+            <option>Noch offen</option>
+            <option>Bis 5.000 €</option>
+            <option>5.000 - 15.000 €</option>
+            <option>15.000 - 30.000 €</option>
+            <option>30.000 - 60.000 €</option>
+            <option>Über 60.000 €</option>
+          </select>
+        </label>
+
+        <label className="formFieldWide">
+          <span>Gewünschter Zeitraum</span>
+          <select value={timing} onChange={(event) => setTiming(event.target.value)}>
+            <option>So schnell wie möglich</option>
+            <option>In den nächsten 4 Wochen</option>
+            <option>In den nächsten 3 Monaten</option>
+            <option>In 3 - 6 Monaten</option>
+            <option>Nur Preisorientierung</option>
+          </select>
+        </label>
+
+        <label className="formFieldWide">
+          <span>Projekt kurz beschreiben</span>
+          <textarea
+            value={details}
+            onChange={(event) => setDetails(event.target.value)}
+            rows={6}
+            placeholder="Was soll gemacht werden? Fläche, Zustand, Materialwünsche oder Besonderheiten helfen bei der Einordnung."
+            required
+          />
+        </label>
+
+        <label>
+          <span>Name</span>
+          <input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" required />
+        </label>
+
+        <label>
+          <span>E-Mail</span>
+          <input
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            autoComplete="email"
+            required
+          />
+        </label>
+
+        <label className="formFieldWide">
+          <span>Telefon (optional)</span>
+          <input
+            type="tel"
+            value={phone}
+            onChange={(event) => setPhone(event.target.value)}
+            autoComplete="tel"
+            placeholder="Für Rückfragen"
+          />
+        </label>
+      </div>
+
+      <div className="requestSubmitRow">
+        <div>
+          <strong>Datenschutzfreundlicher Pilot</strong>
+          <p>
+            Beim Klick wird eine vorbereitete E-Mail in Ihrem Mailprogramm geöffnet. Die Formulardaten werden nicht
+            automatisch an unseren Server übertragen. Erst wenn Sie die E-Mail absenden, erhalten wir Ihre Anfrage.
+          </p>
+        </div>
+        <button className="primaryButton requestSubmitButton" type="submit">Anfrage als E-Mail vorbereiten</button>
+      </div>
+    </form>
+  );
+}
