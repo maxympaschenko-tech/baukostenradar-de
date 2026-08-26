@@ -14,6 +14,13 @@ export default function HandwerkerCostCalculatorPage() {
     <>
       <section className="contentHero">
         <div className="shell">
+          <nav className="visibleBreadcrumbs" aria-label="Breadcrumb">
+            <Link href="/">Startseite</Link>
+            <span aria-hidden="true">›</span>
+            <Link href="/rechner">Kostenrechner</Link>
+            <span aria-hidden="true">›</span>
+            <span aria-current="page">Handwerkerkosten</span>
+          </nav>
           <span className="eyebrow">Kostenrechner Deutschland</span>
           <h1>Handwerkerkosten Rechner 2026</h1>
           <p>
