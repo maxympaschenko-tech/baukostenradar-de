@@ -82,12 +82,12 @@ export function ProjectRequestForm({
 
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
-      event: "bkr_project_request_email",
+      event: "bkr_project_request_mailto_open",
       project_service: service,
       project_city: city,
       project_source: source || "direct",
     });
-    window.gtag?.("event", "project_request_email", {
+    window.gtag?.("event", "project_request_mailto_open", {
       project_service: service,
       project_city: city,
       project_source: source || "direct",
