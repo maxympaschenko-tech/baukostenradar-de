@@ -42,6 +42,13 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
     <>
       <section className="contentHero">
         <div className="shell">
+          <nav className="visibleBreadcrumbs" aria-label="Breadcrumb">
+            <Link href="/">Startseite</Link>
+            <span aria-hidden="true">›</span>
+            <Link href="/staedte">Städte</Link>
+            <span aria-hidden="true">›</span>
+            <span aria-current="page">{region.label}</span>
+          </nav>
           <span className="eyebrow">Regionale Einordnung 2026</span>
           <h1>Handwerker Kosten in {region.label}</h1>
           <p>
