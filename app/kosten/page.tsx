@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { priceItemSlug } from "@/lib/price-slug";
 import { services } from "@/lib/pricing";
 
 export const metadata: Metadata = {
@@ -53,7 +54,9 @@ export default function CostsPage() {
                 <div className="directoryPrices">
                   {service.priceItems.slice(0, 3).map((item) => (
                     <div key={item.name}>
-                      <span>{item.name}</span>
+                      <Link className="priceItemLink" href={`/kosten/${service.slug}/leistung/${priceItemSlug(item.name)}`}>
+                        {item.name}
+                      </Link>
                       <strong>{priceRange(item.low, item.high)}</strong>
                       <small>{item.unit}</small>
                     </div>
