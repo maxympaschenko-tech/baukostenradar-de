@@ -5,6 +5,14 @@ export const metadata: Metadata = {
   title: "Impressum",
   description: "Impressum und Anbieterkennzeichnung von BauKostenRadar.",
   alternates: { canonical: "/impressum" },
+  robots: {
+    index: false,
+    follow: true,
+    googleBot: {
+      index: false,
+      follow: true,
+    },
+  },
 };
 
 export default function ImpressumPage() {
