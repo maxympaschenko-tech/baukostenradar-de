@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import "./portal.css";
+import { ConsentManager } from "@/components/consent-manager";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { siteConfig } from "@/lib/site";
@@ -79,6 +80,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <SiteHeader />
         <main>{children}</main>
         <SiteFooter />
+        <ConsentManager />
       </body>
     </html>
   );
