@@ -108,10 +108,7 @@ jobs:
           host_id=$(printf '%s' "$services" | jq -r --arg domain 'baukostenradar.de' '
             [
               .. | objects
-              | select(
-                  to_entries
-                  | any(.value; type == "string" and contains($domain))
-                )
+              | select((tojson | contains($domain)))
               | (.host_id // .id // empty)
               | tostring
             ][0] // empty
