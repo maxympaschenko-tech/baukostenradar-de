@@ -8,6 +8,47 @@ export const metadata: Metadata = {
   alternates: { canonical: "/ratgeber" },
 };
 
+const guideGroups = [
+  {
+    eyebrow: "Sanierungskosten",
+    title: "Haus und Bestand sanieren",
+    description: "Richtwerte pro Quadratmeter, Kernsanierung, Altbau und Einfamilienhaus als Gesamtprojekt einordnen.",
+    slugs: [
+      "sanierungskosten-pro-qm",
+      "haus-sanieren-kosten",
+      "kernsanierung-kosten",
+      "sanierungskosten-einfamilienhaus",
+      "altbausanierung-kosten",
+    ],
+  },
+  {
+    eyebrow: "Renovierung nach Wohnfläche",
+    title: "Budgets für konkrete Wohnflächen",
+    description: "Beispielrechnungen für Wohnungen und Häuser mit 100, 150 oder 200 m² sowie allgemeine Hausbudgets.",
+    slugs: [
+      "wohnung-renovieren-kosten",
+      "renovierungskosten-haus",
+      "renovierungskosten-100-qm",
+      "haus-renovieren-150-qm-kosten",
+      "haus-renovieren-200-qm-kosten",
+    ],
+  },
+  {
+    eyebrow: "Planung & Kostenstruktur",
+    title: "Sanierung richtig planen und Preise verstehen",
+    description: "Reihenfolge, Arbeits- und Materialkosten sowie Handwerker-Stundensätze verständlich erklärt.",
+    slugs: [
+      "sanierung-reihenfolge",
+      "arbeitskosten-materialkosten",
+      "handwerker-stundensaetze",
+    ],
+  },
+] as const;
+
+function guideBySlug(slug: string) {
+  return allGuides.find((guide) => guide.slug === slug);
+}
+
 export default function GuidesPage() {
   return (
     <>
@@ -21,30 +62,44 @@ export default function GuidesPage() {
           </p>
           <div className="heroFacts">
             <span><strong>{allGuides.length}</strong> ausführliche Ratgeber</span>
+            <span><strong>{guideGroups.length}</strong> Themenbereiche</span>
             <span><strong>2026</strong> aktueller Datenstand</span>
-            <span><strong>Transparent</strong> Modellwerte klar gekennzeichnet</span>
           </div>
         </div>
       </section>
 
-      <section className="section">
-        <div className="shell">
-          <div className="directoryGrid">
-            {allGuides.map((guide) => (
-              <article className="directoryCard" key={guide.slug}>
-                <span className="eyebrow">{guide.eyebrow}</span>
-                <h2>{guide.title}</h2>
-                <p>{guide.description}</p>
-                <div className="miniPrice">
-                  <span>Wichtigster Richtwert</span>
-                  <strong>{guide.keyFact}</strong>
+      {guideGroups.map((group, index) => {
+        const groupGuides = group.slugs.map(guideBySlug).filter((guide): guide is NonNullable<typeof guide> => Boolean(guide));
+
+        return (
+          <section className={`section${index % 2 === 1 ? " sectionAlt" : ""}`} key={group.title}>
+            <div className="shell">
+              <div className="premiumSectionHeading">
+                <div>
+                  <span className="eyebrow">{group.eyebrow}</span>
+                  <h2>{group.title}</h2>
+                  <p>{group.description}</p>
                 </div>
-                <Link className="textLink" href={`/ratgeber/${guide.slug}`}>Ratgeber lesen →</Link>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+              </div>
+
+              <div className="directoryGrid">
+                {groupGuides.map((guide) => (
+                  <article className="directoryCard" key={guide.slug}>
+                    <span className="eyebrow">{guide.eyebrow}</span>
+                    <h3>{guide.title}</h3>
+                    <p>{guide.description}</p>
+                    <div className="miniPrice">
+                      <span>Wichtigster Richtwert</span>
+                      <strong>{guide.keyFact}</strong>
+                    </div>
+                    <Link className="textLink" href={`/ratgeber/${guide.slug}`}>Ratgeber lesen →</Link>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      })}
 
       <section className="section sectionAlt">
         <div className="shell twoColumn">
