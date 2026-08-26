@@ -36,6 +36,27 @@ jobs:
             test -d '$REMOTE_PATH/.next';
           "
 
+      - name: Verify exact deployed commit
+        if: ${{ github.event_name == 'workflow_run' }}
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          curl -sS --fail 'https://baukostenradar.de/api/version' -o /tmp/version.json
+          deployed_sha=$(jq -r '.sha // empty' /tmp/version.json)
+          echo "Expected SHA: $EXPECTED_SHA"
+          echo "Deployed SHA: $deployed_sha"
+          test "$deployed_sha" = "$EXPECTED_SHA"
+
+      - name: Verify version endpoint
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sS --fail 'https://baukostenradar.de/api/version' -o /tmp/version.json
+          jq -e '.service == "BauKostenRadar" and (.sha | length > 7) and .sha != "development"' /tmp/version.json >/dev/null
+
       - name: Verify canonical production site
         shell: bash
         run: |
@@ -52,6 +73,7 @@ jobs:
           done
           test "$success" = "1"
           grep -q 'GTM-WCPZ9WFT' /tmp/home.html
+          grep -q 'vXOTcob1kFIZony7RPFaEkolb_RX3iMjOJkWlS-LH38' /tmp/home.html
 
       - name: Verify www redirects to apex
         shell: bash
