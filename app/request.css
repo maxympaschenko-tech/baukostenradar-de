@@ -1,0 +1,94 @@
+.projectRequestForm {
+  margin-top: 24px;
+}
+
+.projectRequestForm .formGrid textarea {
+  width: 100%;
+  min-height: 150px;
+  resize: vertical;
+  border: 1px solid #c9d4dc;
+  border-radius: 11px;
+  background: #fff;
+  color: var(--text);
+  padding: 12px;
+  font: inherit;
+}
+
+.projectRequestForm .formGrid textarea:focus {
+  outline: 2px solid rgba(31, 88, 127, 0.16);
+  border-color: var(--primary-2);
+}
+
+.formFieldWide {
+  grid-column: 1 / -1;
+}
+
+.requestSubmitRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.requestSubmitRow strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.requestSubmitRow p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.requestSubmitButton {
+  margin-top: 0;
+  border: 0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.requestInfoCard h2 {
+  margin: 12px 0;
+}
+
+.requestSteps {
+  display: grid;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.requestSteps li {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.requestSteps li strong {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+}
+
+.requestSteps li span {
+  color: var(--muted);
+}
+
+@media (max-width: 700px) {
+  .requestSubmitRow {
+    grid-template-columns: 1fr;
+  }
+
+  .requestSubmitButton {
+    width: 100%;
+  }
+}
