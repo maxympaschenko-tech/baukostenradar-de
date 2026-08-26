@@ -29,7 +29,8 @@ export function SiteFooter() {
           <Link href="/ratgeber/sanierungskosten-pro-qm">Sanierungskosten pro m²</Link>
           <Link href="/ratgeber/handwerker-stundensaetze">Handwerker-Stundensätze</Link>
           <Link href="/staedte">Städte</Link>
-          <Link href="/methodik">Methodik & Quellen</Link>
+          <Link href="/methodik">Methodik</Link>
+          <Link href="/quellen">Quellenverzeichnis</Link>
           <Link href="/ueber-uns">Über BauKostenRadar</Link>
         </div>
         <div>
