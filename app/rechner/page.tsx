@@ -12,6 +12,11 @@ export default function CalculatorDirectoryPage() {
     <>
       <section className="contentHero">
         <div className="shell">
+          <nav className="visibleBreadcrumbs" aria-label="Breadcrumb">
+            <Link href="/">Startseite</Link>
+            <span aria-hidden="true">›</span>
+            <span aria-current="page">Kostenrechner</span>
+          </nav>
           <span className="eyebrow">BauKostenRadar Rechner</span>
           <h1>Kostenrechner für Renovierung und Handwerk</h1>
           <p>Gesamtbudget, Badsanierung oder einzelne Handwerkerleistungen mit transparenten Preisbändern kalkulieren.</p>
@@ -51,17 +56,6 @@ export default function CalculatorDirectoryPage() {
               </div>
             </div>
             <Link className="primaryButton" href="/rechner/handwerkerkosten">Handwerkerkosten berechnen</Link>
-          </article>
-
-          <article className="directoryCard">
-            <div className="directoryCardTop">
-              <span className="serviceIcon" aria-hidden="true">✓</span>
-              <div>
-                <h2>Projektanfrage</h2>
-                <p>Berechnung fertig? Projekt, Standort, Budget und Zeitraum strukturiert an BauKostenRadar senden.</p>
-              </div>
-            </div>
-            <Link className="secondaryButton" href="/angebot">Projekt anfragen</Link>
           </article>
         </div>
       </section>
