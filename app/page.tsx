@@ -28,6 +28,8 @@ const featuredGuideSlugs = [
   "kernsanierung-kosten",
   "haus-sanieren-kosten",
   "sanierungskosten-einfamilienhaus",
+  "dach-sanieren-kosten-pro-qm",
+  "bad-komplett-sanieren-kosten",
 ];
 
 export default function HomePage() {
