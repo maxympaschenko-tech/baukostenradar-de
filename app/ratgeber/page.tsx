@@ -90,6 +90,11 @@ export default function GuidesPage() {
     <>
       <section className="contentHero">
         <div className="shell">
+          <nav className="visibleBreadcrumbs" aria-label="Breadcrumb">
+            <Link href="/">Startseite</Link>
+            <span aria-hidden="true">›</span>
+            <span aria-current="page">Ratgeber</span>
+          </nav>
           <span className="eyebrow">Baukosten-Ratgeber</span>
           <h1>Sanierung, Renovierung und Handwerkerkosten verständlich erklärt</h1>
           <p>
