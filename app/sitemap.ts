@@ -21,7 +21,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.95,
     },
     {
+      url: `${base}/rechner`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.92,
+    },
+    {
       url: `${base}/rechner/renovierungskosten`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${base}/rechner/handwerkerkosten`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.9,
