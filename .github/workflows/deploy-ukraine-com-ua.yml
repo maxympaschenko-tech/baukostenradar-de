@@ -100,34 +100,37 @@ jobs:
             exit 0
           fi
 
-          host_id=""
-          for candidate in "$PRODUCTION_HOST" "baukostenradar.de"; do
-            echo "Resolving ADM.TOOLS host id for $candidate"
-            lookup=$(curl --silent --show-error \
-              -X POST 'https://adm.tools/action/get_id/' \
-              -H "Authorization: Bearer $ADMTOOLS_TOKEN" \
-              -d "name=$candidate&type=host" || true)
+          services=$(curl --fail-with-body --silent --show-error \
+            -X POST 'https://adm.tools/action/get_services/' \
+            -H "Authorization: Bearer $ADMTOOLS_TOKEN" \
+            -d 'type=host')
 
-            host_id=$(printf '%s' "$lookup" | jq -r '.response.host_id // empty' 2>/dev/null || true)
-            if [[ -n "$host_id" ]]; then
-              echo "Resolved host id."
-              break
-            fi
-          done
+          host_id=$(printf '%s' "$services" | jq -r --arg domain 'baukostenradar.de' '
+            [
+              .. | objects
+              | select(
+                  to_entries
+                  | any(.value; type == "string" and contains($domain))
+                )
+              | (.host_id // .id // empty)
+              | tostring
+            ][0] // empty
+          ')
 
           if [[ -z "$host_id" ]]; then
-            echo "Could not resolve ADM.TOOLS host id automatically." >&2
+            echo "Could not resolve ADM.TOOLS host id from get_services." >&2
             exit 1
           fi
 
-          restart=$(curl --silent --show-error \
+          echo "Resolved ADM.TOOLS host id."
+
+          restart=$(curl --fail-with-body --silent --show-error \
             -X POST 'https://adm.tools/action/hosting/account/app/systemd/restart/' \
             -H "Authorization: Bearer $ADMTOOLS_TOKEN" \
             -d "host_id=$host_id")
 
           if ! printf '%s' "$restart" | jq -e '.result == true' >/dev/null 2>&1; then
             echo "ADM.TOOLS restart request failed." >&2
-            printf '%s\n' "$restart" >&2
             exit 1
           fi
 
