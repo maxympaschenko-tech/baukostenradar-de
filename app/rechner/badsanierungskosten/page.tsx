@@ -6,7 +6,7 @@ import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Badsanierung Kosten Rechner 2026",
-  description: "Badsanierungskosten 2026 nach Badgröße und Region online berechnen. Mit transparentem m²-Richtwert, Regionalfaktor, Quellen und Projektanfrage.",
+  description: "Badsanierungskosten 2026 nach Badgröße und Region online berechnen. Mit transparentem m²-Richtwert, Regionalfaktor, Quellen und weiterführenden Kosten-Ratgebern.",
   alternates: { canonical: "/rechner/badsanierungskosten" },
 };
 
@@ -89,6 +89,29 @@ export default function BathCostCalculatorPage() {
             und Vergleichswert angezeigt. Er wird nicht zusätzlich auf die Quadratmeterberechnung aufgeschlagen.
           </p>
           <Link className="textLink" href="/methodik">Gesamte Methodik ansehen →</Link>
+        </section>
+
+        <section className="contentCard proseCard">
+          <span className="eyebrow">Weiterführende Planung</span>
+          <h2>Badkosten im Gesamtbudget einordnen</h2>
+          <p>
+            Eine Badsanierung ist häufig nur ein Teil einer größeren Wohnungs- oder Altbausanierung. Die folgenden
+            Ratgeber helfen dabei, den Badposten mit dem gesamten Renovierungsbudget zu vergleichen.
+          </p>
+          <div className="sourceList">
+            <Link href="/kosten/badsanierung">
+              <strong>Badsanierung Kosten 2026</strong>
+              <span>Einzelpositionen und Quellen im Detail</span>
+            </Link>
+            <Link href="/ratgeber/sanierungskosten-pro-qm">
+              <strong>Sanierungskosten pro m² 2026</strong>
+              <span>Vier Sanierungsstufen und Beispielbudgets</span>
+            </Link>
+            <Link href="/ratgeber/wohnung-renovieren-kosten">
+              <strong>Wohnung renovieren: Kosten 2026</strong>
+              <span>Beispiele für 60, 80 und 100 m²</span>
+            </Link>
+          </div>
         </section>
 
         <section className="contentCard proseCard">
