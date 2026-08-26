@@ -1,0 +1,122 @@
+/* Mobile overflow hardening for internal cost pages */
+@media (max-width: 920px) {
+  main,
+  .contentHero,
+  .contentGrid,
+  .contentGrid > *,
+  .contentGrid > div,
+  .contentGrid > aside,
+  .articleShell,
+  .contentCard,
+  .sidebarSticky,
+  .calculator,
+  .cardHeaderRow,
+  .faqList,
+  .faqItem,
+  .sourceList,
+  .regionChips {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .contentGrid {
+    width: min(1180px, calc(100% - 24px));
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .contentCard {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .priceTableWrap {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-inline: contain;
+  }
+
+  .priceTable {
+    width: max(100%, 620px);
+    max-width: none;
+  }
+
+  .contentHero h1,
+  .contentHero p,
+  .contentCard h1,
+  .contentCard h2,
+  .contentCard h3,
+  .contentCard p,
+  .contentCard a,
+  .contentCard span,
+  .contentCard strong,
+  .contentCard small,
+  .faqItem h3,
+  .faqItem p {
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  .sourceList a {
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .sourceList a > * {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .regionChips .regionChip,
+  .regionChips span {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .heroFacts {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .heroFacts span {
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .heroActions {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .heroActions > a {
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 620px) {
+  .contentGrid {
+    width: calc(100% - 20px);
+  }
+
+  .contentCard {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .priceTableWrap {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
