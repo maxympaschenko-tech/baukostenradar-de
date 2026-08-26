@@ -4,6 +4,7 @@ const nav = [
   ["Kosten", "/kosten"],
   ["Rechner", "/rechner"],
   ["Städte", "/staedte"],
+  ["Projekt anfragen", "/angebot"],
   ["Methodik", "/methodik"],
   ["Kontakt", "/kontakt"],
 ] as const;
