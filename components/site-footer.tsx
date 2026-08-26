@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { siteConfig } from "@/lib/site";
 
 export function SiteFooter() {
   return (
@@ -7,6 +8,9 @@ export function SiteFooter() {
         <div>
           <strong>BauKostenRadar</strong>
           <p>Aktuelle Richtwerte und Rechner für Renovierung und Handwerk in Deutschland.</p>
+          <p>
+            Kontakt: <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
+          </p>
         </div>
         <div>
           <strong>Bereiche</strong>
@@ -14,6 +18,7 @@ export function SiteFooter() {
           <Link href="/rechner/renovierungskosten">Renovierungskosten-Rechner</Link>
           <Link href="/staedte">Städte</Link>
           <Link href="/methodik">Methodik & Quellen</Link>
+          <Link href="/kontakt">Kontakt</Link>
         </div>
         <div>
           <strong>Datenhinweis</strong>
