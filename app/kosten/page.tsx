@@ -3,8 +3,8 @@ import Link from "next/link";
 import { services } from "@/lib/pricing";
 
 export const metadata: Metadata = {
-  title: "Handwerker Kosten 2026 - Preise für 11 Gewerke",
-  description: "Aktuelle Handwerkerpreise 2026 für Maler, Fliesenleger, Elektriker, Trockenbau, Sanitär, Wärmepumpe, Photovoltaik, Dämmung und weitere Gewerke in Deutschland.",
+  title: "Handwerker Kosten 2026 - Preise & Vergleich",
+  description: "Aktuelle Handwerkerpreise 2026 für Renovierung, Sanierung, Haustechnik, Fenster, Fassade, Garten und weitere Gewerke in Deutschland.",
   alternates: { canonical: "/kosten" },
 };
 
