@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getGuide, guides } from "@/lib/guides";
+import { allGuides, getAnyGuide } from "@/lib/all-guides";
 import { siteConfig } from "@/lib/site";
 
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return guides.map((guide) => ({ slug: guide.slug }));
+  return allGuides.map((guide) => ({ slug: guide.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const guide = getGuide(slug);
+  const guide = getAnyGuide(slug);
   if (!guide) return {};
 
   return {
@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function GuidePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const guide = getGuide(slug);
+  const guide = getAnyGuide(slug);
   if (!guide) notFound();
 
   const base = siteConfig.url.replace(/\/$/, "");
