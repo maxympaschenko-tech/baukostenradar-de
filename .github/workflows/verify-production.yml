@@ -75,6 +75,14 @@ jobs:
           grep -q 'GTM-WCPZ9WFT' /tmp/home.html
           grep -q 'vXOTcob1kFIZony7RPFaEkolb_RX3iMjOJkWlS-LH38' /tmp/home.html
 
+      - name: Verify project request delivery readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+          code=$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 10 --max-time 20 'https://baukostenradar.de/api/project-request')
+          echo "Project request readiness HTTP: $code"
+          test "$code" = "204"
+
       - name: Verify www redirects to apex
         shell: bash
         run: |
@@ -94,6 +102,13 @@ jobs:
           curl -sS --fail 'https://baukostenradar.de/datenschutz' -o /tmp/datenschutz.html
           grep -qi 'noindex' /tmp/impressum.html
           grep -qi 'noindex' /tmp/datenschutz.html
+
+      - name: Verify robots blocks API routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sS --fail 'https://baukostenradar.de/robots.txt' -o /tmp/robots.txt
+          grep -q 'Disallow: /api/' /tmp/robots.txt
 
       - name: Verify sitemap excludes Impressum
         shell: bash
