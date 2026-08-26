@@ -140,6 +140,7 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
               Die Werte sind unverbindliche Orientierungswerte. Je nach Region, Objektzustand,
               Material, Zugänglichkeit und Auftragsgröße können konkrete Angebote niedriger oder höher ausfallen.
             </p>
+            <Link className="textLink" href="/rechner/handwerkerkosten">Eigene Menge im Handwerkerkosten-Rechner kalkulieren →</Link>
           </section>
 
           <section className="contentCard">
@@ -212,14 +213,15 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
 
           <section className="contentCard">
             <span className="eyebrow">Budget</span>
-            <h2>Gesamte Renovierung kalkulieren</h2>
+            <h2>Vom Einzelpreis zum Gesamtbudget</h2>
             <p>
-              Einzelpreise helfen beim Vergleich. Für das Gesamtbudget sind Fläche, Sanierungsumfang,
-              Qualitätsniveau und Region entscheidend. Dafür ist der Renovierungskosten-Rechner gedacht.
+              Für einzelne Arbeiten nutzen Sie den Handwerkerkosten-Rechner. Für eine komplette Renovierung sind zusätzlich
+              Wohnfläche, Sanierungsumfang, Qualitätsniveau und Region entscheidend.
             </p>
-            <Link className="primaryButton" href="/rechner/renovierungskosten">
-              Renovierungskosten berechnen
-            </Link>
+            <div className="heroActions">
+              <Link className="primaryButton" href="/rechner/handwerkerkosten">Handwerkerkosten berechnen</Link>
+              <Link className="ghostButton" href="/rechner/renovierungskosten">Renovierung kalkulieren</Link>
+            </div>
           </section>
         </div>
 
