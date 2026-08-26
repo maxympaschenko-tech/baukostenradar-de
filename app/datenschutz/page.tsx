@@ -46,8 +46,8 @@ export default function DatenschutzPage() {
           <p>
             Wir verarbeiten personenbezogene Daten nur, soweit dies für den Betrieb dieser Website, die technische
             Sicherheit, die Bearbeitung von Anfragen sowie - nach entsprechender Einwilligung - für Reichweitenmessung
-            und Werbefinanzierung erforderlich ist. Personenbezogene Daten sind alle Informationen, die sich auf eine
-            identifizierte oder identifizierbare natürliche Person beziehen.
+            und eine spätere Werbefinanzierung erforderlich ist. Personenbezogene Daten sind alle Informationen, die
+            sich auf eine identifizierte oder identifizierbare natürliche Person beziehen.
           </p>
 
           <h2>3. Hosting und Server-Logfiles</h2>
@@ -79,35 +79,9 @@ export default function DatenschutzPage() {
           </p>
           <p>
             Die Daten werden gelöscht, sobald sie für den jeweiligen Zweck nicht mehr erforderlich sind und keine
-            gesetzlichen Aufbewahrungspflichten entgegenstehen.
-          </p>
-
-          <h2>4a. Projektanfrage über die Website</h2>
-          <p>
-            Auf der Seite zur Projektanfrage können Sie Angaben zu gewünschter Leistung, Region, Postleitzahl,
-            Budget, Zeitraum, Projektbeschreibung sowie Name, E-Mail-Adresse und optional Telefonnummer übermitteln.
-            Wenn Sie die Anfrage absenden, werden diese Angaben verschlüsselt per HTTPS an unseren Webserver
-            übertragen und dort zur Zustellung einer E-Mail an BauKostenRadar verarbeitet.
-          </p>
-          <p>
-            In der aktuellen Pilotphase werden Projektanfragen nicht in einer separaten Website-Datenbank gespeichert.
-            Die übermittelten Angaben werden als E-Mail an {siteConfig.email} zugestellt und anschließend im Rahmen
-            der Bearbeitung der Anfrage verarbeitet. Für die Missbrauchs- und Spamabwehr verarbeitet die Anwendung
-            kurzfristig technische Merkmale der Anfrage, unter anderem zur Begrenzung einer ungewöhnlich hohen
-            Anzahl von Übermittlungen. Eine dauerhafte separate Speicherung der IP-Adresse durch die Projektanfrage-
-            Anwendung ist derzeit nicht vorgesehen; die allgemeinen Server-Logfiles des Hostings bleiben hiervon unberührt.
-          </p>
-          <p>
-            Soweit die Projektanfrage der Anbahnung einer möglichen Leistung oder Vermittlung dient, erfolgt die
-            Verarbeitung auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO. In sonstigen Fällen erfolgt sie auf Grundlage
-            von Art. 6 Abs. 1 lit. f DSGVO aufgrund unseres berechtigten Interesses an der Bearbeitung der Anfrage und
-            am Aufbau der Projektanfrage-Funktion. Eine automatische Weitergabe der Formulardaten an Handwerksbetriebe
-            findet in der Pilotphase nicht statt.
-          </p>
-          <p>
-            Sollte die direkte technische Zustellung einer Anfrage fehlschlagen, kann die Website ersatzweise Ihr
-            lokales E-Mail-Programm mit einer vorbereiteten Nachricht öffnen. In diesem Fall werden die Daten erst
-            durch das tatsächliche Absenden der E-Mail an uns übermittelt.
+            gesetzlichen Aufbewahrungspflichten entgegenstehen. BauKostenRadar bietet derzeit kein Formular zur
+            Übermittlung von Renovierungs- oder Handwerkerprojekten an und verarbeitet daher keine entsprechenden
+            Projektformulardaten über die Website.
           </p>
 
           <h2>5. Google Tag Manager</h2>
@@ -150,25 +124,25 @@ export default function DatenschutzPage() {
             der <a className="textLink" href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">Datenschutzerklärung von Google</a>.
           </p>
 
-          <h2>7. Vorgesehener Einsatz von Google AdSense</h2>
+          <h2>7. Geplanter Einsatz von Google AdSense</h2>
           <p>
-            BauKostenRadar kann Google AdSense zur Finanzierung des Angebots durch Werbung einsetzen. Anbieter für
-            Nutzer im Europäischen Wirtschaftsraum ist Google Ireland Limited, Gordon House, Barrow Street, Dublin 4,
-            Irland. Abhängig von den gewählten Einstellungen und Ihrer Einwilligung können Cookies oder vergleichbare
+            Google AdSense ist auf BauKostenRadar derzeit nicht für die Auslieferung von Werbung aktiviert. Für eine
+            spätere Finanzierung des Angebots kann Google AdSense eingesetzt werden. Anbieter für Nutzer im
+            Europäischen Wirtschaftsraum ist Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland.
+            Abhängig von den später gewählten Einstellungen und Ihrer Einwilligung können Cookies oder vergleichbare
             Technologien verwendet und Informationen über Gerät, Browser, IP-Adresse, Werbeinteraktionen und
             Nutzungsverhalten verarbeitet werden.
           </p>
           <p>
-            Für Nutzer im Europäischen Wirtschaftsraum, im Vereinigten Königreich und in der Schweiz wird vor dem
-            Einsatz zustimmungspflichtiger Werbetechnologien eine geeignete, von Google unterstützte bzw. zertifizierte
-            Consent Management Platform eingesetzt. Personalisierte Werbung und entsprechende Speicher- bzw.
-            Verarbeitungsvorgänge werden nur im Rahmen der erteilten Einwilligung aktiviert. Rechtsgrundlage ist
-            Art. 6 Abs. 1 lit. a DSGVO.
+            Vor einer Aktivierung von Google AdSense für Nutzer im Europäischen Wirtschaftsraum, im Vereinigten
+            Königreich und in der Schweiz wird eine von Google zertifizierte Consent Management Platform eingesetzt,
+            die die dafür erforderlichen IAB-TCF-Signale unterstützt. Personalisierte Werbung und entsprechende
+            Speicher- bzw. Verarbeitungsvorgänge werden nur im Rahmen der jeweils erforderlichen Einwilligung aktiviert.
           </p>
           <p>
-            Je nach Einwilligung und technischer Konfiguration kann auch nicht personalisierte oder eingeschränkte
-            Werbung ausgeliefert werden. Weitere Informationen zu Google-Werbediensten und Datenschutz finden Sie
-            unter <a className="textLink" href="https://policies.google.com/technologies/ads" target="_blank" rel="noreferrer">policies.google.com/technologies/ads</a>.
+            Je nach Einwilligung und technischer Konfiguration kann später auch nicht personalisierte oder
+            eingeschränkte Werbung ausgeliefert werden. Weitere Informationen zu Google-Werbediensten und Datenschutz
+            finden Sie unter <a className="textLink" href="https://policies.google.com/technologies/ads" target="_blank" rel="noreferrer">policies.google.com/technologies/ads</a>.
           </p>
 
           <h2>8. Einwilligungsverwaltung und Google Consent Mode</h2>
@@ -187,9 +161,9 @@ export default function DatenschutzPage() {
           </p>
           <p>
             Sie können Ihre Einwilligung jederzeit mit Wirkung für die Zukunft ändern oder widerrufen. Verwenden Sie
-            dazu den dauerhaft im Seitenfuß erreichbaren Link „Datenschutz-Einstellungen“. Für den späteren Einsatz
-            von Google AdSense wird zusätzlich eine Google-zertifizierte CMP eingesetzt, soweit dies für die jeweilige
-            Region und Werbekonfiguration erforderlich ist.
+            dazu den dauerhaft im Seitenfuß erreichbaren Link „Datenschutz-Einstellungen“. Die derzeitige
+            Einwilligungsverwaltung dient insbesondere der Analytics-Konfiguration. Vor dem späteren Einsatz von
+            Google AdSense wird zusätzlich eine Google-zertifizierte CMP für die erforderlichen Regionen eingebunden.
           </p>
 
           <h2>9. Externe Links</h2>
