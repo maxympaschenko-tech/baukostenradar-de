@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getCalculationExample } from "@/lib/price-guidance";
 import { priceItemSlug } from "@/lib/price-slug";
 import { getRegion, getService, priceSources, regions, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
@@ -60,6 +61,11 @@ export default async function LocalCostPage({
   const leadPrice = service.priceItems[0];
   const adjustedLeadLow = leadPrice.low * region.factor;
   const adjustedLeadHigh = leadPrice.high * region.factor;
+  const localExample = getCalculationExample({
+    ...leadPrice,
+    low: adjustedLeadLow,
+    high: adjustedLeadHigh,
+  });
   const baseUrl = siteConfig.url.replace(/\/$/, "");
   const canonicalUrl = `${baseUrl}/kosten/${service.slug}/${region.slug}`;
   const otherCities = regions.filter((item) => item.value !== "de" && item.slug !== region.slug);
@@ -175,6 +181,25 @@ export default async function LocalCostPage({
               und ersetzt kein individuelles Angebot eines Fachbetriebs.
             </p>
           </section>
+
+          {localExample && (
+            <section className="contentCard">
+              <span className="eyebrow">Beispielbudget</span>
+              <h2>{leadPrice.name}: Beispiel in {region.label}</h2>
+              <p>
+                Für eine Beispielmenge von <strong>{localExample.quantityLabel}</strong> ergibt das regionale
+                BauKostenRadar-Modell eine rechnerische Spanne von <strong>{priceRange(localExample.low, localExample.high)}</strong>.
+              </p>
+              <div className="heroFacts">
+                <span><strong>{localExample.quantityLabel}</strong> Beispielmenge</span>
+                <span><strong>{priceRange(adjustedLeadLow, adjustedLeadHigh)}</strong> {leadPrice.unit}</span>
+                <span><strong>{priceRange(localExample.low, localExample.high)}</strong> rechnerisch gesamt</span>
+              </div>
+              <p className="tableNote">
+                Das Beispiel basiert ausschließlich auf dem ausgewiesenen Standortfaktor und der bundesweiten Preisbasis. Zusätzliche Leistungen sind nicht enthalten.
+              </p>
+            </section>
+          )}
 
           <section className="contentCard">
             <span className="eyebrow">Einordnung</span>
