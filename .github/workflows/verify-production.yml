@@ -86,13 +86,16 @@ jobs:
           test "$code" = "200"
           grep -q '<svg' /tmp/icon.svg
 
-      - name: Verify project request delivery readiness
+      - name: Verify retired lead routes stay removed
         shell: bash
         run: |
           set -euo pipefail
-          code=$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 10 --max-time 20 'https://baukostenradar.de/api/project-request')
-          echo "Project request readiness HTTP: $code"
-          test "$code" = "204"
+          api_code=$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 10 --max-time 20 'https://baukostenradar.de/api/project-request')
+          page_code=$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 10 --max-time 20 'https://baukostenradar.de/angebot')
+          echo "Retired API HTTP: $api_code"
+          echo "Retired page HTTP: $page_code"
+          test "$api_code" = "404"
+          test "$page_code" = "404"
 
       - name: Verify www redirects to apex
         shell: bash
@@ -121,12 +124,14 @@ jobs:
           curl -sS --fail 'https://baukostenradar.de/robots.txt' -o /tmp/robots.txt
           grep -q 'Disallow: /api/' /tmp/robots.txt
 
-      - name: Verify sitemap excludes Impressum
+      - name: Verify sitemap excludes non-indexable pages
         shell: bash
         run: |
           set -euo pipefail
           curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
-          if grep -q '/impressum' /tmp/sitemap.xml; then
-            echo 'Impressum must not be present in sitemap.xml' >&2
-            exit 1
-          fi
+          for path in '/impressum' '/datenschutz' '/angebot'; do
+            if grep -q "$path" /tmp/sitemap.xml; then
+              echo "$path must not be present in sitemap.xml" >&2
+              exit 1
+            fi
+          done
