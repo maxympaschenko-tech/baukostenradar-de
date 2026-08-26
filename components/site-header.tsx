@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand-logo";
+import { MobileNavigation } from "@/components/mobile-navigation";
 
 const nav = [
   ["Startseite", "/"],
@@ -32,6 +33,8 @@ export function SiteHeader() {
           Kostenloses Angebot
           <span>einholen</span>
         </Link>
+
+        <MobileNavigation />
       </div>
     </header>
   );
