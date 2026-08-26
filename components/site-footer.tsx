@@ -15,7 +15,9 @@ export function SiteFooter() {
         <div>
           <strong>Bereiche</strong>
           <Link href="/kosten">Handwerkerkosten</Link>
+          <Link href="/rechner">Kostenrechner</Link>
           <Link href="/rechner/renovierungskosten">Renovierungskosten-Rechner</Link>
+          <Link href="/rechner/handwerkerkosten">Handwerkerkosten-Rechner</Link>
           <Link href="/staedte">Städte</Link>
           <Link href="/methodik">Methodik & Quellen</Link>
           <Link href="/kontakt">Kontakt</Link>
