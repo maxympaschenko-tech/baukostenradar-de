@@ -13,6 +13,13 @@ export default function RenovationCalculatorPage() {
     <>
       <section className="contentHero">
         <div className="shell">
+          <nav className="visibleBreadcrumbs" aria-label="Breadcrumb">
+            <Link href="/">Startseite</Link>
+            <span aria-hidden="true">›</span>
+            <Link href="/rechner">Kostenrechner</Link>
+            <span aria-hidden="true">›</span>
+            <span aria-current="page">Renovierungskosten</span>
+          </nav>
           <span className="eyebrow">Kostenloser Rechner</span>
           <h1>Renovierungskosten Rechner 2026</h1>
           <p>
