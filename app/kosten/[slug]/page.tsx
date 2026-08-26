@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RenovationCalculator } from "@/components/renovation-calculator";
-import { priceItemSlug } from "@/lib/price-slug";
 import { getService, priceSources, regions, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
 
@@ -43,6 +42,7 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
   const leadPrice = service.priceItems[0];
   const relatedServices = services.filter((item) => item.slug !== service.slug).slice(0, 5);
   const canonicalUrl = `${siteConfig.url.replace(/\/$/, "")}/kosten/${service.slug}`;
+  const requestUrl = `/angebot?leistung=${encodeURIComponent(service.slug)}`;
 
   const faqs = [
     {
@@ -126,9 +126,7 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
                   {service.priceItems.map((item) => (
                     <tr key={item.name}>
                       <td>
-                        <Link className="textLink" href={`/kosten/${service.slug}/leistung/${priceItemSlug(item.name)}`}>
-                          {item.name}
-                        </Link>
+                        <strong>{item.name}</strong>
                         {item.note ? <small>{item.note}</small> : null}
                       </td>
                       <td><strong>{priceRange(item.low, item.high)}</strong></td>
@@ -144,6 +142,16 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
               Material, Zugänglichkeit und Auftragsgröße können konkrete Angebote niedriger oder höher ausfallen.
             </p>
             <Link className="textLink" href="/rechner/handwerkerkosten">Eigene Menge im Handwerkerkosten-Rechner kalkulieren →</Link>
+          </section>
+
+          <section className="contentCard">
+            <span className="eyebrow">Projektanfrage</span>
+            <h2>{service.shortTitle}-Projekt geplant?</h2>
+            <p>
+              Übernehmen Sie den Kostenbereich direkt in die Projektanfrage und ergänzen Sie dort Standort, Budget,
+              Zeitraum und eine kurze Beschreibung des Vorhabens.
+            </p>
+            <Link className="primaryButton" href={requestUrl}>Projekt anfragen</Link>
           </section>
 
           <section className="contentCard">
@@ -224,6 +232,7 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
             <div className="heroActions">
               <Link className="primaryButton" href="/rechner/handwerkerkosten">Handwerkerkosten berechnen</Link>
               <Link className="ghostButton" href="/rechner/renovierungskosten">Renovierung kalkulieren</Link>
+              <Link className="secondaryButton" href={requestUrl}>Projekt anfragen</Link>
             </div>
           </section>
         </div>
