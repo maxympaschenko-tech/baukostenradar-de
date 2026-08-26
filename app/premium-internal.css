@@ -133,6 +133,37 @@
 .priceTable tbody tr:hover { background: #fbfcfd; }
 .priceTable td:nth-child(2) strong { color: #167049; }
 
+.guideTable td:first-child {
+  color: #172333;
+  font-weight: 750;
+}
+
+.guideBullets {
+  display: grid;
+  gap: 9px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guideBullets li {
+  position: relative;
+  padding: 12px 14px 12px 40px;
+  border: 1px solid #e0e7ec;
+  border-radius: 10px;
+  background: #fafcfd;
+  color: #465966;
+}
+
+.guideBullets li::before {
+  content: "✓";
+  position: absolute;
+  left: 14px;
+  top: 12px;
+  color: #167049;
+  font-weight: 900;
+}
+
 .regionChips .regionChip,
 .regionChips span {
   border-color: #d9e4ea;
@@ -199,4 +230,5 @@
   .contentHero { padding: 48px 0 30px; }
   .contentHero::after { right: 0; width: 120px; }
   .contentCard { padding: 21px; }
+  .guideBullets li { padding-left: 38px; }
 }
