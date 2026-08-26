@@ -100,18 +100,19 @@ export default function DatenschutzPage() {
             <a className="textLink" href="https://policies.google.com/privacy" target="_blank" rel="noreferrer"> policies.google.com/privacy</a>.
           </p>
 
-          <h2>6. Vorgesehener Einsatz von Google Analytics 4</h2>
+          <h2>6. Google Analytics 4</h2>
           <p>
-            BauKostenRadar kann Google Analytics 4 zur Reichweitenmessung und zur Analyse der Nutzung dieser Website
-            einsetzen. Anbieter ist Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland. Google
-            Analytics kann Informationen über Seitenaufrufe, Sitzungsdauer, verwendete Geräte, Browser, ungefähre
-            geografische Herkunft, Referrer und Interaktionen mit der Website verarbeiten.
+            BauKostenRadar setzt Google Analytics 4 zur Reichweitenmessung und zur Analyse der Nutzung dieser Website
+            ein. Anbieter ist Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland. Google Analytics
+            kann insbesondere Informationen über Seitenaufrufe, Sitzungsdauer, verwendete Geräte, Browser,
+            ungefähre geografische Herkunft, Referrer und Interaktionen mit der Website verarbeiten.
           </p>
           <p>
-            Google Analytics wird erst aktiviert, wenn die dafür erforderliche Einwilligung erteilt wurde. Die
-            Rechtsgrundlage ist dann Art. 6 Abs. 1 lit. a DSGVO. Eine erteilte Einwilligung kann jederzeit mit
-            Wirkung für die Zukunft widerrufen werden. Soweit Google Analytics über Google Tag Manager eingebunden
-            wird, werden die entsprechenden Consent-Signale an Google übermittelt.
+            Google Analytics ist über Google Tag Manager eingebunden. Für einwilligungspflichtige Speicher- und
+            Analysevorgänge werden die entsprechenden Consent-Signale standardmäßig restriktiv gesetzt. Soweit eine
+            Einwilligung erforderlich ist, erfolgt die Freigabe erst nach einer wirksamen Einwilligung. Rechtsgrundlage
+            für die einwilligungsbasierte Verarbeitung ist Art. 6 Abs. 1 lit. a DSGVO. Eine erteilte Einwilligung kann
+            jederzeit mit Wirkung für die Zukunft widerrufen werden.
           </p>
           <p>
             Eine Übermittlung von Daten an Google-Unternehmen oder Dienstleister außerhalb des Europäischen
