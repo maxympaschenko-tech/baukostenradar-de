@@ -115,9 +115,11 @@ export default function DatenschutzPage() {
             jederzeit mit Wirkung für die Zukunft widerrufen werden.
           </p>
           <p>
-            Eine Übermittlung von Daten an Google-Unternehmen oder Dienstleister außerhalb des Europäischen
-            Wirtschaftsraums kann nicht ausgeschlossen werden. Weitere Informationen finden Sie in der
-            <a className="textLink" href="https://policies.google.com/privacy" target="_blank" rel="noreferrer"> Datenschutzerklärung von Google</a>.
+            Bei verweigerter Einwilligung bleiben die entsprechenden Speicherzugriffe deaktiviert. Abhängig von der
+            technischen Konfiguration des Google Consent Mode können dabei eingeschränkte, cookielose Signale an
+            Google übermittelt werden. Eine Übermittlung von Daten an Google-Unternehmen oder Dienstleister außerhalb
+            des Europäischen Wirtschaftsraums kann nicht ausgeschlossen werden. Weitere Informationen finden Sie in
+            der <a className="textLink" href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">Datenschutzerklärung von Google</a>.
           </p>
 
           <h2>7. Vorgesehener Einsatz von Google AdSense</h2>
@@ -130,9 +132,10 @@ export default function DatenschutzPage() {
           </p>
           <p>
             Für Nutzer im Europäischen Wirtschaftsraum, im Vereinigten Königreich und in der Schweiz wird vor dem
-            Einsatz zustimmungspflichtiger Werbetechnologien eine geeignete Consent Management Platform eingesetzt.
-            Personalisierte Werbung und entsprechende Speicher- bzw. Verarbeitungsvorgänge werden nur im Rahmen der
-            erteilten Einwilligung aktiviert. Rechtsgrundlage ist Art. 6 Abs. 1 lit. a DSGVO.
+            Einsatz zustimmungspflichtiger Werbetechnologien eine geeignete, von Google unterstützte bzw. zertifizierte
+            Consent Management Platform eingesetzt. Personalisierte Werbung und entsprechende Speicher- bzw.
+            Verarbeitungsvorgänge werden nur im Rahmen der erteilten Einwilligung aktiviert. Rechtsgrundlage ist
+            Art. 6 Abs. 1 lit. a DSGVO.
           </p>
           <p>
             Je nach Einwilligung und technischer Konfiguration kann auch nicht personalisierte oder eingeschränkte
@@ -142,15 +145,23 @@ export default function DatenschutzPage() {
 
           <h2>8. Einwilligungsverwaltung und Google Consent Mode</h2>
           <p>
-            Für einwilligungspflichtige Analyse- und Werbedienste werden die entsprechenden Consent-Signale zunächst
-            restriktiv gesetzt. Erst nach einer wirksamen Einwilligung können die jeweils betroffenen Kategorien
-            freigegeben werden. Für den zukünftigen Einsatz von Google AdSense ist eine von Google unterstützte bzw.
-            zertifizierte Consent Management Platform vorgesehen, soweit dies für die jeweilige Region erforderlich ist.
+            Beim ersten Besuch zeigt BauKostenRadar eine Einwilligungsabfrage. Notwendige Funktionen bleiben aktiv;
+            Statistik und Marketing können getrennt erlaubt oder abgelehnt werden. Die Google-Consent-Signale
+            <code> analytics_storage</code>, <code>ad_storage</code>, <code>ad_user_data</code> und
+            <code> ad_personalization</code> sind zunächst auf <code>denied</code> gesetzt und werden entsprechend
+            Ihrer Auswahl aktualisiert.
           </p>
           <p>
-            Sie können eine erteilte Einwilligung jederzeit mit Wirkung für die Zukunft ändern oder widerrufen. Nach
-            Einrichtung des Consent-Dialogs wird hierfür eine dauerhaft erreichbare Möglichkeit zur Änderung der
-            Datenschutzeinstellungen bereitgestellt.
+            Ihre Auswahl wird ausschließlich im lokalen Speicher Ihres Browsers unter dem Schlüssel
+            <code> baukostenradar-consent-v1</code> gespeichert, damit wir die Abfrage nicht bei jedem Seitenaufruf
+            erneut anzeigen müssen. Diese Speicherung ist für die Verwaltung Ihrer Datenschutzeinstellungen
+            erforderlich.
+          </p>
+          <p>
+            Sie können Ihre Einwilligung jederzeit mit Wirkung für die Zukunft ändern oder widerrufen. Verwenden Sie
+            dazu den dauerhaft im Seitenfuß erreichbaren Link „Datenschutz-Einstellungen“. Für den späteren Einsatz
+            von Google AdSense wird zusätzlich eine Google-zertifizierte CMP eingesetzt, soweit dies für die jeweilige
+            Region und Werbekonfiguration erforderlich ist.
           </p>
 
           <h2>9. Externe Links</h2>
