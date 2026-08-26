@@ -62,6 +62,7 @@ export default async function LocalCostPage({
   const baseUrl = siteConfig.url.replace(/\/$/, "");
   const canonicalUrl = `${baseUrl}/kosten/${service.slug}/${region.slug}`;
   const otherCities = regions.filter((item) => item.value !== "de" && item.slug !== region.slug);
+  const requestUrl = `/angebot?leistung=${encodeURIComponent(service.slug)}&stadt=${encodeURIComponent(region.slug)}`;
 
   const faqs = [
     {
@@ -164,6 +165,16 @@ export default async function LocalCostPage({
           </section>
 
           <section className="contentCard">
+            <span className="eyebrow">Projektanfrage</span>
+            <h2>{service.shortTitle} in {region.label} geplant?</h2>
+            <p>
+              Übernehmen Sie Gewerk und Stadt direkt in die Projektanfrage. Ergänzen Sie dort nur noch PLZ, Budget,
+              Zeitraum und die Beschreibung Ihres Vorhabens.
+            </p>
+            <Link className="primaryButton" href={requestUrl}>Projekt in {region.label} anfragen</Link>
+          </section>
+
+          <section className="contentCard">
             <span className="eyebrow">Einordnung</span>
             <h2>Was bedeutet der Standortfaktor für {region.label}?</h2>
             <p>
@@ -241,7 +252,8 @@ export default async function LocalCostPage({
             <p>{leadPrice.name}</p>
             <strong className="bigMetric">{priceRange(adjustedLeadLow, adjustedLeadHigh)}</strong>
             <p>{leadPrice.unit}</p>
-            <Link className="primaryButton" href="/rechner/renovierungskosten">Gesamtbudget berechnen</Link>
+            <Link className="primaryButton" href={requestUrl}>Projekt anfragen</Link>
+            <Link className="textLink" href="/rechner/renovierungskosten">Gesamtbudget berechnen →</Link>
           </section>
         </aside>
       </div>
