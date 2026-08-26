@@ -43,13 +43,21 @@ npm start
 Copy `.env.example` to `.env.local` and set the public production URL when known.
 
 ```env
-NEXT_PUBLIC_SITE_URL=https://example.de
+NEXT_PUBLIC_SITE_URL=https://baukostenradar.de
 ```
 
 ## Deployment
 
-All code changes are maintained through GitHub. A CI build runs on pushes and pull requests. Production deployment will be connected to the existing hosting after its Node.js deployment method and target path are confirmed.
+GitHub is the source of truth for production. Every push to `main` runs TypeScript checks and a Next.js production build, deploys the standalone bundle over SSH to Ukraine.com.ua Business Hosting, restarts the Node.js application through the ADM.TOOLS API, and verifies the public site over HTTPS.
+
+Production path:
+
+```text
+/home/uageek/baukostenradar.de/www
+```
+
+No manual file uploads are part of the normal deployment flow.
 
 ## Data note
 
-The first calculator uses an explicit MVP pricing model so the product flow can be built and tested. Before public launch, the coefficients will be replaced or calibrated with documented German market data and a visible methodology page.
+The first calculator uses a structured pricing model and documented German market references. The price dataset and methodology will be expanded as additional trades and regions are added.
