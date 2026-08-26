@@ -36,18 +36,38 @@ jobs:
             test -d '$REMOTE_PATH/.next';
           "
 
-      - name: Verify exact deployed commit
+      - name: Verify deployed commit is expected or newer
         if: ${{ github.event_name == 'workflow_run' }}
         shell: bash
         env:
           EXPECTED_SHA: ${{ github.event.workflow_run.head_sha }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           curl -sS --fail 'https://baukostenradar.de/api/version' -o /tmp/version.json
           deployed_sha=$(jq -r '.sha // empty' /tmp/version.json)
           echo "Expected SHA: $EXPECTED_SHA"
           echo "Deployed SHA: $deployed_sha"
-          test "$deployed_sha" = "$EXPECTED_SHA"
+
+          if [[ "$deployed_sha" == "$EXPECTED_SHA" ]]; then
+            echo "Production is running the expected commit."
+            exit 0
+          fi
+
+          compare=$(curl -sS --fail \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/compare/$EXPECTED_SHA...$deployed_sha")
+          compare_status=$(printf '%s' "$compare" | jq -r '.status // empty')
+          echo "GitHub compare status: $compare_status"
+
+          if [[ "$compare_status" == "ahead" ]]; then
+            echo "Production has already advanced to a newer descendant commit."
+            exit 0
+          fi
+
+          echo "Production is neither the expected commit nor a newer descendant." >&2
+          exit 1
 
       - name: Verify version endpoint
         if: ${{ github.event_name == 'workflow_dispatch' }}
