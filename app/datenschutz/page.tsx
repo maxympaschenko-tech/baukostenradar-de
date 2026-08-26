@@ -85,17 +85,29 @@ export default function DatenschutzPage() {
           <h2>4a. Projektanfrage über die Website</h2>
           <p>
             Auf der Seite zur Projektanfrage können Sie Angaben zu gewünschter Leistung, Region, Postleitzahl,
-            Budget, Zeitraum, Projektbeschreibung sowie Kontaktdaten erfassen. Die Eingaben werden in der aktuellen
-            Pilotphase zunächst nur lokal in Ihrem Browser verarbeitet. Beim Absenden öffnet die Website eine
-            vorbereitete E-Mail an BauKostenRadar. Die eingegebenen Formulardaten werden dabei nicht automatisch
-            an unseren Webserver übertragen.
+            Budget, Zeitraum, Projektbeschreibung sowie Name, E-Mail-Adresse und optional Telefonnummer übermitteln.
+            Wenn Sie die Anfrage absenden, werden diese Angaben verschlüsselt per HTTPS an unseren Webserver
+            übertragen und dort zur Zustellung einer E-Mail an BauKostenRadar verarbeitet.
           </p>
           <p>
-            Erst wenn Sie die vorbereitete E-Mail in Ihrem Mailprogramm tatsächlich absenden, erhalten wir die darin
-            enthaltenen personenbezogenen Daten. Für diese anschließende Verarbeitung gelten die Hinweise zur
-            Kontaktaufnahme per E-Mail. Die Projektanfrage dient derzeit der manuellen Prüfung und dem Aufbau einer
-            späteren Angebotsvergleich- bzw. Vermittlungsfunktion. Eine automatische Weitergabe an Handwerksbetriebe
-            findet aktuell nicht statt.
+            In der aktuellen Pilotphase werden Projektanfragen nicht in einer separaten Website-Datenbank gespeichert.
+            Die übermittelten Angaben werden als E-Mail an {siteConfig.email} zugestellt und anschließend im Rahmen
+            der Bearbeitung der Anfrage verarbeitet. Für die Missbrauchs- und Spamabwehr verarbeitet die Anwendung
+            kurzfristig technische Merkmale der Anfrage, unter anderem zur Begrenzung einer ungewöhnlich hohen
+            Anzahl von Übermittlungen. Eine dauerhafte separate Speicherung der IP-Adresse durch die Projektanfrage-
+            Anwendung ist derzeit nicht vorgesehen; die allgemeinen Server-Logfiles des Hostings bleiben hiervon unberührt.
+          </p>
+          <p>
+            Soweit die Projektanfrage der Anbahnung einer möglichen Leistung oder Vermittlung dient, erfolgt die
+            Verarbeitung auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO. In sonstigen Fällen erfolgt sie auf Grundlage
+            von Art. 6 Abs. 1 lit. f DSGVO aufgrund unseres berechtigten Interesses an der Bearbeitung der Anfrage und
+            am Aufbau der Projektanfrage-Funktion. Eine automatische Weitergabe der Formulardaten an Handwerksbetriebe
+            findet in der Pilotphase nicht statt.
+          </p>
+          <p>
+            Sollte die direkte technische Zustellung einer Anfrage fehlschlagen, kann die Website ersatzweise Ihr
+            lokales E-Mail-Programm mit einer vorbereiteten Nachricht öffnen. In diesem Fall werden die Daten erst
+            durch das tatsächliche Absenden der E-Mail an uns übermittelt.
           </p>
 
           <h2>5. Google Tag Manager</h2>
