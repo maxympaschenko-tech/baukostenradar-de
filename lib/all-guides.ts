@@ -2,6 +2,7 @@ import { guides as primaryGuides } from "@/lib/guides";
 import { secondaryGuides } from "@/lib/guides-secondary";
 import { tertiaryGuides } from "@/lib/guides-tertiary";
 import { tradeGuides } from "@/lib/guides-trade";
+import { scenarioGuides } from "@/lib/guides-scenarios";
 
 const primaryClusterLinks: Record<string, Array<{ label: string; href: string }>> = {
   "sanierungskosten-pro-qm": [
@@ -72,6 +73,24 @@ const tertiaryClusterLinks: Record<string, Array<{ label: string; href: string }
   ],
 };
 
+const tradeClusterLinks: Record<string, Array<{ label: string; href: string }>> = {
+  "dach-sanieren-kosten-pro-qm": [
+    { label: "Dach 150 m² Kosten", href: "/ratgeber/dach-150-qm-kosten" },
+  ],
+  "fenster-austauschen-kosten-haus": [
+    { label: "20 Fenster austauschen Kosten", href: "/ratgeber/20-fenster-austauschen-kosten" },
+  ],
+  "elektrik-erneuern-altbau": [
+    { label: "Elektrik bei 100 m² erneuern", href: "/ratgeber/elektrik-erneuern-100-qm-kosten" },
+  ],
+  "heizung-erneuern-kosten": [
+    { label: "Fußbodenheizung 100 m² Kosten", href: "/ratgeber/fussbodenheizung-100-qm-kosten" },
+  ],
+  "bad-komplett-sanieren-kosten": [
+    { label: "Bad 10 m² sanieren Kosten", href: "/ratgeber/bad-10-qm-sanieren-kosten" },
+  ],
+};
+
 const enrichedPrimaryGuides = primaryGuides.map((guide) => ({
   ...guide,
   related: [...guide.related, ...(primaryClusterLinks[guide.slug] ?? [])],
@@ -87,7 +106,18 @@ const enrichedTertiaryGuides = tertiaryGuides.map((guide) => ({
   related: [...guide.related, ...(tertiaryClusterLinks[guide.slug] ?? [])],
 }));
 
-export const allGuides = [...enrichedPrimaryGuides, ...enrichedSecondaryGuides, ...enrichedTertiaryGuides, ...tradeGuides];
+const enrichedTradeGuides = tradeGuides.map((guide) => ({
+  ...guide,
+  related: [...guide.related, ...(tradeClusterLinks[guide.slug] ?? [])],
+}));
+
+export const allGuides = [
+  ...enrichedPrimaryGuides,
+  ...enrichedSecondaryGuides,
+  ...enrichedTertiaryGuides,
+  ...enrichedTradeGuides,
+  ...scenarioGuides,
+];
 
 export function getAnyGuide(slug: string) {
   return allGuides.find((guide) => guide.slug === slug);
