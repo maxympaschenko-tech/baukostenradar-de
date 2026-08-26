@@ -122,7 +122,7 @@ jobs:
           echo "Resolved ADM.TOOLS host id."
 
           restart=$(curl --fail-with-body --silent --show-error \
-            -X POST 'https://adm.tools/action/hosting/account/app/systemd/restart/' \
+            -X POST 'https://adm.tools/action/hosting/account/nodejs/reload/' \
             -H "Authorization: Bearer $ADMTOOLS_TOKEN" \
             -d "host_id=$host_id")
 
