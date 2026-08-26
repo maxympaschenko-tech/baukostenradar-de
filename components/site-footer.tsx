@@ -26,6 +26,7 @@ export function SiteFooter() {
         <div>
           <strong>Rechtliches</strong>
           <Link href="/impressum">Impressum</Link>
+          <Link href="/datenschutz">Datenschutzerklärung</Link>
           <p>Preisangaben sind unverbindliche Orientierungswerte. Datenstand und Quellen werden transparent auf den jeweiligen Seiten ausgewiesen.</p>
         </div>
       </div>
