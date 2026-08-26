@@ -7,8 +7,6 @@ const nav = [
   ["Preise", "/kosten"],
   ["Rechner", "/rechner"],
   ["Städte", "/staedte"],
-  ["Über uns", "/ueber-uns"],
-  ["Kontakt", "/kontakt"],
 ] as const;
 
 export function SiteHeader() {
