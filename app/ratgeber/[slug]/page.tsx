@@ -102,7 +102,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
 
-      <section className="contentHero">
+      <section className="contentHero" id="artikel-start">
         <div className="shell">
           <nav className="visibleBreadcrumbs" aria-label="Breadcrumb">
             <Link href="/">Startseite</Link>
@@ -223,6 +223,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
             Wie BauKostenRadar Quellen, Modellbänder und regionale Faktoren trennt, ist auf der {" "}
             <Link className="textLink" href="/methodik">Methodik-Seite</Link> dokumentiert.
           </p>
+          <a className="textLink" href="#artikel-start">Zum Seitenanfang ↑</a>
         </section>
       </article>
     </>
