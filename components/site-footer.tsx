@@ -9,7 +9,8 @@ export function SiteFooter() {
           <strong>BauKostenRadar</strong>
           <p>Aktuelle Richtwerte und Rechner für Renovierung und Handwerk in Deutschland.</p>
           <p>
-            Kontakt: <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
+            Kontakt: <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a><br />
+            Telefon: <a href={`tel:${siteConfig.phone}`}>{siteConfig.phoneDisplay}</a>
           </p>
         </div>
         <div>
