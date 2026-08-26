@@ -26,12 +26,18 @@ export function getCalculationExample(item: PriceLike): CalculationExample | nul
   if (unit.includes("pro m²")) {
     quantity = 20;
     quantityLabel = "20 m²";
+  } else if (unit.includes("pro m³")) {
+    quantity = 100;
+    quantityLabel = "100 m³";
   } else if (unit.includes("pro lfd. meter")) {
     quantity = 20;
     quantityLabel = "20 lfd. Meter";
   } else if (unit.includes("pro stunde")) {
     quantity = 8;
     quantityLabel = "8 Arbeitsstunden";
+  } else if (unit.includes("pro tür")) {
+    quantity = 5;
+    quantityLabel = "5 Türen";
   } else if (unit.includes("pro stück")) {
     quantity = 5;
     quantityLabel = "5 Stück";
@@ -102,6 +108,27 @@ export function getOfferChecks(item: PriceLike): OfferCheck[] {
     ];
   }
 
+  if (unit.includes("pro m³")) {
+    return [
+      {
+        title: "Volumenberechnung",
+        text: "Das Angebot sollte nachvollziehbar ausweisen, wie der umbaute Raum oder das abzurechnende Volumen ermittelt wurde.",
+      },
+      {
+        title: "Bauweise und Zugänglichkeit",
+        text: "Massive Bauteile, Keller, enge Zufahrten und notwendiger Handabbruch können den Aufwand deutlich verändern.",
+      },
+      {
+        title: "Entsorgung enthalten?",
+        text: "Klären Sie, welche Abfallarten, Transportwege, Container und Deponiekosten bereits im Preis enthalten sind.",
+      },
+      {
+        title: "Schadstoffe",
+        text: "Verdacht auf Asbest oder andere Schadstoffe sollte vorab geklärt werden, weil dafür Spezialverfahren und zusätzliche Kosten entstehen können.",
+      },
+    ];
+  }
+
   if (unit.includes("pro lfd. meter")) {
     return [
       {
@@ -123,7 +150,7 @@ export function getOfferChecks(item: PriceLike): OfferCheck[] {
     ];
   }
 
-  if (unit.includes("pro stück") || unit.includes("pro fenster") || unit.includes("pro baum")) {
+  if (unit.includes("pro tür") || unit.includes("pro stück") || unit.includes("pro fenster") || unit.includes("pro baum")) {
     return [
       {
         title: "Stückzahl und Abmessungen",
