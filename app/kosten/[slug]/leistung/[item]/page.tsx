@@ -114,6 +114,15 @@ export default async function PriceItemPage({
 
       <section className="contentHero">
         <div className="shell">
+          <nav className="visibleBreadcrumbs" aria-label="Breadcrumb">
+            <Link href="/">Startseite</Link>
+            <span aria-hidden="true">›</span>
+            <Link href="/kosten">Handwerker Kosten</Link>
+            <span aria-hidden="true">›</span>
+            <Link href={`/kosten/${service.slug}`}>{service.shortTitle}</Link>
+            <span aria-hidden="true">›</span>
+            <span aria-current="page">{item.name}</span>
+          </nav>
           <span className="eyebrow">{service.shortTitle} - Preisstand August 2026</span>
           <h1>{item.name}: Kosten 2026</h1>
           <p>
