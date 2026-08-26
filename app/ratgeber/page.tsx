@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { guides } from "@/lib/guides";
+import { allGuides } from "@/lib/all-guides";
 
 export const metadata: Metadata = {
-  title: "Ratgeber zu Sanierungs- und Handwerkerkosten 2026",
-  description: "Ratgeber zu Sanierungskosten, Handwerker-Stundensätzen, Altbausanierung und Wohnungsrenovierung mit Richtwerten, Beispielen und Rechnern.",
+  title: "Ratgeber zu Sanierung, Renovierung & Handwerkerkosten 2026",
+  description: "Ratgeber zu Sanierungskosten, Haussanierung, Renovierung, Handwerkerpreisen, Arbeitskosten und sinnvoller Sanierungsreihenfolge mit Richtwerten und Rechnern.",
   alternates: { canonical: "/ratgeber" },
 };
 
@@ -14,13 +14,13 @@ export default function GuidesPage() {
       <section className="contentHero">
         <div className="shell">
           <span className="eyebrow">Baukosten-Ratgeber</span>
-          <h1>Sanierung und Handwerkerkosten verständlich erklärt</h1>
+          <h1>Sanierung, Renovierung und Handwerkerkosten verständlich erklärt</h1>
           <p>
-            Praxisnahe Richtwerte, Rechenbeispiele und Einordnung für typische Kostenfragen rund um Renovierung,
-            Sanierung und Handwerkerleistungen in Deutschland.
+            Praxisnahe Richtwerte, Rechenbeispiele und Einordnung für typische Kosten- und Planungsfragen rund um
+            Renovierung, Sanierung und Handwerkerleistungen in Deutschland.
           </p>
           <div className="heroFacts">
-            <span><strong>{guides.length}</strong> ausführliche Ratgeber</span>
+            <span><strong>{allGuides.length}</strong> ausführliche Ratgeber</span>
             <span><strong>2026</strong> aktueller Datenstand</span>
             <span><strong>Transparent</strong> Modellwerte klar gekennzeichnet</span>
           </div>
@@ -30,7 +30,7 @@ export default function GuidesPage() {
       <section className="section">
         <div className="shell">
           <div className="directoryGrid">
-            {guides.map((guide) => (
+            {allGuides.map((guide) => (
               <article className="directoryCard" key={guide.slug}>
                 <span className="eyebrow">{guide.eyebrow}</span>
                 <h2>{guide.title}</h2>
@@ -52,8 +52,8 @@ export default function GuidesPage() {
             <span className="eyebrow">Direkt rechnen</span>
             <h2>Vom Ratgeber zur eigenen Kostenspanne</h2>
             <p>
-              Die Ratgeber erklären die Größenordnung. Mit den Rechnern kannst du Fläche, Umfang, Region oder
-              konkrete Einzelarbeiten direkt für dein eigenes Szenario anpassen.
+              Die Ratgeber erklären die Größenordnung. Mit den Rechnern können Sie Fläche, Umfang, Region oder
+              konkrete Einzelarbeiten direkt für Ihr eigenes Szenario anpassen.
             </p>
           </div>
           <div className="heroActions">
