@@ -42,7 +42,6 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
   const leadPrice = service.priceItems[0];
   const relatedServices = services.filter((item) => item.slug !== service.slug).slice(0, 5);
   const canonicalUrl = `${siteConfig.url.replace(/\/$/, "")}/kosten/${service.slug}`;
-  const requestUrl = `/angebot?leistung=${encodeURIComponent(service.slug)}`;
   const serviceCalculatorUrl = service.slug === "badsanierung"
     ? "/rechner/badsanierungskosten"
     : "/rechner/handwerkerkosten";
@@ -151,16 +150,6 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
           </section>
 
           <section className="contentCard">
-            <span className="eyebrow">Projektanfrage</span>
-            <h2>{service.shortTitle}-Projekt geplant?</h2>
-            <p>
-              Übernehmen Sie den Kostenbereich direkt in die Projektanfrage und ergänzen Sie dort Standort, Budget,
-              Zeitraum und eine kurze Beschreibung des Vorhabens.
-            </p>
-            <Link className="primaryButton" href={requestUrl}>Projekt anfragen</Link>
-          </section>
-
-          <section className="contentCard">
             <span className="eyebrow">Regionale Unterschiede</span>
             <h2>{service.shortTitle}-Kosten nach Stadt vergleichen</h2>
             <p>
@@ -238,7 +227,6 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
             <div className="heroActions">
               <Link className="primaryButton" href={serviceCalculatorUrl}>{serviceCalculatorLabel}</Link>
               <Link className="ghostButton" href="/rechner/renovierungskosten">Renovierung kalkulieren</Link>
-              <Link className="secondaryButton" href={requestUrl}>Projekt anfragen</Link>
             </div>
           </section>
         </div>
