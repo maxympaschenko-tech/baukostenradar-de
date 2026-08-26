@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RenovationCalculator } from "@/components/renovation-calculator";
 import { getService, priceSources, regions, services } from "@/lib/pricing";
+import { siteConfig } from "@/lib/site";
 
 function euro(value: number) {
   return new Intl.NumberFormat("de-DE", {
@@ -10,6 +11,10 @@ function euro(value: number) {
     currency: "EUR",
     maximumFractionDigits: 0,
   }).format(value);
+}
+
+function priceRange(low: number, high: number) {
+  return low === high ? euro(low) : `${euro(low)} - ${euro(high)}`;
 }
 
 export function generateStaticParams() {
@@ -34,9 +39,56 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
   if (!service) notFound();
 
   const sourceKeys = [...new Set(service.priceItems.map((item) => item.sourceKey))];
+  const leadPrice = service.priceItems[0];
+  const relatedServices = services.filter((item) => item.slug !== service.slug).slice(0, 5);
+  const canonicalUrl = `${siteConfig.url.replace(/\/$/, "")}/kosten/${service.slug}`;
+
+  const faqs = [
+    {
+      question: `Was kostet ${service.shortTitle} 2026?`,
+      answer: `Ein typischer Richtwert für „${leadPrice.name}“ liegt 2026 bei ${priceRange(leadPrice.low, leadPrice.high)} ${leadPrice.unit}. Weitere Positionen und Einheiten finden Sie in der Preistabelle auf dieser Seite.`,
+    },
+    {
+      question: `Warum unterscheiden sich die Preise für ${service.shortTitle} so stark?`,
+      answer: "Region, Objektzustand, Materialqualität, Zugänglichkeit, Auftragsgröße und notwendige Vorarbeiten beeinflussen den Endpreis. Deshalb sind die veröffentlichten Werte Orientierungsbereiche und kein verbindliches Angebot.",
+    },
+    {
+      question: `Sind die ${service.shortTitle}-Preise bei BauKostenRadar aktuell?`,
+      answer: `Ja. Die auf dieser Seite verwendeten Quellen wurden zuletzt im August 2026 geprüft. Jede Preisposition ist einer öffentlich nachvollziehbaren Quelle zugeordnet.`,
+    },
+  ];
+
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Startseite", item: siteConfig.url },
+        { "@type": "ListItem", position: 2, name: "Handwerker Kosten", item: `${siteConfig.url.replace(/\/$/, "")}/kosten` },
+        { "@type": "ListItem", position: 3, name: service.shortTitle, item: canonicalUrl },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqs.map((faq) => ({
+        "@type": "Question",
+        name: faq.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: faq.answer,
+        },
+      })),
+    },
+  ];
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+
       <section className="contentHero">
         <div className="shell">
           <span className="eyebrow">Preisstand August 2026</span>
@@ -76,7 +128,7 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
                         <strong>{item.name}</strong>
                         {item.note ? <small>{item.note}</small> : null}
                       </td>
-                      <td><strong>{euro(item.low)} - {euro(item.high)}</strong></td>
+                      <td><strong>{priceRange(item.low, item.high)}</strong></td>
                       <td>{item.unit}</td>
                     </tr>
                   ))}
@@ -107,6 +159,19 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
           </section>
 
           <section className="contentCard">
+            <span className="eyebrow">Häufige Fragen</span>
+            <h2>FAQ zu {service.shortTitle}-Kosten</h2>
+            <div className="faqList">
+              {faqs.map((faq) => (
+                <div key={faq.question} className="faqItem">
+                  <h3>{faq.question}</h3>
+                  <p>{faq.answer}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="contentCard">
             <span className="eyebrow">Datenbasis</span>
             <h2>Quellen und Aktualität</h2>
             <p>
@@ -125,6 +190,20 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
               })}
             </div>
             <Link className="textLink" href="/methodik">Methodik von BauKostenRadar ansehen →</Link>
+          </section>
+
+          <section className="contentCard">
+            <span className="eyebrow">Weitere Gewerke</span>
+            <h2>Weitere Handwerkerkosten vergleichen</h2>
+            <div className="sourceList">
+              {relatedServices.map((item) => (
+                <Link key={item.slug} href={`/kosten/${item.slug}`}>
+                  <strong>{item.shortTitle} Kosten 2026</strong>
+                  <span>{item.description}</span>
+                </Link>
+              ))}
+            </div>
+            <Link className="textLink" href="/kosten">Alle Handwerkerpreise ansehen →</Link>
           </section>
 
           <section className="contentCard">
