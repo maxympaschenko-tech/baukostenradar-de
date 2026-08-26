@@ -31,14 +31,19 @@ jobs:
         id: deploy_config
         env:
           REMOTE_KEY: ${{ secrets.REMOTE_KEY }}
+          ADMTOOLS_TOKEN: ${{ secrets.ADMTOOLS_TOKEN }}
         shell: bash
         run: |
-          if [[ -n "$REMOTE_KEY" ]]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "REMOTE_KEY is not configured yet. Build will be verified, remote deploy will be skipped."
+          set -euo pipefail
+          if [[ -z "$REMOTE_KEY" ]]; then
+            echo "REMOTE_KEY is required for production deploy." >&2
+            exit 1
           fi
+          if [[ -z "$ADMTOOLS_TOKEN" ]]; then
+            echo "ADMTOOLS_TOKEN is required for production restart." >&2
+            exit 1
+          fi
+          echo "ready=true" >> "$GITHUB_OUTPUT"
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
@@ -50,6 +55,7 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_SITE_URL: https://baukostenradar.de
+          NEXT_PUBLIC_GIT_SHA: ${{ github.sha }}
 
       - name: Assemble standalone bundle
         shell: bash
@@ -70,7 +76,6 @@ jobs:
           JSON
 
       - name: Configure SSH
-        if: steps.deploy_config.outputs.ready == 'true'
         shell: bash
         env:
           REMOTE_KEY: ${{ secrets.REMOTE_KEY }}
@@ -81,24 +86,17 @@ jobs:
           ssh-keyscan -p 22 -H "$REMOTE_HOST" >> ~/.ssh/known_hosts
 
       - name: Deploy standalone bundle
-        if: steps.deploy_config.outputs.ready == 'true'
         shell: bash
         run: |
           ssh -p 22 "$REMOTE_USER@$REMOTE_HOST" "mkdir -p '$REMOTE_PATH'"
           rsync -az --delete -e 'ssh -p 22' --exclude='.env*' .next/standalone/ "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/"
 
       - name: Restart application through adm.tools API
-        if: steps.deploy_config.outputs.ready == 'true'
         shell: bash
         env:
           ADMTOOLS_TOKEN: ${{ secrets.ADMTOOLS_TOKEN }}
         run: |
           set -euo pipefail
-
-          if [[ -z "$ADMTOOLS_TOKEN" ]]; then
-            echo "ADMTOOLS_TOKEN is missing. Files were deployed, but automatic restart was skipped."
-            exit 0
-          fi
 
           services=$(curl --fail-with-body --silent --show-error \
             -X POST 'https://adm.tools/action/get_services/' \
@@ -133,18 +131,21 @@ jobs:
 
           echo "Node.js application restart requested successfully."
 
-      - name: Verify production HTTPS
-        if: steps.deploy_config.outputs.ready == 'true'
+      - name: Verify exact production commit
         shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
         run: |
+          set -euo pipefail
           for i in 1 2 3 4 5 6 7 8; do
-            code=$(curl -L -sS -o /tmp/site.html -w '%{http_code}' --connect-timeout 10 --max-time 20 'https://baukostenradar.de/' || true)
-            if [[ "$code" == "200" ]] && grep -qi 'BauKostenRadar' /tmp/site.html; then
-              echo "Production verification passed."
+            code=$(curl -sS -o /tmp/version.json -w '%{http_code}' --connect-timeout 10 --max-time 20 'https://baukostenradar.de/api/version' || true)
+            deployed_sha=$(jq -r '.sha // empty' /tmp/version.json 2>/dev/null || true)
+            if [[ "$code" == "200" && "$deployed_sha" == "$EXPECTED_SHA" ]]; then
+              echo "Production is running commit $EXPECTED_SHA."
               exit 0
             fi
-            echo "Attempt $i returned HTTP $code; waiting for app restart..."
+            echo "Attempt $i: HTTP $code, deployed SHA '$deployed_sha'; waiting for app restart..."
             sleep 5
           done
-          echo "Production verification failed." >&2
+          echo "Production version verification failed. Expected $EXPECTED_SHA." >&2
           exit 1
