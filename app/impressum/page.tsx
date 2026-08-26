@@ -26,12 +26,13 @@ export default function ImpressumPage() {
           <p>
             <strong>{operator.name}</strong><br />
             {operator.addressLine}<br />
-            {operator.city}<br />
+            {operator.postalCode} {operator.city}<br />
             {operator.country}
           </p>
 
           <h2>Kontakt</h2>
           <p>
+            Telefon: <a className="textLink" href={`tel:${siteConfig.phone}`}>{siteConfig.phoneDisplay}</a><br />
             E-Mail: <a className="textLink" href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a><br />
             Website: <a className="textLink" href={siteConfig.url}>{siteConfig.url}</a>
           </p>
@@ -40,7 +41,7 @@ export default function ImpressumPage() {
           <p>
             {operator.name}<br />
             {operator.addressLine}<br />
-            {operator.city}<br />
+            {operator.postalCode} {operator.city}<br />
             {operator.country}
           </p>
 
