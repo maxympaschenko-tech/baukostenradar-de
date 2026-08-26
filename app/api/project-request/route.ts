@@ -30,6 +30,7 @@ function clientIp(request: NextRequest) {
 }
 
 function rateLimited(ip: string) {
+  if (requestsByIp.size > 5000) requestsByIp.clear();
   const now = Date.now();
   const recent = (requestsByIp.get(ip) || []).filter((timestamp) => now - timestamp < WINDOW_MS);
   if (recent.length >= MAX_REQUESTS_PER_WINDOW) {
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
   }
 
   const ip = clientIp(request);
-  if (rateLimited(ip)) {
+  if (ip !== "unknown" && rateLimited(ip)) {
     return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429 });
   }
 
@@ -93,7 +94,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  const startedAt = Number(input.startedAt || 0);
+  const startedAt = Number(input.startedAt ?? 0);
   const elapsed = Date.now() - startedAt;
   if (!Number.isFinite(startedAt) || elapsed < 1500 || elapsed > 2 * 60 * 60 * 1000) {
     return NextResponse.json({ ok: false, error: "invalid_timing" }, { status: 400 });
