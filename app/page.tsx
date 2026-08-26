@@ -10,7 +10,13 @@ function euro(value: number) {
   }).format(value);
 }
 
+function priceRange(low: number, high: number) {
+  return low === high ? euro(low) : `${euro(low)} - ${euro(high)}`;
+}
+
 export default function HomePage() {
+  const priceCount = services.reduce((sum, service) => sum + service.priceItems.length, 0);
+
   return (
     <>
       <section className="hero">
@@ -27,8 +33,8 @@ export default function HomePage() {
               <Link className="ghostButton" href="/rechner/renovierungskosten">Kosten berechnen</Link>
             </div>
             <div className="trustRow">
-              <div><strong>28+ Preispositionen</strong><span>Strukturierte Richtwerte statt langer Fließtexte.</span></div>
-              <div><strong>9 Regionen</strong><span>Deutschland plus wichtige Großstädte im Modell.</span></div>
+              <div><strong>{priceCount} Preispositionen</strong><span>Strukturierte Richtwerte statt langer Fließtexte.</span></div>
+              <div><strong>{regions.length} Regionen</strong><span>Deutschland plus wichtige Großstädte im Modell.</span></div>
               <div><strong>Quellen sichtbar</strong><span>Preisangaben mit Datenquelle und Prüfdatum.</span></div>
             </div>
           </div>
@@ -58,7 +64,7 @@ export default function HomePage() {
                   <p>{service.description}</p>
                   <div className="miniPrice">
                     <span>{firstPrice.name}</span>
-                    <strong>{euro(firstPrice.low)} - {euro(firstPrice.high)}</strong>
+                    <strong>{priceRange(firstPrice.low, firstPrice.high)}</strong>
                     <small>{firstPrice.unit}</small>
                   </div>
                   <span className="cardLink">Preise ansehen →</span>
@@ -92,7 +98,7 @@ export default function HomePage() {
             <p>Aktuelle öffentlich verfügbare deutsche Handwerker- und Sanierungspreise.</p>
             <div className="metricGrid">
               <div><strong>{services.length}</strong><span>Kostenbereiche</span></div>
-              <div><strong>{services.reduce((sum, service) => sum + service.priceItems.length, 0)}</strong><span>Preispositionen</span></div>
+              <div><strong>{priceCount}</strong><span>Preispositionen</span></div>
               <div><strong>{regions.length}</strong><span>Regionen</span></div>
               <div><strong>€</strong><span>Richtwerte</span></div>
             </div>
