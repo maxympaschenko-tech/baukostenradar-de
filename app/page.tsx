@@ -25,9 +25,9 @@ const heroCategories = [
 
 const featuredGuideSlugs = [
   "sanierungskosten-pro-qm",
+  "kernsanierung-kosten",
   "haus-sanieren-kosten",
-  "handwerker-stundensaetze",
-  "renovierungskosten-haus",
+  "sanierungskosten-einfamilienhaus",
 ];
 
 export default function HomePage() {
