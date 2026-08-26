@@ -4,7 +4,7 @@ import { allGuides } from "@/lib/all-guides";
 
 export const metadata: Metadata = {
   title: "Ratgeber zu Sanierung, Renovierung & Handwerkerkosten 2026",
-  description: "Ratgeber zu Sanierungskosten, Haussanierung, Renovierung, Handwerkerpreisen, Arbeitskosten und sinnvoller Sanierungsreihenfolge mit Richtwerten und Rechnern.",
+  description: "Ratgeber zu Sanierungskosten, Kernsanierung, Einfamilienhaus, Renovierungskosten nach Wohnfläche, Handwerkerpreisen und Sanierungsplanung mit Richtwerten und Rechnern.",
   alternates: { canonical: "/ratgeber" },
 };
 
