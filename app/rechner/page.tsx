@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Baukosten Rechner 2026",
-  description: "Kostenrechner für Renovierung und Handwerkerarbeiten in Deutschland. Gesamtbudget oder einzelne Leistungen schnell kalkulieren.",
+  description: "Kostenrechner für Renovierung und Handwerkerarbeiten in Deutschland. Gesamtbudget, Badsanierung oder einzelne Leistungen schnell kalkulieren.",
   alternates: { canonical: "/rechner" },
 };
 
@@ -14,7 +14,7 @@ export default function CalculatorDirectoryPage() {
         <div className="shell">
           <span className="eyebrow">BauKostenRadar Rechner</span>
           <h1>Kostenrechner für Renovierung und Handwerk</h1>
-          <p>Wählen Sie zwischen einer Gesamtkalkulation für Renovierungsprojekte und einem Rechner für einzelne Handwerkerleistungen.</p>
+          <p>Gesamtbudget, Badsanierung oder einzelne Handwerkerleistungen mit transparenten Preisbändern kalkulieren.</p>
         </div>
       </section>
 
@@ -29,6 +29,17 @@ export default function CalculatorDirectoryPage() {
               </div>
             </div>
             <Link className="primaryButton" href="/rechner/renovierungskosten">Renovierung berechnen</Link>
+          </article>
+
+          <article className="directoryCard">
+            <div className="directoryCardTop">
+              <span className="serviceIcon" aria-hidden="true">◫</span>
+              <div>
+                <h2>Badsanierungskosten-Rechner</h2>
+                <p>Komplette Badsanierung nach Badgröße und Region mit transparentem m²-Richtwert schätzen.</p>
+              </div>
+            </div>
+            <Link className="primaryButton" href="/rechner/badsanierungskosten">Badsanierung berechnen</Link>
           </article>
 
           <article className="directoryCard">
