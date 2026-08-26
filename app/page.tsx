@@ -31,6 +31,7 @@ export default function HomePage() {
             <div className="heroActions">
               <Link className="primaryButton" href="/kosten">Preise vergleichen</Link>
               <Link className="ghostButton" href="/rechner">Kostenrechner öffnen</Link>
+              <Link className="secondaryButton" href="/angebot">Projekt anfragen</Link>
             </div>
             <div className="trustRow">
               <div><strong>{priceCount} Preispositionen</strong><span>Strukturierte Richtwerte statt langer Fließtexte.</span></div>
@@ -132,11 +133,12 @@ export default function HomePage() {
           <div>
             <span className="eyebrow">Projekt planen</span>
             <h2>Einzelarbeit oder komplette Renovierung kalkulieren</h2>
-            <p>Nutzen Sie den passenden Rechner für eine konkrete Handwerkerleistung oder für das gesamte Renovierungsbudget.</p>
+            <p>Nutzen Sie den passenden Rechner und erfassen Sie danach Ihr Vorhaben als strukturierte Projektanfrage.</p>
           </div>
           <div className="heroActions">
             <Link className="secondaryButton" href="/rechner/handwerkerkosten">Handwerkerkosten</Link>
             <Link className="ghostButton" href="/rechner/renovierungskosten">Renovierungskosten</Link>
+            <Link className="ghostButton" href="/angebot">Projekt anfragen</Link>
           </div>
         </div>
       </section>
