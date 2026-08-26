@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
 import { NextRequest, NextResponse } from "next/server";
 import { regions, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
@@ -9,6 +10,11 @@ export const dynamic = "force-dynamic";
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 5;
 const requestsByIp = new Map<string, number[]>();
+
+const privateHeaders = {
+  "Cache-Control": "no-store",
+  "X-Robots-Tag": "noindex, nofollow",
+};
 
 function clean(value: unknown, max: number) {
   return typeof value === "string"
@@ -71,33 +77,40 @@ function sendMail(message: string) {
   });
 }
 
+export function GET() {
+  return new NextResponse(null, {
+    status: existsSync("/usr/sbin/sendmail") ? 204 : 503,
+    headers: privateHeaders,
+  });
+}
+
 export async function POST(request: NextRequest) {
   const origin = request.headers.get("origin");
   if (origin && origin !== "https://baukostenradar.de" && origin !== "https://www.baukostenradar.de") {
-    return NextResponse.json({ ok: false, error: "invalid_origin" }, { status: 403 });
+    return NextResponse.json({ ok: false, error: "invalid_origin" }, { status: 403, headers: privateHeaders });
   }
 
   const ip = clientIp(request);
   if (ip !== "unknown" && rateLimited(ip)) {
-    return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429 });
+    return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429, headers: privateHeaders });
   }
 
   let input: Record<string, unknown>;
   try {
     input = (await request.json()) as Record<string, unknown>;
   } catch {
-    return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400, headers: privateHeaders });
   }
 
   const honeypot = clean(input.website, 200);
   if (honeypot) {
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true }, { headers: privateHeaders });
   }
 
   const startedAt = Number(input.startedAt ?? 0);
   const elapsed = Date.now() - startedAt;
   if (!Number.isFinite(startedAt) || elapsed < 1500 || elapsed > 2 * 60 * 60 * 1000) {
-    return NextResponse.json({ ok: false, error: "invalid_timing" }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "invalid_timing" }, { status: 400, headers: privateHeaders });
   }
 
   const serviceSlug = clean(input.service, 80);
@@ -117,7 +130,7 @@ export async function POST(request: NextRequest) {
     : regions.find((item) => item.slug === citySlug && item.value !== "de");
 
   if (!service || !city || !name || !details || !validEmail(email)) {
-    return NextResponse.json({ ok: false, error: "invalid_fields" }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "invalid_fields" }, { status: 400, headers: privateHeaders });
   }
 
   const safePostcode = /^[0-9]{5}$/.test(postcode) ? postcode : postcode || "nicht angegeben";
@@ -156,25 +169,11 @@ export async function POST(request: NextRequest) {
 
   try {
     await sendMail(message);
-    return NextResponse.json(
-      { ok: true },
-      {
-        headers: {
-          "Cache-Control": "no-store",
-          "X-Robots-Tag": "noindex, nofollow",
-        },
-      },
-    );
+    return NextResponse.json({ ok: true }, { headers: privateHeaders });
   } catch {
     return NextResponse.json(
       { ok: false, error: "mail_delivery_failed" },
-      {
-        status: 503,
-        headers: {
-          "Cache-Control": "no-store",
-          "X-Robots-Tag": "noindex, nofollow",
-        },
-      },
+      { status: 503, headers: privateHeaders },
     );
   }
 }
