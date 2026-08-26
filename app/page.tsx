@@ -14,61 +14,125 @@ function priceRange(low: number, high: number) {
   return low === high ? euro(low) : `${euro(low)} - ${euro(high)}`;
 }
 
+const heroCategories = [
+  ["Badsanierung", "/kosten/badsanierung"],
+  ["Dacharbeiten", "/kosten/dachsanierung"],
+  ["Fenster", "/kosten/fenster"],
+  ["Heizung & Sanitär", "/kosten/heizung"],
+  ["Elektroarbeiten", "/kosten/elektriker"],
+] as const;
+
 export default function HomePage() {
   const priceCount = services.reduce((sum, service) => sum + service.priceItems.length, 0);
+  const featuredServices = services.slice(0, 6);
 
   return (
     <>
-      <section className="hero">
-        <div className="shell heroGrid">
-          <div className="heroCopy">
-            <span className="eyebrow">Handwerkerpreise Deutschland - Stand August 2026</span>
-            <h1>Was kostet Renovieren wirklich?</h1>
+      <section className="premiumHero">
+        <div className="premiumHeroBackdrop" aria-hidden="true" />
+        <div className="shell premiumHeroGrid">
+          <div className="premiumHeroCopy">
+            <span className="premiumKicker">Aktuelle Baukosten 2026 für Deutschland</span>
+            <h1>Baukosten im Blick.<br />Projekte besser planen.</h1>
             <p>
-              BauKostenRadar bündelt aktuelle Richtpreise für Handwerkerarbeiten und macht sie
-              mit Rechnern, Tabellen und regionalen Faktoren vergleichbar.
+              Aktuelle Kosten für Handwerkerarbeiten, Sanierungen und Modernisierung transparent,
+              regional und verständlich erklärt.
             </p>
-            <div className="heroActions">
-              <Link className="primaryButton" href="/kosten">Preise vergleichen</Link>
-              <Link className="ghostButton" href="/rechner">Kostenrechner öffnen</Link>
-              <Link className="secondaryButton" href="/angebot">Projekt anfragen</Link>
+
+            <div className="premiumHeroActions">
+              <Link className="premiumPrimaryButton" href="/angebot">Kostenloses Angebot einholen</Link>
+              <Link className="premiumOutlineButton" href="/kosten">Zu den Preisen</Link>
             </div>
-            <div className="trustRow">
-              <div><strong>{priceCount} Preispositionen</strong><span>Strukturierte Richtwerte statt langer Fließtexte.</span></div>
-              <div><strong>{regions.length} Regionen</strong><span>Deutschland plus wichtige Großstädte im Modell.</span></div>
-              <div><strong>Quellen sichtbar</strong><span>Preisangaben mit Datenquelle und Prüfdatum.</span></div>
+
+            <div className="premiumTrustRow">
+              <div>
+                <span className="premiumTrustIcon">€</span>
+                <div><strong>Aktuelle Preise 2026</strong><small>Regelmäßig geprüft und aktualisiert</small></div>
+              </div>
+              <div>
+                <span className="premiumTrustIcon">●</span>
+                <div><strong>Regional & transparent</strong><small>Preise nach Städten und Regionen</small></div>
+              </div>
+              <div>
+                <span className="premiumTrustIcon">✓</span>
+                <div><strong>Unverbindlich & kostenlos</strong><small>Klare Richtwerte für die Planung</small></div>
+              </div>
             </div>
           </div>
-          <div className="heroCard">
+
+          <div className="premiumHeroVisual">
+            <img src="/hero-house.svg" alt="Modernes Wohnhaus als Symbol für Bau- und Renovierungskosten" />
+            <div className="premiumCategoryPanel">
+              <strong>Beliebte Kategorien</strong>
+              <div className="premiumCategoryList">
+                {heroCategories.map(([label, href]) => (
+                  <Link key={href} href={href}>
+                    <span>{label}</span>
+                    <span aria-hidden="true">›</span>
+                  </Link>
+                ))}
+              </div>
+              <Link className="premiumAllCategories" href="/kosten">Alle Kategorien anzeigen</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="premiumQuickStats">
+        <div className="shell premiumStatsGrid">
+          <div><strong>{services.length}</strong><span>Kostenbereiche</span></div>
+          <div><strong>{priceCount}</strong><span>Preispositionen</span></div>
+          <div><strong>{regions.length - 1}</strong><span>Städte im Vergleich</span></div>
+          <div><strong>2026</strong><span>Aktueller Datenstand</span></div>
+        </div>
+      </section>
+
+      <section className="section premiumCalculatorSection">
+        <div className="shell premiumCalculatorGrid">
+          <div className="premiumCalculatorIntro">
+            <span className="eyebrow">Kosten schnell einschätzen</span>
+            <h2>Renovierungskosten direkt berechnen</h2>
+            <p>
+              Fläche, Sanierungsumfang, Qualitätsniveau und Region auswählen. Der Rechner liefert sofort eine
+              unverbindliche Kostenspanne als erste Budgetorientierung.
+            </p>
+            <div className="premiumMiniFeatures">
+              <span>Keine Anmeldung</span>
+              <span>Regionale Faktoren</span>
+              <span>Transparente Methodik</span>
+            </div>
+            <Link className="textLink" href="/rechner">Alle Rechner ansehen →</Link>
+          </div>
+          <div className="premiumCalculatorCard">
             <RenovationCalculator compact />
           </div>
         </div>
       </section>
 
-      <section className="section">
+      <section className="section premiumServiceSection">
         <div className="shell">
-          <div className="sectionHeading splitHeading">
+          <div className="premiumSectionHeading">
             <div>
               <span className="eyebrow">Preisspiegel 2026</span>
               <h2>Beliebte Handwerkerkosten</h2>
-              <p>Direkt zu typischen Preisen, Einheiten, Quellen und regionaler Einordnung.</p>
+              <p>Typische Preise, Einheiten, Quellen und regionale Einordnung auf einen Blick.</p>
             </div>
-            <Link className="textLink" href="/kosten">Alle Kostenbereiche →</Link>
+            <Link className="premiumTextArrow" href="/kosten">Alle Kostenbereiche ansehen</Link>
           </div>
-          <div className="cardGrid">
-            {services.map((service) => {
+
+          <div className="premiumServiceGrid">
+            {featuredServices.map((service) => {
               const firstPrice = service.priceItems[0];
               return (
-                <Link className="serviceCard" href={`/kosten/${service.slug}`} key={service.slug}>
-                  <span className="serviceIcon" aria-hidden="true">{service.icon}</span>
-                  <h3>{service.shortTitle}</h3>
-                  <p>{service.description}</p>
-                  <div className="miniPrice">
-                    <span>{firstPrice.name}</span>
-                    <strong>{priceRange(firstPrice.low, firstPrice.high)}</strong>
-                    <small>{firstPrice.unit}</small>
+                <Link className="premiumServiceCard" href={`/kosten/${service.slug}`} key={service.slug}>
+                  <div className="premiumServiceCardTop">
+                    <span className="premiumServiceIcon" aria-hidden="true">{service.icon}</span>
+                    <span className="premiumServiceArrow" aria-hidden="true">↗</span>
                   </div>
-                  <span className="cardLink">Preise ansehen →</span>
+                  <h3>{service.shortTitle}</h3>
+                  <p>{firstPrice.name}</p>
+                  <strong>{priceRange(firstPrice.low, firstPrice.high)}</strong>
+                  <small>{firstPrice.unit}</small>
                 </Link>
               );
             })}
@@ -76,69 +140,59 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section sectionAlt">
-        <div className="shell twoColumn">
+      <section className="section premiumDarkSection">
+        <div className="shell premiumHowGrid">
           <div>
-            <span className="eyebrow">So funktioniert BauKostenRadar</span>
-            <h2>Ein Preisportal statt eines Preis-Blogs</h2>
+            <span className="premiumDarkKicker">So funktioniert BauKostenRadar</span>
+            <h2>Von der ersten Preisidee bis zur Projektanfrage</h2>
             <p>
-              Preispositionen liegen als strukturierte Daten vor. Dieselben Werte können in
-              Tabellen, Rechnern, Stadtseiten und später in Angebotsvergleichen verwendet werden.
+              BauKostenRadar verbindet strukturierte Preisdaten mit Rechnern, Stadtseiten und einer direkten
+              Projektanfrage. So bleibt die Planung nachvollziehbar und praktisch.
             </p>
-            <div className="stepsList">
-              <div><strong>1</strong><span><b>Leistung wählen</b> - zum Beispiel Maler, Bad oder Dach.</span></div>
-              <div><strong>2</strong><span><b>Richtwert prüfen</b> - Preisspanne und Einheit vergleichen.</span></div>
-              <div><strong>3</strong><span><b>Region einordnen</b> - lokale Preisunterschiede berücksichtigen.</span></div>
-              <div><strong>4</strong><span><b>Projekt kalkulieren</b> - Einzelarbeit oder Gesamtbudget im Rechner abschätzen.</span></div>
-            </div>
-            <Link className="primaryButton" href="/methodik">Unsere Methodik</Link>
+            <Link className="premiumLightButton" href="/methodik">Methodik & Quellen</Link>
           </div>
-          <div className="dataPanel">
-            <span className="eyebrow">Datenstand</span>
-            <strong className="bigMetric">August 2026</strong>
-            <p>Aktuelle öffentlich verfügbare deutsche Handwerker- und Sanierungspreise.</p>
-            <div className="metricGrid">
-              <div><strong>{services.length}</strong><span>Kostenbereiche</span></div>
-              <div><strong>{priceCount}</strong><span>Preispositionen</span></div>
-              <div><strong>{regions.length}</strong><span>Regionen</span></div>
-              <div><strong>2</strong><span>Kostenrechner</span></div>
-            </div>
+
+          <div className="premiumSteps">
+            <div><span>01</span><strong>Leistung wählen</strong><p>Zum Beispiel Bad, Dach, Fenster oder Elektrik.</p></div>
+            <div><span>02</span><strong>Preis einordnen</strong><p>Richtwerte und Einheiten transparent vergleichen.</p></div>
+            <div><span>03</span><strong>Region berücksichtigen</strong><p>Stadtfaktoren als Modellhilfe für die Budgetplanung nutzen.</p></div>
+            <div><span>04</span><strong>Projekt anfragen</strong><p>Projekt direkt strukturiert an BauKostenRadar senden.</p></div>
           </div>
         </div>
       </section>
 
-      <section className="section" id="staedte">
+      <section className="section premiumCitiesSection" id="staedte">
         <div className="shell">
-          <div className="sectionHeading splitHeading">
+          <div className="premiumSectionHeading">
             <div>
               <span className="eyebrow">Regionen</span>
-              <h2>Handwerkerpreise nach Stadt einordnen</h2>
-              <p>Die Standortfaktoren dienen als grobe Modellhilfe und ersetzen kein lokales Angebot.</p>
+              <h2>Handwerkerpreise nach Stadt</h2>
+              <p>Regionale Modellfaktoren helfen bei der ersten Einordnung des Budgets.</p>
             </div>
-            <Link className="textLink" href="/staedte">Alle Städte →</Link>
+            <Link className="premiumTextArrow" href="/staedte">Alle Städte ansehen</Link>
           </div>
-          <div className="cityGrid">
+
+          <div className="premiumCityGrid">
             {regions.filter((region) => region.value !== "de").map((region) => (
-              <Link key={region.value} href={`/staedte/${region.slug}`} className="cityCard">
-                <strong>{region.label}</strong>
-                <span>{region.factor >= 1 ? "+" : ""}{Math.round((region.factor - 1) * 100)} % Modellfaktor</span>
+              <Link key={region.value} href={`/staedte/${region.slug}`} className="premiumCityCard">
+                <span>{region.label}</span>
+                <strong>{region.factor >= 1 ? "+" : ""}{Math.round((region.factor - 1) * 100)} %</strong>
+                <small>Modellfaktor</small>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="section sectionTight">
-        <div className="shell ctaPanel">
+      <section className="premiumFinalCta">
+        <div className="shell premiumFinalCtaInner">
           <div>
-            <span className="eyebrow">Projekt planen</span>
-            <h2>Einzelarbeit oder komplette Renovierung kalkulieren</h2>
-            <p>Nutzen Sie den passenden Rechner und erfassen Sie danach Ihr Vorhaben als strukturierte Projektanfrage.</p>
+            <span>Projekt geplant?</span>
+            <h2>Kosten grob einschätzen und Anfrage senden.</h2>
           </div>
-          <div className="heroActions">
-            <Link className="secondaryButton" href="/rechner/handwerkerkosten">Handwerkerkosten</Link>
-            <Link className="ghostButton" href="/rechner/renovierungskosten">Renovierungskosten</Link>
-            <Link className="ghostButton" href="/angebot">Projekt anfragen</Link>
+          <div className="premiumHeroActions">
+            <Link className="premiumPrimaryButton premiumPrimaryButtonLight" href="/angebot">Kostenloses Angebot einholen</Link>
+            <Link className="premiumOutlineButton premiumOutlineButtonDark" href="/rechner">Kosten berechnen</Link>
           </div>
         </div>
       </section>
