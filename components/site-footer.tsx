@@ -23,7 +23,8 @@ export function SiteFooter() {
           <Link href="/kontakt">Kontakt</Link>
         </div>
         <div>
-          <strong>Datenhinweis</strong>
+          <strong>Rechtliches</strong>
+          <Link href="/impressum">Impressum</Link>
           <p>Preisangaben sind unverbindliche Orientierungswerte. Datenstand und Quellen werden transparent auf den jeweiligen Seiten ausgewiesen.</p>
         </div>
       </div>
