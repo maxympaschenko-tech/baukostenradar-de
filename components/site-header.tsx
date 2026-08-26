@@ -5,6 +5,7 @@ const nav = [
   ["Rechner", "/rechner/renovierungskosten"],
   ["Städte", "/staedte"],
   ["Methodik", "/methodik"],
+  ["Kontakt", "/kontakt"],
 ] as const;
 
 export function SiteHeader() {
