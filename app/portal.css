@@ -1,0 +1,330 @@
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.ghostButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: #fff;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 800;
+}
+
+.splitHeading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 28px;
+  max-width: none;
+}
+
+.textLink {
+  display: inline-block;
+  color: var(--primary-2);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.miniPrice {
+  display: grid;
+  gap: 2px;
+  margin: 18px 0;
+  padding: 14px;
+  background: #f6f9fb;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.miniPrice span,
+.miniPrice small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.miniPrice strong {
+  color: var(--success);
+  font-size: 19px;
+}
+
+.stepsList {
+  display: grid;
+  gap: 10px;
+  margin: 24px 0;
+}
+
+.stepsList > div {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  background: rgba(255,255,255,.7);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.stepsList > div > strong {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+}
+
+.stepsList span { color: var(--muted); }
+
+.dataPanel {
+  padding: 28px;
+  border-radius: 20px;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.bigMetric {
+  display: block;
+  margin: 14px 0 2px;
+  font-size: clamp(34px, 5vw, 56px);
+  letter-spacing: -0.05em;
+  line-height: 1;
+  color: var(--primary);
+}
+
+.dataPanel > p { color: var(--muted); }
+
+.metricGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.metricGrid > div {
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--surface-soft);
+}
+
+.metricGrid strong {
+  display: block;
+  font-size: 24px;
+  color: var(--primary-2);
+}
+
+.metricGrid span { color: var(--muted); font-size: 12px; }
+
+.cityGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.cityCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 102px;
+  padding: 18px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  text-decoration: none;
+}
+
+.cityCard:hover { border-color: #b9ccd8; box-shadow: 0 10px 30px rgba(25,45,61,.08); }
+.cityCard strong { font-size: 19px; }
+.cityCard span, .cityCard small { color: var(--muted); }
+.cityCard small { margin-top: auto; color: var(--primary-2); font-weight: 800; }
+.cityGridLarge { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.cityCardLarge { min-height: 150px; }
+.sectionTight { padding-top: 24px; }
+
+.heroFacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.heroFacts span {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f7f9fa;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.heroFacts strong { color: var(--text); }
+
+.cardHeaderRow {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.priceTableWrap { overflow-x: auto; margin-top: 18px; }
+
+.priceTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 620px;
+}
+
+.priceTable th,
+.priceTable td {
+  padding: 14px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.priceTable th {
+  background: #f5f8fa;
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.priceTable td:nth-child(2) strong { color: var(--success); white-space: nowrap; }
+.priceTable td small { display: block; margin-top: 3px; color: var(--muted); }
+.tableNote { font-size: 13px; }
+
+.regionChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.regionChips span {
+  padding: 9px 11px;
+  background: #f2f6f8;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.regionChips strong { color: var(--primary-2); }
+
+.sourceList {
+  display: grid;
+  gap: 9px;
+  margin: 18px 0;
+}
+
+.sourceList a {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  text-decoration: none;
+  background: #f9fbfc;
+}
+
+.sourceList a:hover { border-color: #b9ccd8; }
+.sourceList span { color: var(--muted); font-size: 13px; }
+
+.directoryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.directoryCard {
+  padding: 24px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.directoryCardTop {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 14px;
+}
+
+.directoryCard h2 { margin: 0 0 6px; font-size: 26px; }
+.directoryCard p { margin: 0; color: var(--muted); }
+
+.directoryPrices {
+  display: grid;
+  gap: 0;
+  margin-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.directoryPrices > div {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.directoryPrices span { color: var(--muted); }
+.directoryPrices strong { color: var(--success); }
+.directoryPrices small { grid-column: 1 / -1; color: var(--muted); }
+
+.articleShell {
+  max-width: 900px;
+  padding-top: 48px;
+  padding-bottom: 72px;
+}
+
+.proseCard + .proseCard { margin-top: 18px; }
+.proseCard h2 { margin-bottom: 10px; }
+
+.cityServiceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.cityServiceCard {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 14px;
+  padding: 22px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.cityServiceCard h2 { margin: 0 0 5px; font-size: 23px; }
+.cityServiceCard span { display: block; color: var(--muted); }
+.cityServiceCard > div > strong { display: block; margin: 4px 0; color: var(--success); font-size: 21px; }
+.cityServiceCard small { display: block; margin-bottom: 8px; color: var(--muted); }
+.cityNotice { margin-top: 20px; }
+
+@media (max-width: 920px) {
+  .cityGrid, .cityGridLarge { grid-template-columns: repeat(2, 1fr); }
+  .directoryGrid, .cityServiceGrid { grid-template-columns: 1fr; }
+  .splitHeading { align-items: start; flex-direction: column; }
+}
+
+@media (max-width: 620px) {
+  .cityGrid, .cityGridLarge, .metricGrid { grid-template-columns: 1fr; }
+  .sourceList a { display: block; }
+  .sourceList span { display: block; margin-top: 4px; }
+  .directoryCard { padding: 18px; }
+  .heroActions > a { width: 100%; }
+}
