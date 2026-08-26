@@ -43,6 +43,29 @@ export default function HandwerkerCostCalculatorPage() {
         </section>
 
         <section className="contentCard proseCard">
+          <span className="eyebrow">Ratgeber</span>
+          <h2>Handwerkerpreise besser einordnen</h2>
+          <p>
+            Einzelpreise sind leichter zu bewerten, wenn Stundensätze, Projektumfang und das Gesamtbudget getrennt
+            betrachtet werden. Diese Ratgeber ergänzen die Rechnerwerte mit Beispielen und Hintergründen.
+          </p>
+          <div className="sourceList">
+            <Link href="/ratgeber/handwerker-stundensaetze">
+              <strong>Handwerker-Stundensätze 2026</strong>
+              <span>Stundensätze ausgewählter Gewerke vergleichen</span>
+            </Link>
+            <Link href="/ratgeber/sanierungskosten-pro-qm">
+              <strong>Sanierungskosten pro m² 2026</strong>
+              <span>Einzelarbeiten in das Gesamtbudget einordnen</span>
+            </Link>
+            <Link href="/ratgeber/altbausanierung-kosten">
+              <strong>Altbausanierung Kosten 2026</strong>
+              <span>Technische Gewerke im Bestand richtig priorisieren</span>
+            </Link>
+          </div>
+        </section>
+
+        <section className="contentCard proseCard">
           <span className="eyebrow">Hinweis</span>
           <h2>Warum ist das Ergebnis nur eine Orientierung?</h2>
           <p>
