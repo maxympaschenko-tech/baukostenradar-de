@@ -93,34 +93,51 @@ jobs:
         env:
           ADMTOOLS_TOKEN: ${{ secrets.ADMTOOLS_TOKEN }}
         run: |
+          set -euo pipefail
+
           if [[ -z "$ADMTOOLS_TOKEN" ]]; then
             echo "ADMTOOLS_TOKEN is missing. Files were deployed, but automatic restart was skipped."
             exit 0
           fi
 
-          lookup=$(curl --fail-with-body --silent --show-error \
-            -X POST 'https://adm.tools/action/get_id/' \
-            -H "Authorization: Bearer $ADMTOOLS_TOKEN" \
-            --data-urlencode "name=$PRODUCTION_HOST" \
-            --data-urlencode 'type=host')
+          host_id=""
+          for candidate in "$PRODUCTION_HOST" "baukostenradar.de"; do
+            echo "Resolving ADM.TOOLS host id for $candidate"
+            lookup=$(curl --silent --show-error \
+              -X POST 'https://adm.tools/action/get_id/' \
+              -H "Authorization: Bearer $ADMTOOLS_TOKEN" \
+              -d "name=$candidate&type=host" || true)
 
-          host_id=$(printf '%s' "$lookup" | jq -r '.response.host_id // empty')
+            host_id=$(printf '%s' "$lookup" | jq -r '.response.host_id // empty' 2>/dev/null || true)
+            if [[ -n "$host_id" ]]; then
+              echo "Resolved host id."
+              break
+            fi
+          done
+
           if [[ -z "$host_id" ]]; then
-            echo "Could not resolve host_id for $PRODUCTION_HOST" >&2
-            printf '%s\n' "$lookup" >&2
+            echo "Could not resolve ADM.TOOLS host id automatically." >&2
             exit 1
           fi
 
-          curl --fail-with-body --silent --show-error \
+          restart=$(curl --silent --show-error \
             -X POST 'https://adm.tools/action/hosting/account/app/systemd/restart/' \
             -H "Authorization: Bearer $ADMTOOLS_TOKEN" \
-            --data-urlencode "host_id=$host_id"
+            -d "host_id=$host_id")
+
+          if ! printf '%s' "$restart" | jq -e '.result == true' >/dev/null 2>&1; then
+            echo "ADM.TOOLS restart request failed." >&2
+            printf '%s\n' "$restart" >&2
+            exit 1
+          fi
+
+          echo "Node.js application restart requested successfully."
 
       - name: Verify production HTTPS
         if: steps.deploy_config.outputs.ready == 'true'
         shell: bash
         run: |
-          for i in 1 2 3 4 5 6; do
+          for i in 1 2 3 4 5 6 7 8; do
             code=$(curl -L -sS -o /tmp/site.html -w '%{http_code}' --connect-timeout 10 --max-time 20 'https://baukostenradar.de/' || true)
             if [[ "$code" == "200" ]] && grep -qi 'BauKostenRadar' /tmp/site.html; then
               echo "Production verification passed."
