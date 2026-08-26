@@ -11,15 +11,26 @@ type Props = {
   recipient: string;
   initialService?: string;
   initialCity?: string;
+  initialDetails?: string;
+  source?: string;
 };
 
 declare global {
   interface Window {
     dataLayer?: unknown[];
+    gtag?: (...args: unknown[]) => void;
   }
 }
 
-export function ProjectRequestForm({ services, cities, recipient, initialService, initialCity }: Props) {
+export function ProjectRequestForm({
+  services,
+  cities,
+  recipient,
+  initialService,
+  initialCity,
+  initialDetails,
+  source,
+}: Props) {
   const validInitialService = services.some((item) => item.value === initialService)
     ? initialService
     : services[0]?.value;
@@ -32,7 +43,7 @@ export function ProjectRequestForm({ services, cities, recipient, initialService
   const [postcode, setPostcode] = useState("");
   const [budget, setBudget] = useState("Noch offen");
   const [timing, setTiming] = useState("In den nächsten 3 Monaten");
-  const [details, setDetails] = useState("");
+  const [details, setDetails] = useState(initialDetails ?? "");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -58,6 +69,7 @@ export function ProjectRequestForm({ services, cities, recipient, initialService
       `PLZ: ${postcode || "nicht angegeben"}`,
       `Budget: ${budget}`,
       `Zeitrahmen: ${timing}`,
+      `Quelle: ${source || "direkter Aufruf"}`,
       "",
       "Projektbeschreibung:",
       details || "Keine zusätzliche Beschreibung.",
@@ -69,10 +81,17 @@ export function ProjectRequestForm({ services, cities, recipient, initialService
     ].join("\n");
 
     window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
+    const eventData = {
       event: "project_request_email",
       project_service: service,
       project_city: city,
+      project_source: source || "direct",
+    };
+    window.dataLayer.push(eventData);
+    window.gtag?.("event", "project_request_email", {
+      project_service: service,
+      project_city: city,
+      project_source: source || "direct",
     });
 
     window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
