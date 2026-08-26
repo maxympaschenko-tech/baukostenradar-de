@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { RenovationCalculator } from "@/components/renovation-calculator";
-import { guides } from "@/lib/guides";
+import { allGuides } from "@/lib/all-guides";
 import { regions, services } from "@/lib/pricing";
 
 function euro(value: number) {
@@ -23,10 +23,19 @@ const heroCategories = [
   ["Elektroarbeiten", "/kosten/elektriker"],
 ] as const;
 
+const featuredGuideSlugs = [
+  "sanierungskosten-pro-qm",
+  "haus-sanieren-kosten",
+  "handwerker-stundensaetze",
+  "renovierungskosten-haus",
+];
+
 export default function HomePage() {
   const priceCount = services.reduce((sum, service) => sum + service.priceItems.length, 0);
   const featuredServices = services.slice(0, 6);
-  const featuredGuides = guides.slice(0, 4);
+  const featuredGuides = featuredGuideSlugs
+    .map((slug) => allGuides.find((guide) => guide.slug === slug))
+    .filter((guide): guide is (typeof allGuides)[number] => Boolean(guide));
 
   return (
     <>
