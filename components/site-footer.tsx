@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ConsentSettingsButton } from "@/components/consent-settings-button";
 import { siteConfig } from "@/lib/site";
 
 export function SiteFooter() {
@@ -27,6 +28,7 @@ export function SiteFooter() {
           <strong>Rechtliches</strong>
           <Link href="/impressum">Impressum</Link>
           <Link href="/datenschutz">Datenschutzerklärung</Link>
+          <ConsentSettingsButton />
           <p>Preisangaben sind unverbindliche Orientierungswerte. Datenstand und Quellen werden transparent auf den jeweiligen Seiten ausgewiesen.</p>
         </div>
       </div>
