@@ -11,6 +11,10 @@ function euro(value: number) {
   }).format(value);
 }
 
+function priceRange(low: number, high: number) {
+  return Math.round(low) === Math.round(high) ? euro(low) : `${euro(low)} - ${euro(high)}`;
+}
+
 export function generateStaticParams() {
   return regions.filter((region) => region.value !== "de").map((region) => ({ slug: region.slug }));
 }
@@ -58,9 +62,11 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
                   <div>
                     <h2>{service.shortTitle}</h2>
                     <span>{item.name}</span>
-                    <strong>{euro(item.low * region.factor)} - {euro(item.high * region.factor)}</strong>
+                    <strong>{priceRange(item.low * region.factor, item.high * region.factor)}</strong>
                     <small>{item.unit}, modelliert für {region.label}</small>
-                    <Link className="textLink" href={`/kosten/${service.slug}`}>Bundesweite Preistabelle →</Link>
+                    <Link className="textLink" href={`/kosten/${service.slug}/${region.slug}`}>
+                      {service.shortTitle}-Preise in {region.label} →
+                    </Link>
                   </div>
                 </article>
               );
