@@ -4,7 +4,7 @@ import { allGuides } from "@/lib/all-guides";
 
 export const metadata: Metadata = {
   title: "Ratgeber zu Sanierung, Renovierung & Handwerkerkosten 2026",
-  description: "Ratgeber zu Sanierungskosten, Kernsanierung, Einfamilienhaus, Renovierungskosten nach Wohnfläche, Handwerkerpreisen und Sanierungsplanung mit Richtwerten und Rechnern.",
+  description: "Ratgeber zu Sanierungskosten, Kernsanierung, Dach, Fenster, Elektrik, Heizung, Badsanierung, Renovierungskosten nach Wohnfläche und Sanierungsplanung mit Richtwerten und Rechnern.",
   alternates: { canonical: "/ratgeber" },
 };
 
@@ -19,6 +19,18 @@ const guideGroups = [
       "kernsanierung-kosten",
       "sanierungskosten-einfamilienhaus",
       "altbausanierung-kosten",
+    ],
+  },
+  {
+    eyebrow: "Konkrete Gewerke",
+    title: "Große Einzelmaßnahmen realistisch kalkulieren",
+    description: "Kosten für Dach, Fenster, Elektrik, Heizung und komplette Badsanierung mit konkreten 2026-Richtwerten und Beispielbudgets.",
+    slugs: [
+      "dach-sanieren-kosten-pro-qm",
+      "fenster-austauschen-kosten-haus",
+      "elektrik-erneuern-altbau",
+      "heizung-erneuern-kosten",
+      "bad-komplett-sanieren-kosten",
     ],
   },
   {
