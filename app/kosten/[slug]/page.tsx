@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RenovationCalculator } from "@/components/renovation-calculator";
+import { priceItemSlug } from "@/lib/price-slug";
 import { getService, priceSources, regions, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
 
@@ -158,7 +159,9 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
                   {service.priceItems.map((item) => (
                     <tr key={item.name}>
                       <td>
-                        <strong>{item.name}</strong>
+                        <Link className="priceItemLink" href={`/kosten/${service.slug}/leistung/${priceItemSlug(item.name)}`}>
+                          {item.name}
+                        </Link>
                         {item.note ? <small>{item.note}</small> : null}
                       </td>
                       <td><strong>{priceRange(item.low, item.high)}</strong></td>
