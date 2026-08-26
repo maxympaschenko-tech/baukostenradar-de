@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const nav = [
   ["Kosten", "/kosten"],
-  ["Rechner", "/rechner/renovierungskosten"],
+  ["Rechner", "/rechner"],
   ["Städte", "/staedte"],
   ["Methodik", "/methodik"],
   ["Kontakt", "/kontakt"],
