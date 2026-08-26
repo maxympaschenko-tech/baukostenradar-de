@@ -14,6 +14,9 @@ export const metadata: Metadata = {
     template: "%s | BauKostenRadar",
   },
   description: siteConfig.description,
+  verification: {
+    google: "vXOTcob1kFIZony7RPFaEkolb_RX3iMjOJkWlS-LH38",
+  },
   alternates: {
     canonical: "/",
   },
