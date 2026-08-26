@@ -52,6 +52,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.85,
     },
     {
+      url: `${base}/ueber-uns`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.72,
+    },
+    {
       url: `${base}/methodik`,
       lastModified: now,
       changeFrequency: "monthly",
