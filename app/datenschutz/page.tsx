@@ -81,29 +81,49 @@ export default function DatenschutzPage() {
             gesetzlichen Aufbewahrungspflichten entgegenstehen.
           </p>
 
-          <h2>5. Cookies, Analyse und Marketing</h2>
+          <h2>5. Google Tag Manager</h2>
           <p>
-            BauKostenRadar setzt derzeit keine Dienste zur Reichweitenanalyse, kein Werbe-Tracking und keine
-            Marketing-Cookies ein. Es werden derzeit auch keine externen Analysewerkzeuge wie Google Analytics
-            verwendet. Sollte sich dies ändern, wird diese Datenschutzerklärung vor dem Einsatz entsprechend
-            angepasst und, soweit erforderlich, eine Einwilligung eingeholt.
+            Auf BauKostenRadar wird Google Tag Manager eingesetzt. Anbieter für Nutzer im Europäischen
+            Wirtschaftsraum ist Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland.
+            Der Tag Manager dient der zentralen Verwaltung von Website-Tags und Skripten.
+          </p>
+          <p>
+            Beim Laden des Google Tag Managers stellt Ihr Browser eine Verbindung zu Servern von Google her.
+            Dabei können insbesondere die IP-Adresse sowie technische Informationen über Browser und Gerät an
+            Google übermittelt werden. Eine Verarbeitung von Daten außerhalb der Europäischen Union bzw. des
+            Europäischen Wirtschaftsraums kann dabei nicht ausgeschlossen werden.
+          </p>
+          <p>
+            Welche weiteren Daten verarbeitet oder Cookies gesetzt werden, hängt von den im Tag-Manager-Container
+            eingebundenen Diensten ab. Solche Dienste werden in dieser Datenschutzerklärung zusätzlich beschrieben,
+            sobald sie auf BauKostenRadar eingesetzt werden. Informationen zum Datenschutz bei Google finden Sie
+            unter <a className="textLink" href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">policies.google.com/privacy</a>.
           </p>
 
-          <h2>6. Externe Links</h2>
+          <h2>6. Cookies, Analyse und Marketing</h2>
+          <p>
+            Abgesehen von der technischen Einbindung des Google Tag Managers werden derzeit keine eigenen
+            Reichweitenanalyse- oder Werbe-Tracking-Dienste auf BauKostenRadar beschrieben. Sobald über den
+            Tag-Manager-Container beispielsweise Google Analytics, Google Ads oder andere Dienste aktiviert werden,
+            wird diese Datenschutzerklärung entsprechend ergänzt und erforderliche Einwilligungsmechanismen werden
+            berücksichtigt.
+          </p>
+
+          <h2>7. Externe Links</h2>
           <p>
             Diese Website enthält Links zu externen Websites und Quellen. Erst wenn Sie einen solchen Link öffnen,
             werden Daten an den jeweiligen externen Anbieter übertragen. Für die Datenverarbeitung auf externen
             Websites ist der jeweilige Anbieter verantwortlich.
           </p>
 
-          <h2>7. SSL- bzw. TLS-Verschlüsselung</h2>
+          <h2>8. SSL- bzw. TLS-Verschlüsselung</h2>
           <p>
             Diese Website nutzt eine SSL- bzw. TLS-Verschlüsselung, um die Übertragung von Inhalten und Anfragen zu
             schützen. Eine verschlüsselte Verbindung erkennen Sie insbesondere an der Verwendung von HTTPS in der
             Adresszeile Ihres Browsers.
           </p>
 
-          <h2>8. Ihre Rechte</h2>
+          <h2>9. Ihre Rechte</h2>
           <p>
             Im Rahmen der gesetzlichen Voraussetzungen haben Sie insbesondere das Recht auf Auskunft über Ihre
             personenbezogenen Daten, Berichtigung unrichtiger Daten, Löschung, Einschränkung der Verarbeitung,
@@ -116,20 +136,20 @@ export default function DatenschutzPage() {
             Orts des mutmaßlichen Verstoßes.
           </p>
 
-          <h2>9. Widerspruch nach Art. 21 DSGVO</h2>
+          <h2>10. Widerspruch nach Art. 21 DSGVO</h2>
           <p>
             Soweit personenbezogene Daten auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO verarbeitet werden, können
             Sie aus Gründen, die sich aus Ihrer besonderen Situation ergeben, jederzeit Widerspruch gegen die
             Verarbeitung einlegen. Wenden Sie sich hierzu an <a className="textLink" href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>.
           </p>
 
-          <h2>10. Automatisierte Entscheidungen</h2>
+          <h2>11. Automatisierte Entscheidungen</h2>
           <p>
             Eine ausschließlich automatisierte Entscheidungsfindung einschließlich Profiling im Sinne von Art. 22
             DSGVO findet auf BauKostenRadar derzeit nicht statt.
           </p>
 
-          <h2>11. Aktualisierung dieser Datenschutzerklärung</h2>
+          <h2>12. Aktualisierung dieser Datenschutzerklärung</h2>
           <p>
             Wir passen diese Datenschutzerklärung an, wenn sich die Website, eingesetzte Dienste oder rechtliche
             Anforderungen ändern. Stand dieser Datenschutzerklärung: August 2026.
