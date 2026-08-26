@@ -1,21 +1,34 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { priceSources } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Methodik und Datenquellen",
-  description: "So sammelt, prüft und strukturiert BauKostenRadar Handwerker- und Renovierungspreise für Deutschland.",
+  title: "Methodik: Preisquellen, Modelle & Regionalfaktoren",
+  description: "So sammelt, prüft und strukturiert BauKostenRadar Handwerker- und Renovierungspreise, Modellbänder und regionale Richtwerte für Deutschland.",
   alternates: { canonical: "/methodik" },
 };
 
 export default function MethodologyPage() {
+  const sourceCount = new Set(Object.values(priceSources).map((source) => source.url)).size;
+
   return (
     <>
       <section className="contentHero">
         <div className="shell">
+          <nav className="visibleBreadcrumbs" aria-label="Breadcrumb">
+            <Link href="/">Startseite</Link>
+            <span aria-hidden="true">›</span>
+            <span aria-current="page">Methodik</span>
+          </nav>
           <span className="eyebrow">Transparenz</span>
-          <h1>Methodik und Datenquellen</h1>
+          <h1>Methodik, Preisquellen und Kostenmodelle</h1>
           <p>So entstehen die Richtwerte, Rechner und regionalen Einordnungen auf BauKostenRadar.</p>
+          <div className="heroFacts">
+            <span><strong>{sourceCount}</strong> unterschiedliche Quellen</span>
+            <span><strong>2026</strong> aktueller Datenstand</span>
+            <span><strong>Getrennt</strong> Quellenwerte und Modellwerte</span>
+          </div>
         </div>
       </section>
 
@@ -41,13 +54,14 @@ export default function MethodologyPage() {
 
         <section className="contentCard proseCard">
           <h2>3. Quellen im aktuellen Datenstand</h2>
-          <div className="sourceList">
-            {Object.entries(priceSources).map(([key, source]) => (
-              <a key={key} href={source.url} target="_blank" rel="noreferrer">
-                <strong>{source.name}</strong>
-                <span>Geprüft: {source.checkedAt}</span>
-              </a>
-            ))}
+          <p>
+            Das zentrale Quellenverzeichnis wird direkt aus derselben Preis-Datenbank erzeugt, die auch
+            unsere Kosten- und Detailseiten verwenden. Dort finden Sie die aktuell hinterlegten Originalquellen
+            mit Prüfdatum und direktem Link.
+          </p>
+          <div className="heroActions">
+            <Link className="primaryButton" href="/quellen">Alle {sourceCount} Quellen ansehen</Link>
+            <Link className="ghostButton" href="/kosten">Preisbereiche öffnen</Link>
           </div>
         </section>
 
