@@ -15,6 +15,8 @@ export default async function OfferPage({ searchParams }: { searchParams: Search
   const query = await searchParams;
   const requestedService = typeof query.leistung === "string" ? query.leistung : undefined;
   const requestedCity = typeof query.stadt === "string" ? query.stadt : undefined;
+  const requestedPosition = typeof query.position === "string" ? query.position : undefined;
+  const source = typeof query.quelle === "string" ? query.quelle : undefined;
 
   const serviceOptions = services.map((service) => ({ value: service.slug, label: service.shortTitle }));
   const cityOptions = [
@@ -23,6 +25,9 @@ export default async function OfferPage({ searchParams }: { searchParams: Search
       .filter((region) => region.value !== "de")
       .map((region) => ({ value: region.slug, label: region.label })),
   ];
+  const initialDetails = requestedPosition
+    ? `Geplante Arbeit: ${requestedPosition}\n\nWeitere Angaben zum Projekt: `
+    : undefined;
 
   return (
     <>
@@ -57,6 +62,8 @@ export default async function OfferPage({ searchParams }: { searchParams: Search
               recipient={siteConfig.email}
               initialService={requestedService}
               initialCity={requestedCity}
+              initialDetails={initialDetails}
+              source={source}
             />
           </section>
         </div>
