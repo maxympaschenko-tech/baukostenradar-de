@@ -19,12 +19,12 @@ export function RenovationCalculator({ compact = false }: { compact?: boolean })
 
   const result = useMemo(() => {
     const safeArea = Math.min(1000, Math.max(10, area || 80));
-    const conditionFactor = renovationModel.conditions.find((item) => item.value === condition)?.factor ?? 1;
+    const conditionBand = renovationModel.conditions.find((item) => item.value === condition) ?? renovationModel.conditions[1];
     const standardFactor = renovationModel.standards.find((item) => item.value === standard)?.factor ?? 1;
     const regionFactor = regions.find((item) => item.value === region)?.factor ?? 1;
-    const midpoint = safeArea * renovationModel.basePerSquareMeter * conditionFactor * standardFactor * regionFactor;
-    const low = midpoint * renovationModel.lowMultiplier;
-    const high = midpoint * renovationModel.highMultiplier;
+
+    const low = safeArea * conditionBand.lowPerSquareMeter * standardFactor * regionFactor;
+    const high = safeArea * conditionBand.highPerSquareMeter * standardFactor * regionFactor;
 
     return {
       low,
@@ -41,7 +41,7 @@ export function RenovationCalculator({ compact = false }: { compact?: boolean })
   return (
     <div className={compact ? "calculator calculatorCompact" : "calculator"}>
       <div className="calculatorHeading">
-        <span className="eyebrow">Renovierungskosten-Rechner</span>
+        <span className="eyebrow">Renovierungskosten-Rechner 2026</span>
         <h2>Was kostet Ihre Renovierung?</h2>
       </div>
 
@@ -61,7 +61,7 @@ export function RenovationCalculator({ compact = false }: { compact?: boolean })
         </label>
 
         <label>
-          <span>Zustand</span>
+          <span>Umfang</span>
           <select value={condition} onChange={(event) => setCondition(event.target.value)}>
             {renovationModel.conditions.map((item) => (
               <option key={item.value} value={item.value}>{item.label}</option>
@@ -91,14 +91,14 @@ export function RenovationCalculator({ compact = false }: { compact?: boolean })
       <div className="resultBox">
         <span>Geschätzte Gesamtkosten</span>
         <strong>{euro(result.low)} - {euro(result.high)}</strong>
-        <small>Orientierungswert aus dem aktuellen MVP-Modell. Vor dem öffentlichen Launch wird die Berechnung mit dokumentierten deutschen Marktdaten kalibriert.</small>
+        <small>Unverbindlicher Orientierungswert auf Basis deutscher Marktpreisspannen 2026. Objektzustand, Leistungsumfang und konkrete Angebote können deutlich abweichen.</small>
       </div>
 
       {!compact && (
         <div className="breakdown">
-          <div><span>Arbeit</span><strong>{euro(result.laborLow)} - {euro(result.laborHigh)}</strong></div>
-          <div><span>Material</span><strong>{euro(result.materialLow)} - {euro(result.materialHigh)}</strong></div>
-          <div><span>Nebenkosten / Reserve</span><strong>{euro(result.reserveLow)} - {euro(result.reserveHigh)}</strong></div>
+          <div><span>Arbeit, grober Modellanteil</span><strong>{euro(result.laborLow)} - {euro(result.laborHigh)}</strong></div>
+          <div><span>Material, grober Modellanteil</span><strong>{euro(result.materialLow)} - {euro(result.materialHigh)}</strong></div>
+          <div><span>Reserve</span><strong>{euro(result.reserveLow)} - {euro(result.reserveHigh)}</strong></div>
         </div>
       )}
     </div>
