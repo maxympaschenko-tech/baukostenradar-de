@@ -54,7 +54,7 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
     },
     {
       question: `Sind die ${service.shortTitle}-Preise bei BauKostenRadar aktuell?`,
-      answer: `Ja. Die auf dieser Seite verwendeten Quellen wurden zuletzt im August 2026 geprüft. Jede Preisposition ist einer öffentlich nachvollziehbaren Quelle zugeordnet.`,
+      answer: "Ja. Die auf dieser Seite verwendeten Quellen wurden zuletzt im August 2026 geprüft. Jede Preisposition ist einer öffentlich nachvollziehbaren Quelle zugeordnet.",
     },
   ];
 
@@ -144,16 +144,16 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
 
           <section className="contentCard">
             <span className="eyebrow">Regionale Unterschiede</span>
-            <h2>Wie stark kann der Standort den Preis verändern?</h2>
+            <h2>{service.shortTitle}-Kosten nach Stadt vergleichen</h2>
             <p>
-              Für die erste Kalkulation nutzt BauKostenRadar regionale Modellfaktoren. Sie sind keine
-              verbindlichen Aufschläge, sondern helfen dabei, typische Unterschiede zwischen Städten grob abzubilden.
+              Für die erste Kalkulation nutzt BauKostenRadar regionale Modellfaktoren. Die verlinkten Stadtseiten
+              zeigen die vollständige Preistabelle mit bundesweitem Ausgangswert und regionaler Modellierung nebeneinander.
             </p>
             <div className="regionChips">
               {regions.filter((region) => region.value !== "de").map((region) => (
-                <span key={region.value}>
+                <Link className="regionChip" key={region.value} href={`/kosten/${service.slug}/${region.slug}`}>
                   {region.label} <strong>{region.factor >= 1 ? "+" : ""}{Math.round((region.factor - 1) * 100)} %</strong>
-                </span>
+                </Link>
               ))}
             </div>
           </section>
@@ -190,6 +190,10 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
               })}
             </div>
             <Link className="textLink" href="/methodik">Methodik von BauKostenRadar ansehen →</Link>
+            <p className="tableNote">
+              Fehler oder aktuellere Quelle gefunden? Schreiben Sie an {" "}
+              <a className="textLink" href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>.
+            </p>
           </section>
 
           <section className="contentCard">
