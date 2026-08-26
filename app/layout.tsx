@@ -26,9 +26,27 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const organizationData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: siteConfig.name,
+    url: siteConfig.url,
+    email: siteConfig.email,
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      email: siteConfig.email,
+      availableLanguage: ["de"],
+    },
+  };
+
   return (
     <html lang="de">
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationData) }}
+        />
         <SiteHeader />
         <main>{children}</main>
         <SiteFooter />
