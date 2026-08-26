@@ -27,11 +27,6 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <Link className="headerOfferButton" href="/angebot">
-          Kostenloses Angebot
-          <span>einholen</span>
-        </Link>
-
         <MobileNavigation />
       </div>
     </header>
