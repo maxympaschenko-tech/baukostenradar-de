@@ -81,13 +81,12 @@ export function ProjectRequestForm({
     ].join("\n");
 
     window.dataLayer = window.dataLayer || [];
-    const eventData = {
-      event: "project_request_email",
+    window.dataLayer.push({
+      event: "bkr_project_request_email",
       project_service: service,
       project_city: city,
       project_source: source || "direct",
-    };
-    window.dataLayer.push(eventData);
+    });
     window.gtag?.("event", "project_request_email", {
       project_service: service,
       project_city: city,
