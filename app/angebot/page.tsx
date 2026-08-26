@@ -9,7 +9,13 @@ export const metadata: Metadata = {
   alternates: { canonical: "/angebot" },
 };
 
-export default function OfferPage() {
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+export default async function OfferPage({ searchParams }: { searchParams: SearchParams }) {
+  const query = await searchParams;
+  const requestedService = typeof query.leistung === "string" ? query.leistung : undefined;
+  const requestedCity = typeof query.stadt === "string" ? query.stadt : undefined;
+
   const serviceOptions = services.map((service) => ({ value: service.slug, label: service.shortTitle }));
   const cityOptions = [
     { value: "andere-region", label: "Andere Region in Deutschland" },
@@ -45,7 +51,13 @@ export default function OfferPage() {
               Je genauer die Angaben zu Leistung, Standort, Budget und Zeitraum sind, desto besser lässt sich das
               Vorhaben später einem passenden Fachbetrieb zuordnen.
             </p>
-            <ProjectRequestForm services={serviceOptions} cities={cityOptions} recipient={siteConfig.email} />
+            <ProjectRequestForm
+              services={serviceOptions}
+              cities={cityOptions}
+              recipient={siteConfig.email}
+              initialService={requestedService}
+              initialCity={requestedCity}
+            />
           </section>
         </div>
 
