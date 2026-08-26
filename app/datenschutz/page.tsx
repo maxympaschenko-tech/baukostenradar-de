@@ -1,0 +1,141 @@
+import type { Metadata } from "next";
+import { siteConfig } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: "Datenschutzerklärung",
+  description: "Datenschutzerklärung von BauKostenRadar.",
+  alternates: { canonical: "/datenschutz" },
+  robots: {
+    index: false,
+    follow: true,
+    googleBot: {
+      index: false,
+      follow: true,
+    },
+  },
+};
+
+export default function DatenschutzPage() {
+  const { operator } = siteConfig;
+
+  return (
+    <>
+      <section className="contentHero">
+        <div className="shell">
+          <span className="eyebrow">Datenschutz</span>
+          <h1>Datenschutzerklärung</h1>
+          <p>Informationen zur Verarbeitung personenbezogener Daten auf BauKostenRadar.</p>
+        </div>
+      </section>
+
+      <div className="shell articleShell">
+        <section className="contentCard proseCard">
+          <h2>1. Verantwortlicher</h2>
+          <p>
+            <strong>{operator.name}</strong><br />
+            {operator.addressLine}<br />
+            {operator.postalCode} {operator.city}<br />
+            {operator.country}
+          </p>
+          <p>
+            Telefon: <a className="textLink" href={`tel:${siteConfig.phone}`}>{siteConfig.phoneDisplay}</a><br />
+            E-Mail: <a className="textLink" href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
+          </p>
+
+          <h2>2. Allgemeine Hinweise</h2>
+          <p>
+            Wir verarbeiten personenbezogene Daten nur, soweit dies für den Betrieb dieser Website, die technische
+            Sicherheit und die Bearbeitung von Anfragen erforderlich ist. Personenbezogene Daten sind alle
+            Informationen, die sich auf eine identifizierte oder identifizierbare natürliche Person beziehen.
+          </p>
+
+          <h2>3. Hosting und Server-Logfiles</h2>
+          <p>
+            Diese Website wird bei Hosting Ukraine LLC (ТОВ «Хостінг Україна») gehostet. Beim Aufruf der Website
+            können technisch erforderliche Verbindungsdaten verarbeitet werden. Dazu können insbesondere
+            IP-Adresse, Datum und Uhrzeit des Zugriffs, aufgerufene URL, übertragene Datenmenge, HTTP-Statuscode,
+            Referrer-URL, Browsertyp, Betriebssystem und Hostname des zugreifenden Geräts gehören.
+          </p>
+          <p>
+            Die Verarbeitung erfolgt zur sicheren und stabilen Bereitstellung der Website sowie zur Erkennung und
+            Abwehr technischer Angriffe auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes Interesse
+            liegt in einem sicheren, funktionsfähigen und missbrauchsgeschützten Webangebot.
+          </p>
+          <p>
+            Nach Angaben des Hosting-Anbieters befinden sich dessen Rechenzentren in der Ukraine. Dadurch kann eine
+            Verarbeitung personenbezogener Daten außerhalb der Europäischen Union und des Europäischen
+            Wirtschaftsraums stattfinden. Weitere Informationen zur Datenverarbeitung des Hosting-Anbieters finden
+            Sie in dessen <a className="textLink" href="https://www.ukraine.com.ua/legal/privacypolicy/" target="_blank" rel="noreferrer">Datenschutzerklärung</a>.
+          </p>
+
+          <h2>4. Kontaktaufnahme per E-Mail oder Telefon</h2>
+          <p>
+            Wenn Sie uns per E-Mail oder Telefon kontaktieren, verarbeiten wir die von Ihnen mitgeteilten Daten zur
+            Bearbeitung Ihrer Anfrage und für mögliche Anschlussfragen. Erfolgt die Anfrage im Zusammenhang mit
+            einem Vertrag oder vorvertraglichen Maßnahmen, ist Art. 6 Abs. 1 lit. b DSGVO die Rechtsgrundlage.
+            In anderen Fällen erfolgt die Verarbeitung auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO aufgrund
+            unseres berechtigten Interesses an der Beantwortung von Anfragen.
+          </p>
+          <p>
+            Die Daten werden gelöscht, sobald sie für den jeweiligen Zweck nicht mehr erforderlich sind und keine
+            gesetzlichen Aufbewahrungspflichten entgegenstehen.
+          </p>
+
+          <h2>5. Cookies, Analyse und Marketing</h2>
+          <p>
+            BauKostenRadar setzt derzeit keine Dienste zur Reichweitenanalyse, kein Werbe-Tracking und keine
+            Marketing-Cookies ein. Es werden derzeit auch keine externen Analysewerkzeuge wie Google Analytics
+            verwendet. Sollte sich dies ändern, wird diese Datenschutzerklärung vor dem Einsatz entsprechend
+            angepasst und, soweit erforderlich, eine Einwilligung eingeholt.
+          </p>
+
+          <h2>6. Externe Links</h2>
+          <p>
+            Diese Website enthält Links zu externen Websites und Quellen. Erst wenn Sie einen solchen Link öffnen,
+            werden Daten an den jeweiligen externen Anbieter übertragen. Für die Datenverarbeitung auf externen
+            Websites ist der jeweilige Anbieter verantwortlich.
+          </p>
+
+          <h2>7. SSL- bzw. TLS-Verschlüsselung</h2>
+          <p>
+            Diese Website nutzt eine SSL- bzw. TLS-Verschlüsselung, um die Übertragung von Inhalten und Anfragen zu
+            schützen. Eine verschlüsselte Verbindung erkennen Sie insbesondere an der Verwendung von HTTPS in der
+            Adresszeile Ihres Browsers.
+          </p>
+
+          <h2>8. Ihre Rechte</h2>
+          <p>
+            Im Rahmen der gesetzlichen Voraussetzungen haben Sie insbesondere das Recht auf Auskunft über Ihre
+            personenbezogenen Daten, Berichtigung unrichtiger Daten, Löschung, Einschränkung der Verarbeitung,
+            Datenübertragbarkeit sowie Widerspruch gegen bestimmte Verarbeitungen. Soweit eine Verarbeitung auf
+            einer Einwilligung beruht, können Sie diese Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen.
+          </p>
+          <p>
+            Sie haben außerdem das Recht, sich bei einer zuständigen Datenschutzaufsichtsbehörde zu beschweren,
+            insbesondere in dem Mitgliedstaat Ihres gewöhnlichen Aufenthaltsorts, Ihres Arbeitsplatzes oder des
+            Orts des mutmaßlichen Verstoßes.
+          </p>
+
+          <h2>9. Widerspruch nach Art. 21 DSGVO</h2>
+          <p>
+            Soweit personenbezogene Daten auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO verarbeitet werden, können
+            Sie aus Gründen, die sich aus Ihrer besonderen Situation ergeben, jederzeit Widerspruch gegen die
+            Verarbeitung einlegen. Wenden Sie sich hierzu an <a className="textLink" href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>.
+          </p>
+
+          <h2>10. Automatisierte Entscheidungen</h2>
+          <p>
+            Eine ausschließlich automatisierte Entscheidungsfindung einschließlich Profiling im Sinne von Art. 22
+            DSGVO findet auf BauKostenRadar derzeit nicht statt.
+          </p>
+
+          <h2>11. Aktualisierung dieser Datenschutzerklärung</h2>
+          <p>
+            Wir passen diese Datenschutzerklärung an, wenn sich die Website, eingesetzte Dienste oder rechtliche
+            Anforderungen ändern. Stand dieser Datenschutzerklärung: August 2026.
+          </p>
+        </section>
+      </div>
+    </>
+  );
+}
