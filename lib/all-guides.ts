@@ -3,6 +3,7 @@ import { secondaryGuides } from "@/lib/guides-secondary";
 import { tertiaryGuides } from "@/lib/guides-tertiary";
 import { tradeGuides } from "@/lib/guides-trade";
 import { scenarioGuides } from "@/lib/guides-scenarios";
+import { catalogScenarioGuides } from "@/lib/guides-catalog-scenarios";
 
 const primaryClusterLinks: Record<string, Array<{ label: string; href: string }>> = {
   "sanierungskosten-pro-qm": [
@@ -43,16 +44,20 @@ const secondaryClusterLinks: Record<string, Array<{ label: string; href: string 
     { label: "Haus renovieren 150 m²", href: "/ratgeber/haus-renovieren-150-qm-kosten" },
     { label: "Haus renovieren 200 m²", href: "/ratgeber/haus-renovieren-200-qm-kosten" },
     { label: "Bad komplett sanieren", href: "/ratgeber/bad-komplett-sanieren-kosten" },
+    { label: "Küche 10 m² renovieren", href: "/ratgeber/kueche-10-qm-renovieren-kosten" },
+    { label: "6 Innentüren austauschen", href: "/ratgeber/6-innentueren-austauschen-kosten" },
   ],
   "sanierung-reihenfolge": [
     { label: "Sanierungskosten Einfamilienhaus", href: "/ratgeber/sanierungskosten-einfamilienhaus" },
     { label: "Kernsanierung Kosten", href: "/ratgeber/kernsanierung-kosten" },
     { label: "Elektrik im Altbau erneuern", href: "/ratgeber/elektrik-erneuern-altbau" },
     { label: "Dach sanieren Kosten pro m²", href: "/ratgeber/dach-sanieren-kosten-pro-qm" },
+    { label: "Estrich 100 m² Kosten", href: "/ratgeber/estrich-100-qm-kosten" },
   ],
   "arbeitskosten-materialkosten": [
     { label: "Renovierungskosten 100 m²", href: "/ratgeber/renovierungskosten-100-qm" },
     { label: "Bad komplett sanieren", href: "/ratgeber/bad-komplett-sanieren-kosten" },
+    { label: "Innenwand mauern Kosten", href: "/ratgeber/innenwand-mauern-kosten" },
   ],
 };
 
@@ -61,6 +66,8 @@ const tertiaryClusterLinks: Record<string, Array<{ label: string; href: string }
     { label: "Elektrik im Altbau erneuern", href: "/ratgeber/elektrik-erneuern-altbau" },
     { label: "Dach sanieren Kosten pro m²", href: "/ratgeber/dach-sanieren-kosten-pro-qm" },
     { label: "Heizung erneuern Kosten", href: "/ratgeber/heizung-erneuern-kosten" },
+    { label: "Innenwand mauern Kosten", href: "/ratgeber/innenwand-mauern-kosten" },
+    { label: "Estrich 100 m² Kosten", href: "/ratgeber/estrich-100-qm-kosten" },
   ],
   "sanierungskosten-einfamilienhaus": [
     { label: "Dach sanieren Kosten pro m²", href: "/ratgeber/dach-sanieren-kosten-pro-qm" },
@@ -70,6 +77,7 @@ const tertiaryClusterLinks: Record<string, Array<{ label: string; href: string }
   "renovierungskosten-100-qm": [
     { label: "Bad komplett sanieren", href: "/ratgeber/bad-komplett-sanieren-kosten" },
     { label: "Elektrik im Altbau erneuern", href: "/ratgeber/elektrik-erneuern-altbau" },
+    { label: "Estrich 100 m² Kosten", href: "/ratgeber/estrich-100-qm-kosten" },
   ],
 };
 
@@ -117,6 +125,7 @@ export const allGuides = [
   ...enrichedTertiaryGuides,
   ...enrichedTradeGuides,
   ...scenarioGuides,
+  ...catalogScenarioGuides,
 ];
 
 export function getAnyGuide(slug: string) {
