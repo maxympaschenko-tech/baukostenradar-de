@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import "./portal.css";
-import "./request.css";
 import "./premium.css";
 import "./premium-footer.css";
 import "./premium-internal.css";
