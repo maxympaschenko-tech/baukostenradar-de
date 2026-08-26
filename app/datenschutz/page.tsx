@@ -45,8 +45,9 @@ export default function DatenschutzPage() {
           <h2>2. Allgemeine Hinweise</h2>
           <p>
             Wir verarbeiten personenbezogene Daten nur, soweit dies für den Betrieb dieser Website, die technische
-            Sicherheit und die Bearbeitung von Anfragen erforderlich ist. Personenbezogene Daten sind alle
-            Informationen, die sich auf eine identifizierte oder identifizierbare natürliche Person beziehen.
+            Sicherheit, die Bearbeitung von Anfragen sowie - nach entsprechender Einwilligung - für Reichweitenmessung
+            und Werbefinanzierung erforderlich ist. Personenbezogene Daten sind alle Informationen, die sich auf eine
+            identifizierte oder identifizierbare natürliche Person beziehen.
           </p>
 
           <h2>3. Hosting und Server-Logfiles</h2>
@@ -84,46 +85,88 @@ export default function DatenschutzPage() {
           <h2>5. Google Tag Manager</h2>
           <p>
             Auf BauKostenRadar wird Google Tag Manager eingesetzt. Anbieter für Nutzer im Europäischen
-            Wirtschaftsraum ist Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland.
-            Der Tag Manager dient der zentralen Verwaltung von Website-Tags und Skripten.
+            Wirtschaftsraum ist Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland. Der Tag
+            Manager dient der zentralen Verwaltung von Website-Tags und Skripten.
           </p>
           <p>
-            Beim Laden des Google Tag Managers stellt Ihr Browser eine Verbindung zu Servern von Google her.
-            Dabei können insbesondere die IP-Adresse sowie technische Informationen über Browser und Gerät an
-            Google übermittelt werden. Eine Verarbeitung von Daten außerhalb der Europäischen Union bzw. des
-            Europäischen Wirtschaftsraums kann dabei nicht ausgeschlossen werden.
+            Beim Laden des Google Tag Managers stellt Ihr Browser eine Verbindung zu Servern von Google her. Dabei
+            können insbesondere die IP-Adresse sowie technische Informationen über Browser und Gerät an Google
+            übermittelt werden. Eine Verarbeitung von Daten außerhalb der Europäischen Union bzw. des Europäischen
+            Wirtschaftsraums kann dabei nicht ausgeschlossen werden.
           </p>
           <p>
             Welche weiteren Daten verarbeitet oder Cookies gesetzt werden, hängt von den im Tag-Manager-Container
-            eingebundenen Diensten ab. Solche Dienste werden in dieser Datenschutzerklärung zusätzlich beschrieben,
-            sobald sie auf BauKostenRadar eingesetzt werden. Informationen zum Datenschutz bei Google finden Sie
-            unter <a className="textLink" href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">policies.google.com/privacy</a>.
+            eingebundenen Diensten ab. Informationen zum Datenschutz bei Google finden Sie unter
+            <a className="textLink" href="https://policies.google.com/privacy" target="_blank" rel="noreferrer"> policies.google.com/privacy</a>.
           </p>
 
-          <h2>6. Cookies, Analyse und Marketing</h2>
+          <h2>6. Vorgesehener Einsatz von Google Analytics 4</h2>
           <p>
-            Abgesehen von der technischen Einbindung des Google Tag Managers werden derzeit keine eigenen
-            Reichweitenanalyse- oder Werbe-Tracking-Dienste auf BauKostenRadar beschrieben. Sobald über den
-            Tag-Manager-Container beispielsweise Google Analytics, Google Ads oder andere Dienste aktiviert werden,
-            wird diese Datenschutzerklärung entsprechend ergänzt und erforderliche Einwilligungsmechanismen werden
-            berücksichtigt.
+            BauKostenRadar kann Google Analytics 4 zur Reichweitenmessung und zur Analyse der Nutzung dieser Website
+            einsetzen. Anbieter ist Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland. Google
+            Analytics kann Informationen über Seitenaufrufe, Sitzungsdauer, verwendete Geräte, Browser, ungefähre
+            geografische Herkunft, Referrer und Interaktionen mit der Website verarbeiten.
+          </p>
+          <p>
+            Google Analytics wird erst aktiviert, wenn die dafür erforderliche Einwilligung erteilt wurde. Die
+            Rechtsgrundlage ist dann Art. 6 Abs. 1 lit. a DSGVO. Eine erteilte Einwilligung kann jederzeit mit
+            Wirkung für die Zukunft widerrufen werden. Soweit Google Analytics über Google Tag Manager eingebunden
+            wird, werden die entsprechenden Consent-Signale an Google übermittelt.
+          </p>
+          <p>
+            Eine Übermittlung von Daten an Google-Unternehmen oder Dienstleister außerhalb des Europäischen
+            Wirtschaftsraums kann nicht ausgeschlossen werden. Weitere Informationen finden Sie in der
+            <a className="textLink" href="https://policies.google.com/privacy" target="_blank" rel="noreferrer"> Datenschutzerklärung von Google</a>.
           </p>
 
-          <h2>7. Externe Links</h2>
+          <h2>7. Vorgesehener Einsatz von Google AdSense</h2>
+          <p>
+            BauKostenRadar kann Google AdSense zur Finanzierung des Angebots durch Werbung einsetzen. Anbieter für
+            Nutzer im Europäischen Wirtschaftsraum ist Google Ireland Limited, Gordon House, Barrow Street, Dublin 4,
+            Irland. Abhängig von den gewählten Einstellungen und Ihrer Einwilligung können Cookies oder vergleichbare
+            Technologien verwendet und Informationen über Gerät, Browser, IP-Adresse, Werbeinteraktionen und
+            Nutzungsverhalten verarbeitet werden.
+          </p>
+          <p>
+            Für Nutzer im Europäischen Wirtschaftsraum, im Vereinigten Königreich und in der Schweiz wird vor dem
+            Einsatz zustimmungspflichtiger Werbetechnologien eine geeignete Consent Management Platform eingesetzt.
+            Personalisierte Werbung und entsprechende Speicher- bzw. Verarbeitungsvorgänge werden nur im Rahmen der
+            erteilten Einwilligung aktiviert. Rechtsgrundlage ist Art. 6 Abs. 1 lit. a DSGVO.
+          </p>
+          <p>
+            Je nach Einwilligung und technischer Konfiguration kann auch nicht personalisierte oder eingeschränkte
+            Werbung ausgeliefert werden. Weitere Informationen zu Google-Werbediensten und Datenschutz finden Sie
+            unter <a className="textLink" href="https://policies.google.com/technologies/ads" target="_blank" rel="noreferrer">policies.google.com/technologies/ads</a>.
+          </p>
+
+          <h2>8. Einwilligungsverwaltung und Google Consent Mode</h2>
+          <p>
+            Für einwilligungspflichtige Analyse- und Werbedienste werden die entsprechenden Consent-Signale zunächst
+            restriktiv gesetzt. Erst nach einer wirksamen Einwilligung können die jeweils betroffenen Kategorien
+            freigegeben werden. Für den zukünftigen Einsatz von Google AdSense ist eine von Google unterstützte bzw.
+            zertifizierte Consent Management Platform vorgesehen, soweit dies für die jeweilige Region erforderlich ist.
+          </p>
+          <p>
+            Sie können eine erteilte Einwilligung jederzeit mit Wirkung für die Zukunft ändern oder widerrufen. Nach
+            Einrichtung des Consent-Dialogs wird hierfür eine dauerhaft erreichbare Möglichkeit zur Änderung der
+            Datenschutzeinstellungen bereitgestellt.
+          </p>
+
+          <h2>9. Externe Links</h2>
           <p>
             Diese Website enthält Links zu externen Websites und Quellen. Erst wenn Sie einen solchen Link öffnen,
             werden Daten an den jeweiligen externen Anbieter übertragen. Für die Datenverarbeitung auf externen
             Websites ist der jeweilige Anbieter verantwortlich.
           </p>
 
-          <h2>8. SSL- bzw. TLS-Verschlüsselung</h2>
+          <h2>10. SSL- bzw. TLS-Verschlüsselung</h2>
           <p>
             Diese Website nutzt eine SSL- bzw. TLS-Verschlüsselung, um die Übertragung von Inhalten und Anfragen zu
             schützen. Eine verschlüsselte Verbindung erkennen Sie insbesondere an der Verwendung von HTTPS in der
             Adresszeile Ihres Browsers.
           </p>
 
-          <h2>9. Ihre Rechte</h2>
+          <h2>11. Ihre Rechte</h2>
           <p>
             Im Rahmen der gesetzlichen Voraussetzungen haben Sie insbesondere das Recht auf Auskunft über Ihre
             personenbezogenen Daten, Berichtigung unrichtiger Daten, Löschung, Einschränkung der Verarbeitung,
@@ -136,20 +179,20 @@ export default function DatenschutzPage() {
             Orts des mutmaßlichen Verstoßes.
           </p>
 
-          <h2>10. Widerspruch nach Art. 21 DSGVO</h2>
+          <h2>12. Widerspruch nach Art. 21 DSGVO</h2>
           <p>
             Soweit personenbezogene Daten auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO verarbeitet werden, können
             Sie aus Gründen, die sich aus Ihrer besonderen Situation ergeben, jederzeit Widerspruch gegen die
             Verarbeitung einlegen. Wenden Sie sich hierzu an <a className="textLink" href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>.
           </p>
 
-          <h2>11. Automatisierte Entscheidungen</h2>
+          <h2>13. Automatisierte Entscheidungen</h2>
           <p>
             Eine ausschließlich automatisierte Entscheidungsfindung einschließlich Profiling im Sinne von Art. 22
             DSGVO findet auf BauKostenRadar derzeit nicht statt.
           </p>
 
-          <h2>12. Aktualisierung dieser Datenschutzerklärung</h2>
+          <h2>14. Aktualisierung dieser Datenschutzerklärung</h2>
           <p>
             Wir passen diese Datenschutzerklärung an, wenn sich die Website, eingesetzte Dienste oder rechtliche
             Anforderungen ändern. Stand dieser Datenschutzerklärung: August 2026.
