@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   title: "Projektanfrage für Renovierung und Handwerker",
   description: "Renovierungs- oder Handwerkerprojekt strukturiert an BauKostenRadar senden: Leistung, Region, Budget und Zeitraum angeben.",
   alternates: { canonical: "/angebot" },
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: { index: false, follow: false },
+  },
 };
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -36,25 +41,20 @@ export default async function OfferPage({ searchParams }: { searchParams: Search
           <span className="eyebrow">Projektanfrage</span>
           <h1>Renovierungsprojekt strukturiert anfragen</h1>
           <p>
-            Beschreiben Sie Ihr Vorhaben in wenigen Schritten. Die Anfrage wird direkt an BauKostenRadar übermittelt
-            und in der Pilotphase manuell geprüft.
+            Diese Funktion befindet sich derzeit in Vorbereitung und ist nicht Teil des öffentlichen
+            Vermittlungsangebots von BauKostenRadar.
           </p>
-          <div className="heroFacts">
-            <span><strong>{services.length}</strong> Kostenbereiche</span>
-            <span><strong>8</strong> Großstädte im Preisvergleich</span>
-            <span><strong>0 €</strong> Anfragekosten</span>
-          </div>
         </div>
       </section>
 
       <div className="shell contentGrid requestPageGrid">
         <div>
           <section className="contentCard">
-            <span className="eyebrow">Projekt erfassen</span>
-            <h2>Was soll gemacht werden?</h2>
+            <span className="eyebrow">Technische Vorbereitung</span>
+            <h2>Projektangaben erfassen</h2>
             <p>
-              Je genauer die Angaben zu Leistung, Standort, Budget und Zeitraum sind, desto besser lässt sich das
-              Vorhaben später einem passenden Fachbetrieb zuordnen.
+              Die technische Formularfunktion bleibt für eine spätere Ausbauphase erhalten. Aktuell liegt der Fokus
+              von BauKostenRadar auf Preisvergleichen, Kostenrechnern und redaktionellen Informationen.
             </p>
             <ProjectRequestForm
               services={serviceOptions}
@@ -70,16 +70,11 @@ export default async function OfferPage({ searchParams }: { searchParams: Search
 
         <aside className="sidebarSticky">
           <section className="contentCard requestInfoCard">
-            <span className="eyebrow">So läuft es aktuell</span>
-            <h2>Pilotphase</h2>
-            <ol className="requestSteps">
-              <li><strong>1.</strong><span>Projektangaben ausfüllen.</span></li>
-              <li><strong>2.</strong><span>Anfrage verschlüsselt an BauKostenRadar senden.</span></li>
-              <li><strong>3.</strong><span>BauKostenRadar prüft die Anfrage manuell.</span></li>
-            </ol>
+            <span className="eyebrow">Hinweis</span>
+            <h2>Noch keine Vermittlung</h2>
             <p className="notice">
-              Es besteht derzeit kein Anspruch auf die Vermittlung eines Handwerksbetriebs und kein verbindliches
-              Angebot. Eine automatische Weitergabe Ihrer Daten an Handwerksbetriebe findet in der Pilotphase nicht statt.
+              BauKostenRadar vermittelt derzeit keine Handwerksbetriebe. Es besteht kein Anspruch auf die Vermittlung
+              eines Betriebs oder auf ein verbindliches Angebot.
             </p>
           </section>
         </aside>
