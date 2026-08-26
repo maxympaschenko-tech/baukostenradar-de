@@ -82,6 +82,22 @@ export default function DatenschutzPage() {
             gesetzlichen Aufbewahrungspflichten entgegenstehen.
           </p>
 
+          <h2>4a. Projektanfrage über die Website</h2>
+          <p>
+            Auf der Seite zur Projektanfrage können Sie Angaben zu gewünschter Leistung, Region, Postleitzahl,
+            Budget, Zeitraum, Projektbeschreibung sowie Kontaktdaten erfassen. Die Eingaben werden in der aktuellen
+            Pilotphase zunächst nur lokal in Ihrem Browser verarbeitet. Beim Absenden öffnet die Website eine
+            vorbereitete E-Mail an BauKostenRadar. Die eingegebenen Formulardaten werden dabei nicht automatisch
+            an unseren Webserver übertragen.
+          </p>
+          <p>
+            Erst wenn Sie die vorbereitete E-Mail in Ihrem Mailprogramm tatsächlich absenden, erhalten wir die darin
+            enthaltenen personenbezogenen Daten. Für diese anschließende Verarbeitung gelten die Hinweise zur
+            Kontaktaufnahme per E-Mail. Die Projektanfrage dient derzeit der manuellen Prüfung und dem Aufbau einer
+            späteren Angebotsvergleich- bzw. Vermittlungsfunktion. Eine automatische Weitergabe an Handwerksbetriebe
+            findet aktuell nicht statt.
+          </p>
+
           <h2>5. Google Tag Manager</h2>
           <p>
             Auf BauKostenRadar wird Google Tag Manager eingesetzt. Anbieter für Nutzer im Europäischen
