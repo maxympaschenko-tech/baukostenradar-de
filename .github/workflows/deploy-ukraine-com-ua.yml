@@ -16,6 +16,7 @@ jobs:
       REMOTE_HOST: uageek.ftp.tools
       REMOTE_USER: uageek
       REMOTE_PATH: /home/uageek/baukostenradar.de/www
+      PRODUCTION_HOST: www.baukostenradar.de
 
     steps:
       - name: Checkout
@@ -86,18 +87,47 @@ jobs:
           ssh -p 22 "$REMOTE_USER@$REMOTE_HOST" "mkdir -p '$REMOTE_PATH'"
           rsync -az --delete -e 'ssh -p 22' --exclude='.env*' .next/standalone/ "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/"
 
-      - name: Restart Node.js application through adm.tools API
+      - name: Restart application through adm.tools API
         if: steps.deploy_config.outputs.ready == 'true'
         shell: bash
         env:
           ADMTOOLS_TOKEN: ${{ secrets.ADMTOOLS_TOKEN }}
-          ADMTOOLS_HOST_ID: ${{ secrets.ADMTOOLS_HOST_ID }}
         run: |
-          if [[ -n "$ADMTOOLS_TOKEN" && -n "$ADMTOOLS_HOST_ID" ]]; then
-            curl --fail-with-body --silent --show-error \
-              -X POST 'https://adm.tools/action/hosting/account/nodejs/reload/' \
-              -H "Authorization: Bearer $ADMTOOLS_TOKEN" \
-              --data-urlencode "host_id=$ADMTOOLS_HOST_ID"
-          else
-            echo "ADMTOOLS_TOKEN or ADMTOOLS_HOST_ID is missing. Files were deployed, but automatic Node.js restart was skipped."
+          if [[ -z "$ADMTOOLS_TOKEN" ]]; then
+            echo "ADMTOOLS_TOKEN is missing. Files were deployed, but automatic restart was skipped."
+            exit 0
           fi
+
+          lookup=$(curl --fail-with-body --silent --show-error \
+            -X POST 'https://adm.tools/action/get_id/' \
+            -H "Authorization: Bearer $ADMTOOLS_TOKEN" \
+            --data-urlencode "name=$PRODUCTION_HOST" \
+            --data-urlencode 'type=host')
+
+          host_id=$(printf '%s' "$lookup" | jq -r '.response.host_id // empty')
+          if [[ -z "$host_id" ]]; then
+            echo "Could not resolve host_id for $PRODUCTION_HOST" >&2
+            printf '%s\n' "$lookup" >&2
+            exit 1
+          fi
+
+          curl --fail-with-body --silent --show-error \
+            -X POST 'https://adm.tools/action/hosting/account/app/systemd/restart/' \
+            -H "Authorization: Bearer $ADMTOOLS_TOKEN" \
+            --data-urlencode "host_id=$host_id"
+
+      - name: Verify production HTTPS
+        if: steps.deploy_config.outputs.ready == 'true'
+        shell: bash
+        run: |
+          for i in 1 2 3 4 5 6; do
+            code=$(curl -L -sS -o /tmp/site.html -w '%{http_code}' --connect-timeout 10 --max-time 20 'https://baukostenradar.de/' || true)
+            if [[ "$code" == "200" ]] && grep -qi 'BauKostenRadar' /tmp/site.html; then
+              echo "Production verification passed."
+              exit 0
+            fi
+            echo "Attempt $i returned HTTP $code; waiting for app restart..."
+            sleep 5
+          done
+          echo "Production verification failed." >&2
+          exit 1
