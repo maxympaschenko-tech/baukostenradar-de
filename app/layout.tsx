@@ -4,6 +4,7 @@ import "./globals.css";
 import "./portal.css";
 import "./request.css";
 import "./premium.css";
+import "./premium-footer.css";
 import { ConsentManager } from "@/components/consent-manager";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
