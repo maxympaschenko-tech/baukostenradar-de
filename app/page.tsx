@@ -40,8 +40,8 @@ export default function HomePage() {
             </p>
 
             <div className="premiumHeroActions">
-              <Link className="premiumPrimaryButton" href="/angebot">Kostenloses Angebot einholen</Link>
-              <Link className="premiumOutlineButton" href="/kosten">Zu den Preisen</Link>
+              <Link className="premiumPrimaryButton" href="/kosten">Preise vergleichen</Link>
+              <Link className="premiumOutlineButton" href="/rechner">Kostenrechner nutzen</Link>
             </div>
 
             <div className="premiumTrustRow">
@@ -55,7 +55,7 @@ export default function HomePage() {
               </div>
               <div>
                 <span className="premiumTrustIcon">✓</span>
-                <div><strong>Unverbindlich & kostenlos</strong><small>Klare Richtwerte für die Planung</small></div>
+                <div><strong>Quellen nachvollziehbar</strong><small>Richtwerte mit Methodik und Herkunft</small></div>
               </div>
             </div>
           </div>
@@ -144,10 +144,10 @@ export default function HomePage() {
         <div className="shell premiumHowGrid">
           <div>
             <span className="premiumDarkKicker">So funktioniert BauKostenRadar</span>
-            <h2>Von der ersten Preisidee bis zur Projektanfrage</h2>
+            <h2>Von der ersten Preisidee bis zur belastbaren Budgetplanung</h2>
             <p>
-              BauKostenRadar verbindet strukturierte Preisdaten mit Rechnern, Stadtseiten und einer direkten
-              Projektanfrage. So bleibt die Planung nachvollziehbar und praktisch.
+              BauKostenRadar verbindet strukturierte Preisdaten mit Rechnern, Stadtseiten und nachvollziehbaren
+              Quellen. So lassen sich Kosten Schritt für Schritt besser einordnen.
             </p>
             <Link className="premiumLightButton" href="/methodik">Methodik & Quellen</Link>
           </div>
@@ -156,7 +156,7 @@ export default function HomePage() {
             <div><span>01</span><strong>Leistung wählen</strong><p>Zum Beispiel Bad, Dach, Fenster oder Elektrik.</p></div>
             <div><span>02</span><strong>Preis einordnen</strong><p>Richtwerte und Einheiten transparent vergleichen.</p></div>
             <div><span>03</span><strong>Region berücksichtigen</strong><p>Stadtfaktoren als Modellhilfe für die Budgetplanung nutzen.</p></div>
-            <div><span>04</span><strong>Projekt anfragen</strong><p>Projekt direkt strukturiert an BauKostenRadar senden.</p></div>
+            <div><span>04</span><strong>Details vertiefen</strong><p>Einzelpreise, Rechner, Quellen und Methodik miteinander abgleichen.</p></div>
           </div>
         </div>
       </section>
@@ -187,12 +187,12 @@ export default function HomePage() {
       <section className="premiumFinalCta">
         <div className="shell premiumFinalCtaInner">
           <div>
-            <span>Projekt geplant?</span>
-            <h2>Kosten grob einschätzen und Anfrage senden.</h2>
+            <span>Budget planen</span>
+            <h2>Preise vergleichen und Kosten selbst berechnen.</h2>
           </div>
           <div className="premiumHeroActions">
-            <Link className="premiumPrimaryButton premiumPrimaryButtonLight" href="/angebot">Kostenloses Angebot einholen</Link>
-            <Link className="premiumOutlineButton premiumOutlineButtonDark" href="/rechner">Kosten berechnen</Link>
+            <Link className="premiumPrimaryButton premiumPrimaryButtonLight" href="/rechner">Kosten berechnen</Link>
+            <Link className="premiumOutlineButton premiumOutlineButtonDark" href="/kosten">Preise ansehen</Link>
           </div>
         </div>
       </section>
