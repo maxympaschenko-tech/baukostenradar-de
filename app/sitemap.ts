@@ -47,12 +47,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${base}/angebot`,
-      lastModified: contentUpdatedAt,
-      changeFrequency: "weekly",
-      priority: 0.88,
-    },
-    {
       url: `${base}/staedte`,
       lastModified: contentUpdatedAt,
       changeFrequency: "weekly",
