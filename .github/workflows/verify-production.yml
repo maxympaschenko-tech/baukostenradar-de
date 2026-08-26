@@ -1,0 +1,65 @@
+name: Verify production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      REMOTE_HOST: uageek.ftp.tools
+      REMOTE_USER: uageek
+      REMOTE_PATH: /home/uageek/baukostenradar.de/www
+    steps:
+      - name: Configure SSH
+        shell: bash
+        env:
+          REMOTE_KEY: ${{ secrets.REMOTE_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          printf '%s\n' "$REMOTE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p 22 -H "$REMOTE_HOST" >> ~/.ssh/known_hosts
+
+      - name: Verify remote files and Node process
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -p 22 "$REMOTE_USER@$REMOTE_HOST" "
+            echo '--- files ---';
+            test -f '$REMOTE_PATH/server.js';
+            test -f '$REMOTE_PATH/package.json';
+            ls -la '$REMOTE_PATH' | head -40;
+            echo '--- node ---';
+            node -v || true;
+            echo '--- process ---';
+            ps -ef | grep '[n]ode.*server.js' || true;
+          "
+
+      - name: Verify public HTTPS
+        shell: bash
+        run: |
+          set -euo pipefail
+          for url in 'https://www.baukostenradar.de/' 'https://baukostenradar.de/'; do
+            echo "Checking $url"
+            success=0
+            for i in 1 2 3 4 5 6; do
+              code=$(curl -L -sS -o /tmp/site.html -w '%{http_code}' --connect-timeout 10 --max-time 20 "$url" || true)
+              echo "Attempt $i: HTTP $code"
+              if [[ "$code" =~ ^2|^3 ]]; then
+                grep -qi 'BauKostenRadar' /tmp/site.html || true
+                head -c 300 /tmp/site.html || true
+                echo
+                success=1
+                break
+              fi
+              sleep 5
+            done
+            if [[ "$success" != "1" ]]; then
+              echo "Public check failed for $url" >&2
+              exit 1
+            fi
+          done
