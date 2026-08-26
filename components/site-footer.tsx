@@ -25,8 +25,9 @@ export function SiteFooter() {
           <strong>Bereiche</strong>
           <Link href="/kosten">Handwerkerkosten</Link>
           <Link href="/rechner">Kostenrechner</Link>
-          <Link href="/rechner/badsanierungskosten">Badsanierungskosten-Rechner</Link>
-          <Link href="/rechner/renovierungskosten">Renovierungskosten-Rechner</Link>
+          <Link href="/ratgeber">Ratgeber</Link>
+          <Link href="/ratgeber/sanierungskosten-pro-qm">Sanierungskosten pro m²</Link>
+          <Link href="/ratgeber/handwerker-stundensaetze">Handwerker-Stundensätze</Link>
           <Link href="/staedte">Städte</Link>
           <Link href="/methodik">Methodik & Quellen</Link>
           <Link href="/ueber-uns">Über BauKostenRadar</Link>
