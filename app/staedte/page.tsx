@@ -13,6 +13,11 @@ export default function CitiesPage() {
     <>
       <section className="contentHero">
         <div className="shell">
+          <nav className="visibleBreadcrumbs" aria-label="Breadcrumb">
+            <Link href="/">Startseite</Link>
+            <span aria-hidden="true">›</span>
+            <span aria-current="page">Städte</span>
+          </nav>
           <span className="eyebrow">Regionale Kosten</span>
           <h1>Handwerkerpreise nach Stadt</h1>
           <p>Großstädte unterscheiden sich beim Lohnniveau, bei der Nachfrage und bei Anfahrtskosten. Unsere Stadtseiten zeigen eine erste modellierte Einordnung.</p>
