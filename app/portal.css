@@ -213,12 +213,26 @@
   margin-top: 18px;
 }
 
-.regionChips span {
+.regionChips span,
+.regionChips .regionChip {
   padding: 9px 11px;
   background: #f2f6f8;
   border: 1px solid var(--line);
   border-radius: 10px;
   font-size: 13px;
+}
+
+.regionChips .regionChip {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.regionChips .regionChip:hover {
+  border-color: #b9ccd8;
+  background: #fff;
 }
 
 .regionChips strong { color: var(--primary-2); }
