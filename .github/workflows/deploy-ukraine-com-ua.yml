@@ -1,0 +1,106 @@
+name: Deploy to Ukraine.com.ua
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Check deploy configuration
+        id: deploy_config
+        env:
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_KEY: ${{ secrets.REMOTE_KEY }}
+          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
+        shell: bash
+        run: |
+          if [[ -n "$REMOTE_HOST" && -n "$REMOTE_USER" && -n "$REMOTE_KEY" && -n "$REMOTE_PATH" ]]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Ukraine.com.ua deploy secrets are not configured yet. Build will be verified, deploy will be skipped."
+          fi
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build production bundle
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+
+      - name: Assemble standalone bundle
+        shell: bash
+        run: |
+          if [[ -d public ]]; then
+            cp -R public .next/standalone/public
+          fi
+          mkdir -p .next/standalone/.next
+          cp -R .next/static .next/standalone/.next/static
+          cat > .next/standalone/package.json <<'JSON'
+          {
+            "name": "baukostenradar-production",
+            "private": true,
+            "scripts": {
+              "start": "HOSTNAME=$HOST PORT=$PORT node server.js"
+            }
+          }
+          JSON
+
+      - name: Configure SSH
+        if: steps.deploy_config.outputs.ready == 'true'
+        shell: bash
+        env:
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_KEY: ${{ secrets.REMOTE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$REMOTE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "$REMOTE_HOST" >> ~/.ssh/known_hosts
+
+      - name: Deploy standalone bundle
+        if: steps.deploy_config.outputs.ready == 'true'
+        shell: bash
+        env:
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
+        run: |
+          ssh "$REMOTE_USER@$REMOTE_HOST" "mkdir -p '$REMOTE_PATH'"
+          rsync -az --delete --exclude='.env*' .next/standalone/ "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/"
+
+      - name: Restart Node.js application through adm.tools API
+        if: steps.deploy_config.outputs.ready == 'true'
+        shell: bash
+        env:
+          ADMTOOLS_TOKEN: ${{ secrets.ADMTOOLS_TOKEN }}
+          ADMTOOLS_HOST_ID: ${{ secrets.ADMTOOLS_HOST_ID }}
+        run: |
+          if [[ -n "$ADMTOOLS_TOKEN" && -n "$ADMTOOLS_HOST_ID" ]]; then
+            curl --fail-with-body --silent --show-error \
+              -X POST 'https://adm.tools/action/hosting/account/nodejs/reload/' \
+              -H "Authorization: Bearer $ADMTOOLS_TOKEN" \
+              --data-urlencode "host_id=$ADMTOOLS_HOST_ID"
+          else
+            echo "ADMTOOLS_TOKEN or ADMTOOLS_HOST_ID is missing. Files were deployed, but automatic Node.js restart was skipped."
+          fi
