@@ -36,8 +36,8 @@ export default async function OfferPage({ searchParams }: { searchParams: Search
           <span className="eyebrow">Projektanfrage</span>
           <h1>Renovierungsprojekt strukturiert anfragen</h1>
           <p>
-            Beschreiben Sie Ihr Vorhaben in wenigen Schritten. BauKostenRadar sammelt derzeit erste Projektanfragen
-            für die spätere Vermittlung und Angebotsvergleich-Funktion.
+            Beschreiben Sie Ihr Vorhaben in wenigen Schritten. Die Anfrage wird direkt an BauKostenRadar übermittelt
+            und in der Pilotphase manuell geprüft.
           </p>
           <div className="heroFacts">
             <span><strong>{services.length}</strong> Kostenbereiche</span>
@@ -74,12 +74,12 @@ export default async function OfferPage({ searchParams }: { searchParams: Search
             <h2>Pilotphase</h2>
             <ol className="requestSteps">
               <li><strong>1.</strong><span>Projektangaben ausfüllen.</span></li>
-              <li><strong>2.</strong><span>Vorbereitete E-Mail prüfen und absenden.</span></li>
+              <li><strong>2.</strong><span>Anfrage verschlüsselt an BauKostenRadar senden.</span></li>
               <li><strong>3.</strong><span>BauKostenRadar prüft die Anfrage manuell.</span></li>
             </ol>
             <p className="notice">
               Es besteht derzeit kein Anspruch auf die Vermittlung eines Handwerksbetriebs und kein verbindliches
-              Angebot. Die Funktion dient zunächst dem Aufbau der Projektanfrage-Infrastruktur.
+              Angebot. Eine automatische Weitergabe Ihrer Daten an Handwerksbetriebe findet in der Pilotphase nicht statt.
             </p>
           </section>
         </aside>
