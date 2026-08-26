@@ -5,7 +5,7 @@ import {
   services as baseServices,
   type PriceItem,
   type Service,
-} from "@/lib/pricing";
+} from "./pricing";
 
 export const priceSources = {
   ...basePriceSources,
