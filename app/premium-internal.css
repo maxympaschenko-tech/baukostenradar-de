@@ -152,6 +152,18 @@
 .priceTable tbody tr:hover { background: #fbfcfd; }
 .priceTable td:nth-child(2) strong { color: #167049; }
 
+.priceItemLink {
+  color: #123e61;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.priceItemLink:hover {
+  color: #07518d;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .guideTable td:first-child {
   color: #172333;
   font-weight: 750;
