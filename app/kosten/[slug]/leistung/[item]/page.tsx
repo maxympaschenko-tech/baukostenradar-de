@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { handwerkerCalculatorHref } from "@/lib/calculator-links";
 import { getCalculationExamples, getOfferChecks, getPriceDrivers } from "@/lib/price-guidance";
 import { getPriceItem, priceItemSlug } from "@/lib/price-slug";
 import { getService, priceSources, regions, services } from "@/lib/pricing";
@@ -65,6 +66,7 @@ export default async function PriceItemPage({
   const source = priceSources[item.sourceKey];
   const base = siteConfig.url.replace(/\/$/, "");
   const canonicalUrl = `${base}/kosten/${service.slug}/leistung/${itemSlug}`;
+  const calculatorUrl = handwerkerCalculatorHref({ serviceSlug: service.slug, itemSlug });
   const cityRegions = regions.filter((region) => region.value !== "de");
   const relatedItems = service.priceItems.filter((candidate) => candidate.name !== item.name).slice(0, 5);
   const calculationExamples = getCalculationExamples(item);
@@ -197,7 +199,7 @@ export default async function PriceItemPage({
             <span><strong>{source.checkedAt}</strong> Quellenprüfung</span>
           </div>
           <div className="heroActions">
-            <Link className="primaryButton" href="/rechner/handwerkerkosten">Eigene Kosten berechnen</Link>
+            <Link className="primaryButton" href={calculatorUrl}>Diese Leistung berechnen</Link>
             <Link className="ghostButton" href={`/kosten/${service.slug}`}>Alle {service.shortTitle}-Preise</Link>
           </div>
         </section>
@@ -312,7 +314,7 @@ export default async function PriceItemPage({
             ))}
           </div>
           <div className="heroActions">
-            <Link className="primaryButton" href="/rechner/handwerkerkosten">Kosten vorab berechnen</Link>
+            <Link className="primaryButton" href={calculatorUrl}>Kosten vorab berechnen</Link>
             <Link className="ghostButton" href="/ratgeber/handwerker-stundensaetze">Handwerkerpreise besser verstehen</Link>
           </div>
         </section>
