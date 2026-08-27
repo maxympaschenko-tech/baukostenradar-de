@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { allGuides, getAnyGuide } from "@/lib/all-guides";
-import { getGuideRegions, getGuideSilo, getGuideSiloServices } from "@/lib/guide-silo";
+import { getGuideRegionalServices, getGuideRegions, getGuideSilo, getGuideSiloServices } from "@/lib/guide-silo";
 import { priceItemSlug } from "@/lib/price-slug";
 import { siteConfig } from "@/lib/site";
 
@@ -77,6 +77,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
   const siloServices = getGuideSiloServices(guide.slug);
   const primaryService = siloServices[0];
   const guideRegions = getGuideRegions();
+  const regionalServices = getGuideRegionalServices(guide.slug);
 
   const structuredData = [
     {
@@ -115,6 +116,18 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
         "@type": "Question",
         name: faq.question,
         acceptedAnswer: { "@type": "Answer", text: faq.answer },
+      })),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: `Regionale Kosten zu ${guide.title.replace(" 2026", "")}`,
+      numberOfItems: guideRegions.length,
+      itemListElement: guideRegions.map((region, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: `Handwerkerkosten ${region.label}`,
+        url: `${base}/staedte/${region.slug}`,
       })),
     },
   ];
@@ -174,7 +187,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
               </li>
             ))}
             <li><a href="#gewerke">Passende Gewerke und Einzelpreise</a></li>
-            <li><a href="#regional">Regionale Einordnung</a></li>
+            <li><a href="#regional">Regionale Preise nach Stadt</a></li>
             <li><a href="#haeufige-fragen">Häufige Fragen</a></li>
             <li><a href="#weiter-planen">Passende Preise und Rechner</a></li>
           </ol>
@@ -245,29 +258,44 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 
         <section className="contentCard proseCard articleSection" id="regional">
           <span className="eyebrow">Regionale Einordnung</span>
-          <h2>{silo.regionalMode === "service" && primaryService ? `${primaryService.shortTitle}-Kosten nach Stadt` : "Sanierungskosten nach Stadt einordnen"}</h2>
+          <h2>Passende Kosten in allen 8 Städten vergleichen</h2>
           <p>
-            BauKostenRadar nutzt transparente regionale Modellfaktoren für die Budgetorientierung. Die Stadtwerte
-            sind keine lokal erhobenen Festpreise, sondern modellierte Richtwerte auf Basis der bundesweiten Ausgangswerte.
+            Die Stadtseiten zeigen modellierte Richtwerte auf Basis der bundesweiten Ausgangswerte und transparenter
+            Regionalfaktoren. Sie sind keine lokal erhobenen Festpreise und ersetzen kein individuelles Angebot.
           </p>
-          <div className="regionChips">
-            {guideRegions.map((region) => {
-              const href = silo.regionalMode === "service" && primaryService
-                ? `/kosten/${primaryService.slug}/${region.slug}`
-                : `/staedte/${region.slug}`;
-              const label = silo.regionalMode === "service" && primaryService
-                ? `${primaryService.shortTitle} ${region.label}`
-                : `Handwerkerkosten ${region.label}`;
 
-              return (
-                <Link className="regionChip" href={href} key={region.value}>
-                  {label} <strong>{region.factor >= 1 ? "+" : ""}{Math.round((region.factor - 1) * 100)} %</strong>
-                </Link>
-              );
-            })}
+          <h3>Stadtübersichten</h3>
+          <div className="regionChips">
+            {guideRegions.map((region) => (
+              <Link className="regionChip" href={`/staedte/${region.slug}`} key={region.value}>
+                Handwerkerkosten {region.label} <strong>{region.factor >= 1 ? "+" : ""}{Math.round((region.factor - 1) * 100)} %</strong>
+              </Link>
+            ))}
           </div>
+
+          <div className="directoryGrid">
+            {regionalServices.map((service) => (
+              <article className="directoryCard" key={service.slug}>
+                <span className="eyebrow">Lokale Gewerkseiten</span>
+                <h3>{service.shortTitle} nach Stadt</h3>
+                <p>
+                  Modellierte {service.shortTitle}-Richtwerte für alle acht verfügbaren Städte direkt aus diesem Ratgeber öffnen.
+                </p>
+                <div className="regionChips">
+                  {guideRegions.map((region) => (
+                    <Link className="regionChip" href={`/kosten/${service.slug}/${region.slug}`} key={`${service.slug}-${region.value}`}>
+                      {service.shortTitle} {region.label}
+                    </Link>
+                  ))}
+                </div>
+                <Link className="textLink" href={`/kosten/${service.slug}`}>Alle {service.shortTitle}-Preise →</Link>
+              </article>
+            ))}
+          </div>
+
           <div className="heroActions">
             <Link className="ghostButton" href="/staedte">Alle Städte vergleichen</Link>
+            {primaryService ? <Link className="ghostButton" href={`/kosten/${primaryService.slug}`}>{primaryService.shortTitle}-Preise deutschlandweit</Link> : null}
             <Link className="ghostButton" href="/methodik">Regionalmodell verstehen</Link>
           </div>
         </section>
