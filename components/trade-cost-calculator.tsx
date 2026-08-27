@@ -32,11 +32,11 @@ export function TradeCostCalculator({
     (item) => item.value === initialRegionValue || item.slug === initialRegionValue,
   ) ?? regions[0];
 
-  const [serviceSlug, setServiceSlug] = useState(initialService?.slug ?? "maler");
+  const [serviceSlug, setServiceSlug] = useState<string>(initialService?.slug ?? "maler");
   const service = services.find((item) => item.slug === serviceSlug) ?? services[0];
   const [itemIndex, setItemIndex] = useState(initialItemIndex >= 0 ? initialItemIndex : 0);
   const [quantity, setQuantity] = useState(1);
-  const [regionValue, setRegionValue] = useState(initialRegion?.value ?? "de");
+  const [regionValue, setRegionValue] = useState<string>(initialRegion?.value ?? "de");
 
   const selectedItem = service.priceItems[Math.min(itemIndex, service.priceItems.length - 1)] ?? service.priceItems[0];
   const selectedRegion = regions.find((item) => item.value === regionValue) ?? regions[0];
