@@ -123,6 +123,16 @@ export const priceSources = {
     url: "https://www.co2online.de/modernisieren-und-bauen/daemmung/daemmung-der-obersten-geschossdecke/",
     checkedAt: "27.08.2026",
   },
+  co2Dachdaemmung: {
+    name: "co2online - Dachdämmung Methoden und Kosten",
+    url: "https://www.co2online.de/modernisieren-und-bauen/daemmung/dachdaemmung/",
+    checkedAt: "27.08.2026",
+  },
+  co2Perimeterdaemmung: {
+    name: "co2online - Perimeterdämmung Kosten",
+    url: "https://www.co2online.de/modernisieren-und-bauen/daemmung/perimeterdaemmung/",
+    checkedAt: "27.08.2026",
+  },
 } as const;
 
 export const services: Service[] = [
@@ -277,17 +287,20 @@ export const services: Service[] = [
     slug: "daemmung",
     title: "Dämmung Kosten 2026",
     shortTitle: "Dämmung",
-    description: "Preise für Dach-, Fassaden-, Kellerdecken- und Geschossdeckendämmung in Deutschland pro Quadratmeter vergleichen.",
+    description: "Preise für Dach-, Fassaden-, Keller-, Kellerdecken- und Geschossdeckendämmung in Deutschland pro Quadratmeter vergleichen.",
     unit: "m²",
     icon: "▨",
     priceItems: [
       { name: "Dachdämmung Aufsparren", low: 100, high: 180, unit: "pro m² Dachfläche", sourceKey: "handwerkerSanierung" },
       { name: "Dachdämmung Zwischensparren", low: 60, high: 120, unit: "pro m²", sourceKey: "handwerkerSanierung" },
+      { name: "Dachdämmung Untersparren", low: 30, high: 80, unit: "pro m²", note: "Dämmmaterial und Anbringen durch Handwerksbetrieb", sourceKey: "co2Dachdaemmung" },
       { name: "Fassadendämmung WDVS", low: 100, high: 200, unit: "pro m²", sourceKey: "handwerkerSanierung" },
       { name: "Innendämmung", low: 80, high: 150, unit: "pro m²", sourceKey: "handwerkerSanierung" },
       { name: "Kellerdeckendämmung inkl. Montage", low: 40, high: 100, unit: "pro m²", note: "Preisbeispiel inklusive Montage; abhängig von Dämmstoff und Ausführung", sourceKey: "adacEnergetischeSanierung" },
+      { name: "Perimeterdämmung Kellerwand", low: 55, high: 90, unit: "pro m²", note: "Dämmung ohne Erdarbeiten; im Bestand kommen Freilegung und Aushub hinzu", sourceKey: "co2Perimeterdaemmung" },
       { name: "Oberste Geschossdecke dämmen, nicht begehbar", low: 20, high: 35, unit: "pro m²", sourceKey: "co2Geschossdecke" },
       { name: "Oberste Geschossdecke dämmen, begehbar", low: 40, high: 80, unit: "pro m²", sourceKey: "co2Geschossdecke" },
+      { name: "Einblasdämmung oberste Geschossdecke", low: 25, high: 50, unit: "pro m²", note: "Orientierung für Holzbalkendecken", sourceKey: "co2Geschossdecke" },
     ],
   },
   {
