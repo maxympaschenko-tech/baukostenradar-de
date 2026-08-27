@@ -110,10 +110,65 @@ export const quinaryItemGuideOverrides: Record<string, QuinaryPriceGuideLink> = 
     title: "Klinkerfassade: Kosten pro m² und Leistungsumfang",
     cta: "Klinker-Ratgeber öffnen",
   },
-  "estrich:zementestrich-komplett": {
+  "tueren:innentuer-mit-zarge-inkl-montage": {
+    href: "/ratgeber/innentuer-einbauen-kosten",
+    title: "Innentür mit Zarge einbauen: Kosten inklusive Montage",
+    cta: "Innentür-Ratgeber öffnen",
+  },
+  "estrich:zementestrich-verlegen": {
     href: "/ratgeber/zementestrich-kosten-pro-qm",
-    title: "Zementestrich komplett: Kosten pro m²",
+    title: "Zementestrich verlegen: Kosten pro m²",
     cta: "Zementestrich-Ratgeber öffnen",
+  },
+  "estrich:fliessestrich-verlegen": {
+    href: "/ratgeber/fliessestrich-kosten-pro-qm",
+    title: "Fließestrich verlegen: Kosten pro m²",
+    cta: "Fließestrich-Ratgeber öffnen",
+  },
+  "estrich:trockenestrich-verlegen": {
+    href: "/ratgeber/trockenestrich-kosten-pro-qm",
+    title: "Trockenestrich verlegen: Kosten pro m²",
+    cta: "Trockenestrich-Ratgeber öffnen",
+  },
+  "estrich:schnellestrich": {
+    href: "/ratgeber/schnellestrich-kosten-pro-qm",
+    title: "Schnellestrich: Kosten pro m² und Belegreife",
+    cta: "Schnellestrich-Ratgeber öffnen",
+  },
+  "estrich:bodenausgleich-5-20-mm": {
+    href: "/ratgeber/bodenausgleich-kosten-pro-qm",
+    title: "Bodenausgleich 5-20 mm: Kosten pro m²",
+    cta: "Bodenausgleich-Ratgeber öffnen",
+  },
+  "estrich:estrich-rissreparatur": {
+    href: "/ratgeber/estrich-rissreparatur-kosten",
+    title: "Estrich-Rissreparatur: Kosten pro laufendem Meter",
+    cta: "Estrichreparatur-Ratgeber öffnen",
+  },
+  "abriss-entsorgung:einfamilienhaus-komplett-abreissen": {
+    href: "/ratgeber/haus-abreissen-kosten",
+    title: "Haus abreißen: Kosten inklusive Entsorgung",
+    cta: "Hausabriss-Ratgeber öffnen",
+  },
+  "abriss-entsorgung:abbruch-nach-umbautem-raum": {
+    href: "/ratgeber/abbruch-kosten-pro-m3",
+    title: "Abbruchkosten: Preis pro m³ umbauter Raum",
+    cta: "Abbruch-Ratgeber öffnen",
+  },
+  "abriss-entsorgung:innenabbruch-einfamilienhaus": {
+    href: "/ratgeber/innenabbruch-einfamilienhaus-kosten",
+    title: "Innenabbruch im Einfamilienhaus: Kosten",
+    cta: "Innenabbruch-Ratgeber öffnen",
+  },
+  "abriss-entsorgung:industriehalle-abbrechen": {
+    href: "/ratgeber/industriehalle-abbrechen-kosten-pro-qm",
+    title: "Industriehalle abbrechen: Kosten pro m²",
+    cta: "Industrieabbruch-Ratgeber öffnen",
+  },
+  "abriss-entsorgung:bauschuttcontainer-30-m3": {
+    href: "/ratgeber/bauschuttcontainer-30-m3-kosten",
+    title: "30 m³ Bauschuttcontainer: Kosten inklusive Entsorgung",
+    cta: "Container-Ratgeber öffnen",
   },
   "maurer:kalksandstein-mauerwerk": {
     href: "/ratgeber/kalksandstein-mauerwerk-kosten-pro-qm",
