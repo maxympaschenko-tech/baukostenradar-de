@@ -36,6 +36,8 @@ jobs:
           curl -sS --fail 'https://baukostenradar.de/kosten/treppen/leistung/holzstufe-schleifen-und-versiegeln' -o /tmp/treppen-item.html
           curl -sS --fail 'https://baukostenradar.de/kosten/kueche/leistung/kuechen-renovierung-ohne-moebel' -o /tmp/kueche-item.html
           curl -sS --fail 'https://baukostenradar.de/kosten/abriss-entsorgung/leistung/einfamilienhaus-komplett-abreissen' -o /tmp/abriss-item.html
+          curl -sS --fail 'https://baukostenradar.de/kosten/abriss-entsorgung/leistung/abbruch-nach-umbautem-raum' -o /tmp/abriss-volume-item.html
+          curl -sS --fail 'https://baukostenradar.de/kosten/abriss-entsorgung/leistung/entsorgung-bauschutt' -o /tmp/abriss-disposal-item.html
 
           grep -q 'Innentür mit Zarge inkl. Montage' /tmp/tueren-item.html
           grep -q 'Zementestrich verlegen' /tmp/estrich-item.html
@@ -43,6 +45,8 @@ jobs:
           grep -q 'Holzstufe schleifen und versiegeln' /tmp/treppen-item.html
           grep -q 'Küchen-Renovierung ohne Möbel' /tmp/kueche-item.html
           grep -q 'Einfamilienhaus komplett abreißen' /tmp/abriss-item.html
+          grep -q 'Abbruch nach umbautem Raum' /tmp/abriss-volume-item.html
+          grep -q 'Entsorgung Bauschutt' /tmp/abriss-disposal-item.html
 
       - name: Verify catalog guide silos and quantities
         shell: bash
@@ -106,8 +110,10 @@ jobs:
           check_guide '/ratgeber/bodenausgleich-kosten-pro-qm' '18' 'estrich' 'bodenausgleich-5-20-mm' /tmp/current-ausgleich.html
           check_guide '/ratgeber/estrich-rissreparatur-kosten' '35' 'estrich' 'estrich-rissreparatur' /tmp/current-riss.html
           check_guide '/ratgeber/haus-abreissen-kosten' '8.500' 'abriss-entsorgung' 'einfamilienhaus-komplett-abreissen' /tmp/current-hausabriss.html
+          check_guide '/ratgeber/abbruch-kosten-pro-m3' '15' 'abriss-entsorgung' 'abbruch-nach-umbautem-raum' /tmp/current-abbruch-volume.html
           check_guide '/ratgeber/innenabbruch-einfamilienhaus-kosten' '8.000' 'abriss-entsorgung' 'innenabbruch-einfamilienhaus' /tmp/current-innenabbruch.html
           check_guide '/ratgeber/bauschuttcontainer-30-m3-kosten' '650' 'abriss-entsorgung' 'bauschuttcontainer-30-m3' /tmp/current-container.html
+          check_guide '/ratgeber/bauschutt-entsorgung-kosten-pro-tonne' '120' 'abriss-entsorgung' 'entsorgung-bauschutt' /tmp/current-disposal.html
 
       - name: Verify quantity deep links resolve in calculator
         shell: bash
@@ -132,6 +138,8 @@ jobs:
           check_calculator 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=treppen&leistung=holzstufe-schleifen-und-versiegeln&menge=14' '14' 'Holzstufe schleifen und versiegeln' /tmp/calc-treppen.html
           check_calculator 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=kueche&leistung=kuechen-renovierung-ohne-moebel&menge=10' '10' 'Küchen-Renovierung ohne Möbel' /tmp/calc-kueche.html
           check_calculator 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=abriss-entsorgung&leistung=einfamilienhaus-komplett-abreissen&menge=1' '1' 'Einfamilienhaus komplett abreißen' /tmp/calc-abriss.html
+          check_calculator 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=abriss-entsorgung&leistung=abbruch-nach-umbautem-raum&menge=500' '500' 'Abbruch nach umbautem Raum' /tmp/calc-abbruch-volume.html
+          check_calculator 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=abriss-entsorgung&leistung=entsorgung-bauschutt&menge=5' '5' 'Entsorgung Bauschutt' /tmp/calc-disposal.html
 
       - name: Verify permanent redirects for retired catalog URLs
         shell: bash
@@ -180,6 +188,10 @@ jobs:
             '/kosten/treppen/leistung/holzstufe-schleifen-und-versiegeln' \
             '/kosten/kueche/leistung/kuechen-renovierung-ohne-moebel' \
             '/kosten/abriss-entsorgung/leistung/einfamilienhaus-komplett-abreissen' \
+            '/kosten/abriss-entsorgung/leistung/abbruch-nach-umbautem-raum' \
+            '/kosten/abriss-entsorgung/leistung/innenabbruch-einfamilienhaus' \
+            '/kosten/abriss-entsorgung/leistung/bauschuttcontainer-30-m3' \
+            '/kosten/abriss-entsorgung/leistung/entsorgung-bauschutt' \
             '/ratgeber/6-innentueren-austauschen-kosten' \
             '/ratgeber/estrich-100-qm-kosten' \
             '/ratgeber/innentuer-einbauen-kosten' \
@@ -190,8 +202,10 @@ jobs:
             '/ratgeber/bodenausgleich-kosten-pro-qm' \
             '/ratgeber/estrich-rissreparatur-kosten' \
             '/ratgeber/haus-abreissen-kosten' \
+            '/ratgeber/abbruch-kosten-pro-m3' \
             '/ratgeber/innenabbruch-einfamilienhaus-kosten' \
             '/ratgeber/bauschuttcontainer-30-m3-kosten' \
+            '/ratgeber/bauschutt-entsorgung-kosten-pro-tonne' \
             '/ratgeber/innenwand-mauern-kosten' \
             '/ratgeber/14-treppenstufen-renovieren-kosten' \
             '/ratgeber/kueche-10-qm-renovieren-kosten'; do
