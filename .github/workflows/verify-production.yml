@@ -168,6 +168,10 @@ jobs:
           curl -sS --fail 'https://baukostenradar.de/kosten/maler/berlin' -o /tmp/local.html
           curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/guides.html
           curl -sS --fail 'https://baukostenradar.de/ratgeber/sanierungskosten-pro-qm' -o /tmp/guide.html
+          curl -sS --fail 'https://baukostenradar.de/rechner' -o /tmp/calculators.html
+          curl -sS --fail 'https://baukostenradar.de/rechner/renovierungskosten' -o /tmp/renovation-calculator.html
+          curl -sS --fail 'https://baukostenradar.de/rechner/handwerkerkosten' -o /tmp/trade-calculator.html
+          curl -sS --fail 'https://baukostenradar.de/rechner/badsanierungskosten' -o /tmp/bath-calculator.html
 
           grep -q 'https://baukostenradar.de/kosten' /tmp/costs.html
           grep -q 'https://baukostenradar.de/kosten/maler' /tmp/service.html
@@ -176,8 +180,12 @@ jobs:
           grep -q 'https://baukostenradar.de/kosten/maler/berlin' /tmp/local.html
           grep -q 'https://baukostenradar.de/ratgeber' /tmp/guides.html
           grep -q 'https://baukostenradar.de/ratgeber/sanierungskosten-pro-qm' /tmp/guide.html
+          grep -q 'https://baukostenradar.de/rechner' /tmp/calculators.html
+          grep -q 'https://baukostenradar.de/rechner/renovierungskosten' /tmp/renovation-calculator.html
+          grep -q 'https://baukostenradar.de/rechner/handwerkerkosten' /tmp/trade-calculator.html
+          grep -q 'https://baukostenradar.de/rechner/badsanierungskosten' /tmp/bath-calculator.html
 
-          for page in /tmp/costs.html /tmp/service.html /tmp/item.html /tmp/city.html /tmp/local.html /tmp/guides.html /tmp/guide.html; do
+          for page in /tmp/costs.html /tmp/service.html /tmp/item.html /tmp/city.html /tmp/local.html /tmp/guides.html /tmp/guide.html /tmp/calculators.html /tmp/renovation-calculator.html /tmp/trade-calculator.html /tmp/bath-calculator.html; do
             if grep -qi 'noindex' "$page"; then
               echo "Unexpected noindex in $page" >&2
               exit 1
@@ -199,6 +207,19 @@ jobs:
           grep -q '/kosten/badsanierung/leistung/' /tmp/guide.html
           grep -q '/staedte/berlin' /tmp/guide.html
 
+          grep -q 'CollectionPage' /tmp/calculators.html
+          grep -q 'ItemList' /tmp/calculators.html
+          grep -q 'WebApplication' /tmp/renovation-calculator.html
+          grep -q 'WebApplication' /tmp/trade-calculator.html
+          grep -q 'WebApplication' /tmp/bath-calculator.html
+          grep -q 'Große Kostenblöcke separat prüfen' /tmp/renovation-calculator.html
+          grep -q '/kosten/badsanierung/leistung/' /tmp/renovation-calculator.html
+          grep -q 'Häufige Gewerke und konkrete Preispositionen' /tmp/trade-calculator.html
+          grep -q '/kosten/maler/leistung/waende-streichen' /tmp/trade-calculator.html
+          grep -q 'Die Preisanker des Rechners im Detail' /tmp/bath-calculator.html
+          grep -q '/kosten/badsanierung/leistung/' /tmp/bath-calculator.html
+          grep -q '/kosten/badsanierung/berlin' /tmp/bath-calculator.html
+
           for path in \
             '/kosten' \
             '/kosten/maler' \
@@ -206,6 +227,10 @@ jobs:
             '/staedte/berlin' \
             '/kosten/maler/berlin' \
             '/ratgeber' \
-            '/ratgeber/sanierungskosten-pro-qm'; do
+            '/ratgeber/sanierungskosten-pro-qm' \
+            '/rechner' \
+            '/rechner/renovierungskosten' \
+            '/rechner/handwerkerkosten' \
+            '/rechner/badsanierungskosten'; do
             grep -q "$path" /tmp/sitemap.xml
           done
