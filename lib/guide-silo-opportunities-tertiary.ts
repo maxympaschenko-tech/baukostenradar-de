@@ -131,4 +131,58 @@ export const tertiaryOpportunitySilos: Record<string, OpportunitySiloConfig> = {
   },
   ...quaternaryOpportunitySilos,
   ...quinaryOpportunitySilos,
+  "innentuer-einbauen-kosten": {
+    serviceSlugs: ["tueren"],
+    serviceSlug: "tueren",
+    itemSlug: "innentuer-mit-zarge-inkl-montage",
+    calculatorLabel: "Innentür berechnen",
+  },
+  "zementestrich-kosten-pro-qm": {
+    serviceSlugs: ["estrich", "bodenleger"],
+    serviceSlug: "estrich",
+    itemSlug: "zementestrich-verlegen",
+    calculatorLabel: "Zementestrich berechnen",
+  },
+  "fliessestrich-kosten-pro-qm": {
+    serviceSlugs: ["estrich", "bodenleger"],
+    serviceSlug: "estrich",
+    itemSlug: "fliessestrich",
+    calculatorLabel: "Fließestrich berechnen",
+  },
+  "schnellestrich-kosten-pro-qm": {
+    serviceSlugs: ["estrich", "bodenleger"],
+    serviceSlug: "estrich",
+    itemSlug: "schnellestrich",
+    calculatorLabel: "Schnellestrich berechnen",
+  },
+  "bodenausgleich-kosten-pro-qm": {
+    serviceSlugs: ["estrich", "bodenleger"],
+    serviceSlug: "estrich",
+    itemSlug: "bodenausgleich-5-20-mm",
+    calculatorLabel: "Bodenausgleich berechnen",
+  },
+  "estrich-rissreparatur-kosten": {
+    serviceSlugs: ["estrich", "bodenleger"],
+    serviceSlug: "estrich",
+    itemSlug: "estrich-rissreparatur",
+    calculatorLabel: "Estrichreparatur berechnen",
+  },
+  "haus-abreissen-kosten": {
+    serviceSlugs: ["abriss-entsorgung"],
+    serviceSlug: "abriss-entsorgung",
+    itemSlug: "einfamilienhaus-komplett-abreissen",
+    calculatorLabel: "Hausabriss berechnen",
+  },
+  "innenabbruch-einfamilienhaus-kosten": {
+    serviceSlugs: ["abriss-entsorgung"],
+    serviceSlug: "abriss-entsorgung",
+    itemSlug: "innenabbruch-einfamilienhaus",
+    calculatorLabel: "Innenabbruch berechnen",
+  },
+  "bauschuttcontainer-30-m3-kosten": {
+    serviceSlugs: ["abriss-entsorgung"],
+    serviceSlug: "abriss-entsorgung",
+    itemSlug: "bauschuttcontainer-30-m3",
+    calculatorLabel: "Containerkosten berechnen",
+  },
 };
