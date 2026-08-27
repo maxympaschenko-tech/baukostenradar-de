@@ -25,6 +25,26 @@ export const quinaryItemGuideOverrides: Record<string, QuinaryPriceGuideLink> = 
     title: "Dachsanierung mit Aufsparrendämmung: Kosten pro m²",
     cta: "Dach-Dämmungs-Ratgeber öffnen",
   },
+  "dachsanierung:dachfenster-nachtraeglich-einbauen": {
+    href: "/ratgeber/dachfenster-nachtraeglich-einbauen-kosten",
+    title: "Dachfenster nachträglich einbauen: Kosten pro Fenster",
+    cta: "Dachfenster-Ratgeber öffnen",
+  },
+  "daemmung:kellerdeckendaemmung-inkl-montage": {
+    href: "/ratgeber/daemmung-kellerdecke-kosten-pro-qm",
+    title: "Kellerdecke dämmen: Kosten pro m² inklusive Montage",
+    cta: "Kellerdecken-Ratgeber öffnen",
+  },
+  "daemmung:oberste-geschossdecke-daemmen-nicht-begehbar": {
+    href: "/ratgeber/daemmung-oberste-geschossdecke-kosten-pro-qm",
+    title: "Oberste Geschossdecke dämmen: begehbar und nicht begehbar",
+    cta: "Geschossdecken-Ratgeber öffnen",
+  },
+  "daemmung:oberste-geschossdecke-daemmen-begehbar": {
+    href: "/ratgeber/daemmung-oberste-geschossdecke-kosten-pro-qm",
+    title: "Oberste Geschossdecke dämmen: begehbar und nicht begehbar",
+    cta: "Geschossdecken-Ratgeber öffnen",
+  },
   "photovoltaik:pv-anlage-5-kwp-inkl-installation": {
     href: "/ratgeber/photovoltaik-5-kwp-kosten",
     title: "Photovoltaik 5 kWp: Startpreis und Leistungsumfang",
