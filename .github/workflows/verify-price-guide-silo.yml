@@ -41,25 +41,41 @@ jobs:
           }
 
           check_guide 'badsanierung' 'bad-sanierung-komplett' 'bad-komplett-sanieren-kosten'
-          check_guide 'maler' 'waende-streichen' 'wohnung-renovieren-kosten'
-          check_guide 'fliesenleger' 'standard-fliesen-verlegen' 'wohnung-renovieren-kosten'
+          check_guide 'maler' 'waende-streichen' 'maler-kosten-pro-qm'
+          check_guide 'fliesenleger' 'standard-fliesen-verlegen' 'fliesenleger-kosten-pro-qm'
           check_guide 'elektriker' 'steckdose-installieren' 'elektrik-erneuern-altbau'
           check_guide 'dachsanierung' 'neueindeckung-inkl-lattung' 'dach-sanieren-kosten-pro-qm'
-          check_guide 'bodenleger' 'vinylboden-klick-inkl-material' 'wohnung-renovieren-kosten'
-          check_guide 'trockenbau' 'trockenbauwand-beidseitig-beplankt' 'wohnung-renovieren-kosten'
-          check_guide 'sanitaer' 'sanitaerobjekte-armaturen-fuer-8-m2-bad' 'bad-komplett-sanieren-kosten'
-          check_guide 'waermepumpe' 'luft-wasser-waermepumpe-komplett' 'heizung-erneuern-kosten'
-          check_guide 'photovoltaik' 'pv-anlage-5-kwp-inkl-installation' 'sanierungskosten-einfamilienhaus'
-          check_guide 'daemmung' 'dachdaemmung-aufsparren' 'dach-sanieren-kosten-pro-qm'
+          check_guide 'bodenleger' 'vinylboden-klick-inkl-material' 'bodenleger-kosten-pro-qm'
+          check_guide 'trockenbau' 'trockenbauwand-beidseitig-beplankt' 'trockenbau-kosten-pro-qm'
+          check_guide 'sanitaer' 'sanitaerobjekte-armaturen-fuer-8-m2-bad' 'sanitaer-kosten'
+          check_guide 'waermepumpe' 'luft-wasser-waermepumpe-komplett' 'waermepumpe-kosten-2026'
+          check_guide 'photovoltaik' 'pv-anlage-5-kwp-inkl-installation' 'photovoltaik-kosten-2026'
+          check_guide 'daemmung' 'fassadendaemmung-wdvs' 'daemmung-kosten-pro-qm'
           check_guide 'fenster' 'fenster-mit-2-fach-verglasung' 'fenster-austauschen-kosten-haus'
           check_guide 'heizung' 'fussbodenheizung-nachruesten' 'fussbodenheizung-100-qm-kosten'
-          check_guide 'fassade' 'putz-fassade-neu' 'haus-sanieren-kosten'
-          check_guide 'garten' 'terrasse-pflastern-inkl-unterbau' 'arbeitskosten-materialkosten'
+          check_guide 'fassade' 'putz-fassade-neu' 'fassade-sanieren-kosten'
+          check_guide 'garten' 'terrasse-pflastern-inkl-unterbau' 'garten-anlegen-kosten'
           check_guide 'tueren' 'innentuer-einbauen-inkl-zarge' '6-innentueren-austauschen-kosten'
           check_guide 'estrich' 'zementestrich-komplett' 'estrich-100-qm-kosten'
           check_guide 'maurer' 'mauerarbeiten-fertige-wand' 'innenwand-mauern-kosten'
           check_guide 'treppen' 'holzstufe-schleifen-und-versiegeln' '14-treppenstufen-renovieren-kosten'
           check_guide 'kueche' 'kuechen-renovierung-ohne-moebel' 'kueche-10-qm-renovieren-kosten'
+
+      - name: Verify specialist contextual overrides
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/kosten/maler/leistung/fassade-streichen-inkl-vorarbeiten' -o /tmp/maler-fassade.html
+          grep -q '/ratgeber/fassade-sanieren-kosten' /tmp/maler-fassade.html
+
+          curl -sS --fail 'https://baukostenradar.de/kosten/fliesenleger/leistung/verbundabdichtung-bad' -o /tmp/fliesen-bad.html
+          grep -q '/ratgeber/bad-komplett-sanieren-kosten' /tmp/fliesen-bad.html
+
+          for item in dachdaemmung-aufsparren dachdaemmung-zwischensparren; do
+            curl -sS --fail "https://baukostenradar.de/kosten/daemmung/leistung/${item}" -o /tmp/daemmung-dach.html
+            grep -q '/ratgeber/dach-sanieren-kosten-pro-qm' /tmp/daemmung-dach.html
+          done
 
       - name: Verify hourly prices use the labor-rate guide
         shell: bash
