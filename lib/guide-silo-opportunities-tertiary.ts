@@ -173,6 +173,12 @@ export const tertiaryOpportunitySilos: Record<string, OpportunitySiloConfig> = {
     itemSlug: "einfamilienhaus-komplett-abreissen",
     calculatorLabel: "Hausabriss berechnen",
   },
+  "abbruch-kosten-pro-m3": {
+    serviceSlugs: ["abriss-entsorgung"],
+    serviceSlug: "abriss-entsorgung",
+    itemSlug: "abbruch-nach-umbautem-raum",
+    calculatorLabel: "Abbruch pro m³ berechnen",
+  },
   "innenabbruch-einfamilienhaus-kosten": {
     serviceSlugs: ["abriss-entsorgung"],
     serviceSlug: "abriss-entsorgung",
@@ -184,5 +190,11 @@ export const tertiaryOpportunitySilos: Record<string, OpportunitySiloConfig> = {
     serviceSlug: "abriss-entsorgung",
     itemSlug: "bauschuttcontainer-30-m3",
     calculatorLabel: "Containerkosten berechnen",
+  },
+  "bauschutt-entsorgung-kosten-pro-tonne": {
+    serviceSlugs: ["abriss-entsorgung"],
+    serviceSlug: "abriss-entsorgung",
+    itemSlug: "entsorgung-bauschutt",
+    calculatorLabel: "Bauschuttentsorgung berechnen",
   },
 };
