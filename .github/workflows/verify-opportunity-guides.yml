@@ -63,9 +63,30 @@ jobs:
           check_opportunity laminat-verlegen-kosten-pro-qm bodenleger laminat-verlegen
           check_opportunity innendaemmung-kosten-pro-qm daemmung innendaemmung
 
-          echo 'Verified 20 opportunity guides and exact price-item mappings'
+          check_opportunity waende-streichen-kosten-pro-qm maler waende-streichen
+          check_opportunity tapezieren-kosten-pro-qm maler tapezieren-inkl-tapete
+          check_opportunity innenputz-q3-kosten-pro-qm maler innenputz-glaetten-q3
+          check_opportunity fliesen-verlegen-kosten-pro-qm fliesenleger standard-fliesen-verlegen
+          check_opportunity grossformat-fliesen-verlegen-kosten fliesenleger grossformat-ab-80-x-80-cm
+          check_opportunity steckdose-installieren-kosten elektriker steckdose-installieren
+          check_opportunity dach-neu-eindecken-kosten-pro-qm dachsanierung neueindeckung-inkl-lattung
+          check_opportunity vinylboden-verlegen-kosten-pro-qm bodenleger vinylboden-klick-inkl-material
+          check_opportunity verspachtelung-q4-kosten-pro-qm trockenbau verspachtelung-q4
+          check_opportunity luft-wasser-waermepumpe-kosten waermepumpe luft-wasser-waermepumpe-komplett
+          check_opportunity photovoltaik-10-kwp-kosten photovoltaik pv-anlage-10-kwp-inkl-installation
+          check_opportunity photovoltaik-mit-speicher-kosten photovoltaik 10-kwp-pv-ca-10-kwh-speicher
+          check_opportunity fenster-3-fach-verglasung-kosten fenster fenster-mit-3-fach-verglasung
+          check_opportunity gasheizung-austauschen-kosten heizung gasheizung-austauschen
+          check_opportunity heizungswartung-kosten heizung heizungswartung
+          check_opportunity doppelstabmattenzaun-kosten-pro-meter garten doppelstabmattenzaun-inkl-montage
+          check_opportunity trockenestrich-kosten-pro-qm estrich trockenestrich
+          check_opportunity zwischensparrendaemmung-kosten-pro-qm daemmung dachdaemmung-zwischensparren
+          check_opportunity aufsparrendaemmung-kosten-pro-qm daemmung dachdaemmung-aufsparren
+          check_opportunity putzfassade-kosten-pro-qm fassade putz-fassade-neu
 
-      - name: Verify parent guides link into the new long-tail cluster
+          echo 'Verified 40 opportunity guides and exact price-item mappings'
+
+      - name: Verify parent guides link into the long-tail cluster
         shell: bash
         run: |
           set -euo pipefail
@@ -98,4 +119,25 @@ jobs:
           check_parent bodenleger-kosten-pro-qm laminat-verlegen-kosten-pro-qm
           check_parent daemmung-kosten-pro-qm innendaemmung-kosten-pro-qm
 
-          echo 'Verified parent-to-opportunity Ratgeber links'
+          check_parent maler-kosten-pro-qm waende-streichen-kosten-pro-qm
+          check_parent maler-kosten-pro-qm tapezieren-kosten-pro-qm
+          check_parent maler-kosten-pro-qm innenputz-q3-kosten-pro-qm
+          check_parent fliesenleger-kosten-pro-qm fliesen-verlegen-kosten-pro-qm
+          check_parent fliesenleger-kosten-pro-qm grossformat-fliesen-verlegen-kosten
+          check_parent elektrik-erneuern-altbau steckdose-installieren-kosten
+          check_parent dach-sanieren-kosten-pro-qm dach-neu-eindecken-kosten-pro-qm
+          check_parent bodenleger-kosten-pro-qm vinylboden-verlegen-kosten-pro-qm
+          check_parent trockenbau-kosten-pro-qm verspachtelung-q4-kosten-pro-qm
+          check_parent waermepumpe-kosten-2026 luft-wasser-waermepumpe-kosten
+          check_parent photovoltaik-kosten-2026 photovoltaik-10-kwp-kosten
+          check_parent photovoltaik-kosten-2026 photovoltaik-mit-speicher-kosten
+          check_parent fenster-austauschen-kosten-haus fenster-3-fach-verglasung-kosten
+          check_parent heizung-erneuern-kosten gasheizung-austauschen-kosten
+          check_parent heizung-erneuern-kosten heizungswartung-kosten
+          check_parent garten-anlegen-kosten doppelstabmattenzaun-kosten-pro-meter
+          check_parent estrich-100-qm-kosten trockenestrich-kosten-pro-qm
+          check_parent daemmung-kosten-pro-qm zwischensparrendaemmung-kosten-pro-qm
+          check_parent daemmung-kosten-pro-qm aufsparrendaemmung-kosten-pro-qm
+          check_parent fassade-sanieren-kosten putzfassade-kosten-pro-qm
+
+          echo 'Verified parent-to-opportunity Ratgeber links for all 40 guides'
