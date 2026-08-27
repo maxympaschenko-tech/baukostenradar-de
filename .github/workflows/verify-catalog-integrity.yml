@@ -80,6 +80,35 @@ jobs:
           grep -q 'menge=10' /tmp/kueche-guide.html
           grep -q '/kosten/kueche/leistung/' /tmp/kueche-guide.html
 
+      - name: Verify current door screed and demolition guides
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          check_guide() {
+            local path="$1"
+            local expected_text="$2"
+            local expected_service="$3"
+            local expected_item="$4"
+            local output="$5"
+            curl -sS --fail "https://baukostenradar.de${path}" -o "$output"
+            grep -q "$expected_text" "$output"
+            grep -q "gewerk=${expected_service}" "$output"
+            grep -q "leistung=${expected_item}" "$output"
+            grep -q "https://baukostenradar.de${path}" "$output"
+          }
+
+          check_guide '/ratgeber/innentuer-einbauen-kosten' '320' 'tueren' 'innentuer-mit-zarge-inkl-montage' /tmp/current-door.html
+          check_guide '/ratgeber/zementestrich-kosten-pro-qm' '30' 'estrich' 'zementestrich-verlegen' /tmp/current-zement.html
+          check_guide '/ratgeber/fliessestrich-kosten-pro-qm' '40' 'estrich' 'fliessestrich' /tmp/current-fliess.html
+          check_guide '/ratgeber/trockenestrich-kosten-pro-qm' '45' 'estrich' 'trockenestrich' /tmp/current-trocken.html
+          check_guide '/ratgeber/schnellestrich-kosten-pro-qm' '60' 'estrich' 'schnellestrich' /tmp/current-schnell.html
+          check_guide '/ratgeber/bodenausgleich-kosten-pro-qm' '18' 'estrich' 'bodenausgleich-5-20-mm' /tmp/current-ausgleich.html
+          check_guide '/ratgeber/estrich-rissreparatur-kosten' '35' 'estrich' 'estrich-rissreparatur' /tmp/current-riss.html
+          check_guide '/ratgeber/haus-abreissen-kosten' '8.500' 'abriss-entsorgung' 'einfamilienhaus-komplett-abreissen' /tmp/current-hausabriss.html
+          check_guide '/ratgeber/innenabbruch-einfamilienhaus-kosten' '8.000' 'abriss-entsorgung' 'innenabbruch-einfamilienhaus' /tmp/current-innenabbruch.html
+          check_guide '/ratgeber/bauschuttcontainer-30-m3-kosten' '650' 'abriss-entsorgung' 'bauschuttcontainer-30-m3' /tmp/current-container.html
+
       - name: Verify quantity deep links resolve in calculator
         shell: bash
         run: |
@@ -102,6 +131,30 @@ jobs:
           check_calculator 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=maurer&leistung=mauerarbeiten-fertige-wand&menge=20' '20' 'Mauerarbeiten fertige Wand' /tmp/calc-maurer.html
           check_calculator 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=treppen&leistung=holzstufe-schleifen-und-versiegeln&menge=14' '14' 'Holzstufe schleifen und versiegeln' /tmp/calc-treppen.html
           check_calculator 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=kueche&leistung=kuechen-renovierung-ohne-moebel&menge=10' '10' 'Küchen-Renovierung ohne Möbel' /tmp/calc-kueche.html
+          check_calculator 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=abriss-entsorgung&leistung=einfamilienhaus-komplett-abreissen&menge=1' '1' 'Einfamilienhaus komplett abreißen' /tmp/calc-abriss.html
+
+      - name: Verify permanent redirects for retired catalog URLs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          check_redirect() {
+            local source="$1"
+            local target="$2"
+            local result
+            result="$(curl -sS -o /dev/null -w '%{http_code} %{redirect_url}' "https://baukostenradar.de${source}")"
+            echo "$result" | grep -Eq '^(301|308) '
+            echo "$result" | grep -q "https://baukostenradar.de${target}"
+          }
+
+          check_redirect '/kosten/tueren/leistung/innentuer-einbauen-inkl-zarge' '/kosten/tueren/leistung/innentuer-mit-zarge-inkl-montage'
+          check_redirect '/kosten/estrich/leistung/zementestrich-komplett' '/kosten/estrich/leistung/zementestrich-verlegen'
+          check_redirect '/kosten/estrich/leistung/calciumsulfat-anhydritestrich' '/kosten/estrich/leistung/fliessestrich'
+          check_redirect '/ratgeber/tuer-lackieren-kosten' '/ratgeber/6-innentueren-austauschen-kosten'
+          check_redirect '/ratgeber/anhydritestrich-kosten-pro-qm' '/ratgeber/fliessestrich-kosten-pro-qm'
+          check_redirect '/ratgeber/gussasphaltestrich-kosten-pro-qm' '/ratgeber/estrich-100-qm-kosten'
+          check_redirect '/ratgeber/sichtestrich-kosten-pro-qm' '/ratgeber/estrich-100-qm-kosten'
+          check_redirect '/ratgeber/estrich-zement-oder-anhydrit-kosten' '/ratgeber/estrich-100-qm-kosten'
 
       - name: Verify extended catalog is indexed
         shell: bash
@@ -118,14 +171,44 @@ jobs:
             '/kosten/abriss-entsorgung' \
             '/kosten/tueren/leistung/innentuer-mit-zarge-inkl-montage' \
             '/kosten/estrich/leistung/zementestrich-verlegen' \
+            '/kosten/estrich/leistung/fliessestrich' \
+            '/kosten/estrich/leistung/trockenestrich' \
+            '/kosten/estrich/leistung/schnellestrich' \
+            '/kosten/estrich/leistung/bodenausgleich-5-20-mm' \
+            '/kosten/estrich/leistung/estrich-rissreparatur' \
             '/kosten/maurer/leistung/mauerarbeiten-fertige-wand' \
             '/kosten/treppen/leistung/holzstufe-schleifen-und-versiegeln' \
             '/kosten/kueche/leistung/kuechen-renovierung-ohne-moebel' \
             '/kosten/abriss-entsorgung/leistung/einfamilienhaus-komplett-abreissen' \
             '/ratgeber/6-innentueren-austauschen-kosten' \
             '/ratgeber/estrich-100-qm-kosten' \
+            '/ratgeber/innentuer-einbauen-kosten' \
+            '/ratgeber/zementestrich-kosten-pro-qm' \
+            '/ratgeber/fliessestrich-kosten-pro-qm' \
+            '/ratgeber/trockenestrich-kosten-pro-qm' \
+            '/ratgeber/schnellestrich-kosten-pro-qm' \
+            '/ratgeber/bodenausgleich-kosten-pro-qm' \
+            '/ratgeber/estrich-rissreparatur-kosten' \
+            '/ratgeber/haus-abreissen-kosten' \
+            '/ratgeber/innenabbruch-einfamilienhaus-kosten' \
+            '/ratgeber/bauschuttcontainer-30-m3-kosten' \
             '/ratgeber/innenwand-mauern-kosten' \
             '/ratgeber/14-treppenstufen-renovieren-kosten' \
             '/ratgeber/kueche-10-qm-renovieren-kosten'; do
             grep -q "$path" /tmp/sitemap.xml
+          done
+
+          for retired in \
+            '/kosten/tueren/leistung/innentuer-einbauen-inkl-zarge' \
+            '/kosten/estrich/leistung/zementestrich-komplett' \
+            '/kosten/estrich/leistung/calciumsulfat-anhydritestrich' \
+            '/ratgeber/tuer-lackieren-kosten' \
+            '/ratgeber/anhydritestrich-kosten-pro-qm' \
+            '/ratgeber/gussasphaltestrich-kosten-pro-qm' \
+            '/ratgeber/sichtestrich-kosten-pro-qm' \
+            '/ratgeber/estrich-zement-oder-anhydrit-kosten'; do
+            if grep -q "$retired" /tmp/sitemap.xml; then
+              echo "Retired URL still present in sitemap: $retired" >&2
+              exit 1
+            fi
           done
