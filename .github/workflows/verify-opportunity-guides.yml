@@ -1,0 +1,85 @@
+name: Verify opportunity guides
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-opportunity-guides:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify all opportunity guides and item mappings
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+
+          check_opportunity() {
+            local guide="$1"
+            local service="$2"
+            local item="$3"
+
+            grep -q "https://baukostenradar.de/ratgeber/${guide}</loc>" /tmp/sitemap.xml
+
+            local guide_output="/tmp/guide-${guide}.html"
+            curl -sS --fail "https://baukostenradar.de/ratgeber/${guide}" -o "$guide_output"
+            grep -q "https://baukostenradar.de/ratgeber/${guide}" "$guide_output"
+            grep -q '"@type":"Article"' "$guide_output"
+            grep -q "/kosten/${service}" "$guide_output"
+            grep -q "/kosten/${service}/berlin" "$guide_output"
+            grep -q "gewerk=${service}" "$guide_output"
+            grep -q "leistung=${item}" "$guide_output"
+            ! grep -qi 'noindex' "$guide_output"
+
+            local item_output="/tmp/item-${service}-${item}.html"
+            curl -sS --fail "https://baukostenradar.de/kosten/${service}/leistung/${item}" -o "$item_output"
+            grep -q 'Passender Ratgeber' "$item_output"
+            grep -q "/ratgeber/${guide}" "$item_output"
+            ! grep -qi 'noindex' "$item_output"
+          }
+
+          check_opportunity einfahrt-pflastern-kosten garten einfahrt-pflastern
+          check_opportunity terrasse-pflastern-kosten garten terrasse-pflastern-inkl-unterbau
+          check_opportunity baum-faellen-kosten garten baumfaellung-mittelgross-inkl-entsorgung
+          check_opportunity rollrasen-kosten-pro-qm garten rollrasen-inkl-vorbereitung
+          check_opportunity parkett-abschleifen-kosten bodenleger parkett-abschleifen-und-oelen
+          check_opportunity sicherungskasten-erneuern-kosten elektriker sicherungskasten-erneuern
+          check_opportunity dachrinne-erneuern-kosten dachsanierung dachrinne-erneuern-zink
+          check_opportunity haustuer-einbauen-kosten tueren haustuer-kunststoff-inkl-montage
+          check_opportunity fassadendaemmung-kosten-pro-qm daemmung fassadendaemmung-wdvs
+          check_opportunity waermepumpe-wartung-kosten waermepumpe wartung-waermepumpe
+          check_opportunity stromspeicher-kosten-pro-kwh photovoltaik stromspeicher-lfp
+          check_opportunity fenstereinbau-kosten fenster fenstereinbau
+
+          echo 'Verified 12 opportunity guides and exact price-item mappings'
+
+      - name: Verify parent guides link into the new long-tail cluster
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          check_parent() {
+            local parent="$1"
+            local child="$2"
+            curl -sS --fail "https://baukostenradar.de/ratgeber/${parent}" -o /tmp/parent.html
+            grep -q "/ratgeber/${child}" /tmp/parent.html
+          }
+
+          check_parent garten-anlegen-kosten einfahrt-pflastern-kosten
+          check_parent garten-anlegen-kosten terrasse-pflastern-kosten
+          check_parent garten-anlegen-kosten baum-faellen-kosten
+          check_parent garten-anlegen-kosten rollrasen-kosten-pro-qm
+          check_parent bodenleger-kosten-pro-qm parkett-abschleifen-kosten
+          check_parent elektrik-erneuern-altbau sicherungskasten-erneuern-kosten
+          check_parent dach-sanieren-kosten-pro-qm dachrinne-erneuern-kosten
+          check_parent haus-sanieren-kosten haustuer-einbauen-kosten
+          check_parent daemmung-kosten-pro-qm fassadendaemmung-kosten-pro-qm
+          check_parent waermepumpe-kosten-2026 waermepumpe-wartung-kosten
+          check_parent photovoltaik-kosten-2026 stromspeicher-kosten-pro-kwh
+          check_parent fenster-austauschen-kosten-haus fenstereinbau-kosten
+
+          echo 'Verified parent-to-opportunity Ratgeber links'
