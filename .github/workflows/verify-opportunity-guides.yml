@@ -54,8 +54,16 @@ jobs:
           check_opportunity waermepumpe-wartung-kosten waermepumpe wartung-waermepumpe
           check_opportunity stromspeicher-kosten-pro-kwh photovoltaik stromspeicher-lfp
           check_opportunity fenstereinbau-kosten fenster fenstereinbau
+          check_opportunity trockenbauwand-kosten-pro-qm trockenbau trockenbauwand-beidseitig-beplankt
+          check_opportunity heizkoerper-montieren-kosten heizung heizkoerper-montieren
+          check_opportunity bodenplatte-kosten-pro-qm maurer bodenplatte-standard
+          check_opportunity kuechenfronten-erneuern-kosten kueche kuechenfronten-austauschen-oder-lackieren
+          check_opportunity kuechenarbeitsplatte-kosten kueche neue-arbeitsplatte
+          check_opportunity parkett-verlegen-kosten-pro-qm bodenleger parkett-verlegen-inkl-material
+          check_opportunity laminat-verlegen-kosten-pro-qm bodenleger laminat-verlegen
+          check_opportunity innendaemmung-kosten-pro-qm daemmung innendaemmung
 
-          echo 'Verified 12 opportunity guides and exact price-item mappings'
+          echo 'Verified 20 opportunity guides and exact price-item mappings'
 
       - name: Verify parent guides link into the new long-tail cluster
         shell: bash
@@ -81,5 +89,13 @@ jobs:
           check_parent waermepumpe-kosten-2026 waermepumpe-wartung-kosten
           check_parent photovoltaik-kosten-2026 stromspeicher-kosten-pro-kwh
           check_parent fenster-austauschen-kosten-haus fenstereinbau-kosten
+          check_parent trockenbau-kosten-pro-qm trockenbauwand-kosten-pro-qm
+          check_parent heizung-erneuern-kosten heizkoerper-montieren-kosten
+          check_parent innenwand-mauern-kosten bodenplatte-kosten-pro-qm
+          check_parent kueche-10-qm-renovieren-kosten kuechenfronten-erneuern-kosten
+          check_parent kueche-10-qm-renovieren-kosten kuechenarbeitsplatte-kosten
+          check_parent bodenleger-kosten-pro-qm parkett-verlegen-kosten-pro-qm
+          check_parent bodenleger-kosten-pro-qm laminat-verlegen-kosten-pro-qm
+          check_parent daemmung-kosten-pro-qm innendaemmung-kosten-pro-qm
 
           echo 'Verified parent-to-opportunity Ratgeber links'
