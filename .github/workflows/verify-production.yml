@@ -161,28 +161,39 @@ jobs:
         run: |
           set -euo pipefail
 
+          curl -sS --fail 'https://baukostenradar.de/kosten' -o /tmp/costs.html
           curl -sS --fail 'https://baukostenradar.de/kosten/maler' -o /tmp/service.html
+          curl -sS --fail 'https://baukostenradar.de/kosten/maler/leistung/waende-streichen' -o /tmp/item.html
           curl -sS --fail 'https://baukostenradar.de/staedte/berlin' -o /tmp/city.html
           curl -sS --fail 'https://baukostenradar.de/kosten/maler/berlin' -o /tmp/local.html
           curl -sS --fail 'https://baukostenradar.de/ratgeber/sanierungskosten-pro-qm' -o /tmp/guide.html
 
+          grep -q 'https://baukostenradar.de/kosten' /tmp/costs.html
           grep -q 'https://baukostenradar.de/kosten/maler' /tmp/service.html
+          grep -q 'https://baukostenradar.de/kosten/maler/leistung/waende-streichen' /tmp/item.html
           grep -q 'https://baukostenradar.de/staedte/berlin' /tmp/city.html
           grep -q 'https://baukostenradar.de/kosten/maler/berlin' /tmp/local.html
           grep -q 'https://baukostenradar.de/ratgeber/sanierungskosten-pro-qm' /tmp/guide.html
 
-          for page in /tmp/service.html /tmp/city.html /tmp/local.html /tmp/guide.html; do
+          for page in /tmp/costs.html /tmp/service.html /tmp/item.html /tmp/city.html /tmp/local.html /tmp/guide.html; do
             if grep -qi 'noindex' "$page"; then
               echo "Unexpected noindex in $page" >&2
               exit 1
             fi
           done
 
+          grep -q 'BreadcrumbList' /tmp/costs.html
+          grep -q 'ItemList' /tmp/costs.html
+          grep -q 'BreadcrumbList' /tmp/item.html
+          grep -q 'FAQPage' /tmp/item.html
+          grep -q 'Beispielrechnungen' /tmp/item.html
           grep -q 'BreadcrumbList' /tmp/city.html
           grep -q 'BreadcrumbList' /tmp/local.html
 
           for path in \
+            '/kosten' \
             '/kosten/maler' \
+            '/kosten/maler/leistung/waende-streichen' \
             '/staedte/berlin' \
             '/kosten/maler/berlin' \
             '/ratgeber/sanierungskosten-pro-qm'; do
