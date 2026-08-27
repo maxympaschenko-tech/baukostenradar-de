@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RenovationCalculator } from "@/components/renovation-calculator";
 import { handwerkerCalculatorHref } from "@/lib/calculator-links";
+import { getServiceGuideLink } from "@/lib/price-guide-links";
 import { priceItemSlug } from "@/lib/price-slug";
 import { getService, priceSources, regions, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
@@ -149,6 +150,64 @@ const costFactorsByService: Record<string, string[]> = {
   ],
 };
 
+const scenarioGuideByService: Record<string, { label: string; href: string; description: string }> = {
+  dachsanierung: {
+    label: "Dach 150 m² Kosten 2026",
+    href: "/ratgeber/dach-150-qm-kosten",
+    description: "Konkretes Beispielbudget für 150 m² Dachfläche berechnen.",
+  },
+  fenster: {
+    label: "20 Fenster austauschen Kosten 2026",
+    href: "/ratgeber/20-fenster-austauschen-kosten",
+    description: "Zwei- und Dreifachverglasung für 20 Standardfenster inklusive Einbau vergleichen.",
+  },
+  elektriker: {
+    label: "Elektrik bei 100 m² erneuern 2026",
+    href: "/ratgeber/elektrik-erneuern-100-qm-kosten",
+    description: "Projektkosten für eine 100-m²-Größe ohne erfundenen Quadratmeterpreis einordnen.",
+  },
+  heizung: {
+    label: "Fußbodenheizung 100 m² Kosten 2026",
+    href: "/ratgeber/fussbodenheizung-100-qm-kosten",
+    description: "Das Nachrüsten von 100 m² Fußbodenheizung konkret durchrechnen.",
+  },
+  badsanierung: {
+    label: "Bad 10 m² sanieren Kosten 2026",
+    href: "/ratgeber/bad-10-qm-sanieren-kosten",
+    description: "Quadratmeter-Richtwert und Komplettspanne für ein 10-m²-Bad vergleichen.",
+  },
+  sanitaer: {
+    label: "Bad 10 m² sanieren Kosten 2026",
+    href: "/ratgeber/bad-10-qm-sanieren-kosten",
+    description: "Sanitärarbeiten im konkreten Beispiel eines 10-m²-Bads einordnen.",
+  },
+  tueren: {
+    label: "6 Innentüren austauschen Kosten 2026",
+    href: "/ratgeber/6-innentueren-austauschen-kosten",
+    description: "Sechs Standard-Innentüren inklusive Zargen konkret durchrechnen.",
+  },
+  estrich: {
+    label: "Estrich 100 m² Kosten 2026",
+    href: "/ratgeber/estrich-100-qm-kosten",
+    description: "Zement-, Anhydrit-, Trocken- und Sichtestrich für 100 m² vergleichen.",
+  },
+  maurer: {
+    label: "Innenwand mauern Kosten 2026",
+    href: "/ratgeber/innenwand-mauern-kosten",
+    description: "Kosten pro Quadratmeter und Beispielbudgets für 10, 20 und 30 m² Wandfläche vergleichen.",
+  },
+  treppen: {
+    label: "14 Treppenstufen renovieren Kosten 2026",
+    href: "/ratgeber/14-treppenstufen-renovieren-kosten",
+    description: "Stufenaufarbeitung und komplette Treppenrenovierung sauber voneinander unterscheiden.",
+  },
+  kueche: {
+    label: "Küche 10 m² renovieren Kosten 2026",
+    href: "/ratgeber/kueche-10-qm-renovieren-kosten",
+    description: "Eine 10-m²-Küche ohne Möbel kalkulieren und weitere Küchenpositionen einordnen.",
+  },
+};
+
 export function generateStaticParams() {
   return services.map((service) => ({ slug: service.slug }));
 }
@@ -186,104 +245,14 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
   const technicalRenovationSlugs = new Set(["elektriker", "sanitaer", "heizung", "fenster", "dachsanierung", "daemmung", "fassade", "estrich", "maurer"]);
   const houseProjectSlugs = new Set(["fenster", "dachsanierung", "daemmung", "fassade", "heizung", "waermepumpe", "photovoltaik"]);
   const hasHourlyPrice = service.priceItems.some((item) => item.unit.toLowerCase().includes("stunde"));
-  const tradeGuideByService: Record<string, { label: string; href: string; description: string }> = {
-    dachsanierung: {
-      label: "Dach sanieren Kosten pro m² 2026",
-      href: "/ratgeber/dach-sanieren-kosten-pro-qm",
-      description: "Neueindeckung, Dämmung und Beispielbudgets nach Dachfläche vertiefen.",
-    },
-    fenster: {
-      label: "Fenster austauschen beim Haus 2026",
-      href: "/ratgeber/fenster-austauschen-kosten-haus",
-      description: "Kosten pro Fenster und Beispielbudgets für 10 oder 15 Fenster vergleichen.",
-    },
-    elektriker: {
-      label: "Elektrik im Altbau erneuern 2026",
-      href: "/ratgeber/elektrik-erneuern-altbau",
-      description: "Komplettinstallation, Sicherungskasten und typische Altbau-Kostentreiber einordnen.",
-    },
-    heizung: {
-      label: "Heizung erneuern Kosten 2026",
-      href: "/ratgeber/heizung-erneuern-kosten",
-      description: "Gasheizung, Wärmepumpe und Wärmeverteilung im Gesamtbudget vergleichen.",
-    },
-    waermepumpe: {
-      label: "Heizung erneuern Kosten 2026",
-      href: "/ratgeber/heizung-erneuern-kosten",
-      description: "Wärmepumpe mit anderen Heizungsmaßnahmen und der Wärmeverteilung vergleichen.",
-    },
-    badsanierung: {
-      label: "Bad komplett sanieren Kosten 2026",
-      href: "/ratgeber/bad-komplett-sanieren-kosten",
-      description: "Komplettbad, 8-m²-Beispiel und einzelne Kostenblöcke vertiefen.",
-    },
-    sanitaer: {
-      label: "Bad komplett sanieren Kosten 2026",
-      href: "/ratgeber/bad-komplett-sanieren-kosten",
-      description: "Sanitärarbeiten im Budget einer vollständigen Badsanierung einordnen.",
-    },
-  };
-  const scenarioGuideByService: Record<string, { label: string; href: string; description: string }> = {
-    dachsanierung: {
-      label: "Dach 150 m² Kosten 2026",
-      href: "/ratgeber/dach-150-qm-kosten",
-      description: "Konkretes Beispielbudget für 150 m² Dachfläche berechnen.",
-    },
-    fenster: {
-      label: "20 Fenster austauschen Kosten 2026",
-      href: "/ratgeber/20-fenster-austauschen-kosten",
-      description: "Zwei- und Dreifachverglasung für 20 Standardfenster inklusive Einbau vergleichen.",
-    },
-    elektriker: {
-      label: "Elektrik bei 100 m² erneuern 2026",
-      href: "/ratgeber/elektrik-erneuern-100-qm-kosten",
-      description: "Projektkosten für eine 100-m²-Größe ohne erfundenen Quadratmeterpreis einordnen.",
-    },
-    heizung: {
-      label: "Fußbodenheizung 100 m² Kosten 2026",
-      href: "/ratgeber/fussbodenheizung-100-qm-kosten",
-      description: "Das Nachrüsten von 100 m² Fußbodenheizung konkret durchrechnen.",
-    },
-    badsanierung: {
-      label: "Bad 10 m² sanieren Kosten 2026",
-      href: "/ratgeber/bad-10-qm-sanieren-kosten",
-      description: "Quadratmeter-Richtwert und Komplettspanne für ein 10-m²-Bad vergleichen.",
-    },
-    sanitaer: {
-      label: "Bad 10 m² sanieren Kosten 2026",
-      href: "/ratgeber/bad-10-qm-sanieren-kosten",
-      description: "Sanitärarbeiten im konkreten Beispiel eines 10-m²-Bads einordnen.",
-    },
-    tueren: {
-      label: "6 Innentüren austauschen Kosten 2026",
-      href: "/ratgeber/6-innentueren-austauschen-kosten",
-      description: "Sechs Standard-Innentüren inklusive Zargen konkret durchrechnen.",
-    },
-    estrich: {
-      label: "Estrich 100 m² Kosten 2026",
-      href: "/ratgeber/estrich-100-qm-kosten",
-      description: "Zement-, Anhydrit-, Trocken- und Sichtestrich für 100 m² vergleichen.",
-    },
-    maurer: {
-      label: "Innenwand mauern Kosten 2026",
-      href: "/ratgeber/innenwand-mauern-kosten",
-      description: "Kosten pro Quadratmeter und Beispielbudgets für 10, 20 und 30 m² Wandfläche vergleichen.",
-    },
-    treppen: {
-      label: "14 Treppenstufen renovieren Kosten 2026",
-      href: "/ratgeber/14-treppenstufen-renovieren-kosten",
-      description: "Stufenaufarbeitung und komplette Treppenrenovierung sauber voneinander unterscheiden.",
-    },
-    kueche: {
-      label: "Küche 10 m² renovieren Kosten 2026",
-      href: "/ratgeber/kueche-10-qm-renovieren-kosten",
-      description: "Eine 10-m²-Küche ohne Möbel kalkulieren und weitere Küchenpositionen einordnen.",
-    },
-  };
-  const directTradeGuide = tradeGuideByService[service.slug];
+  const primaryGuide = getServiceGuideLink(service.slug);
   const directScenarioGuide = scenarioGuideByService[service.slug];
-  const relatedGuides = [
-    ...(directTradeGuide ? [directTradeGuide] : []),
+  const guideCandidates = [
+    {
+      label: primaryGuide.title,
+      href: primaryGuide.href,
+      description: `Passender Themen-Ratgeber zu ${service.shortTitle} mit Kostenblöcken, Beispielen und Planungsansätzen.`,
+    },
     ...(directScenarioGuide ? [directScenarioGuide] : []),
     {
       label: "Sanierungskosten pro m² 2026",
@@ -316,6 +285,9 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
         }]
       : []),
   ];
+  const relatedGuides = guideCandidates.filter(
+    (guide, index, all) => all.findIndex((candidate) => candidate.href === guide.href) === index,
+  );
 
   const faqs = [
     {
@@ -498,12 +470,12 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
             </div>
           </section>
 
-          <section className="contentCard">
+          <section className="contentCard" id="ratgeber">
             <span className="eyebrow">Ratgeber</span>
             <h2>{service.shortTitle} im Gesamtbudget einordnen</h2>
             <p>
-              Einzelpreise werden aussagekräftiger, wenn sie mit dem gesamten Renovierungsumfang verglichen werden.
-              Diese Ratgeber vertiefen die wichtigsten übergeordneten Kostenfragen.
+              Der erste Link ist der zentrale Themen-Ratgeber für dieses Gewerk. Weitere Artikel ordnen einzelne
+              Szenarien, Sanierungsumfang und gegebenenfalls Stundensätze in das Gesamtbudget ein.
             </p>
             <div className="sourceList">
               {relatedGuides.map((guide) => (
