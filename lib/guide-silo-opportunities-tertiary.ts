@@ -1,3 +1,5 @@
+import { quaternaryOpportunitySilos } from "@/lib/guide-silo-opportunities-quaternary";
+
 export type OpportunitySiloConfig = {
   serviceSlugs: string[];
   serviceSlug: string;
@@ -126,4 +128,5 @@ export const tertiaryOpportunitySilos: Record<string, OpportunitySiloConfig> = {
     itemSlug: "putz-fassade-neu",
     calculatorLabel: "Putzfassade berechnen",
   },
+  ...quaternaryOpportunitySilos,
 };
