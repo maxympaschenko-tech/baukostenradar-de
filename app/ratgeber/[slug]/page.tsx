@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { allGuides, getAnyGuide } from "@/lib/all-guides";
+import { getGuideRegions, getGuideSilo, getGuideSiloServices } from "@/lib/guide-silo";
+import { priceItemSlug } from "@/lib/price-slug";
 import { siteConfig } from "@/lib/site";
 
 export const dynamicParams = false;
@@ -24,6 +26,18 @@ function relatedType(href: string) {
   return "Weiterführend";
 }
 
+function euro(value: number) {
+  return new Intl.NumberFormat("de-DE", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function priceRange(low: number, high: number) {
+  return low === high ? euro(low) : `${euro(low)} - ${euro(high)}`;
+}
+
 export function generateStaticParams() {
   return allGuides.map((guide) => ({ slug: guide.slug }));
 }
@@ -42,6 +56,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: guide.title,
       description: guide.description,
       url: `/ratgeber/${guide.slug}`,
+      publishedTime: "2026-08-26T08:00:00+02:00",
+      modifiedTime: "2026-08-27T10:00:00+02:00",
     },
   };
 }
@@ -57,6 +73,10 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
     label: section.heading,
     id: headingId(section.heading),
   }));
+  const silo = getGuideSilo(guide.slug);
+  const siloServices = getGuideSiloServices(guide.slug);
+  const primaryService = siloServices[0];
+  const guideRegions = getGuideRegions();
 
   const structuredData = [
     {
@@ -74,8 +94,9 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
       headline: guide.h1,
       description: guide.description,
       datePublished: "2026-08-26",
-      dateModified: "2026-08-26",
+      dateModified: "2026-08-27",
       mainEntityOfPage: canonicalUrl,
+      articleSection: guide.sections.map((section) => section.heading),
       author: {
         "@type": "Organization",
         name: siteConfig.name,
@@ -117,7 +138,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
           <p>{guide.intro}</p>
           <div className="guideMeta" aria-label="Redaktionelle Angaben">
             <span><strong>Redaktion:</strong> <Link href="/ueber-uns">BauKostenRadar</Link></span>
-            <span><strong>Aktualisiert:</strong> 26. August 2026</span>
+            <span><strong>Aktualisiert:</strong> 27. August 2026</span>
             <span><strong>Datenbasis:</strong> Quellen + transparentes Kostenmodell</span>
           </div>
           <div className="heroFacts">
@@ -138,7 +159,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
             <li><strong>Genauer planen:</strong> Fläche, Stückzahl, Zustand, Ausstattung und Region können das konkrete Budget deutlich verändern.</li>
           </ul>
           <div className="heroActions">
-            <Link className="primaryButton" href="/rechner/renovierungskosten">Renovierung berechnen</Link>
+            <Link className="primaryButton" href={silo.calculatorHref}>{silo.calculatorLabel}</Link>
             <Link className="ghostButton" href="/kosten">Handwerkerpreise vergleichen</Link>
           </div>
         </section>
@@ -152,6 +173,8 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                 <a href={`#${item.id}`}>{item.label}</a>
               </li>
             ))}
+            <li><a href="#gewerke">Passende Gewerke und Einzelpreise</a></li>
+            <li><a href="#regional">Regionale Einordnung</a></li>
             <li><a href="#haeufige-fragen">Häufige Fragen</a></li>
             <li><a href="#weiter-planen">Passende Preise und Rechner</a></li>
           </ol>
@@ -193,6 +216,62 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
           </section>
         ))}
 
+        <section className="contentCard proseCard articleSection" id="gewerke">
+          <span className="eyebrow">Vom Ratgeber zum Einzelpreis</span>
+          <h2>Passende Gewerke und konkrete Preispositionen</h2>
+          <p>
+            Gesamtbudgets werden belastbarer, wenn die wichtigsten Arbeiten einzeln geprüft werden. Die folgenden
+            Preisbereiche passen thematisch zu diesem Ratgeber und führen direkt zu dokumentierten Richtwerten.
+          </p>
+          <div className="directoryGrid">
+            {siloServices.map((service) => (
+              <article className="directoryCard" key={service.slug}>
+                <span className="eyebrow">{service.shortTitle}</span>
+                <h3><Link href={`/kosten/${service.slug}`}>{service.title}</Link></h3>
+                <p>{service.description}</p>
+                <div className="sourceList">
+                  {service.priceItems.slice(0, 2).map((item) => (
+                    <Link key={item.name} href={`/kosten/${service.slug}/leistung/${priceItemSlug(item.name)}`}>
+                      <strong>{item.name}</strong>
+                      <span>{priceRange(item.low, item.high)} {item.unit}</span>
+                    </Link>
+                  ))}
+                </div>
+                <Link className="textLink" href={`/kosten/${service.slug}`}>Alle {service.shortTitle}-Preise →</Link>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="contentCard proseCard articleSection" id="regional">
+          <span className="eyebrow">Regionale Einordnung</span>
+          <h2>{silo.regionalMode === "service" && primaryService ? `${primaryService.shortTitle}-Kosten nach Stadt` : "Sanierungskosten nach Stadt einordnen"}</h2>
+          <p>
+            BauKostenRadar nutzt transparente regionale Modellfaktoren für die Budgetorientierung. Die Stadtwerte
+            sind keine lokal erhobenen Festpreise, sondern modellierte Richtwerte auf Basis der bundesweiten Ausgangswerte.
+          </p>
+          <div className="regionChips">
+            {guideRegions.map((region) => {
+              const href = silo.regionalMode === "service" && primaryService
+                ? `/kosten/${primaryService.slug}/${region.slug}`
+                : `/staedte/${region.slug}`;
+              const label = silo.regionalMode === "service" && primaryService
+                ? `${primaryService.shortTitle} ${region.label}`
+                : `Handwerkerkosten ${region.label}`;
+
+              return (
+                <Link className="regionChip" href={href} key={region.value}>
+                  {label} <strong>{region.factor >= 1 ? "+" : ""}{Math.round((region.factor - 1) * 100)} %</strong>
+                </Link>
+              );
+            })}
+          </div>
+          <div className="heroActions">
+            <Link className="ghostButton" href="/staedte">Alle Städte vergleichen</Link>
+            <Link className="ghostButton" href="/methodik">Regionalmodell verstehen</Link>
+          </div>
+        </section>
+
         <section className="contentCard proseCard articleSection" id="haeufige-fragen">
           <span className="eyebrow">Häufige Fragen</span>
           <h2>FAQ zu {guide.title.replace(" 2026", "")}</h2>
@@ -218,6 +297,10 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                 <span>Weiterlesen →</span>
               </Link>
             ))}
+          </div>
+          <div className="heroActions">
+            <Link className="primaryButton" href={silo.calculatorHref}>{silo.calculatorLabel}</Link>
+            <Link className="ghostButton" href="/quellen">Quellen ansehen</Link>
           </div>
           <p className="tableNote">
             Wie BauKostenRadar Quellen, Modellbänder und regionale Faktoren trennt, ist auf der {" "}
