@@ -52,31 +52,32 @@ jobs:
 
           check_mapping() {
             local service="$1"
-            local guide="$2"
+            local service_guide="$2"
             local item="$3"
+            local item_guide="$4"
 
             curl -sS --fail "https://baukostenradar.de/kosten/${service}" -o /tmp/service.html
-            grep -q "/ratgeber/${guide}" /tmp/service.html
+            grep -q "/ratgeber/${service_guide}" /tmp/service.html
 
             curl -sS --fail "https://baukostenradar.de/kosten/${service}/berlin" -o /tmp/city.html
-            grep -q "/ratgeber/${guide}" /tmp/city.html
+            grep -q "/ratgeber/${service_guide}" /tmp/city.html
             grep -q 'Passender Ratgeber' /tmp/city.html
 
             curl -sS --fail "https://baukostenradar.de/kosten/${service}/leistung/${item}" -o /tmp/item.html
-            grep -q "/ratgeber/${guide}" /tmp/item.html
+            grep -q "/ratgeber/${item_guide}" /tmp/item.html
             grep -q 'Passender Ratgeber' /tmp/item.html
           }
 
-          check_mapping maler maler-kosten-pro-qm waende-streichen
-          check_mapping fliesenleger fliesenleger-kosten-pro-qm standard-fliesen-verlegen
-          check_mapping bodenleger bodenleger-kosten-pro-qm vinylboden-klick-inkl-material
-          check_mapping trockenbau trockenbau-kosten-pro-qm trockenbauwand-beidseitig-beplankt
-          check_mapping sanitaer sanitaer-kosten sanitaerobjekte-armaturen-fuer-8-m2-bad
-          check_mapping waermepumpe waermepumpe-kosten-2026 luft-wasser-waermepumpe-komplett
-          check_mapping photovoltaik photovoltaik-kosten-2026 pv-anlage-10-kwp-inkl-installation
-          check_mapping daemmung daemmung-kosten-pro-qm innendaemmung
-          check_mapping fassade fassade-sanieren-kosten putz-fassade-neu
-          check_mapping garten garten-anlegen-kosten doppelstabmattenzaun-inkl-montage
+          check_mapping maler maler-kosten-pro-qm waende-streichen waende-streichen-kosten-pro-qm
+          check_mapping fliesenleger fliesenleger-kosten-pro-qm standard-fliesen-verlegen fliesen-verlegen-kosten-pro-qm
+          check_mapping bodenleger bodenleger-kosten-pro-qm vinylboden-klick-inkl-material vinylboden-verlegen-kosten-pro-qm
+          check_mapping trockenbau trockenbau-kosten-pro-qm trockenbauwand-beidseitig-beplankt trockenbauwand-kosten-pro-qm
+          check_mapping sanitaer sanitaer-kosten sanitaerobjekte-armaturen-fuer-8-m2-bad sanitaer-kosten
+          check_mapping waermepumpe waermepumpe-kosten-2026 luft-wasser-waermepumpe-komplett luft-wasser-waermepumpe-kosten
+          check_mapping photovoltaik photovoltaik-kosten-2026 pv-anlage-10-kwp-inkl-installation photovoltaik-10-kwp-kosten
+          check_mapping daemmung daemmung-kosten-pro-qm innendaemmung innendaemmung-kosten-pro-qm
+          check_mapping fassade fassade-sanieren-kosten putz-fassade-neu putzfassade-kosten-pro-qm
+          check_mapping garten garten-anlegen-kosten doppelstabmattenzaun-inkl-montage doppelstabmattenzaun-kosten-pro-meter
 
       - name: Verify specialist reverse silo and calculators
         shell: bash
