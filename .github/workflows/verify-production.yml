@@ -168,11 +168,15 @@ jobs:
           curl -sS --fail 'https://baukostenradar.de/kosten/maler/berlin' -o /tmp/local.html
           curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/guides.html
           curl -sS --fail 'https://baukostenradar.de/ratgeber/sanierungskosten-pro-qm' -o /tmp/guide.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber/dach-150-qm-kosten' -o /tmp/dach-scenario.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber/20-fenster-austauschen-kosten' -o /tmp/fenster-scenario.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber/bad-10-qm-sanieren-kosten' -o /tmp/bad-scenario.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber/fussbodenheizung-100-qm-kosten' -o /tmp/heizung-scenario.html
           curl -sS --fail 'https://baukostenradar.de/rechner' -o /tmp/calculators.html
           curl -sS --fail 'https://baukostenradar.de/rechner/renovierungskosten' -o /tmp/renovation-calculator.html
           curl -sS --fail 'https://baukostenradar.de/rechner/handwerkerkosten' -o /tmp/trade-calculator.html
           curl -sS --fail 'https://baukostenradar.de/rechner/badsanierungskosten' -o /tmp/bath-calculator.html
-          curl -sS --fail 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=maler&leistung=waende-streichen&region=berlin' -o /tmp/deep-trade-calculator.html
+          curl -sS --fail 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=maler&leistung=waende-streichen&region=berlin&menge=25' -o /tmp/deep-trade-calculator.html
 
           grep -q 'https://baukostenradar.de/kosten' /tmp/costs.html
           grep -q 'https://baukostenradar.de/kosten/maler' /tmp/service.html
@@ -187,7 +191,7 @@ jobs:
           grep -q 'https://baukostenradar.de/rechner/badsanierungskosten' /tmp/bath-calculator.html
           grep -q 'https://baukostenradar.de/rechner/handwerkerkosten' /tmp/deep-trade-calculator.html
 
-          for page in /tmp/costs.html /tmp/service.html /tmp/item.html /tmp/city.html /tmp/local.html /tmp/guides.html /tmp/guide.html /tmp/calculators.html /tmp/renovation-calculator.html /tmp/trade-calculator.html /tmp/bath-calculator.html /tmp/deep-trade-calculator.html; do
+          for page in /tmp/costs.html /tmp/service.html /tmp/item.html /tmp/city.html /tmp/local.html /tmp/guides.html /tmp/guide.html /tmp/dach-scenario.html /tmp/fenster-scenario.html /tmp/bad-scenario.html /tmp/heizung-scenario.html /tmp/calculators.html /tmp/renovation-calculator.html /tmp/trade-calculator.html /tmp/bath-calculator.html /tmp/deep-trade-calculator.html; do
             if grep -qi 'noindex' "$page"; then
               echo "Unexpected noindex in $page" >&2
               exit 1
@@ -214,6 +218,19 @@ jobs:
           grep -q '/kosten/badsanierung/leistung/' /tmp/guide.html
           grep -q '/staedte/berlin' /tmp/guide.html
 
+          grep -q 'gewerk=dachsanierung' /tmp/dach-scenario.html
+          grep -q 'leistung=neueindeckung-inkl-lattung' /tmp/dach-scenario.html
+          grep -q 'menge=150' /tmp/dach-scenario.html
+          grep -q 'gewerk=fenster' /tmp/fenster-scenario.html
+          grep -q 'leistung=fenster-mit-2-fach-verglasung' /tmp/fenster-scenario.html
+          grep -q 'menge=20' /tmp/fenster-scenario.html
+          grep -q 'gewerk=badsanierung' /tmp/bad-scenario.html
+          grep -q 'leistung=bad-neubau-sanierung' /tmp/bad-scenario.html
+          grep -q 'menge=10' /tmp/bad-scenario.html
+          grep -q 'gewerk=heizung' /tmp/heizung-scenario.html
+          grep -q 'leistung=fussbodenheizung-nachruesten' /tmp/heizung-scenario.html
+          grep -q 'menge=100' /tmp/heizung-scenario.html
+
           grep -q 'CollectionPage' /tmp/calculators.html
           grep -q 'ItemList' /tmp/calculators.html
           grep -q 'WebApplication' /tmp/renovation-calculator.html
@@ -229,6 +246,7 @@ jobs:
           grep -q 'Vorauswahl aus der vorherigen Kostenseite übernommen' /tmp/deep-trade-calculator.html
           grep -q 'Wände streichen' /tmp/deep-trade-calculator.html
           grep -q 'Berlin' /tmp/deep-trade-calculator.html
+          grep -q 'Menge: 25' /tmp/deep-trade-calculator.html
 
           for path in \
             '/kosten' \
@@ -238,6 +256,10 @@ jobs:
             '/kosten/maler/berlin' \
             '/ratgeber' \
             '/ratgeber/sanierungskosten-pro-qm' \
+            '/ratgeber/dach-150-qm-kosten' \
+            '/ratgeber/20-fenster-austauschen-kosten' \
+            '/ratgeber/bad-10-qm-sanieren-kosten' \
+            '/ratgeber/fussbodenheizung-100-qm-kosten' \
             '/rechner' \
             '/rechner/renovierungskosten' \
             '/rechner/handwerkerkosten' \
