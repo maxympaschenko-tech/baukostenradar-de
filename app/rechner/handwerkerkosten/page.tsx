@@ -13,7 +13,30 @@ export const metadata: Metadata = {
 
 const featuredServiceSlugs = ["maler", "elektriker", "dachsanierung", "fenster", "heizung", "bodenleger"];
 
-export default function HandwerkerCostCalculatorPage() {
+type CalculatorSearchParams = Record<string, string | string[] | undefined>;
+
+function firstParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function HandwerkerCostCalculatorPage({
+  searchParams,
+}: {
+  searchParams: Promise<CalculatorSearchParams>;
+}) {
+  const query = await searchParams;
+  const requestedServiceSlug = firstParam(query.gewerk);
+  const requestedItemSlug = firstParam(query.leistung);
+  const requestedRegion = firstParam(query.region);
+
+  const selectedService = services.find((service) => service.slug === requestedServiceSlug);
+  const validItemSlug = selectedService?.priceItems.some((item) => priceItemSlug(item.name) === requestedItemSlug)
+    ? requestedItemSlug
+    : undefined;
+  const validRegion = regions.find(
+    (region) => region.value === requestedRegion || region.slug === requestedRegion,
+  );
+
   const base = siteConfig.url.replace(/\/$/, "");
   const priceCount = services.reduce((sum, service) => sum + service.priceItems.length, 0);
   const featuredServices = featuredServiceSlugs
@@ -71,7 +94,11 @@ export default function HandwerkerCostCalculatorPage() {
       </section>
 
       <div className="shell articleShell">
-        <TradeCostCalculator />
+        <TradeCostCalculator
+          initialServiceSlug={selectedService?.slug}
+          initialItemSlug={validItemSlug}
+          initialRegionValue={validRegion?.value}
+        />
 
         <section className="contentCard proseCard">
           <span className="eyebrow">Datenbasis</span>
