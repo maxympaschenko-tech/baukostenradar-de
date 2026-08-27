@@ -1,6 +1,6 @@
 import type { Guide } from "@/lib/guides";
 
-type CurrentCatalogGuideConfig = {
+type Config = {
   slug: string;
   title: string;
   h1: string;
@@ -22,7 +22,7 @@ type CurrentCatalogGuideConfig = {
   related: Array<{ label: string; href: string }>;
 };
 
-function createGuide(config: CurrentCatalogGuideConfig): Guide {
+function createGuide(config: Config): Guide {
   return {
     slug: config.slug,
     title: config.title,
@@ -57,38 +57,35 @@ function createGuide(config: CurrentCatalogGuideConfig): Guide {
   };
 }
 
-const configs: CurrentCatalogGuideConfig[] = [
+const configs: Config[] = [
   {
     slug: "innentuer-einbauen-kosten",
     title: "Innentür einbauen Kosten 2026",
     h1: "Innentür mit Zarge einbauen: Kosten 2026 inklusive Montage",
     description: "Innentür einbauen Kosten 2026: aktueller Richtwert von 320-950 € pro Tür inklusive Zarge und Montage, Kostentreiber und Angebotsvergleich.",
     eyebrow: "Innentür 2026",
-    intro: "Beim Einbau einer Innentür sind Türblatt, Zarge und Montage gemeinsam entscheidend. BauKostenRadar führt die aktuelle Preisposition deshalb als Komplettorientierung pro Tür, statt Material und Einbau künstlich zu trennen.",
+    intro: "Beim Einbau einer Innentür sind Türblatt, Zarge und Montage gemeinsam entscheidend. BauKostenRadar führt die aktuelle Preisposition deshalb als Komplettorientierung pro Tür.",
     keyFact: "Innentür mit Zarge inklusive Montage etwa 320-950 € pro Tür",
     priceHeading: "Was kostet eine Innentür mit Zarge und Montage?",
     priceParagraphs: [
       "Die aktuelle BauKostenRadar-Datenbasis führt für eine Innentür mit Zarge inklusive Montage etwa 320 bis 950 Euro pro Tür.",
       "Für sechs Türen ergibt sich daraus rechnerisch eine Orientierung von etwa 1.920 bis 5.700 Euro. Sondermaße und zusätzliche Nacharbeiten können außerhalb dieser Spanne liegen.",
     ],
-    table: {
-      headers: ["Anzahl", "Budgetorientierung"],
-      rows: [
-        { cells: ["1 Tür", "320-950 €"] },
-        { cells: ["3 Türen", "960-2.850 €"] },
-        { cells: ["6 Türen", "1.920-5.700 €"], href: "/ratgeber/6-innentueren-austauschen-kosten" },
-      ],
-    },
+    table: { headers: ["Anzahl", "Budgetorientierung"], rows: [
+      { cells: ["1 Tür", "320-950 €"] },
+      { cells: ["3 Türen", "960-2.850 €"] },
+      { cells: ["6 Türen", "1.920-5.700 €"], href: "/ratgeber/6-innentueren-austauschen-kosten" },
+    ] },
     factors: ["Türblatt und Oberflächenqualität", "Zarge und Wandstärke", "Standardmaß oder Sondermaß", "Beschläge und Glasausschnitte", "Zustand der vorhandenen Öffnung", "Demontage, Entsorgung und Nacharbeiten"],
     compareHeading: "Stückpreis und Stundensatz nicht doppelt rechnen",
     compareParagraphs: [
-      "Für Türen- und Fensterbauer führt BauKostenRadar zusätzlich etwa 55 bis 95 Euro pro Stunde als aktuelle Orientierung. Dieser Stundensatz darf nicht pauschal auf den Stückpreis aufgeschlagen werden, weil die Innentür-Position bereits die Montage umfasst.",
+      "Für Türen- und Fensterbauer führt BauKostenRadar zusätzlich etwa 55 bis 95 Euro pro Stunde als Orientierung. Dieser Stundensatz darf nicht pauschal auf den Stückpreis aufgeschlagen werden, weil die Innentür-Position bereits die Montage umfasst.",
       "Vergleichen Sie Angebote nach identischem Leistungsumfang und prüfen Sie besonders Demontage, Entsorgung und Putz- oder Malernacharbeiten.",
     ],
     faqs: [
       { question: "Was kostet eine Innentür mit Zarge und Einbau 2026?", answer: "BauKostenRadar führt aktuell etwa 320 bis 950 Euro pro Tür inklusive Zarge und Montage." },
-      { question: "Was kosten sechs Innentüren?", answer: "Rechnerisch ergeben sich mit dem aktuellen Richtwert etwa 1.920 bis 5.700 Euro für sechs Türen." },
-      { question: "Ist die Montage enthalten?", answer: "Ja. Die aktuelle BauKostenRadar-Preisposition ist ausdrücklich als Innentür mit Zarge inklusive Montage beschrieben." },
+      { question: "Was kosten sechs Innentüren?", answer: "Rechnerisch ergeben sich etwa 1.920 bis 5.700 Euro für sechs Türen." },
+      { question: "Ist die Montage enthalten?", answer: "Ja. Die aktuelle Preisposition ist ausdrücklich als Innentür mit Zarge inklusive Montage beschrieben." },
     ],
     serviceSlug: "tueren",
     itemSlug: "innentuer-mit-zarge-inkl-montage",
@@ -105,30 +102,27 @@ const configs: CurrentCatalogGuideConfig[] = [
     h1: "Zementestrich verlegen: Kosten 2026 pro m²",
     description: "Zementestrich Kosten 2026 pro m²: aktueller Richtwert von 30-55 €/m² inklusive Material, Beispielbudgets und wichtige Zusatzarbeiten.",
     eyebrow: "Zementestrich 2026",
-    intro: "Zementestrich gehört zu den verbreiteten Nassestrichen. Für die Budgetplanung ist wichtig, dass Untergrundausgleich, Reparaturen oder ein besonderer Bodenaufbau nicht automatisch im Quadratmeterpreis enthalten sein müssen.",
+    intro: "Zementestrich gehört zu den verbreiteten Nassestrichen. Untergrundausgleich, Reparaturen oder besondere Bodenaufbauten müssen im konkreten Angebot separat geprüft werden.",
     keyFact: "Zementestrich verlegen etwa 30-55 €/m² inklusive Material",
     priceHeading: "Was kostet Zementestrich pro m²?",
     priceParagraphs: [
       "Die aktuelle BauKostenRadar-Datenbasis führt für Zementestrich verlegen etwa 30 bis 55 Euro pro Quadratmeter inklusive Material.",
-      "Bei 100 m² ergibt sich daraus rechnerisch eine Orientierung von etwa 3.000 bis 5.500 Euro für diese Preisposition.",
+      "Bei 100 m² ergibt sich daraus rechnerisch eine Orientierung von etwa 3.000 bis 5.500 Euro.",
     ],
-    table: {
-      headers: ["Fläche", "Budgetorientierung"],
-      rows: [
-        { cells: ["50 m²", "1.500-2.750 €"] },
-        { cells: ["100 m²", "3.000-5.500 €"], href: "/ratgeber/estrich-100-qm-kosten" },
-        { cells: ["150 m²", "4.500-8.250 €"] },
-      ],
-    },
-    factors: ["Untergrund und notwendiger Ausgleich", "Aufbauhöhe und Anschlüsse", "Flächengröße und viele Teilflächen", "Bodenaufbau mit Dämmung oder Fußbodenheizung", "Trocknung und Bauablauf", "Zusätzliche Reparaturen am Bestand"],
+    table: { headers: ["Fläche", "Budgetorientierung"], rows: [
+      { cells: ["50 m²", "1.500-2.750 €"] },
+      { cells: ["100 m²", "3.000-5.500 €"], href: "/ratgeber/estrich-100-qm-kosten" },
+      { cells: ["150 m²", "4.500-8.250 €"] },
+    ] },
+    factors: ["Untergrund und notwendiger Ausgleich", "Aufbauhöhe und Anschlüsse", "Flächengröße und Teilflächen", "Dämmung oder Fußbodenheizung", "Trocknung und Bauablauf", "Zusätzliche Reparaturen am Bestand"],
     compareHeading: "Zementestrich mit anderen Estricharten vergleichen",
     compareParagraphs: [
-      "Fließestrich liegt in der aktuellen Datenbasis bei etwa 40 bis 70 Euro pro Quadratmeter, Trockenestrich bei 45 bis 80 Euro und Schnellestrich bei 60 bis 110 Euro.",
-      "Die Preisunterschiede sollten nicht isoliert betrachtet werden. Verarbeitung, Bauablauf und notwendige Belegreife können für das konkrete Projekt wichtiger sein als der niedrigste Quadratmeterpreis.",
+      "Fließestrich liegt aktuell bei etwa 40 bis 70 Euro pro Quadratmeter, Trockenestrich bei 45 bis 80 Euro und Schnellestrich bei 60 bis 110 Euro.",
+      "Verarbeitung, Bauablauf und notwendige Belegreife können für das konkrete Projekt wichtiger sein als der niedrigste Quadratmeterpreis.",
     ],
     faqs: [
       { question: "Was kostet Zementestrich pro m² 2026?", answer: "BauKostenRadar führt aktuell etwa 30 bis 55 Euro pro Quadratmeter inklusive Material." },
-      { question: "Was kosten 100 m² Zementestrich?", answer: "Rechnerisch ergeben sich etwa 3.000 bis 5.500 Euro für 100 m²." },
+      { question: "Was kosten 100 m² Zementestrich?", answer: "Rechnerisch ergeben sich etwa 3.000 bis 5.500 Euro." },
       { question: "Ist Bodenausgleich enthalten?", answer: "Nicht automatisch. BauKostenRadar führt Bodenausgleich 5-20 mm separat mit etwa 18 bis 38 Euro pro Quadratmeter inklusive Material." },
     ],
     serviceSlug: "estrich",
@@ -144,37 +138,34 @@ const configs: CurrentCatalogGuideConfig[] = [
   {
     slug: "fliessestrich-kosten-pro-qm",
     title: "Fließestrich Kosten pro m² 2026",
-    h1: "Fließestrich: Kosten 2026 pro m²",
+    h1: "Fließestrich verlegen: Kosten 2026 pro m²",
     description: "Fließestrich Kosten 2026 pro m²: aktueller Richtwert von 40-70 €/m² inklusive Material, Beispielbudgets, Bodenaufbau und Angebotsvergleich.",
     eyebrow: "Fließestrich 2026",
-    intro: "Fließestrich wird in fließfähiger Konsistenz eingebracht und verteilt sich großflächig. Für einen Preisvergleich sollten Estrichart, Aufbauhöhe, Untergrund und der weitere Bodenaufbau im Angebot eindeutig beschrieben sein.",
-    keyFact: "Fließestrich etwa 40-70 €/m² inklusive Material",
+    intro: "Fließestrich wird in fließfähiger Konsistenz eingebracht und verteilt sich großflächig. Für den Preisvergleich sollten Aufbauhöhe, Untergrund und der weitere Bodenaufbau eindeutig beschrieben sein.",
+    keyFact: "Fließestrich verlegen etwa 40-70 €/m² inklusive Material",
     priceHeading: "Was kostet Fließestrich pro m²?",
     priceParagraphs: [
-      "Die aktuelle BauKostenRadar-Datenbasis führt für Fließestrich etwa 40 bis 70 Euro pro Quadratmeter inklusive Material.",
+      "Die aktuelle BauKostenRadar-Datenbasis führt für Fließestrich verlegen etwa 40 bis 70 Euro pro Quadratmeter inklusive Material.",
       "Bei 100 m² ergibt sich daraus rechnerisch eine Budgetorientierung von etwa 4.000 bis 7.000 Euro.",
     ],
-    table: {
-      headers: ["Fläche", "Budgetorientierung"],
-      rows: [
-        { cells: ["50 m²", "2.000-3.500 €"] },
-        { cells: ["100 m²", "4.000-7.000 €"] },
-        { cells: ["150 m²", "6.000-10.500 €"] },
-      ],
-    },
-    factors: ["Flächengröße und Raumaufteilung", "Aufbauhöhe", "Untergrund und Ausgleich", "Dämm- und Trennschichten", "Bodenaufbau mit Fußbodenheizung", "Pump- und Förderweg auf der Baustelle"],
+    table: { headers: ["Fläche", "Budgetorientierung"], rows: [
+      { cells: ["50 m²", "2.000-3.500 €"] },
+      { cells: ["100 m²", "4.000-7.000 €"] },
+      { cells: ["150 m²", "6.000-10.500 €"] },
+    ] },
+    factors: ["Flächengröße und Raumaufteilung", "Aufbauhöhe", "Untergrund und Ausgleich", "Dämm- und Trennschichten", "Fußbodenheizung", "Pump- und Förderweg"],
     compareHeading: "Fließestrich und Zementestrich nicht nur nach Preis auswählen",
     compareParagraphs: [
-      "Zementestrich liegt in der aktuellen BauKostenRadar-Datenbasis bei etwa 30 bis 55 Euro pro Quadratmeter inklusive Material und damit unter der Fließestrich-Spanne.",
-      "Für die Auswahl sollten jedoch Bauablauf, Untergrund und technische Anforderungen gemeinsam mit dem Fachbetrieb bewertet werden.",
+      "Zementestrich liegt aktuell bei etwa 30 bis 55 Euro pro Quadratmeter inklusive Material und damit unter der Fließestrich-Spanne.",
+      "Für die Auswahl sollten Bauablauf, Untergrund und technische Anforderungen gemeinsam mit dem Fachbetrieb bewertet werden.",
     ],
     faqs: [
       { question: "Was kostet Fließestrich pro m² 2026?", answer: "BauKostenRadar führt aktuell etwa 40 bis 70 Euro pro Quadratmeter inklusive Material." },
       { question: "Was kosten 100 m² Fließestrich?", answer: "Rechnerisch ergeben sich etwa 4.000 bis 7.000 Euro." },
-      { question: "Ist Fließestrich dasselbe wie die alte Anhydrit-Preisposition?", answer: "BauKostenRadar verwendet aktuell die breiter bezeichnete Preisposition Fließestrich. Deshalb wird die aktuelle Kalkulation nicht mehr über die frühere Anhydrit-Position geführt." },
+      { question: "Welche Preisposition verwendet BauKostenRadar?", answer: "Die aktuelle Katalogposition heißt Fließestrich verlegen und wird direkt im Kostenrechner verwendet." },
     ],
     serviceSlug: "estrich",
-    itemSlug: "fliessestrich",
+    itemSlug: "fliessestrich-verlegen",
     itemLabel: "Fließestrich",
     serviceLabel: "Estrich",
     related: [
@@ -186,37 +177,34 @@ const configs: CurrentCatalogGuideConfig[] = [
   {
     slug: "trockenestrich-kosten-pro-qm",
     title: "Trockenestrich Kosten pro m² 2026",
-    h1: "Trockenestrich: Kosten 2026 pro m²",
-    description: "Trockenestrich Kosten 2026 pro m²: aktueller Richtwert von 45-80 €/m² inklusive Platten und Verlegung, Beispielbudgets und Kostentreiber.",
+    h1: "Trockenestrich verlegen: Kosten 2026 pro m²",
+    description: "Trockenestrich Kosten 2026 pro m²: aktueller Richtwert von 45-80 €/m² inklusive Material, Beispielbudgets und Kostentreiber.",
     eyebrow: "Trockenestrich 2026",
-    intro: "Trockenestrich wird aus Plattenelementen aufgebaut und benötigt keine klassische Trocknungsphase wie Nassestrich. Besonders im Bestand können Gewicht, Aufbauhöhe und ein notwendiger Niveauausgleich für die Kalkulation entscheidend sein.",
-    keyFact: "Trockenestrich etwa 45-80 €/m² inklusive Platten und Verlegung",
+    intro: "Trockenestrich benötigt keine klassische Trocknungsphase wie Nassestrich. Besonders im Bestand können Gewicht, Aufbauhöhe und ein notwendiger Niveauausgleich für die Kalkulation entscheidend sein.",
+    keyFact: "Trockenestrich verlegen etwa 45-80 €/m² inklusive Material",
     priceHeading: "Was kostet Trockenestrich pro m²?",
     priceParagraphs: [
-      "Die aktuelle BauKostenRadar-Datenbasis führt für Trockenestrich etwa 45 bis 80 Euro pro Quadratmeter inklusive Platten und Verlegung.",
+      "Die aktuelle BauKostenRadar-Datenbasis führt für Trockenestrich verlegen etwa 45 bis 80 Euro pro Quadratmeter inklusive Material.",
       "Bei 100 m² ergibt sich daraus eine Budgetorientierung von etwa 4.500 bis 8.000 Euro.",
     ],
-    table: {
-      headers: ["Fläche", "Budgetorientierung"],
-      rows: [
-        { cells: ["50 m²", "2.250-4.000 €"] },
-        { cells: ["100 m²", "4.500-8.000 €"] },
-        { cells: ["150 m²", "6.750-12.000 €"] },
-      ],
-    },
+    table: { headers: ["Fläche", "Budgetorientierung"], rows: [
+      { cells: ["50 m²", "2.250-4.000 €"] },
+      { cells: ["100 m²", "4.500-8.000 €"] },
+      { cells: ["150 m²", "6.750-12.000 €"] },
+    ] },
     factors: ["Plattensystem und Aufbau", "Untergrundebenheit", "Ausgleichsschüttung oder Bodenausgleich", "Dämmung und Trittschall", "Viele Anschlüsse und Zuschnitte", "Geschosslage und Materialtransport"],
     compareHeading: "Trockenestrich und Nassestrich unterscheiden",
     compareParagraphs: [
-      "Trockenestrich liegt in der aktuellen Datenbasis über Zementestrich, kann aber für Projekte interessant sein, bei denen ein trockener Aufbau oder ein schneller Bauablauf wichtig ist.",
-      "Angebote sollten klar ausweisen, ob Ausgleichsschüttung, Dämmung und weitere Schichten bereits enthalten sind.",
+      "Trockenestrich liegt in der aktuellen Datenbasis über Zementestrich, kann aber bei einem trockenen Aufbau oder engem Terminplan interessant sein.",
+      "Angebote sollten klar ausweisen, ob Ausgleich, Dämmung und weitere Schichten bereits enthalten sind.",
     ],
     faqs: [
-      { question: "Was kostet Trockenestrich pro m² 2026?", answer: "BauKostenRadar führt aktuell etwa 45 bis 80 Euro pro Quadratmeter inklusive Platten und Verlegung." },
+      { question: "Was kostet Trockenestrich pro m² 2026?", answer: "BauKostenRadar führt aktuell etwa 45 bis 80 Euro pro Quadratmeter inklusive Material." },
       { question: "Was kosten 100 m² Trockenestrich?", answer: "Rechnerisch ergeben sich etwa 4.500 bis 8.000 Euro." },
       { question: "Ist Bodenausgleich enthalten?", answer: "Nicht automatisch. Ein notwendiger Ausgleich sollte im konkreten Angebot separat oder eindeutig als enthalten ausgewiesen sein." },
     ],
     serviceSlug: "estrich",
-    itemSlug: "trockenestrich",
+    itemSlug: "trockenestrich-verlegen",
     itemLabel: "Trockenestrich",
     serviceLabel: "Estrich",
     related: [
@@ -231,31 +219,28 @@ const configs: CurrentCatalogGuideConfig[] = [
     h1: "Schnellestrich: Kosten 2026 pro m² und Belegreife",
     description: "Schnellestrich Kosten 2026 pro m²: aktueller Richtwert von 60-110 €/m², typische Belegreife von 1-3 Tagen und wichtige Preisfaktoren.",
     eyebrow: "Schnellestrich 2026",
-    intro: "Schnellestrich ist teurer als die Standardvarianten, kann dafür den Bauablauf beschleunigen. Die aktuelle BauKostenRadar-Preisposition nennt eine typische Belegreife von etwa ein bis drei Tagen, wobei die konkrete Freigabe immer vom eingesetzten System und den Baustellenbedingungen abhängt.",
+    intro: "Schnellestrich ist teurer als die Standardvarianten, kann dafür den Bauablauf beschleunigen. Die aktuelle Preisposition nennt eine typische Belegreife von etwa ein bis drei Tagen.",
     keyFact: "Schnellestrich etwa 60-110 €/m², typische Belegreife laut Datenquelle 1-3 Tage",
     priceHeading: "Was kostet Schnellestrich pro m²?",
     priceParagraphs: [
-      "BauKostenRadar führt für Schnellestrich aktuell etwa 60 bis 110 Euro pro Quadratmeter. Bei 100 m² ergibt sich daraus rechnerisch eine Orientierung von etwa 6.000 bis 11.000 Euro.",
-      "Der höhere Quadratmeterpreis sollte gegen den möglichen Zeitgewinn im Projekt abgewogen werden.",
+      "BauKostenRadar führt für Schnellestrich aktuell etwa 60 bis 110 Euro pro Quadratmeter inklusive Material.",
+      "Bei 100 m² ergibt sich daraus rechnerisch eine Orientierung von etwa 6.000 bis 11.000 Euro.",
     ],
-    table: {
-      headers: ["Fläche", "Budgetorientierung"],
-      rows: [
-        { cells: ["50 m²", "3.000-5.500 €"] },
-        { cells: ["100 m²", "6.000-11.000 €"] },
-        { cells: ["150 m²", "9.000-16.500 €"] },
-      ],
-    },
-    factors: ["Schnellbindendes System", "Schichtdicke", "Untergrund", "Flächengröße", "Baustellenklima und Trocknungsbedingungen", "Anforderungen an den nachfolgenden Bodenbelag"],
+    table: { headers: ["Fläche", "Budgetorientierung"], rows: [
+      { cells: ["50 m²", "3.000-5.500 €"] },
+      { cells: ["100 m²", "6.000-11.000 €"] },
+      { cells: ["150 m²", "9.000-16.500 €"] },
+    ] },
+    factors: ["Schnellbindendes System", "Schichtdicke", "Untergrund", "Flächengröße", "Baustellenklima", "Anforderungen an den nachfolgenden Bodenbelag"],
     compareHeading: "Mehrpreis gegen Bauzeit abwägen",
     compareParagraphs: [
-      "Zementestrich liegt aktuell bei etwa 30 bis 55 Euro pro Quadratmeter, Fließestrich bei 40 bis 70 Euro und Trockenestrich bei 45 bis 80 Euro. Schnellestrich ist damit in der Datenbasis die teuerste der vier aktuellen Hauptpositionen.",
+      "Zementestrich liegt aktuell bei etwa 30 bis 55 Euro, Fließestrich bei 40 bis 70 Euro und Trockenestrich bei 45 bis 80 Euro pro Quadratmeter.",
       "Ob sich der Mehrpreis lohnt, hängt davon ab, wie wichtig eine kurze Bauzeit und frühe Belegreife für das Gesamtprojekt sind.",
     ],
     faqs: [
-      { question: "Was kostet Schnellestrich pro m² 2026?", answer: "BauKostenRadar führt aktuell etwa 60 bis 110 Euro pro Quadratmeter." },
+      { question: "Was kostet Schnellestrich pro m² 2026?", answer: "BauKostenRadar führt aktuell etwa 60 bis 110 Euro pro Quadratmeter inklusive Material." },
       { question: "Was kosten 100 m² Schnellestrich?", answer: "Rechnerisch ergeben sich etwa 6.000 bis 11.000 Euro." },
-      { question: "Wann ist Schnellestrich belegreif?", answer: "Die hinterlegte BauKostenRadar-Datenquelle nennt typischerweise etwa ein bis drei Tage. Die tatsächliche Belegreife muss für das eingesetzte System fachgerecht geprüft werden." },
+      { question: "Wann ist Schnellestrich belegreif?", answer: "Die hinterlegte Datenquelle nennt typischerweise etwa ein bis drei Tage. Die tatsächliche Belegreife muss für das eingesetzte System fachgerecht geprüft werden." },
     ],
     serviceSlug: "estrich",
     itemSlug: "schnellestrich",
@@ -273,30 +258,27 @@ const configs: CurrentCatalogGuideConfig[] = [
     h1: "Bodenausgleich 5-20 mm: Kosten 2026 pro m²",
     description: "Bodenausgleich Kosten 2026 pro m²: aktueller Richtwert von 18-38 €/m² inklusive Material für 5-20 mm Ausgleich und wichtige Kostentreiber.",
     eyebrow: "Bodenausgleich 2026",
-    intro: "Ein ebener Untergrund ist für viele Bodenaufbauten entscheidend. BauKostenRadar führt den Bodenausgleich von 5 bis 20 Millimetern deshalb als eigene Preisposition, statt ihn automatisch in Estrich- oder Bodenbelagskosten einzurechnen.",
+    intro: "Ein ebener Untergrund ist für viele Bodenaufbauten entscheidend. BauKostenRadar führt den Bodenausgleich von 5 bis 20 Millimetern deshalb als eigene Preisposition.",
     keyFact: "Bodenausgleich 5-20 mm etwa 18-38 €/m² inklusive Material",
     priceHeading: "Was kostet Bodenausgleich pro m²?",
     priceParagraphs: [
       "Die aktuelle BauKostenRadar-Datenbasis führt für Bodenausgleich mit 5 bis 20 Millimetern etwa 18 bis 38 Euro pro Quadratmeter inklusive Material.",
-      "Bei 100 m² ergibt sich daraus eine Orientierung von etwa 1.800 bis 3.800 Euro, sofern die Fläche und Ausgleichsstärke zur hinterlegten Preisposition passen.",
+      "Bei 100 m² ergibt sich daraus eine Orientierung von etwa 1.800 bis 3.800 Euro, sofern die Fläche und Ausgleichsstärke zur Preisposition passen.",
     ],
-    table: {
-      headers: ["Fläche", "Budgetorientierung"],
-      rows: [
-        { cells: ["50 m²", "900-1.900 €"] },
-        { cells: ["100 m²", "1.800-3.800 €"] },
-        { cells: ["150 m²", "2.700-5.700 €"] },
-      ],
-    },
-    factors: ["Höhenunterschiede im Untergrund", "Benötigte Ausgleichsstärke", "Untergrundfestigkeit", "Grundierung und Vorarbeiten", "Viele kleine Teilflächen", "Anschlusshöhen an Türen und Treppen"],
+    table: { headers: ["Fläche", "Budgetorientierung"], rows: [
+      { cells: ["50 m²", "900-1.900 €"] },
+      { cells: ["100 m²", "1.800-3.800 €"] },
+      { cells: ["150 m²", "2.700-5.700 €"] },
+    ] },
+    factors: ["Höhenunterschiede", "Benötigte Ausgleichsstärke", "Untergrundfestigkeit", "Grundierung und Vorarbeiten", "Teilflächen", "Anschlusshöhen an Türen und Treppen"],
     compareHeading: "Ausgleich nicht mit neuem Estrich verwechseln",
     compareParagraphs: [
       "Bodenausgleich korrigiert Unebenheiten in einem begrenzten Bereich und ist nicht automatisch ein vollständiger neuer Estrichaufbau.",
-      "Bei größeren Schäden oder ungeeignetem Bestand sollte fachlich geprüft werden, ob Ausgleich noch sinnvoll ist oder ein anderer Bodenaufbau notwendig wird.",
+      "Bei größeren Schäden sollte fachlich geprüft werden, ob Ausgleich noch sinnvoll ist oder ein anderer Bodenaufbau notwendig wird.",
     ],
     faqs: [
       { question: "Was kostet Bodenausgleich pro m² 2026?", answer: "BauKostenRadar führt für 5 bis 20 Millimeter Ausgleich etwa 18 bis 38 Euro pro Quadratmeter inklusive Material." },
-      { question: "Was kosten 100 m² Bodenausgleich?", answer: "Rechnerisch ergeben sich etwa 1.800 bis 3.800 Euro für die hinterlegte Ausgleichsstärke." },
+      { question: "Was kosten 100 m² Bodenausgleich?", answer: "Rechnerisch ergeben sich etwa 1.800 bis 3.800 Euro." },
       { question: "Ist Bodenausgleich dasselbe wie Estrich?", answer: "Nein. Die BauKostenRadar-Datenbasis führt Bodenausgleich als eigene Leistung neben den Estricharten." },
     ],
     serviceSlug: "estrich",
@@ -314,22 +296,19 @@ const configs: CurrentCatalogGuideConfig[] = [
     h1: "Estrich-Rissreparatur: Kosten 2026 pro laufendem Meter",
     description: "Estrich-Rissreparatur Kosten 2026: aktueller Richtwert von 35-85 € pro laufendem Meter, Beispielbudgets, Schadensumfang und Angebotsvergleich.",
     eyebrow: "Estrichreparatur 2026",
-    intro: "Risse im Estrich sollten vor dem neuen Bodenbelag fachlich bewertet werden. BauKostenRadar führt die Rissreparatur als eigene Leistung pro laufendem Meter, weil sie sich nicht sinnvoll über die gesamte Raumfläche kalkulieren lässt.",
+    intro: "Risse im Estrich sollten vor dem neuen Bodenbelag fachlich bewertet werden. BauKostenRadar führt die Rissreparatur als eigene Leistung pro laufendem Meter.",
     keyFact: "Estrich-Rissreparatur etwa 35-85 € pro laufendem Meter",
     priceHeading: "Was kostet eine Estrich-Rissreparatur?",
     priceParagraphs: [
       "Die aktuelle BauKostenRadar-Datenbasis führt für Estrich-Rissreparatur etwa 35 bis 85 Euro pro laufendem Meter.",
       "Bei zehn Metern zu reparierender Risslänge ergibt sich daraus rechnerisch eine Orientierung von etwa 350 bis 850 Euro.",
     ],
-    table: {
-      headers: ["Risslänge", "Budgetorientierung"],
-      rows: [
-        { cells: ["5 lfd. m", "175-425 €"] },
-        { cells: ["10 lfd. m", "350-850 €"] },
-        { cells: ["20 lfd. m", "700-1.700 €"] },
-      ],
-    },
-    factors: ["Rissbreite und Rissverlauf", "Zustand und Tragfähigkeit des Estrichs", "Vorbereitung und Öffnen des Risses", "Reparatursystem", "Viele kurze Risse statt weniger langer Risse", "Nachfolgender Bodenbelag und Ebenheitsanforderungen"],
+    table: { headers: ["Risslänge", "Budgetorientierung"], rows: [
+      { cells: ["5 lfd. m", "175-425 €"] },
+      { cells: ["10 lfd. m", "350-850 €"] },
+      { cells: ["20 lfd. m", "700-1.700 €"] },
+    ] },
+    factors: ["Rissbreite und Rissverlauf", "Zustand und Tragfähigkeit", "Vorbereitung des Risses", "Reparatursystem", "Viele kurze Risse", "Nachfolgender Bodenbelag"],
     compareHeading: "Reparatur oder neuer Estrich?",
     compareParagraphs: [
       "Eine lokale Rissreparatur ist nicht mit einer vollständigen Estricherneuerung gleichzusetzen. Bei großflächigen Schäden kann ein anderer Sanierungsweg erforderlich sein.",
@@ -337,7 +316,7 @@ const configs: CurrentCatalogGuideConfig[] = [
     ],
     faqs: [
       { question: "Was kostet Estrich-Rissreparatur 2026?", answer: "BauKostenRadar führt aktuell etwa 35 bis 85 Euro pro laufendem Meter." },
-      { question: "Was kosten 10 Meter Estrichrisse?", answer: "Rechnerisch ergeben sich etwa 350 bis 850 Euro als Budgetorientierung." },
+      { question: "Was kosten 10 Meter Estrichrisse?", answer: "Rechnerisch ergeben sich etwa 350 bis 850 Euro." },
       { question: "Wann ist ein neuer Estrich statt Reparatur nötig?", answer: "Das lässt sich nicht allein anhand des Preises entscheiden. Bei größeren oder konstruktiven Schäden sollte der Zustand fachlich beurteilt werden." },
     ],
     serviceSlug: "estrich",
