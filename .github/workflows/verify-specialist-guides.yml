@@ -72,7 +72,7 @@ jobs:
           check_mapping fliesenleger fliesenleger-kosten-pro-qm standard-fliesen-verlegen fliesen-verlegen-kosten-pro-qm
           check_mapping bodenleger bodenleger-kosten-pro-qm vinylboden-klick-inkl-material vinylboden-verlegen-kosten-pro-qm
           check_mapping trockenbau trockenbau-kosten-pro-qm trockenbauwand-beidseitig-beplankt trockenbauwand-kosten-pro-qm
-          check_mapping sanitaer sanitaer-kosten sanitaerobjekte-armaturen-fuer-8-m2-bad sanitaer-kosten
+          check_mapping sanitaer sanitaer-kosten sanitaerobjekte-armaturen-fuer-8-m2-bad sanitaerobjekte-bad-kosten
           check_mapping waermepumpe waermepumpe-kosten-2026 luft-wasser-waermepumpe-komplett luft-wasser-waermepumpe-kosten
           check_mapping photovoltaik photovoltaik-kosten-2026 pv-anlage-10-kwp-inkl-installation photovoltaik-10-kwp-kosten
           check_mapping daemmung daemmung-kosten-pro-qm innendaemmung innendaemmung-kosten-pro-qm
