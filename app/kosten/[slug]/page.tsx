@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RenovationCalculator } from "@/components/renovation-calculator";
+import { handwerkerCalculatorHref } from "@/lib/calculator-links";
 import { priceItemSlug } from "@/lib/price-slug";
 import { getService, priceSources, regions, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
@@ -174,12 +175,13 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
   const leadPrice = service.priceItems[0];
   const relatedServices = services.filter((item) => item.slug !== service.slug).slice(0, 5);
   const canonicalUrl = `${siteConfig.url.replace(/\/$/, "")}/kosten/${service.slug}`;
+  const leadItemSlug = priceItemSlug(leadPrice.name);
   const serviceCalculatorUrl = service.slug === "badsanierung"
     ? "/rechner/badsanierungskosten"
-    : "/rechner/handwerkerkosten";
+    : handwerkerCalculatorHref({ serviceSlug: service.slug, itemSlug: leadItemSlug });
   const serviceCalculatorLabel = service.slug === "badsanierung"
     ? "Badsanierungskosten berechnen"
-    : "Handwerkerkosten berechnen";
+    : `${service.shortTitle}-Kosten berechnen`;
   const costFactors = costFactorsByService[service.slug] ?? defaultCostFactors;
   const technicalRenovationSlugs = new Set(["elektriker", "sanitaer", "heizung", "fenster", "dachsanierung", "daemmung", "fassade", "estrich", "maurer"]);
   const houseProjectSlugs = new Set(["fenster", "dachsanierung", "daemmung", "fassade", "heizung", "waermepumpe", "photovoltaik"]);
@@ -397,7 +399,7 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
             </p>
             <div className="heroActions">
               <Link className="primaryButton" href={serviceCalculatorUrl}>{serviceCalculatorLabel}</Link>
-              <Link className="ghostButton" href={`/kosten/${service.slug}/leistung/${priceItemSlug(leadPrice.name)}`}>
+              <Link className="ghostButton" href={`/kosten/${service.slug}/leistung/${leadItemSlug}`}>
                 Beispielpreis im Detail
               </Link>
             </div>
@@ -437,18 +439,25 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
                   </tr>
                 </thead>
                 <tbody>
-                  {service.priceItems.map((item) => (
-                    <tr key={item.name}>
-                      <td>
-                        <Link className="priceItemLink" href={`/kosten/${service.slug}/leistung/${priceItemSlug(item.name)}`}>
-                          {item.name}
-                        </Link>
-                        {item.note ? <small>{item.note}</small> : null}
-                      </td>
-                      <td><strong>{priceRange(item.low, item.high)}</strong></td>
-                      <td>{item.unit}</td>
-                    </tr>
-                  ))}
+                  {service.priceItems.map((item) => {
+                    const itemSlug = priceItemSlug(item.name);
+                    const itemCalculatorUrl = handwerkerCalculatorHref({ serviceSlug: service.slug, itemSlug });
+                    return (
+                      <tr key={item.name}>
+                        <td>
+                          <Link className="priceItemLink" href={`/kosten/${service.slug}/leistung/${itemSlug}`}>
+                            {item.name}
+                          </Link>
+                          {item.note ? <small>{item.note}</small> : null}
+                          {service.slug !== "badsanierung" ? (
+                            <small><Link className="textLink" href={itemCalculatorUrl}>Im Rechner öffnen →</Link></small>
+                          ) : null}
+                        </td>
+                        <td><strong>{priceRange(item.low, item.high)}</strong></td>
+                        <td>{item.unit}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
