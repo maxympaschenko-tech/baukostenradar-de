@@ -17,12 +17,6 @@ jobs:
           set -euo pipefail
 
           cities=(berlin hamburg muenchen koeln frankfurt stuttgart duesseldorf leipzig)
-          services=(
-            badsanierung maler fliesenleger elektriker dachsanierung
-            bodenleger trockenbau sanitaer waermepumpe photovoltaik
-            daemmung fenster heizung fassade garten
-            tueren estrich maurer treppen kueche
-          )
           guides=(
             /ratgeber/bad-komplett-sanieren-kosten
             /ratgeber/dach-sanieren-kosten-pro-qm
@@ -41,13 +35,17 @@ jobs:
             grep -q "https://baukostenradar.de/staedte/${city}" "$output"
             ! grep -qi 'noindex' "$output"
             grep -q 'ItemList' "$output"
-            grep -q '"numberOfItems":20' "$output"
             grep -q 'Preispositionen' "$output"
             grep -q "region=${city}" "$output"
 
-            for service in "${services[@]}"; do
-              grep -q "/kosten/${service}/${city}" "$output"
-            done
+            service_count=$(grep -oE "/kosten/[a-z0-9-]+/${city}" "$output" | sort -u | wc -l | tr -d ' ')
+            echo "${city}: ${service_count} live Gewerke"
+            test "$service_count" -ge 20
+            grep -q "\"numberOfItems\":${service_count}" "$output"
+
+            # Explicitly keep the newest catalog sections covered by the city hubs.
+            grep -q "/kosten/kellerabdichtung/${city}" "$output"
+            grep -q "/kosten/abriss-entsorgung/${city}" "$output"
 
             for guide in "${guides[@]}"; do
               grep -q "$guide" "$output"
