@@ -155,3 +155,36 @@ jobs:
               exit 1
             fi
           done
+
+      - name: Verify representative SEO templates
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/kosten/maler' -o /tmp/service.html
+          curl -sS --fail 'https://baukostenradar.de/staedte/berlin' -o /tmp/city.html
+          curl -sS --fail 'https://baukostenradar.de/kosten/maler/berlin' -o /tmp/local.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber/sanierungskosten-pro-qm' -o /tmp/guide.html
+
+          grep -q 'https://baukostenradar.de/kosten/maler' /tmp/service.html
+          grep -q 'https://baukostenradar.de/staedte/berlin' /tmp/city.html
+          grep -q 'https://baukostenradar.de/kosten/maler/berlin' /tmp/local.html
+          grep -q 'https://baukostenradar.de/ratgeber/sanierungskosten-pro-qm' /tmp/guide.html
+
+          for page in /tmp/service.html /tmp/city.html /tmp/local.html /tmp/guide.html; do
+            if grep -qi 'noindex' "$page"; then
+              echo "Unexpected noindex in $page" >&2
+              exit 1
+            fi
+          done
+
+          grep -q 'BreadcrumbList' /tmp/city.html
+          grep -q 'BreadcrumbList' /tmp/local.html
+
+          for path in \
+            '/kosten/maler' \
+            '/staedte/berlin' \
+            '/kosten/maler/berlin' \
+            '/ratgeber/sanierungskosten-pro-qm'; do
+            grep -q "$path" /tmp/sitemap.xml
+          done
