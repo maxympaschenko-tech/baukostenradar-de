@@ -35,7 +35,17 @@ export const quinaryItemGuideOverrides: Record<string, QuinaryPriceGuideLink> = 
     title: "Fassade streichen: Kosten pro m² inklusive Vorarbeiten",
     cta: "Fassadenanstrich-Ratgeber öffnen",
   },
+  "maler:fassade-streichen-inkl-vorarbeiten": {
+    href: "/ratgeber/fassade-streichen-kosten-pro-qm",
+    title: "Fassade streichen: Kosten pro m² inklusive Vorarbeiten",
+    cta: "Fassadenanstrich-Ratgeber öffnen",
+  },
   "fassade:klinker-verblendung": {
+    href: "/ratgeber/klinkerfassade-kosten-pro-qm",
+    title: "Klinkerfassade: Kosten pro m² und Leistungsumfang",
+    cta: "Klinker-Ratgeber öffnen",
+  },
+  "maurer:klinker-verblendmauerwerk": {
     href: "/ratgeber/klinkerfassade-kosten-pro-qm",
     title: "Klinkerfassade: Kosten pro m² und Leistungsumfang",
     cta: "Klinker-Ratgeber öffnen",
