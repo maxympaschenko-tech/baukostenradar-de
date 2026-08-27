@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRegion, regions, services } from "@/lib/pricing";
+import { siteConfig } from "@/lib/site";
 
 function euro(value: number) {
   return new Intl.NumberFormat("de-DE", {
@@ -37,9 +38,24 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
   if (!region || region.value === "de") notFound();
 
   const percent = Math.round((region.factor - 1) * 100);
+  const baseUrl = siteConfig.url.replace(/\/$/, "");
+  const canonicalUrl = `${baseUrl}/staedte/${region.slug}`;
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Startseite", item: baseUrl },
+      { "@type": "ListItem", position: 2, name: "Städte", item: `${baseUrl}/staedte` },
+      { "@type": "ListItem", position: 3, name: region.label, item: canonicalUrl },
+    ],
+  };
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <section className="contentHero">
         <div className="shell">
           <nav className="visibleBreadcrumbs" aria-label="Breadcrumb">
