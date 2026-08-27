@@ -113,6 +113,11 @@ export const priceSources = {
     url: "https://www.obi.de/magazin/bauen/fenster/dachfenster-einbauen",
     checkedAt: "27.08.2026",
   },
+  obiDachfensterAustausch: {
+    name: "OBI - Dachfenster austauschen oder erneuern 2026",
+    url: "https://www.obi.de/magazin/bauen/fenster/dachfenster-austauschen-oder-erneuern",
+    checkedAt: "27.08.2026",
+  },
   adacEnergetischeSanierung: {
     name: "ADAC - Energetische Sanierung 2026",
     url: "https://www.adac.de/rund-ums-haus/energie/spartipps/energetische-sanierung/",
@@ -131,6 +136,11 @@ export const priceSources = {
   co2Perimeterdaemmung: {
     name: "co2online - Perimeterdämmung Kosten",
     url: "https://www.co2online.de/modernisieren-und-bauen/daemmung/perimeterdaemmung/",
+    checkedAt: "27.08.2026",
+  },
+  blauarbeitKellerabdichtung: {
+    name: "Blauarbeit - Kellerabdichtung Kosten 2026",
+    url: "https://ratgeber.blauarbeit.de/kosten-preise/kellerabdichtung-kosten",
     checkedAt: "27.08.2026",
   },
 } as const;
@@ -205,6 +215,7 @@ export const services: Service[] = [
       { name: "Neueindeckung inkl. Lattung", low: 120, high: 250, unit: "pro m² Dachfläche", sourceKey: "d24Preisspiegel" },
       { name: "Dachsanierung inkl. Aufsparrendämmung", low: 250, high: 450, unit: "pro m²", sourceKey: "d24Preisspiegel" },
       { name: "Dachfenster nachträglich einbauen", low: 1500, high: 4000, unit: "pro Fenster", note: "Gesamtkosten inklusive Fenster, Einbau und typischen Zusatzarbeiten; aufwendige Projekte können höher liegen", sourceKey: "obiDachfenster" },
+      { name: "Dachfenster 1:1 austauschen", low: 1600, high: 3300, unit: "pro Fenster", note: "Orientierung vom manuellen Standard-Austausch bis zu elektrischer Ausführung; Sondergrößen und Zusatzarbeiten können höher liegen", sourceKey: "obiDachfensterAustausch" },
       { name: "Gerüst, ca. 4 Wochen", low: 8, high: 15, unit: "pro m² Gerüstfläche", sourceKey: "d24Preisspiegel" },
       { name: "Dachrinne erneuern, Zink", low: 30, high: 60, unit: "pro lfd. Meter", sourceKey: "d24Preisspiegel" },
     ],
@@ -287,13 +298,15 @@ export const services: Service[] = [
     slug: "daemmung",
     title: "Dämmung Kosten 2026",
     shortTitle: "Dämmung",
-    description: "Preise für Dach-, Fassaden-, Keller-, Kellerdecken- und Geschossdeckendämmung in Deutschland pro Quadratmeter vergleichen.",
+    description: "Preise für Dach-, Fassaden-, Keller-, Kellerdecken-, Flachdach- und Geschossdeckendämmung in Deutschland pro Quadratmeter vergleichen.",
     unit: "m²",
     icon: "▨",
     priceItems: [
       { name: "Dachdämmung Aufsparren", low: 100, high: 180, unit: "pro m² Dachfläche", sourceKey: "handwerkerSanierung" },
       { name: "Dachdämmung Zwischensparren", low: 60, high: 120, unit: "pro m²", sourceKey: "handwerkerSanierung" },
       { name: "Dachdämmung Untersparren", low: 30, high: 80, unit: "pro m²", note: "Dämmmaterial und Anbringen durch Handwerksbetrieb", sourceKey: "co2Dachdaemmung" },
+      { name: "Flachdachdämmung Warmdach", low: 100, high: 180, unit: "pro m²", note: "Gesamtkosten für Dämmung laut co2online-Richtwert, 20 cm Dämmstärke", sourceKey: "co2Dachdaemmung" },
+      { name: "Flachdachdämmung Kaltdach", low: 90, high: 160, unit: "pro m²", note: "Gesamtkosten für Dämmung laut co2online-Richtwert, 20 cm Dämmstärke", sourceKey: "co2Dachdaemmung" },
       { name: "Fassadendämmung WDVS", low: 100, high: 200, unit: "pro m²", sourceKey: "handwerkerSanierung" },
       { name: "Innendämmung", low: 80, high: 150, unit: "pro m²", sourceKey: "handwerkerSanierung" },
       { name: "Kellerdeckendämmung inkl. Montage", low: 40, high: 100, unit: "pro m²", note: "Preisbeispiel inklusive Montage; abhängig von Dämmstoff und Ausführung", sourceKey: "adacEnergetischeSanierung" },
@@ -301,6 +314,18 @@ export const services: Service[] = [
       { name: "Oberste Geschossdecke dämmen, nicht begehbar", low: 20, high: 35, unit: "pro m²", sourceKey: "co2Geschossdecke" },
       { name: "Oberste Geschossdecke dämmen, begehbar", low: 40, high: 80, unit: "pro m²", sourceKey: "co2Geschossdecke" },
       { name: "Einblasdämmung oberste Geschossdecke", low: 25, high: 50, unit: "pro m²", note: "Orientierung für Holzbalkendecken", sourceKey: "co2Geschossdecke" },
+    ],
+  },
+  {
+    slug: "kellerabdichtung",
+    title: "Kellerabdichtung Kosten 2026",
+    shortTitle: "Kellerabdichtung",
+    description: "Richtwerte für Kellerabdichtung außen und innen im Bestand, inklusive typischer Unterschiede bei Erdarbeiten und Zugänglichkeit.",
+    unit: "m²",
+    icon: "▥",
+    priceItems: [
+      { name: "Kellerabdichtung außen inkl. Aushub", low: 300, high: 600, unit: "pro m² Wandfläche", note: "Richtwert für Außenabdichtung; Erdarbeiten und Freilegung bestimmen einen großen Teil des Gesamtpreises", sourceKey: "blauarbeitKellerabdichtung" },
+      { name: "Kellerabdichtung innen", low: 80, high: 200, unit: "pro m² Wandfläche", note: "Günstigere Alternative, wenn eine Außenabdichtung nicht möglich oder nicht sinnvoll ist", sourceKey: "blauarbeitKellerabdichtung" },
     ],
   },
   {
