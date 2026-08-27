@@ -139,15 +139,70 @@ const itemGuideOverrides: Record<string, PriceGuideLink> = {
     title: "Dach sanieren: Dämmkosten pro m² einordnen",
     cta: "Dach-Ratgeber öffnen",
   },
+  "garten:einfahrt-pflastern": {
+    href: "/ratgeber/einfahrt-pflastern-kosten",
+    title: "Einfahrt pflastern: Kosten pro m² mit Unterbau",
+    cta: "Einfahrt-Ratgeber öffnen",
+  },
+  "garten:terrasse-pflastern-inkl-unterbau": {
+    href: "/ratgeber/terrasse-pflastern-kosten",
+    title: "Terrasse pflastern: Kosten pro m² inklusive Unterbau",
+    cta: "Terrassen-Ratgeber öffnen",
+  },
+  "garten:baumfaellung-mittelgross-inkl-entsorgung": {
+    href: "/ratgeber/baum-faellen-kosten",
+    title: "Baum fällen: Kosten inklusive Entsorgung",
+    cta: "Baumfällungs-Ratgeber öffnen",
+  },
+  "garten:rollrasen-inkl-vorbereitung": {
+    href: "/ratgeber/rollrasen-kosten-pro-qm",
+    title: "Rollrasen: Kosten pro m² inklusive Vorbereitung",
+    cta: "Rollrasen-Ratgeber öffnen",
+  },
+  "bodenleger:parkett-abschleifen-und-oelen": {
+    href: "/ratgeber/parkett-abschleifen-kosten",
+    title: "Parkett abschleifen: Kosten pro m² für Schleifen und Ölen",
+    cta: "Parkett-Ratgeber öffnen",
+  },
+  "elektriker:sicherungskasten-erneuern": {
+    href: "/ratgeber/sicherungskasten-erneuern-kosten",
+    title: "Sicherungskasten erneuern: Kosten und Zusatzarbeiten",
+    cta: "Sicherungskasten-Ratgeber öffnen",
+  },
+  "dachsanierung:dachrinne-erneuern-zink": {
+    href: "/ratgeber/dachrinne-erneuern-kosten",
+    title: "Dachrinne erneuern: Kosten pro laufendem Meter",
+    cta: "Dachrinnen-Ratgeber öffnen",
+  },
   "tueren:haustuer-kunststoff-inkl-montage": {
-    href: "/ratgeber/haus-sanieren-kosten",
-    title: "Haus sanieren: Haustüren im Gesamtbudget",
-    cta: "Haus-Sanierungs-Ratgeber öffnen",
+    href: "/ratgeber/haustuer-einbauen-kosten",
+    title: "Haustür einbauen: Kunststoff, Holz-Alu und Montage",
+    cta: "Haustür-Ratgeber öffnen",
   },
   "tueren:haustuer-holz-alu-rc2-inkl-montage": {
-    href: "/ratgeber/haus-sanieren-kosten",
-    title: "Haus sanieren: Haustüren im Gesamtbudget",
-    cta: "Haus-Sanierungs-Ratgeber öffnen",
+    href: "/ratgeber/haustuer-einbauen-kosten",
+    title: "Haustür einbauen: Kunststoff, Holz-Alu und Montage",
+    cta: "Haustür-Ratgeber öffnen",
+  },
+  "daemmung:fassadendaemmung-wdvs": {
+    href: "/ratgeber/fassadendaemmung-kosten-pro-qm",
+    title: "Fassadendämmung: WDVS-Kosten pro m²",
+    cta: "Fassadendämmungs-Ratgeber öffnen",
+  },
+  "waermepumpe:wartung-waermepumpe": {
+    href: "/ratgeber/waermepumpe-wartung-kosten",
+    title: "Wärmepumpe warten: jährliche Kosten und Leistungsumfang",
+    cta: "Wartungs-Ratgeber öffnen",
+  },
+  "photovoltaik:stromspeicher-lfp": {
+    href: "/ratgeber/stromspeicher-kosten-pro-kwh",
+    title: "Stromspeicher: Kosten pro kWh Speicherkapazität",
+    cta: "Stromspeicher-Ratgeber öffnen",
+  },
+  "fenster:fenstereinbau": {
+    href: "/ratgeber/fenstereinbau-kosten",
+    title: "Fenstereinbau: Montagekosten pro Fenster",
+    cta: "Fenstereinbau-Ratgeber öffnen",
   },
   "maurer:bodenplatte-standard": {
     href: "/ratgeber/haus-sanieren-kosten",
