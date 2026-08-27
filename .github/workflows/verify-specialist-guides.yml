@@ -74,9 +74,9 @@ jobs:
           check_mapping sanitaer sanitaer-kosten sanitaerobjekte-armaturen-fuer-8-m2-bad
           check_mapping waermepumpe waermepumpe-kosten-2026 luft-wasser-waermepumpe-komplett
           check_mapping photovoltaik photovoltaik-kosten-2026 pv-anlage-10-kwp-inkl-installation
-          check_mapping daemmung daemmung-kosten-pro-qm fassadendaemmung-wdvs
+          check_mapping daemmung daemmung-kosten-pro-qm innendaemmung
           check_mapping fassade fassade-sanieren-kosten putz-fassade-neu
-          check_mapping garten garten-anlegen-kosten terrasse-pflastern-inkl-unterbau
+          check_mapping garten garten-anlegen-kosten doppelstabmattenzaun-inkl-montage
 
       - name: Verify specialist reverse silo and calculators
         shell: bash
