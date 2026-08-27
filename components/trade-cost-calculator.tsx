@@ -17,12 +17,14 @@ type TradeCostCalculatorProps = {
   initialServiceSlug?: string;
   initialItemSlug?: string;
   initialRegionValue?: string;
+  initialQuantity?: number;
 };
 
 export function TradeCostCalculator({
   initialServiceSlug,
   initialItemSlug,
   initialRegionValue,
+  initialQuantity,
 }: TradeCostCalculatorProps = {}) {
   const initialService = services.find((item) => item.slug === initialServiceSlug) ?? services[0];
   const initialItemIndex = initialService
@@ -31,11 +33,14 @@ export function TradeCostCalculator({
   const initialRegion = regions.find(
     (item) => item.value === initialRegionValue || item.slug === initialRegionValue,
   ) ?? regions[0];
+  const safeInitialQuantity = Number.isFinite(initialQuantity)
+    ? Math.min(10000, Math.max(0.1, initialQuantity as number))
+    : 1;
 
   const [serviceSlug, setServiceSlug] = useState<string>(initialService?.slug ?? "maler");
   const service = services.find((item) => item.slug === serviceSlug) ?? services[0];
   const [itemIndex, setItemIndex] = useState(initialItemIndex >= 0 ? initialItemIndex : 0);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(safeInitialQuantity);
   const [regionValue, setRegionValue] = useState<string>(initialRegion?.value ?? "de");
 
   const selectedItem = service.priceItems[Math.min(itemIndex, service.priceItems.length - 1)] ?? service.priceItems[0];
@@ -116,9 +121,9 @@ export function TradeCostCalculator({
         </label>
       </div>
 
-      {(initialServiceSlug || initialItemSlug || initialRegionValue) ? (
+      {(initialServiceSlug || initialItemSlug || initialRegionValue || initialQuantity) ? (
         <p className="tableNote">
-          Vorauswahl aus der vorherigen Kostenseite übernommen. Alle Felder können jederzeit geändert werden.
+          Vorauswahl aus der vorherigen Kostenseite übernommen. Leistung, Menge und Region können jederzeit geändert werden.
         </p>
       ) : null}
 
