@@ -43,6 +43,46 @@ const scenarioCalculatorLinks: Record<string, Pick<GuideSilo, "calculatorHref" |
     }),
     calculatorLabel: "100 m² Fußbodenheizung berechnen",
   },
+  "6-innentueren-austauschen-kosten": {
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "tueren",
+      itemSlug: "innentuer-einbauen-inkl-zarge",
+      quantity: 6,
+    }),
+    calculatorLabel: "6 Innentüren berechnen",
+  },
+  "estrich-100-qm-kosten": {
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "estrich",
+      itemSlug: "zementestrich-komplett",
+      quantity: 100,
+    }),
+    calculatorLabel: "100 m² Estrich berechnen",
+  },
+  "innenwand-mauern-kosten": {
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "maurer",
+      itemSlug: "mauerarbeiten-fertige-wand",
+      quantity: 20,
+    }),
+    calculatorLabel: "20 m² Innenwand berechnen",
+  },
+  "14-treppenstufen-renovieren-kosten": {
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "treppen",
+      itemSlug: "holzstufe-schleifen-und-versiegeln",
+      quantity: 14,
+    }),
+    calculatorLabel: "14 Treppenstufen berechnen",
+  },
+  "kueche-10-qm-renovieren-kosten": {
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "kueche",
+      itemSlug: "kuechen-renovierung-ohne-moebel",
+      quantity: 10,
+    }),
+    calculatorLabel: "10 m² Küche berechnen",
+  },
 };
 
 export function getGuideSilo(slug: string): GuideSilo {
@@ -95,45 +135,45 @@ export function getGuideSilo(slug: string): GuideSilo {
 
   if (slug.includes("estrich")) {
     return {
-      serviceSlugs: ["bodenleger"],
-      calculatorHref: "/rechner/handwerkerkosten",
-      calculatorLabel: "Bodenkosten berechnen",
+      serviceSlugs: ["estrich", "bodenleger", "heizung"],
+      calculatorHref: scenarioCalculator?.calculatorHref ?? handwerkerCalculatorHref({ serviceSlug: "estrich" }),
+      calculatorLabel: scenarioCalculator?.calculatorLabel ?? "Estrichkosten berechnen",
       regionalMode: "service",
     };
   }
 
   if (slug.includes("innenwand")) {
     return {
-      serviceSlugs: ["trockenbau", "maler"],
-      calculatorHref: "/rechner/handwerkerkosten",
-      calculatorLabel: "Ausbaukosten berechnen",
+      serviceSlugs: ["maurer", "trockenbau", "maler"],
+      calculatorHref: scenarioCalculator?.calculatorHref ?? handwerkerCalculatorHref({ serviceSlug: "maurer" }),
+      calculatorLabel: scenarioCalculator?.calculatorLabel ?? "Maurerkosten berechnen",
       regionalMode: "service",
     };
   }
 
   if (slug.includes("treppen")) {
     return {
-      serviceSlugs: ["bodenleger", "maler"],
-      calculatorHref: "/rechner/handwerkerkosten",
-      calculatorLabel: "Handwerkerkosten berechnen",
+      serviceSlugs: ["treppen", "bodenleger", "maler"],
+      calculatorHref: scenarioCalculator?.calculatorHref ?? handwerkerCalculatorHref({ serviceSlug: "treppen" }),
+      calculatorLabel: scenarioCalculator?.calculatorLabel ?? "Treppenkosten berechnen",
       regionalMode: "service",
     };
   }
 
   if (slug.includes("tueren")) {
     return {
-      serviceSlugs: ["trockenbau", "maler", "bodenleger"],
-      calculatorHref: "/rechner/handwerkerkosten",
-      calculatorLabel: "Handwerkerkosten berechnen",
+      serviceSlugs: ["tueren", "maler", "trockenbau"],
+      calculatorHref: scenarioCalculator?.calculatorHref ?? handwerkerCalculatorHref({ serviceSlug: "tueren" }),
+      calculatorLabel: scenarioCalculator?.calculatorLabel ?? "Türkosten berechnen",
       regionalMode: "service",
     };
   }
 
   if (slug.includes("kueche")) {
     return {
-      serviceSlugs: ["elektriker", "sanitaer", "bodenleger", "maler"],
-      calculatorHref: "/rechner/handwerkerkosten",
-      calculatorLabel: "Küchenarbeiten berechnen",
+      serviceSlugs: ["kueche", "elektriker", "sanitaer", "bodenleger"],
+      calculatorHref: scenarioCalculator?.calculatorHref ?? handwerkerCalculatorHref({ serviceSlug: "kueche" }),
+      calculatorLabel: scenarioCalculator?.calculatorLabel ?? "Küchenkosten berechnen",
       regionalMode: "service",
     };
   }
