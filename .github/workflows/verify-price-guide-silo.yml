@@ -11,14 +11,45 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Verify all long-tail price pages are indexed
+      - name: Verify all live long-tail price pages are indexed
         shell: bash
         run: |
           set -euo pipefail
           curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
-          count=$(grep -oE 'https://baukostenradar\.de/kosten/[^<]+/leistung/[^<]+' /tmp/sitemap.xml | sort -u | wc -l | tr -d ' ')
-          echo "Long-tail price URLs: $count"
-          test "$count" = "101"
+
+          mapfile -t services < <(
+            grep -oE 'https://baukostenradar\.de/kosten/[^<]+' /tmp/sitemap.xml \
+              | sed 's#https://baukostenradar.de/kosten/##' \
+              | grep -Ev '/|^$' \
+              | sort -u
+          )
+
+          test "${#services[@]}" -gt 0
+          checked=0
+
+          for service in "${services[@]}"; do
+            curl -sS --fail "https://baukostenradar.de/kosten/${service}" -o "/tmp/service-${service}.html"
+            mapfile -t detail_paths < <(
+              grep -oE "/kosten/${service}/leistung/[a-z0-9-]+" "/tmp/service-${service}.html" | sort -u
+            )
+
+            if [ "${#detail_paths[@]}" -eq 0 ]; then
+              echo "No price detail links found for ${service}" >&2
+              exit 1
+            fi
+
+            for path in "${detail_paths[@]}"; do
+              grep -q "https://baukostenradar.de${path}" /tmp/sitemap.xml || {
+                echo "Missing from sitemap: ${path}" >&2
+                exit 1
+              }
+              checked=$((checked + 1))
+            done
+          done
+
+          indexed_count=$(grep -oE 'https://baukostenradar\.de/kosten/[^<]+/leistung/[^<]+' /tmp/sitemap.xml | sort -u | wc -l | tr -d ' ')
+          echo "Long-tail price URLs in sitemap: ${indexed_count}; live detail links checked: ${checked}"
+          test "$indexed_count" -eq "$checked"
 
       - name: Verify contextual guide mapping for every trade
         shell: bash
@@ -55,11 +86,12 @@ jobs:
           check_guide 'heizung' 'fussbodenheizung-nachruesten' 'fussbodenheizung-100-qm-kosten'
           check_guide 'fassade' 'putz-fassade-neu' 'putzfassade-kosten-pro-qm'
           check_guide 'garten' 'doppelstabmattenzaun-inkl-montage' 'doppelstabmattenzaun-kosten-pro-meter'
-          check_guide 'tueren' 'innentuer-einbauen-inkl-zarge' 'innentuer-einbauen-kosten'
-          check_guide 'estrich' 'zementestrich-komplett' 'zementestrich-kosten-pro-qm'
+          check_guide 'tueren' 'innentuer-mit-zarge-inkl-montage' 'innentuer-einbauen-kosten'
+          check_guide 'estrich' 'zementestrich-verlegen' 'zementestrich-kosten-pro-qm'
           check_guide 'maurer' 'mauerarbeiten-fertige-wand' 'innenwand-mauern-kosten'
           check_guide 'treppen' 'holzstufe-schleifen-und-versiegeln' '14-treppenstufen-renovieren-kosten'
           check_guide 'kueche' 'kuechen-renovierung-ohne-moebel' 'kueche-10-qm-renovieren-kosten'
+          check_guide 'abriss-entsorgung' 'einfamilienhaus-komplett-abreissen' 'haus-abreissen-kosten'
 
       - name: Verify specialist contextual overrides
         shell: bash
