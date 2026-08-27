@@ -161,6 +161,10 @@ const itemGuideOverrides: Record<string, PriceGuideLink> = {
   },
 };
 
+export function getServiceGuideLink(serviceSlug: string): PriceGuideLink {
+  return serviceGuideLinks[serviceSlug] ?? HANDWERKER_RATES;
+}
+
 export function getPriceGuideLink(options: {
   serviceSlug: string;
   itemSlug: string;
@@ -180,6 +184,5 @@ export function getPriceGuideLink(options: {
   }
 
   return itemGuideOverrides[`${serviceSlug}:${itemSlug}`]
-    ?? serviceGuideLinks[serviceSlug]
-    ?? HANDWERKER_RATES;
+    ?? getServiceGuideLink(serviceSlug);
 }
