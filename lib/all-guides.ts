@@ -2,6 +2,7 @@ import { guides as primaryGuides } from "@/lib/guides";
 import { secondaryGuides } from "@/lib/guides-secondary";
 import { tertiaryGuides } from "@/lib/guides-tertiary";
 import { tradeGuides } from "@/lib/guides-trade";
+import { specialistGuides } from "@/lib/guides-specialists";
 import { scenarioGuides } from "@/lib/guides-scenarios";
 import { catalogScenarioGuides } from "@/lib/guides-catalog-scenarios";
 
@@ -124,6 +125,7 @@ export const allGuides = [
   ...enrichedSecondaryGuides,
   ...enrichedTertiaryGuides,
   ...enrichedTradeGuides,
+  ...specialistGuides,
   ...scenarioGuides,
   ...catalogScenarioGuides,
 ];
