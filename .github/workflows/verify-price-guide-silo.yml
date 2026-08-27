@@ -1,0 +1,78 @@
+name: Verify price guide silo
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-price-guide-silo:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify all long-tail price pages are indexed
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          count=$(grep -oE 'https://baukostenradar\.de/kosten/[^<]+/leistung/[^<]+' /tmp/sitemap.xml | sort -u | wc -l | tr -d ' ')
+          echo "Long-tail price URLs: $count"
+          test "$count" = "101"
+
+      - name: Verify contextual guide mapping for every trade
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          check_guide() {
+            local service="$1"
+            local item="$2"
+            local guide="$3"
+            local output="/tmp/${service}-${item}.html"
+            curl -sS --fail "https://baukostenradar.de/kosten/${service}/leistung/${item}" -o "$output"
+            grep -q 'Passender Ratgeber' "$output"
+            grep -q "/ratgeber/${guide}" "$output"
+            if grep -qi 'noindex' "$output"; then
+              echo "Unexpected noindex for ${service}/${item}" >&2
+              exit 1
+            fi
+            curl -sS --fail -o /dev/null "https://baukostenradar.de/ratgeber/${guide}"
+          }
+
+          check_guide 'badsanierung' 'bad-sanierung-komplett' 'bad-komplett-sanieren-kosten'
+          check_guide 'maler' 'waende-streichen' 'wohnung-renovieren-kosten'
+          check_guide 'fliesenleger' 'standard-fliesen-verlegen' 'wohnung-renovieren-kosten'
+          check_guide 'elektriker' 'steckdose-installieren' 'elektrik-erneuern-altbau'
+          check_guide 'dachsanierung' 'neueindeckung-inkl-lattung' 'dach-sanieren-kosten-pro-qm'
+          check_guide 'bodenleger' 'vinylboden-klick-inkl-material' 'wohnung-renovieren-kosten'
+          check_guide 'trockenbau' 'trockenbauwand-beidseitig-beplankt' 'wohnung-renovieren-kosten'
+          check_guide 'sanitaer' 'sanitaerobjekte-armaturen-fuer-8-m2-bad' 'bad-komplett-sanieren-kosten'
+          check_guide 'waermepumpe' 'luft-wasser-waermepumpe-komplett' 'heizung-erneuern-kosten'
+          check_guide 'photovoltaik' 'pv-anlage-5-kwp-inkl-installation' 'sanierungskosten-einfamilienhaus'
+          check_guide 'daemmung' 'dachdaemmung-aufsparren' 'dach-sanieren-kosten-pro-qm'
+          check_guide 'fenster' 'fenster-mit-2-fach-verglasung' 'fenster-austauschen-kosten-haus'
+          check_guide 'heizung' 'fussbodenheizung-nachruesten' 'fussbodenheizung-100-qm-kosten'
+          check_guide 'fassade' 'putz-fassade-neu' 'haus-sanieren-kosten'
+          check_guide 'garten' 'terrasse-pflastern-inkl-unterbau' 'arbeitskosten-materialkosten'
+          check_guide 'tueren' 'innentuer-einbauen-inkl-zarge' '6-innentueren-austauschen-kosten'
+          check_guide 'estrich' 'zementestrich-komplett' 'estrich-100-qm-kosten'
+          check_guide 'maurer' 'mauerarbeiten-fertige-wand' 'innenwand-mauern-kosten'
+          check_guide 'treppen' 'holzstufe-schleifen-und-versiegeln' '14-treppenstufen-renovieren-kosten'
+          check_guide 'kueche' 'kuechen-renovierung-ohne-moebel' 'kueche-10-qm-renovieren-kosten'
+
+      - name: Verify hourly prices use the labor-rate guide
+        shell: bash
+        run: |
+          set -euo pipefail
+          for path in \
+            'elektriker/elektriker-stundensatz' \
+            'trockenbau/trockenbauer-stundensatz' \
+            'sanitaer/sanitaerinstallateur-stundensatz' \
+            'heizung/heizungsinstallateur-stundensatz' \
+            'fassade/fassadenbauer-stundensatz' \
+            'garten/gartenpflege' \
+            'maurer/maurer-stundensatz'; do
+            curl -sS --fail "https://baukostenradar.de/kosten/${path%/*}/leistung/${path#*/}" -o /tmp/hourly.html
+            grep -q '/ratgeber/handwerker-stundensaetze' /tmp/hourly.html
+          done
