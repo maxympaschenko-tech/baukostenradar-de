@@ -105,7 +105,26 @@ jobs:
           check_opportunity betontreppe-neuer-belag-kosten treppen betontreppe-mit-neuem-belag
           check_opportunity fliesenspiegel-erneuern-kosten kueche fliesenspiegel-erneuern
 
-          echo 'Verified 60 opportunity guides and exact price-item mappings'
+          check_opportunity bad-komplett-verfliesen-kosten badsanierung komplettverfliesung-bad
+          check_opportunity bad-abdichten-kosten-pro-qm badsanierung verbundabdichtung-nassbereich
+          check_opportunity elektro-neuinstallation-kosten elektriker komplett-neuinstallation
+          check_opportunity dachsanierung-aufsparrendaemmung-kosten-pro-qm dachsanierung dachsanierung-inkl-aufsparrendaemmung
+          check_opportunity photovoltaik-5-kwp-kosten photovoltaik pv-anlage-5-kwp-inkl-installation
+          check_opportunity fassade-streichen-kosten-pro-qm fassade fassade-streichen-inkl-vorarbeiten
+          check_opportunity klinkerfassade-kosten-pro-qm fassade klinker-verblendung
+          check_opportunity zementestrich-kosten-pro-qm estrich zementestrich-komplett
+          check_opportunity kalksandstein-mauerwerk-kosten-pro-qm maurer kalksandstein-mauerwerk
+          check_opportunity poroton-mauerwerk-kosten-pro-qm maurer poroton-mauerwerk
+          check_opportunity porenbeton-mauerwerk-kosten-pro-qm maurer porenbeton-mauerwerk
+          check_opportunity treppenrenovierung-holzstufen-system-kosten treppen treppenrenovierung-holzstufen-system
+          check_opportunity treppen-stufenueberbau-gelaender-kosten treppen holztreppe-stufenueberbau-gelaender
+          check_opportunity natursteintreppe-schleifen-kosten treppen natursteintreppe-schleifen-und-polieren
+          check_opportunity sanitaerobjekte-bad-kosten sanitaer sanitaerobjekte-armaturen-fuer-8-m2-bad
+          check_opportunity kueche-elektrogeraete-kosten kueche neue-elektrogeraete
+          check_opportunity einbaukueche-kosten kueche komplett-neue-einbaukueche
+          check_opportunity premium-kueche-umbau-kosten kueche premium-kueche-mit-umbau
+
+          echo 'Verified 78 opportunity guides and exact price-item mappings'
 
       - name: Verify parent guides link into the long-tail cluster
         shell: bash
@@ -182,4 +201,23 @@ jobs:
           check_parent 14-treppenstufen-renovieren-kosten betontreppe-neuer-belag-kosten
           check_parent kueche-10-qm-renovieren-kosten fliesenspiegel-erneuern-kosten
 
-          echo 'Verified parent-to-opportunity Ratgeber links for all 60 guides'
+          check_parent bad-komplett-sanieren-kosten bad-komplett-verfliesen-kosten
+          check_parent bad-komplett-sanieren-kosten bad-abdichten-kosten-pro-qm
+          check_parent elektrik-erneuern-altbau elektro-neuinstallation-kosten
+          check_parent dach-sanieren-kosten-pro-qm dachsanierung-aufsparrendaemmung-kosten-pro-qm
+          check_parent photovoltaik-kosten-2026 photovoltaik-5-kwp-kosten
+          check_parent fassade-sanieren-kosten fassade-streichen-kosten-pro-qm
+          check_parent fassade-sanieren-kosten klinkerfassade-kosten-pro-qm
+          check_parent estrich-100-qm-kosten zementestrich-kosten-pro-qm
+          check_parent innenwand-mauern-kosten kalksandstein-mauerwerk-kosten-pro-qm
+          check_parent innenwand-mauern-kosten poroton-mauerwerk-kosten-pro-qm
+          check_parent innenwand-mauern-kosten porenbeton-mauerwerk-kosten-pro-qm
+          check_parent 14-treppenstufen-renovieren-kosten treppenrenovierung-holzstufen-system-kosten
+          check_parent 14-treppenstufen-renovieren-kosten treppen-stufenueberbau-gelaender-kosten
+          check_parent 14-treppenstufen-renovieren-kosten natursteintreppe-schleifen-kosten
+          check_parent sanitaer-kosten sanitaerobjekte-bad-kosten
+          check_parent kueche-10-qm-renovieren-kosten kueche-elektrogeraete-kosten
+          check_parent kueche-10-qm-renovieren-kosten einbaukueche-kosten
+          check_parent kueche-10-qm-renovieren-kosten premium-kueche-umbau-kosten
+
+          echo 'Verified parent-to-opportunity Ratgeber links for all 78 guides'
