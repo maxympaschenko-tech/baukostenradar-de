@@ -1,4 +1,5 @@
 import type { Guide, GuideTable } from "@/lib/guides";
+import { secondaryComparisonGuides } from "@/lib/guides-comparisons-secondary";
 
 type ComparisonGuideConfig = {
   slug: string;
@@ -341,4 +342,4 @@ const configs: ComparisonGuideConfig[] = [
   },
 ];
 
-export const comparisonGuides: Guide[] = configs.map(createComparisonGuide);
+export const comparisonGuides: Guide[] = [...configs.map(createComparisonGuide), ...secondaryComparisonGuides];
