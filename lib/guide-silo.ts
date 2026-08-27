@@ -88,6 +88,96 @@ const scenarioCalculatorLinks: Record<string, Pick<GuideSilo, "calculatorHref" |
 export function getGuideSilo(slug: string): GuideSilo {
   const scenarioCalculator = scenarioCalculatorLinks[slug];
 
+  if (slug.includes("maler")) {
+    return {
+      serviceSlugs: ["maler", "trockenbau", "fassade"],
+      calculatorHref: handwerkerCalculatorHref({ serviceSlug: "maler" }),
+      calculatorLabel: "Malerarbeiten berechnen",
+      regionalMode: "service",
+    };
+  }
+
+  if (slug.includes("fliesenleger")) {
+    return {
+      serviceSlugs: ["fliesenleger", "badsanierung", "sanitaer"],
+      calculatorHref: handwerkerCalculatorHref({ serviceSlug: "fliesenleger" }),
+      calculatorLabel: "Fliesenkosten berechnen",
+      regionalMode: "service",
+    };
+  }
+
+  if (slug.includes("bodenleger")) {
+    return {
+      serviceSlugs: ["bodenleger", "estrich", "heizung"],
+      calculatorHref: handwerkerCalculatorHref({ serviceSlug: "bodenleger" }),
+      calculatorLabel: "Bodenkosten berechnen",
+      regionalMode: "service",
+    };
+  }
+
+  if (slug.includes("trockenbau")) {
+    return {
+      serviceSlugs: ["trockenbau", "maler", "elektriker"],
+      calculatorHref: handwerkerCalculatorHref({ serviceSlug: "trockenbau" }),
+      calculatorLabel: "Trockenbaukosten berechnen",
+      regionalMode: "service",
+    };
+  }
+
+  if (slug.includes("sanitaer")) {
+    return {
+      serviceSlugs: ["sanitaer", "badsanierung", "fliesenleger"],
+      calculatorHref: handwerkerCalculatorHref({ serviceSlug: "sanitaer" }),
+      calculatorLabel: "Sanitärkosten berechnen",
+      regionalMode: "service",
+    };
+  }
+
+  if (slug.includes("waermepumpe")) {
+    return {
+      serviceSlugs: ["waermepumpe", "heizung", "daemmung"],
+      calculatorHref: handwerkerCalculatorHref({ serviceSlug: "waermepumpe" }),
+      calculatorLabel: "Wärmepumpenkosten berechnen",
+      regionalMode: "service",
+    };
+  }
+
+  if (slug.includes("photovoltaik")) {
+    return {
+      serviceSlugs: ["photovoltaik", "elektriker", "dachsanierung"],
+      calculatorHref: handwerkerCalculatorHref({ serviceSlug: "photovoltaik" }),
+      calculatorLabel: "Photovoltaikkosten berechnen",
+      regionalMode: "service",
+    };
+  }
+
+  if (slug.startsWith("daemmung")) {
+    return {
+      serviceSlugs: ["daemmung", "fassade", "dachsanierung"],
+      calculatorHref: handwerkerCalculatorHref({ serviceSlug: "daemmung" }),
+      calculatorLabel: "Dämmkosten berechnen",
+      regionalMode: "service",
+    };
+  }
+
+  if (slug.includes("fassade")) {
+    return {
+      serviceSlugs: ["fassade", "daemmung", "maler"],
+      calculatorHref: handwerkerCalculatorHref({ serviceSlug: "fassade" }),
+      calculatorLabel: "Fassadenkosten berechnen",
+      regionalMode: "service",
+    };
+  }
+
+  if (slug.includes("garten")) {
+    return {
+      serviceSlugs: ["garten"],
+      calculatorHref: handwerkerCalculatorHref({ serviceSlug: "garten" }),
+      calculatorLabel: "Gartenkosten berechnen",
+      regionalMode: "service",
+    };
+  }
+
   if (slug.includes("dach")) {
     return {
       serviceSlugs: ["dachsanierung", "daemmung"],
