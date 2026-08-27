@@ -8,6 +8,7 @@ import { secondaryOpportunityGuides } from "@/lib/guides-opportunities-secondary
 import { tertiaryOpportunityGuides } from "@/lib/guides-opportunities-tertiary";
 import { quaternaryOpportunityGuides } from "@/lib/guides-opportunities-quaternary";
 import { quinaryOpportunityGuides } from "@/lib/guides-opportunities-quinary";
+import { comparisonGuides } from "@/lib/guides-comparisons";
 import { scenarioGuides } from "@/lib/guides-scenarios";
 import { catalogScenarioGuides } from "@/lib/guides-catalog-scenarios";
 
@@ -101,6 +102,7 @@ const tradeClusterLinks: Record<string, Array<{ label: string; href: string }>> 
     { label: "Fenstereinbau Kosten", href: "/ratgeber/fenstereinbau-kosten" },
     { label: "Fenster 3-fach Verglasung Kosten", href: "/ratgeber/fenster-3-fach-verglasung-kosten" },
     { label: "Fenster 2-fach Verglasung Kosten", href: "/ratgeber/fenster-2-fach-verglasung-kosten" },
+    { label: "2-fach oder 3-fach Verglasung vergleichen", href: "/ratgeber/fenster-2-fach-oder-3-fach-verglasung-kosten" },
   ],
   "elektrik-erneuern-altbau": [
     { label: "Elektrik bei 100 m² erneuern", href: "/ratgeber/elektrik-erneuern-100-qm-kosten" },
@@ -115,6 +117,7 @@ const tradeClusterLinks: Record<string, Array<{ label: string; href: string }>> 
     { label: "Gasheizung austauschen Kosten", href: "/ratgeber/gasheizung-austauschen-kosten" },
     { label: "Heizungswartung Kosten", href: "/ratgeber/heizungswartung-kosten" },
     { label: "Thermostat installieren Kosten", href: "/ratgeber/thermostat-installieren-kosten" },
+    { label: "Wärmepumpe oder Gasheizung vergleichen", href: "/ratgeber/heizung-waermepumpe-oder-gasheizung-kosten" },
   ],
   "bad-komplett-sanieren-kosten": [
     { label: "Bad 10 m² sanieren Kosten", href: "/ratgeber/bad-10-qm-sanieren-kosten" },
@@ -150,6 +153,7 @@ const specialistClusterLinks: Record<string, Array<{ label: string; href: string
     { label: "Laminat verlegen Kosten pro m²", href: "/ratgeber/laminat-verlegen-kosten-pro-qm" },
     { label: "Vinylboden verlegen Kosten pro m²", href: "/ratgeber/vinylboden-verlegen-kosten-pro-qm" },
     { label: "Bodensanierung Kosten pro m²", href: "/ratgeber/boden-sanieren-kosten-pro-qm" },
+    { label: "Parkett oder Vinyl vergleichen", href: "/ratgeber/bodenleger-parkett-oder-vinyl-kosten" },
   ],
   "trockenbau-kosten-pro-qm": [
     { label: "Trockenbauwand Kosten pro m²", href: "/ratgeber/trockenbauwand-kosten-pro-qm" },
@@ -163,6 +167,7 @@ const specialistClusterLinks: Record<string, Array<{ label: string; href: string
     { label: "Innendämmung Kosten pro m²", href: "/ratgeber/innendaemmung-kosten-pro-qm" },
     { label: "Zwischensparrendämmung Kosten pro m²", href: "/ratgeber/zwischensparrendaemmung-kosten-pro-qm" },
     { label: "Aufsparrendämmung Kosten pro m²", href: "/ratgeber/aufsparrendaemmung-kosten-pro-qm" },
+    { label: "Aufsparren oder Zwischensparren vergleichen", href: "/ratgeber/daemmung-aufsparren-oder-zwischensparren-kosten" },
   ],
   "waermepumpe-kosten-2026": [
     { label: "Wärmepumpe Wartung Kosten", href: "/ratgeber/waermepumpe-wartung-kosten" },
@@ -181,6 +186,7 @@ const specialistClusterLinks: Record<string, Array<{ label: string; href: string
     { label: "Klinkerfassade Kosten pro m²", href: "/ratgeber/klinkerfassade-kosten-pro-qm" },
     { label: "Fassadenrisse sanieren Kosten", href: "/ratgeber/fassadenrisse-sanieren-kosten-pro-qm" },
     { label: "Vorgehängte hinterlüftete Fassade Kosten", href: "/ratgeber/vorgehaengte-hinterlueftete-fassade-kosten-pro-qm" },
+    { label: "WDVS oder VHF vergleichen", href: "/ratgeber/fassade-wdvs-oder-vhf-kosten" },
   ],
 };
 
@@ -201,6 +207,7 @@ const catalogScenarioClusterLinks: Record<string, Array<{ label: string; href: s
     { label: "Anhydritestrich Kosten pro m²", href: "/ratgeber/anhydritestrich-kosten-pro-qm" },
     { label: "Gussasphaltestrich Kosten pro m²", href: "/ratgeber/gussasphaltestrich-kosten-pro-qm" },
     { label: "Sichtestrich Kosten pro m²", href: "/ratgeber/sichtestrich-kosten-pro-qm" },
+    { label: "Zementestrich oder Anhydrit vergleichen", href: "/ratgeber/estrich-zement-oder-anhydrit-kosten" },
   ],
   "14-treppenstufen-renovieren-kosten": [
     { label: "Treppenrenovierung Holzstufen-System", href: "/ratgeber/treppenrenovierung-holzstufen-system-kosten" },
@@ -250,6 +257,7 @@ export const allGuides = [
   ...tertiaryOpportunityGuides,
   ...quaternaryOpportunityGuides,
   ...quinaryOpportunityGuides,
+  ...comparisonGuides,
   ...scenarioGuides,
   ...enrichedCatalogScenarioGuides,
 ];
