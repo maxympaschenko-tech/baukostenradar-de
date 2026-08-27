@@ -84,7 +84,28 @@ jobs:
           check_opportunity aufsparrendaemmung-kosten-pro-qm daemmung dachdaemmung-aufsparren
           check_opportunity putzfassade-kosten-pro-qm fassade putz-fassade-neu
 
-          echo 'Verified 40 opportunity guides and exact price-item mappings'
+          check_opportunity mosaik-fliesen-verlegen-kosten-pro-qm fliesenleger mosaik-fliesen-verlegen
+          check_opportunity naturstein-verlegen-kosten-pro-qm fliesenleger naturstein-verlegen
+          check_opportunity lichtschalter-austauschen-kosten elektriker lichtschalter-austauschen
+          check_opportunity geruest-kosten-pro-qm dachsanierung geruest-ca-4-wochen
+          check_opportunity boden-sanieren-kosten-pro-qm bodenleger boden-sanierung-alt-raus-neu-rein
+          check_opportunity bad-entkernen-kosten sanitaer demontage-entsorgung-altbad
+          check_opportunity photovoltaik-15-kwp-kosten photovoltaik pv-anlage-15-kwp-inkl-installation
+          check_opportunity fenster-2-fach-verglasung-kosten fenster fenster-mit-2-fach-verglasung
+          check_opportunity thermostat-installieren-kosten heizung thermostat-installieren
+          check_opportunity fassadenrisse-sanieren-kosten-pro-qm fassade fassaden-sanierung-bei-rissen
+          check_opportunity vorgehaengte-hinterlueftete-fassade-kosten-pro-qm fassade vorgehaengte-hinterlueftete-fassade
+          check_opportunity heckenschnitt-kosten-pro-meter garten heckenschnitt
+          check_opportunity innentuer-einbauen-kosten tueren innentuer-einbauen-inkl-zarge
+          check_opportunity tuer-lackieren-kosten tueren tuer-lackieren-mit-zarge
+          check_opportunity anhydritestrich-kosten-pro-qm estrich calciumsulfat-anhydritestrich
+          check_opportunity gussasphaltestrich-kosten-pro-qm estrich gussasphaltestrich
+          check_opportunity sichtestrich-kosten-pro-qm estrich sichtestrich
+          check_opportunity holztreppe-schleifen-kosten treppen holztreppe-schleifen-und-versiegeln
+          check_opportunity betontreppe-neuer-belag-kosten treppen betontreppe-mit-neuem-belag
+          check_opportunity fliesenspiegel-erneuern-kosten kueche fliesenspiegel-erneuern
+
+          echo 'Verified 60 opportunity guides and exact price-item mappings'
 
       - name: Verify parent guides link into the long-tail cluster
         shell: bash
@@ -140,4 +161,25 @@ jobs:
           check_parent daemmung-kosten-pro-qm aufsparrendaemmung-kosten-pro-qm
           check_parent fassade-sanieren-kosten putzfassade-kosten-pro-qm
 
-          echo 'Verified parent-to-opportunity Ratgeber links for all 40 guides'
+          check_parent fliesenleger-kosten-pro-qm mosaik-fliesen-verlegen-kosten-pro-qm
+          check_parent fliesenleger-kosten-pro-qm naturstein-verlegen-kosten-pro-qm
+          check_parent elektrik-erneuern-altbau lichtschalter-austauschen-kosten
+          check_parent dach-sanieren-kosten-pro-qm geruest-kosten-pro-qm
+          check_parent bodenleger-kosten-pro-qm boden-sanieren-kosten-pro-qm
+          check_parent bad-komplett-sanieren-kosten bad-entkernen-kosten
+          check_parent photovoltaik-kosten-2026 photovoltaik-15-kwp-kosten
+          check_parent fenster-austauschen-kosten-haus fenster-2-fach-verglasung-kosten
+          check_parent heizung-erneuern-kosten thermostat-installieren-kosten
+          check_parent fassade-sanieren-kosten fassadenrisse-sanieren-kosten-pro-qm
+          check_parent fassade-sanieren-kosten vorgehaengte-hinterlueftete-fassade-kosten-pro-qm
+          check_parent garten-anlegen-kosten heckenschnitt-kosten-pro-meter
+          check_parent 6-innentueren-austauschen-kosten innentuer-einbauen-kosten
+          check_parent 6-innentueren-austauschen-kosten tuer-lackieren-kosten
+          check_parent estrich-100-qm-kosten anhydritestrich-kosten-pro-qm
+          check_parent estrich-100-qm-kosten gussasphaltestrich-kosten-pro-qm
+          check_parent estrich-100-qm-kosten sichtestrich-kosten-pro-qm
+          check_parent 14-treppenstufen-renovieren-kosten holztreppe-schleifen-kosten
+          check_parent 14-treppenstufen-renovieren-kosten betontreppe-neuer-belag-kosten
+          check_parent kueche-10-qm-renovieren-kosten fliesenspiegel-erneuern-kosten
+
+          echo 'Verified parent-to-opportunity Ratgeber links for all 60 guides'
