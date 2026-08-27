@@ -67,7 +67,10 @@ jobs:
           set -euo pipefail
 
           curl -sS --fail 'https://baukostenradar.de/kosten/maler/leistung/fassade-streichen-inkl-vorarbeiten' -o /tmp/maler-fassade.html
-          grep -q '/ratgeber/fassade-sanieren-kosten' /tmp/maler-fassade.html
+          grep -q '/ratgeber/fassade-streichen-kosten-pro-qm' /tmp/maler-fassade.html
+
+          curl -sS --fail 'https://baukostenradar.de/kosten/maurer/leistung/klinker-verblendmauerwerk' -o /tmp/maurer-klinker.html
+          grep -q '/ratgeber/klinkerfassade-kosten-pro-qm' /tmp/maurer-klinker.html
 
           curl -sS --fail 'https://baukostenradar.de/kosten/fliesenleger/leistung/verbundabdichtung-bad' -o /tmp/fliesen-bad.html
           grep -q '/ratgeber/bad-komplett-sanieren-kosten' /tmp/fliesen-bad.html
