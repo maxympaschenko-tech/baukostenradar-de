@@ -18,6 +18,136 @@ function priceRange(low: number, high: number) {
   return low === high ? euro(low) : `${euro(low)} - ${euro(high)}`;
 }
 
+const defaultCostFactors = [
+  "Umfang und Menge der beauftragten Arbeiten",
+  "Materialqualität und gewünschte Ausführung",
+  "Objektzustand, Zugänglichkeit und notwendige Vorarbeiten",
+  "Region, Auslastung des Betriebs und Anfahrtsaufwand",
+];
+
+const costFactorsByService: Record<string, string[]> = {
+  badsanierung: [
+    "Badgröße und Umfang von Demontage und Neuaufbau",
+    "Sanitärobjekte, Armaturen und Fliesenqualität",
+    "Änderungen an Wasser-, Abwasser- und Elektroanschlüssen",
+    "Abdichtung, Untergrund und notwendige Vorarbeiten",
+  ],
+  maler: [
+    "Zu bearbeitende Wand- und Deckenfläche",
+    "Untergrundzustand und notwendiges Spachteln oder Grundieren",
+    "Farb-, Tapeten- und Qualitätsanforderungen",
+    "Raumhöhe, Abdeckarbeiten und Zugänglichkeit",
+  ],
+  fliesenleger: [
+    "Fliesenformat und Verlegemuster",
+    "Untergrund, Abdichtung und Ausgleichsarbeiten",
+    "Materialart von Standardfliese bis Naturstein",
+    "Schnittaufwand, Nischen und Detailanschlüsse",
+  ],
+  elektriker: [
+    "Anzahl von Stromkreisen, Steckdosen und Anschlüssen",
+    "Bestandszustand von Leitungen und Verteilung",
+    "Unterputz-, Aufputz- oder kompletter Neuinstallationsaufwand",
+    "Zusätzliche Technik wie Netzwerk, Smart Home oder Wallbox",
+  ],
+  dachsanierung: [
+    "Dachfläche, Dachform und Zugänglichkeit",
+    "Neueindeckung, Dämmstandard und Zustand des Dachstuhls",
+    "Gerüst, Entsorgung und notwendige Nebenarbeiten",
+    "Materialwahl bei Ziegeln, Dachsteinen und Anschlüssen",
+  ],
+  bodenleger: [
+    "Bodenfläche und gewählter Belag",
+    "Untergrundvorbereitung und Ausgleich",
+    "Rückbau und Entsorgung vorhandener Beläge",
+    "Verlegeart, Sockelleisten und Detailanschlüsse",
+  ],
+  trockenbau: [
+    "Wand- oder Deckenfläche und Konstruktionsart",
+    "Ein- oder mehrlagige Beplankung",
+    "Schall-, Brand- und Wärmeschutzanforderungen",
+    "Oberflächenqualität von Q2 bis Q4",
+  ],
+  sanitaer: [
+    "Anzahl und Lage der Wasser- und Abwasseranschlüsse",
+    "Sanitärobjekte und Armaturenqualität",
+    "Zustand vorhandener Leitungen",
+    "Demontage, Stemmarbeiten und Wiederherstellung von Oberflächen",
+  ],
+  heizung: [
+    "Heizungssystem und Leistung der Anlage",
+    "Zustand der vorhandenen Wärmeverteilung",
+    "Umbauten an Leitungen, Heizkörpern oder Flächenheizung",
+    "Hydraulischer Abgleich, Regelung und Zusatzarbeiten",
+  ],
+  fenster: [
+    "Fenstergröße, Material und Verglasung",
+    "Anzahl der Fenster und Montageaufwand",
+    "Ausbau und Entsorgung alter Elemente",
+    "Rollläden, Fensterbänke und Anschlussarbeiten",
+  ],
+  daemmung: [
+    "Zu dämmende Fläche und Bauteil",
+    "Dämmstoff und gewünschter energetischer Standard",
+    "Untergrund und notwendige Vorarbeiten",
+    "Gerüst, Anschlüsse und Fassadendetails",
+  ],
+  waermepumpe: [
+    "Gebäudegröße und erforderliche Heizleistung",
+    "Wärmepumpentyp und Erschließungsaufwand",
+    "Eignung der vorhandenen Heizflächen",
+    "Elektroarbeiten, Speicher und hydraulische Einbindung",
+  ],
+  photovoltaik: [
+    "Anlagengröße in kWp und Modulanzahl",
+    "Dachform, Ausrichtung und Montageaufwand",
+    "Wechselrichter, Speicher und elektrische Einbindung",
+    "Gerüst, Zählerschrank und zusätzliche Elektroarbeiten",
+  ],
+  fassade: [
+    "Fassadenfläche und Gebäudehöhe",
+    "Untergrundzustand, Risse und Putzschäden",
+    "Anstrich, Putz, Dämmung oder Bekleidungssystem",
+    "Gerüst und Detailanschlüsse an Fenstern und Dach",
+  ],
+  garten: [
+    "Fläche und Art der Außenanlage",
+    "Erdarbeiten, Unterbau und Entsorgung",
+    "Materialwahl für Pflaster, Zaun oder Bepflanzung",
+    "Zugänglichkeit für Maschinen und Transport",
+  ],
+  estrich: [
+    "Fläche, Estrichart und erforderliche Aufbauhöhe",
+    "Untergrund und Dämm- oder Trennschichten",
+    "Trocknungs- und Terminanforderungen",
+    "Sonderlösungen wie Sichtestrich oder Fußbodenheizung",
+  ],
+  maurer: [
+    "Mauerfläche, Wandstärke und Steinart",
+    "Öffnungen, Anschlüsse und statische Anforderungen",
+    "Rückbau und Vorbereitung des Bestands",
+    "Putz- und Folgearbeiten an der neuen Wand",
+  ],
+  tueren: [
+    "Türtyp, Material und gewünschte Ausstattung",
+    "Zarge, Beschläge und Schallschutzanforderungen",
+    "Ausbau und Entsorgung vorhandener Türen",
+    "Anpassungen an Wandöffnung und Bodenanschluss",
+  ],
+  treppen: [
+    "Anzahl der Stufen und Treppenform",
+    "Aufarbeitung, Verkleidung oder kompletter Austausch",
+    "Material und Oberflächenqualität",
+    "Geländer, Wangen und notwendige Reparaturen",
+  ],
+  kueche: [
+    "Umfang von Rückbau und Oberflächenarbeiten",
+    "Elektro-, Wasser- und Abluftanpassungen",
+    "Boden, Wände und Beleuchtung",
+    "Qualität der Materialien und Detailausführung",
+  ],
+};
+
 export function generateStaticParams() {
   return services.map((service) => ({ slug: service.slug }));
 }
@@ -26,10 +156,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const service = getService(slug);
   if (!service) return {};
+  const leadPrice = service.priceItems[0];
 
   return {
     title: service.title,
-    description: service.description,
+    description: `${service.shortTitle} Kosten 2026: ${leadPrice.name} ${priceRange(leadPrice.low, leadPrice.high)} ${leadPrice.unit}. Mit Preistabelle, Quellen, Stadtvergleich und Rechner.`,
     alternates: { canonical: `/kosten/${service.slug}` },
   };
 }
@@ -49,6 +180,7 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
   const serviceCalculatorLabel = service.slug === "badsanierung"
     ? "Badsanierungskosten berechnen"
     : "Handwerkerkosten berechnen";
+  const costFactors = costFactorsByService[service.slug] ?? defaultCostFactors;
   const technicalRenovationSlugs = new Set(["elektriker", "sanitaer", "heizung", "fenster", "dachsanierung", "daemmung", "fassade", "estrich", "maurer"]);
   const houseProjectSlugs = new Set(["fenster", "dachsanierung", "daemmung", "fassade", "heizung", "waermepumpe", "photovoltaik"]);
   const hasHourlyPrice = service.priceItems.some((item) => item.unit.toLowerCase().includes("stunde"));
@@ -245,6 +377,42 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
             <span><strong>{service.priceItems.length}</strong> Preispositionen</span>
             <span><strong>{sourceKeys.length}</strong> geprüfte Quellen</span>
             <span><strong>Deutschland</strong> bundesweite Richtwerte</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="section sectionTight">
+        <div className="shell twoColumn">
+          <div>
+            <span className="eyebrow">Kosten auf einen Blick</span>
+            <h2>Was bestimmt die {service.shortTitle}-Kosten?</h2>
+            <p>
+              Als schneller Einstieg liegt „{leadPrice.name}“ in unserer aktuellen Datenbasis bei
+              <strong> {priceRange(leadPrice.low, leadPrice.high)}</strong> {leadPrice.unit}. Für das reale Projekt
+              zählt aber nicht nur dieser Einzelwert, sondern der gesamte Leistungsumfang.
+            </p>
+            <p>
+              Die folgenden Faktoren erklären, warum Angebote selbst innerhalb derselben Region deutlich
+              voneinander abweichen können.
+            </p>
+            <div className="heroActions">
+              <Link className="primaryButton" href={serviceCalculatorUrl}>{serviceCalculatorLabel}</Link>
+              <Link className="ghostButton" href={`/kosten/${service.slug}/leistung/${priceItemSlug(leadPrice.name)}`}>
+                Beispielpreis im Detail
+              </Link>
+            </div>
+          </div>
+
+          <div className="contentCard proseCard">
+            <span className="eyebrow">Wichtige Kostentreiber</span>
+            <div className="stepsList">
+              {costFactors.map((factor, index) => (
+                <div key={factor}>
+                  <strong>{index + 1}</strong>
+                  <span>{factor}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
