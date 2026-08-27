@@ -18,7 +18,7 @@ jobs:
           curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
           count=$(grep -oE 'https://baukostenradar\.de/kosten/[^<]+/leistung/[^<]+' /tmp/sitemap.xml | sort -u | wc -l | tr -d ' ')
           echo "Long-tail price URLs: $count"
-          test "$count" = "101"
+          test "$count" = "116"
 
       - name: Verify contextual guide mapping for every trade
         shell: bash
