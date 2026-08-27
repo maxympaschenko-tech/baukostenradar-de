@@ -58,7 +58,7 @@ jobs:
             daemmung fenster heizung fassade garten
             tueren estrich maurer treppen kueche
           )
-          cities=(berlin hamburg muenchen koeln frankfurt-am-main stuttgart duesseldorf leipzig)
+          cities=(berlin hamburg muenchen koeln frankfurt stuttgart duesseldorf leipzig)
 
           declare -A guides=(
             [badsanierung]='/ratgeber/bad-komplett-sanieren-kosten'
@@ -108,7 +108,7 @@ jobs:
           curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
 
           services='badsanierung|maler|fliesenleger|elektriker|dachsanierung|bodenleger|trockenbau|sanitaer|waermepumpe|photovoltaik|daemmung|fenster|heizung|fassade|garten|tueren|estrich|maurer|treppen|kueche'
-          cities='berlin|hamburg|muenchen|koeln|frankfurt-am-main|stuttgart|duesseldorf|leipzig'
+          cities='berlin|hamburg|muenchen|koeln|frankfurt|stuttgart|duesseldorf|leipzig'
           count=$(grep -oE "https://baukostenradar.de/kosten/(${services})/(${cities})</loc>" /tmp/sitemap.xml | wc -l | tr -d ' ')
           test "$count" -eq 160
 
