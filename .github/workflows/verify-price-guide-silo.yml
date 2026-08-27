@@ -17,6 +17,10 @@ jobs:
           set -euo pipefail
           curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
 
+          grep -oE 'https://baukostenradar\.de/kosten/[^<]+/leistung/[^<]+' /tmp/sitemap.xml \
+            | sed 's#https://baukostenradar.de##' \
+            | sort -u > /tmp/sitemap-detail-paths.txt
+
           mapfile -t services < <(
             grep -oE 'https://baukostenradar\.de/kosten/[^<]+' /tmp/sitemap.xml \
               | sed 's#https://baukostenradar.de/kosten/##' \
@@ -25,7 +29,7 @@ jobs:
           )
 
           test "${#services[@]}" -gt 0
-          checked=0
+          : > /tmp/hub-detail-paths.txt
 
           for service in "${services[@]}"; do
             curl -sS --fail "https://baukostenradar.de/kosten/${service}" -o "/tmp/service-${service}.html"
@@ -38,18 +42,30 @@ jobs:
               exit 1
             fi
 
-            for path in "${detail_paths[@]}"; do
-              grep -q "https://baukostenradar.de${path}" /tmp/sitemap.xml || {
-                echo "Missing from sitemap: ${path}" >&2
-                exit 1
-              }
-              checked=$((checked + 1))
-            done
+            printf '%s\n' "${detail_paths[@]}" >> /tmp/hub-detail-paths.txt
           done
 
-          indexed_count=$(grep -oE 'https://baukostenradar\.de/kosten/[^<]+/leistung/[^<]+' /tmp/sitemap.xml | sort -u | wc -l | tr -d ' ')
-          echo "Long-tail price URLs in sitemap: ${indexed_count}; live detail links checked: ${checked}"
-          test "$indexed_count" -eq "$checked"
+          sort -u /tmp/hub-detail-paths.txt -o /tmp/hub-detail-paths.txt
+
+          indexed_count=$(wc -l < /tmp/sitemap-detail-paths.txt | tr -d ' ')
+          linked_count=$(wc -l < /tmp/hub-detail-paths.txt | tr -d ' ')
+          echo "Long-tail price URLs in sitemap: ${indexed_count}; linked from service hubs: ${linked_count}"
+
+          missing=$(comm -23 /tmp/sitemap-detail-paths.txt /tmp/hub-detail-paths.txt || true)
+          extra=$(comm -13 /tmp/sitemap-detail-paths.txt /tmp/hub-detail-paths.txt || true)
+
+          if [ -n "$missing" ]; then
+            echo "Price detail URLs present in sitemap but missing from service hubs:" >&2
+            printf '%s\n' "$missing" >&2
+          fi
+
+          if [ -n "$extra" ]; then
+            echo "Price detail URLs linked from service hubs but missing from sitemap:" >&2
+            printf '%s\n' "$extra" >&2
+          fi
+
+          test -z "$missing"
+          test -z "$extra"
 
       - name: Verify contextual guide mapping for every trade
         shell: bash
