@@ -203,5 +203,9 @@ export function getGuideSiloServices(slug: string) {
 }
 
 export function getGuideRegions() {
-  return regions.filter((region) => region.value !== "de").slice(0, 4);
+  return regions.filter((region) => region.value !== "de");
+}
+
+export function getGuideRegionalServices(slug: string, limit = 3) {
+  return getGuideSiloServices(slug).slice(0, Math.max(1, limit));
 }
