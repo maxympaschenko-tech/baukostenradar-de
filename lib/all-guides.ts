@@ -48,6 +48,7 @@ const secondaryClusterLinks: Record<string, Array<{ label: string; href: string 
     { label: "Fenster austauschen Kosten", href: "/ratgeber/fenster-austauschen-kosten-haus" },
     { label: "Heizung erneuern Kosten", href: "/ratgeber/heizung-erneuern-kosten" },
     { label: "Haustür einbauen Kosten", href: "/ratgeber/haustuer-einbauen-kosten" },
+    { label: "Kellerabdichtung außen oder innen", href: "/ratgeber/kellerabdichtung-aussen-oder-innen-kosten" },
   ],
   "renovierungskosten-haus": [
     { label: "Renovierungskosten 100 m²", href: "/ratgeber/renovierungskosten-100-qm" },
@@ -78,6 +79,7 @@ const tertiaryClusterLinks: Record<string, Array<{ label: string; href: string }
     { label: "Heizung erneuern Kosten", href: "/ratgeber/heizung-erneuern-kosten" },
     { label: "Innenwand mauern Kosten", href: "/ratgeber/innenwand-mauern-kosten" },
     { label: "Estrich 100 m² Kosten", href: "/ratgeber/estrich-100-qm-kosten" },
+    { label: "Kellerabdichtung außen oder innen", href: "/ratgeber/kellerabdichtung-aussen-oder-innen-kosten" },
   ],
   "sanierungskosten-einfamilienhaus": [
     { label: "Dach sanieren Kosten pro m²", href: "/ratgeber/dach-sanieren-kosten-pro-qm" },
@@ -99,6 +101,8 @@ const tradeClusterLinks: Record<string, Array<{ label: string; href: string }>> 
     { label: "Gerüst Kosten pro m²", href: "/ratgeber/geruest-kosten-pro-qm" },
     { label: "Dachsanierung mit Aufsparrendämmung", href: "/ratgeber/dachsanierung-aufsparrendaemmung-kosten-pro-qm" },
     { label: "Dachfenster nachträglich einbauen", href: "/ratgeber/dachfenster-nachtraeglich-einbauen-kosten" },
+    { label: "Dachfenster austauschen Kosten", href: "/ratgeber/dachfenster-austauschen-kosten" },
+    { label: "Dachfenster austauschen oder neu einbauen", href: "/ratgeber/dachfenster-austauschen-oder-neu-einbauen-kosten" },
     { label: "Untersparrendämmung Kosten", href: "/ratgeber/untersparrendaemmung-kosten-pro-qm" },
   ],
   "fenster-austauschen-kosten-haus": [
@@ -172,6 +176,9 @@ const specialistClusterLinks: Record<string, Array<{ label: string; href: string
     { label: "Zwischensparrendämmung Kosten pro m²", href: "/ratgeber/zwischensparrendaemmung-kosten-pro-qm" },
     { label: "Aufsparrendämmung Kosten pro m²", href: "/ratgeber/aufsparrendaemmung-kosten-pro-qm" },
     { label: "Untersparrendämmung Kosten pro m²", href: "/ratgeber/untersparrendaemmung-kosten-pro-qm" },
+    { label: "Warmdach Dämmung Kosten", href: "/ratgeber/flachdach-warmdaemmung-kosten-pro-qm" },
+    { label: "Kaltdach Dämmung Kosten", href: "/ratgeber/flachdach-kaltdaemmung-kosten-pro-qm" },
+    { label: "Warmdach oder Kaltdach vergleichen", href: "/ratgeber/flachdach-warmdach-oder-kaltdach-kosten" },
     { label: "Aufsparren oder Zwischensparren vergleichen", href: "/ratgeber/daemmung-aufsparren-oder-zwischensparren-kosten" },
     { label: "Kellerdecke dämmen Kosten", href: "/ratgeber/daemmung-kellerdecke-kosten-pro-qm" },
     { label: "Perimeterdämmung Kosten", href: "/ratgeber/perimeterdaemmung-kosten-pro-qm" },
