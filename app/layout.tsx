@@ -7,6 +7,7 @@ import "./premium-footer.css";
 import "./premium-internal.css";
 import "./premium-mobile.css";
 import "./mobile-overflow-fix.css";
+import "./city-pages.css";
 import { ConsentManager } from "@/components/consent-manager";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
