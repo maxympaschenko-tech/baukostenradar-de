@@ -1,0 +1,78 @@
+name: Verify guide regional silo
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-guide-regional-silo:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Discover all indexed guides
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          grep -oE 'https://baukostenradar.de/ratgeber/[a-z0-9-]+</loc>' /tmp/sitemap.xml \
+            | sed 's#</loc>##' \
+            | sort -u > /tmp/guides.txt
+
+          guide_count=$(wc -l < /tmp/guides.txt | tr -d ' ')
+          test "$guide_count" -ge 20
+          echo "Found ${guide_count} indexed guides"
+
+      - name: Verify city hubs and local trade links on every guide
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cities=(berlin hamburg muenchen koeln frankfurt stuttgart duesseldorf leipzig)
+          checked=0
+
+          while IFS= read -r url; do
+            test -n "$url"
+            slug="${url##*/}"
+            output="/tmp/guide-${slug}.html"
+            curl -sS --fail "$url" -o "$output"
+
+            grep -q "$url" "$output"
+            ! grep -qi 'noindex' "$output"
+            grep -q '"@type":"Article"' "$output"
+            grep -q '"@type":"ItemList"' "$output"
+            grep -q '"numberOfItems":8' "$output"
+            grep -q 'Passende Kosten in allen 8 Städten vergleichen' "$output"
+            grep -q 'Lokale Gewerkseiten' "$output"
+
+            for city in "${cities[@]}"; do
+              grep -q "/staedte/${city}" "$output"
+              grep -Eq "/kosten/[a-z0-9-]+/${city}" "$output"
+            done
+
+            local_count=$(grep -oE '/kosten/[a-z0-9-]+/(berlin|hamburg|muenchen|koeln|frankfurt|stuttgart|duesseldorf|leipzig)' "$output" \
+              | sort -u \
+              | wc -l \
+              | tr -d ' ')
+            test "$local_count" -ge 8
+
+            checked=$((checked + 1))
+          done < /tmp/guides.txt
+
+          test "$checked" -ge 20
+          echo "Verified ${checked} guides"
+
+      - name: Verify regional destinations resolve
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for city in berlin hamburg muenchen koeln frankfurt stuttgart duesseldorf leipzig; do
+            curl -sS --fail "https://baukostenradar.de/staedte/${city}" -o /dev/null
+          done
+
+          for service in badsanierung elektriker dachsanierung fenster heizung bodenleger; do
+            curl -sS --fail "https://baukostenradar.de/kosten/${service}/berlin" -o /dev/null
+          done
