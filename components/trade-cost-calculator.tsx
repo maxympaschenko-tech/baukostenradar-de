@@ -13,12 +13,30 @@ function euro(value: number) {
   }).format(value);
 }
 
-export function TradeCostCalculator() {
-  const [serviceSlug, setServiceSlug] = useState(services[0]?.slug ?? "maler");
+type TradeCostCalculatorProps = {
+  initialServiceSlug?: string;
+  initialItemSlug?: string;
+  initialRegionValue?: string;
+};
+
+export function TradeCostCalculator({
+  initialServiceSlug,
+  initialItemSlug,
+  initialRegionValue,
+}: TradeCostCalculatorProps = {}) {
+  const initialService = services.find((item) => item.slug === initialServiceSlug) ?? services[0];
+  const initialItemIndex = initialService
+    ? initialService.priceItems.findIndex((item) => priceItemSlug(item.name) === initialItemSlug)
+    : -1;
+  const initialRegion = regions.find(
+    (item) => item.value === initialRegionValue || item.slug === initialRegionValue,
+  ) ?? regions[0];
+
+  const [serviceSlug, setServiceSlug] = useState(initialService?.slug ?? "maler");
   const service = services.find((item) => item.slug === serviceSlug) ?? services[0];
-  const [itemIndex, setItemIndex] = useState(0);
+  const [itemIndex, setItemIndex] = useState(initialItemIndex >= 0 ? initialItemIndex : 0);
   const [quantity, setQuantity] = useState(1);
-  const [regionValue, setRegionValue] = useState("de");
+  const [regionValue, setRegionValue] = useState(initialRegion?.value ?? "de");
 
   const selectedItem = service.priceItems[Math.min(itemIndex, service.priceItems.length - 1)] ?? service.priceItems[0];
   const selectedRegion = regions.find((item) => item.value === regionValue) ?? regions[0];
@@ -97,6 +115,12 @@ export function TradeCostCalculator() {
           </select>
         </label>
       </div>
+
+      {(initialServiceSlug || initialItemSlug || initialRegionValue) ? (
+        <p className="tableNote">
+          Vorauswahl aus der vorherigen Kostenseite übernommen. Alle Felder können jederzeit geändert werden.
+        </p>
+      ) : null}
 
       <div className="resultBox">
         <span>Geschätzte Kosten</span>
