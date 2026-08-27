@@ -166,6 +166,7 @@ jobs:
           curl -sS --fail 'https://baukostenradar.de/kosten/maler/leistung/waende-streichen' -o /tmp/item.html
           curl -sS --fail 'https://baukostenradar.de/staedte/berlin' -o /tmp/city.html
           curl -sS --fail 'https://baukostenradar.de/kosten/maler/berlin' -o /tmp/local.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/guides.html
           curl -sS --fail 'https://baukostenradar.de/ratgeber/sanierungskosten-pro-qm' -o /tmp/guide.html
 
           grep -q 'https://baukostenradar.de/kosten' /tmp/costs.html
@@ -173,9 +174,10 @@ jobs:
           grep -q 'https://baukostenradar.de/kosten/maler/leistung/waende-streichen' /tmp/item.html
           grep -q 'https://baukostenradar.de/staedte/berlin' /tmp/city.html
           grep -q 'https://baukostenradar.de/kosten/maler/berlin' /tmp/local.html
+          grep -q 'https://baukostenradar.de/ratgeber' /tmp/guides.html
           grep -q 'https://baukostenradar.de/ratgeber/sanierungskosten-pro-qm' /tmp/guide.html
 
-          for page in /tmp/costs.html /tmp/service.html /tmp/item.html /tmp/city.html /tmp/local.html /tmp/guide.html; do
+          for page in /tmp/costs.html /tmp/service.html /tmp/item.html /tmp/city.html /tmp/local.html /tmp/guides.html /tmp/guide.html; do
             if grep -qi 'noindex' "$page"; then
               echo "Unexpected noindex in $page" >&2
               exit 1
@@ -189,6 +191,13 @@ jobs:
           grep -q 'Beispielrechnungen' /tmp/item.html
           grep -q 'BreadcrumbList' /tmp/city.html
           grep -q 'BreadcrumbList' /tmp/local.html
+          grep -q 'CollectionPage' /tmp/guides.html
+          grep -q 'ItemList' /tmp/guides.html
+          grep -q 'Article' /tmp/guide.html
+          grep -q 'FAQPage' /tmp/guide.html
+          grep -q 'Passende Gewerke und konkrete Preispositionen' /tmp/guide.html
+          grep -q '/kosten/badsanierung/leistung/' /tmp/guide.html
+          grep -q '/staedte/berlin' /tmp/guide.html
 
           for path in \
             '/kosten' \
@@ -196,6 +205,7 @@ jobs:
             '/kosten/maler/leistung/waende-streichen' \
             '/staedte/berlin' \
             '/kosten/maler/berlin' \
+            '/ratgeber' \
             '/ratgeber/sanierungskosten-pro-qm'; do
             grep -q "$path" /tmp/sitemap.xml
           done
