@@ -6,6 +6,7 @@ import { specialistGuides } from "@/lib/guides-specialists";
 import { opportunityGuides } from "@/lib/guides-opportunities";
 import { secondaryOpportunityGuides } from "@/lib/guides-opportunities-secondary";
 import { tertiaryOpportunityGuides } from "@/lib/guides-opportunities-tertiary";
+import { quaternaryOpportunityGuides } from "@/lib/guides-opportunities-quaternary";
 import { scenarioGuides } from "@/lib/guides-scenarios";
 import { catalogScenarioGuides } from "@/lib/guides-catalog-scenarios";
 
@@ -91,25 +92,30 @@ const tradeClusterLinks: Record<string, Array<{ label: string; href: string }>> 
     { label: "Dach 150 m² Kosten", href: "/ratgeber/dach-150-qm-kosten" },
     { label: "Dachrinne erneuern Kosten", href: "/ratgeber/dachrinne-erneuern-kosten" },
     { label: "Dach neu eindecken Kosten", href: "/ratgeber/dach-neu-eindecken-kosten-pro-qm" },
+    { label: "Gerüst Kosten pro m²", href: "/ratgeber/geruest-kosten-pro-qm" },
   ],
   "fenster-austauschen-kosten-haus": [
     { label: "20 Fenster austauschen Kosten", href: "/ratgeber/20-fenster-austauschen-kosten" },
     { label: "Fenstereinbau Kosten", href: "/ratgeber/fenstereinbau-kosten" },
     { label: "Fenster 3-fach Verglasung Kosten", href: "/ratgeber/fenster-3-fach-verglasung-kosten" },
+    { label: "Fenster 2-fach Verglasung Kosten", href: "/ratgeber/fenster-2-fach-verglasung-kosten" },
   ],
   "elektrik-erneuern-altbau": [
     { label: "Elektrik bei 100 m² erneuern", href: "/ratgeber/elektrik-erneuern-100-qm-kosten" },
     { label: "Sicherungskasten erneuern Kosten", href: "/ratgeber/sicherungskasten-erneuern-kosten" },
     { label: "Steckdose installieren Kosten", href: "/ratgeber/steckdose-installieren-kosten" },
+    { label: "Lichtschalter austauschen Kosten", href: "/ratgeber/lichtschalter-austauschen-kosten" },
   ],
   "heizung-erneuern-kosten": [
     { label: "Fußbodenheizung 100 m² Kosten", href: "/ratgeber/fussbodenheizung-100-qm-kosten" },
     { label: "Heizkörper montieren Kosten", href: "/ratgeber/heizkoerper-montieren-kosten" },
     { label: "Gasheizung austauschen Kosten", href: "/ratgeber/gasheizung-austauschen-kosten" },
     { label: "Heizungswartung Kosten", href: "/ratgeber/heizungswartung-kosten" },
+    { label: "Thermostat installieren Kosten", href: "/ratgeber/thermostat-installieren-kosten" },
   ],
   "bad-komplett-sanieren-kosten": [
     { label: "Bad 10 m² sanieren Kosten", href: "/ratgeber/bad-10-qm-sanieren-kosten" },
+    { label: "Bad entkernen Kosten", href: "/ratgeber/bad-entkernen-kosten" },
   ],
 };
 
@@ -122,6 +128,8 @@ const specialistClusterLinks: Record<string, Array<{ label: string; href: string
   "fliesenleger-kosten-pro-qm": [
     { label: "Fliesen verlegen Kosten pro m²", href: "/ratgeber/fliesen-verlegen-kosten-pro-qm" },
     { label: "Großformat-Fliesen verlegen Kosten", href: "/ratgeber/grossformat-fliesen-verlegen-kosten" },
+    { label: "Mosaikfliesen verlegen Kosten", href: "/ratgeber/mosaik-fliesen-verlegen-kosten-pro-qm" },
+    { label: "Naturstein verlegen Kosten", href: "/ratgeber/naturstein-verlegen-kosten-pro-qm" },
   ],
   "garten-anlegen-kosten": [
     { label: "Einfahrt pflastern Kosten", href: "/ratgeber/einfahrt-pflastern-kosten" },
@@ -129,12 +137,14 @@ const specialistClusterLinks: Record<string, Array<{ label: string; href: string
     { label: "Baum fällen Kosten", href: "/ratgeber/baum-faellen-kosten" },
     { label: "Rollrasen Kosten pro m²", href: "/ratgeber/rollrasen-kosten-pro-qm" },
     { label: "Doppelstabmattenzaun Kosten", href: "/ratgeber/doppelstabmattenzaun-kosten-pro-meter" },
+    { label: "Heckenschnitt Kosten", href: "/ratgeber/heckenschnitt-kosten-pro-meter" },
   ],
   "bodenleger-kosten-pro-qm": [
     { label: "Parkett abschleifen Kosten", href: "/ratgeber/parkett-abschleifen-kosten" },
     { label: "Parkett verlegen Kosten pro m²", href: "/ratgeber/parkett-verlegen-kosten-pro-qm" },
     { label: "Laminat verlegen Kosten pro m²", href: "/ratgeber/laminat-verlegen-kosten-pro-qm" },
     { label: "Vinylboden verlegen Kosten pro m²", href: "/ratgeber/vinylboden-verlegen-kosten-pro-qm" },
+    { label: "Bodensanierung Kosten pro m²", href: "/ratgeber/boden-sanieren-kosten-pro-qm" },
   ],
   "trockenbau-kosten-pro-qm": [
     { label: "Trockenbauwand Kosten pro m²", href: "/ratgeber/trockenbauwand-kosten-pro-qm" },
@@ -154,9 +164,12 @@ const specialistClusterLinks: Record<string, Array<{ label: string; href: string
     { label: "Stromspeicher Kosten pro kWh", href: "/ratgeber/stromspeicher-kosten-pro-kwh" },
     { label: "Photovoltaik 10 kWp Kosten", href: "/ratgeber/photovoltaik-10-kwp-kosten" },
     { label: "Photovoltaik mit Speicher Kosten", href: "/ratgeber/photovoltaik-mit-speicher-kosten" },
+    { label: "Photovoltaik 15 kWp Kosten", href: "/ratgeber/photovoltaik-15-kwp-kosten" },
   ],
   "fassade-sanieren-kosten": [
     { label: "Putzfassade Kosten pro m²", href: "/ratgeber/putzfassade-kosten-pro-qm" },
+    { label: "Fassadenrisse sanieren Kosten", href: "/ratgeber/fassadenrisse-sanieren-kosten-pro-qm" },
+    { label: "Vorgehängte hinterlüftete Fassade Kosten", href: "/ratgeber/vorgehaengte-hinterlueftete-fassade-kosten-pro-qm" },
   ],
 };
 
@@ -164,12 +177,24 @@ const catalogScenarioClusterLinks: Record<string, Array<{ label: string; href: s
   "innenwand-mauern-kosten": [
     { label: "Bodenplatte Kosten pro m²", href: "/ratgeber/bodenplatte-kosten-pro-qm" },
   ],
+  "6-innentueren-austauschen-kosten": [
+    { label: "Innentür einbauen Kosten", href: "/ratgeber/innentuer-einbauen-kosten" },
+    { label: "Tür lackieren Kosten", href: "/ratgeber/tuer-lackieren-kosten" },
+  ],
   "estrich-100-qm-kosten": [
     { label: "Trockenestrich Kosten pro m²", href: "/ratgeber/trockenestrich-kosten-pro-qm" },
+    { label: "Anhydritestrich Kosten pro m²", href: "/ratgeber/anhydritestrich-kosten-pro-qm" },
+    { label: "Gussasphaltestrich Kosten pro m²", href: "/ratgeber/gussasphaltestrich-kosten-pro-qm" },
+    { label: "Sichtestrich Kosten pro m²", href: "/ratgeber/sichtestrich-kosten-pro-qm" },
+  ],
+  "14-treppenstufen-renovieren-kosten": [
+    { label: "Holztreppe schleifen Kosten", href: "/ratgeber/holztreppe-schleifen-kosten" },
+    { label: "Betontreppe neuer Belag Kosten", href: "/ratgeber/betontreppe-neuer-belag-kosten" },
   ],
   "kueche-10-qm-renovieren-kosten": [
     { label: "Küchenfronten erneuern Kosten", href: "/ratgeber/kuechenfronten-erneuern-kosten" },
     { label: "Küchenarbeitsplatte Kosten", href: "/ratgeber/kuechenarbeitsplatte-kosten" },
+    { label: "Fliesenspiegel erneuern Kosten", href: "/ratgeber/fliesenspiegel-erneuern-kosten" },
   ],
 };
 
@@ -202,6 +227,7 @@ export const allGuides = [
   ...opportunityGuides,
   ...secondaryOpportunityGuides,
   ...tertiaryOpportunityGuides,
+  ...quaternaryOpportunityGuides,
   ...scenarioGuides,
   ...enrichedCatalogScenarioGuides,
 ];
