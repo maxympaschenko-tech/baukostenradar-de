@@ -76,13 +76,13 @@ const guideGroups = [
   {
     eyebrow: "Abriss & Entsorgung",
     title: "Rückbau, Hausabriss und Entsorgung kalkulieren",
-    description: "Kosten für kompletten Hausabriss, Abbruch pro Kubikmeter, Innenabbruch, Bauschuttcontainer und tonnenbezogene Entsorgung mit sauberer Abgrenzung der Leistungen.",
+    description: "Kosten für kompletten Hausabriss, Abbruch pro Kubikmeter, Innenabbruch, Industriehallen-Abbruch und Bauschuttcontainer mit sauberer Abgrenzung der Leistungen.",
     slugs: [
       "haus-abreissen-kosten",
       "abbruch-kosten-pro-m3",
       "innenabbruch-einfamilienhaus-kosten",
+      "industriehalle-abbrechen-kosten-pro-qm",
       "bauschuttcontainer-30-m3-kosten",
-      "bauschutt-entsorgung-kosten-pro-tonne",
     ],
   },
   {
