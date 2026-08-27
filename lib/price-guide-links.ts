@@ -1,3 +1,5 @@
+import { quinaryItemGuideOverrides } from "@/lib/price-guide-links-quinary";
+
 export type PriceGuideLink = {
   href: string;
   title: string;
@@ -463,6 +465,8 @@ export function getPriceGuideLink(options: {
     return serviceGuideLinks.badsanierung;
   }
 
-  return itemGuideOverrides[`${serviceSlug}:${itemSlug}`]
+  const key = `${serviceSlug}:${itemSlug}`;
+  return quinaryItemGuideOverrides[key]
+    ?? itemGuideOverrides[key]
     ?? getServiceGuideLink(serviceSlug);
 }
