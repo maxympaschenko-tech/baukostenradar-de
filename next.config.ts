@@ -33,7 +33,17 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/kosten/estrich/leistung/calciumsulfat-anhydritestrich",
-        destination: "/kosten/estrich/leistung/fliessestrich",
+        destination: "/kosten/estrich/leistung/fliessestrich-verlegen",
+        permanent: true,
+      },
+      {
+        source: "/kosten/estrich/leistung/fliessestrich",
+        destination: "/kosten/estrich/leistung/fliessestrich-verlegen",
+        permanent: true,
+      },
+      {
+        source: "/kosten/estrich/leistung/trockenestrich",
+        destination: "/kosten/estrich/leistung/trockenestrich-verlegen",
         permanent: true,
       },
       {
