@@ -5,7 +5,7 @@ import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Ratgeber zu Sanierung, Renovierung & Handwerkerkosten 2026",
-  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Türen, Estrich, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
+  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
   alternates: { canonical: "/ratgeber" },
 };
 
@@ -48,14 +48,39 @@ const guideGroups = [
   },
   {
     eyebrow: "Innenausbau & Modernisierung",
-    title: "Türen, Estrich, Mauern, Treppen und Küche konkret kalkulieren",
-    description: "Weitere typische Renovierungsszenarien mit klarer Rechenbasis statt pauschaler Durchschnittswerte.",
+    title: "Türen, Mauern, Treppen und Küche konkret kalkulieren",
+    description: "Typische Innenausbau-Projekte mit aktuellen Stück- und Projektpreisen, klarer Rechenbasis und direktem Weg zum Kostenrechner.",
     slugs: [
       "6-innentueren-austauschen-kosten",
-      "estrich-100-qm-kosten",
+      "innentuer-einbauen-kosten",
+      "haustuer-einbauen-kosten",
       "innenwand-mauern-kosten",
       "14-treppenstufen-renovieren-kosten",
       "kueche-10-qm-renovieren-kosten",
+    ],
+  },
+  {
+    eyebrow: "Estrich & Bodenaufbau",
+    title: "Estricharten, Ausgleich und Reparatur vergleichen",
+    description: "Aktuelle 2026-Richtwerte für Zementestrich, Fließestrich, Trockenestrich und Schnellestrich sowie Bodenausgleich und Rissreparatur.",
+    slugs: [
+      "estrich-100-qm-kosten",
+      "zementestrich-kosten-pro-qm",
+      "fliessestrich-kosten-pro-qm",
+      "trockenestrich-kosten-pro-qm",
+      "schnellestrich-kosten-pro-qm",
+      "bodenausgleich-kosten-pro-qm",
+      "estrich-rissreparatur-kosten",
+    ],
+  },
+  {
+    eyebrow: "Abriss & Entsorgung",
+    title: "Rückbau, Hausabriss und Entsorgung kalkulieren",
+    description: "Kosten für kompletten Hausabriss, Innenabbruch und Bauschuttcontainer mit klarer Abgrenzung zwischen Rückbau- und Entsorgungsleistungen.",
+    slugs: [
+      "haus-abreissen-kosten",
+      "innenabbruch-einfamilienhaus-kosten",
+      "bauschuttcontainer-30-m3-kosten",
     ],
   },
   {
