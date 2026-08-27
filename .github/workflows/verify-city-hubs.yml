@@ -41,9 +41,41 @@ jobs:
             service_count=$(grep -oE "/kosten/[a-z0-9-]+/${city}" "$output" | sort -u | wc -l | tr -d ' ')
             echo "${city}: ${service_count} live Gewerke"
             test "$service_count" -ge 20
-            grep -q "\"numberOfItems\":${service_count}" "$output"
 
-            # Explicitly keep the newest catalog sections covered by the city hubs.
+            python3 - "$output" "$service_count" <<'PY'
+          import json
+          import re
+          import sys
+
+          html = open(sys.argv[1], encoding="utf-8").read()
+          expected = int(sys.argv[2])
+          scripts = re.findall(r'<script[^>]*type="application/ld\+json"[^>]*>(.*?)</script>', html, flags=re.S)
+          found = []
+          for script in scripts:
+              try:
+                  data = json.loads(script)
+              except json.JSONDecodeError:
+                  continue
+              stack = list(data) if isinstance(data, list) else [data]
+              while stack:
+                  value = stack.pop()
+                  if isinstance(value, dict):
+                      if value.get("@type") == "ItemList" and str(value.get("name", "")).startswith("Handwerkerpreise nach Gewerk"):
+                          found.append(value)
+                      stack.extend(value.values())
+                  elif isinstance(value, list):
+                      stack.extend(value)
+
+          if len(found) != 1:
+              raise SystemExit(f"Expected one trade ItemList, found {len(found)}")
+          item_list = found[0]
+          actual = item_list.get("numberOfItems")
+          elements = item_list.get("itemListElement", [])
+          if actual != expected or len(elements) != expected:
+              raise SystemExit(f"ItemList mismatch: numberOfItems={actual}, entries={len(elements)}, expected={expected}")
+          print(f"JSON-LD ItemList verified: {actual} Gewerke")
+          PY
+
             grep -q "/kosten/kellerabdichtung/${city}" "$output"
             grep -q "/kosten/abriss-entsorgung/${city}" "$output"
 

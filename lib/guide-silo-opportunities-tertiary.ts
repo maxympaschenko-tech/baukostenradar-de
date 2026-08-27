@@ -108,7 +108,7 @@ export const tertiaryOpportunitySilos: Record<string, OpportunitySiloConfig> = {
   "trockenestrich-kosten-pro-qm": {
     serviceSlugs: ["estrich", "bodenleger"],
     serviceSlug: "estrich",
-    itemSlug: "trockenestrich",
+    itemSlug: "trockenestrich-verlegen",
     calculatorLabel: "Trockenestrich berechnen",
   },
   "zwischensparrendaemmung-kosten-pro-qm": {
