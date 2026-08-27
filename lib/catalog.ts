@@ -19,6 +19,11 @@ export const priceSources = {
     url: "https://dienstleistungen24.de/malerarbeiten-kosten/",
     checkedAt: "August 2026",
   },
+  d24Abriss: {
+    name: "Dienstleistungen24 - Abrissunternehmen 2026",
+    url: "https://dienstleistungen24.de/abrissunternehmen/",
+    checkedAt: "August 2026",
+  },
   blauarbeitEstrich: {
     name: "Blauarbeit - Estrich Kosten 2026",
     url: "https://ratgeber.blauarbeit.de/kosten-preise/estrich-verlegen-kosten",
@@ -130,6 +135,21 @@ export const extraServices: Service[] = [
       { name: "Fliesenspiegel erneuern", low: 800, high: 2500, unit: "pro Küche", sourceKey: "handwerkerKueche" },
       { name: "Komplett neue Einbauküche", low: 5000, high: 25000, unit: "pro Küche", sourceKey: "handwerkerKueche" },
       { name: "Premium-Küche mit Umbau", low: 15000, high: 40000, unit: "pro Küche", note: "Quelle nennt 40.000 € und mehr als mögliche Obergrenze", sourceKey: "handwerkerKueche" },
+    ],
+  },
+  {
+    slug: "abriss-entsorgung",
+    title: "Abriss & Entsorgung Kosten 2026",
+    shortTitle: "Abriss & Entsorgung",
+    description: "Orientierungswerte für Hausabriss, Innenabbruch, Industrieabbruch und Bauschuttcontainer in Deutschland.",
+    unit: "Projekt / m² / m³",
+    icon: "▱",
+    priceItems: [
+      { name: "Einfamilienhaus komplett abreißen", low: 8500, high: 32000, unit: "pro Haus inkl. Entsorgung", sourceKey: "d24Abriss" },
+      { name: "Abbruch nach umbautem Raum", low: 15, high: 45, unit: "pro m³ umbauter Raum", sourceKey: "d24Abriss" },
+      { name: "Innenabbruch Einfamilienhaus", low: 8000, high: 28000, unit: "pro Haus", sourceKey: "d24Abriss" },
+      { name: "Industriehalle abbrechen", low: 25, high: 85, unit: "pro m² inkl. Entsorgung", sourceKey: "d24Abriss" },
+      { name: "Bauschuttcontainer 30 m³", low: 650, high: 1450, unit: "pauschal inkl. Entsorgung", sourceKey: "d24Abriss" },
     ],
   },
 ];

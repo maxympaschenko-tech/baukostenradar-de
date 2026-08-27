@@ -20,8 +20,8 @@ jobs:
           services=(
             badsanierung maler fliesenleger elektriker dachsanierung
             bodenleger trockenbau sanitaer waermepumpe photovoltaik
-            daemmung fenster heizung fassade garten
-            tueren estrich maurer treppen kueche
+            daemmung kellerabdichtung fenster heizung fassade garten
+            tueren estrich maurer treppen kueche abriss-entsorgung
           )
           guides=(
             /ratgeber/bad-komplett-sanieren-kosten
@@ -41,7 +41,7 @@ jobs:
             grep -q "https://baukostenradar.de/staedte/${city}" "$output"
             ! grep -qi 'noindex' "$output"
             grep -q 'ItemList' "$output"
-            grep -q '"numberOfItems":20' "$output"
+            grep -q '"numberOfItems":22' "$output"
             grep -q 'Preispositionen' "$output"
             grep -q "region=${city}" "$output"
 
