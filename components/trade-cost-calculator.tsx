@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
+import { priceItemSlug } from "@/lib/price-slug";
 import { regions, services } from "@/lib/pricing";
 
 function euro(value: number) {
@@ -19,10 +21,11 @@ export function TradeCostCalculator() {
   const [regionValue, setRegionValue] = useState("de");
 
   const selectedItem = service.priceItems[Math.min(itemIndex, service.priceItems.length - 1)] ?? service.priceItems[0];
+  const selectedRegion = regions.find((item) => item.value === regionValue) ?? regions[0];
 
   const result = useMemo(() => {
     const safeQuantity = Math.min(10000, Math.max(0.1, Number.isFinite(quantity) ? quantity : 1));
-    const factor = regions.find((item) => item.value === regionValue)?.factor ?? 1;
+    const factor = selectedRegion.factor;
 
     return {
       low: selectedItem.low * safeQuantity * factor,
@@ -30,13 +33,18 @@ export function TradeCostCalculator() {
       quantity: safeQuantity,
       factor,
     };
-  }, [quantity, regionValue, selectedItem]);
+  }, [quantity, selectedItem, selectedRegion]);
 
   function handleServiceChange(value: string) {
     setServiceSlug(value);
     setItemIndex(0);
     setQuantity(1);
   }
+
+  const itemHref = `/kosten/${service.slug}/leistung/${priceItemSlug(selectedItem.name)}`;
+  const regionHref = selectedRegion.value === "de"
+    ? `/kosten/${service.slug}`
+    : `/kosten/${service.slug}/${selectedRegion.slug}`;
 
   return (
     <div className="calculator">
@@ -104,6 +112,14 @@ export function TradeCostCalculator() {
         <div><span>Unterer Richtwert</span><strong>{euro(result.low)}</strong></div>
         <div><span>Oberer Richtwert</span><strong>{euro(result.high)}</strong></div>
         <div><span>Ausgewählte Leistung</span><strong>{selectedItem.name}</strong></div>
+      </div>
+
+      <div className="heroActions">
+        <Link className="primaryButton" href={itemHref}>Einzelpreis im Detail</Link>
+        <Link className="ghostButton" href={regionHref}>
+          {selectedRegion.value === "de" ? `${service.shortTitle}-Preise` : `${service.shortTitle} in ${selectedRegion.label}`}
+        </Link>
+        <Link className="ghostButton" href={`/kosten/${service.slug}`}>Alle Leistungen des Gewerks</Link>
       </div>
     </div>
   );
