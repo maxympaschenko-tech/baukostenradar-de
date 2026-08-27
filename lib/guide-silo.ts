@@ -1,3 +1,4 @@
+import { handwerkerCalculatorHref } from "@/lib/calculator-links";
 import { regions, services } from "@/lib/pricing";
 
 export type GuideSilo = {
@@ -9,12 +10,49 @@ export type GuideSilo = {
 
 const renovationServices = ["badsanierung", "elektriker", "dachsanierung", "fenster", "heizung", "bodenleger"];
 
+const scenarioCalculatorLinks: Record<string, Pick<GuideSilo, "calculatorHref" | "calculatorLabel">> = {
+  "dach-150-qm-kosten": {
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "dachsanierung",
+      itemSlug: "neueindeckung-inkl-lattung",
+      quantity: 150,
+    }),
+    calculatorLabel: "150 m² Dach berechnen",
+  },
+  "20-fenster-austauschen-kosten": {
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "fenster",
+      itemSlug: "fenster-mit-2-fach-verglasung",
+      quantity: 20,
+    }),
+    calculatorLabel: "20 Fenster berechnen",
+  },
+  "bad-10-qm-sanieren-kosten": {
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "badsanierung",
+      itemSlug: "bad-neubau-sanierung",
+      quantity: 10,
+    }),
+    calculatorLabel: "10 m² Bad berechnen",
+  },
+  "fussbodenheizung-100-qm-kosten": {
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "heizung",
+      itemSlug: "fussbodenheizung-nachruesten",
+      quantity: 100,
+    }),
+    calculatorLabel: "100 m² Fußbodenheizung berechnen",
+  },
+};
+
 export function getGuideSilo(slug: string): GuideSilo {
+  const scenarioCalculator = scenarioCalculatorLinks[slug];
+
   if (slug.includes("dach")) {
     return {
       serviceSlugs: ["dachsanierung", "daemmung"],
-      calculatorHref: "/rechner/handwerkerkosten",
-      calculatorLabel: "Dachkosten berechnen",
+      calculatorHref: scenarioCalculator?.calculatorHref ?? "/rechner/handwerkerkosten",
+      calculatorLabel: scenarioCalculator?.calculatorLabel ?? "Dachkosten berechnen",
       regionalMode: "service",
     };
   }
@@ -22,8 +60,8 @@ export function getGuideSilo(slug: string): GuideSilo {
   if (slug.includes("fenster")) {
     return {
       serviceSlugs: ["fenster", "daemmung", "fassade"],
-      calculatorHref: "/rechner/handwerkerkosten",
-      calculatorLabel: "Fensterkosten berechnen",
+      calculatorHref: scenarioCalculator?.calculatorHref ?? "/rechner/handwerkerkosten",
+      calculatorLabel: scenarioCalculator?.calculatorLabel ?? "Fensterkosten berechnen",
       regionalMode: "service",
     };
   }
@@ -40,8 +78,8 @@ export function getGuideSilo(slug: string): GuideSilo {
   if (slug.includes("fussbodenheizung") || slug.includes("heizung")) {
     return {
       serviceSlugs: ["heizung", "waermepumpe"],
-      calculatorHref: "/rechner/handwerkerkosten",
-      calculatorLabel: "Heizungskosten berechnen",
+      calculatorHref: scenarioCalculator?.calculatorHref ?? "/rechner/handwerkerkosten",
+      calculatorLabel: scenarioCalculator?.calculatorLabel ?? "Heizungskosten berechnen",
       regionalMode: "service",
     };
   }
@@ -49,8 +87,8 @@ export function getGuideSilo(slug: string): GuideSilo {
   if (slug.includes("bad")) {
     return {
       serviceSlugs: ["badsanierung", "sanitaer", "fliesenleger"],
-      calculatorHref: "/rechner/handwerkerkosten",
-      calculatorLabel: "Badkosten berechnen",
+      calculatorHref: scenarioCalculator?.calculatorHref ?? "/rechner/handwerkerkosten",
+      calculatorLabel: scenarioCalculator?.calculatorLabel ?? "Badkosten berechnen",
       regionalMode: "service",
     };
   }
