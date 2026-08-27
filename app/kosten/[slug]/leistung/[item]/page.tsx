@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCalculationExample, getOfferChecks } from "@/lib/price-guidance";
+import { getCalculationExamples, getOfferChecks, getPriceDrivers } from "@/lib/price-guidance";
 import { getPriceItem, priceItemSlug } from "@/lib/price-slug";
 import { getService, priceSources, regions, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
@@ -46,7 +46,7 @@ export async function generateMetadata({
 
   return {
     title: `${item.name} Kosten 2026`,
-    description: `${item.name}: aktuelle Kosten 2026 von ${priceRange(item.low, item.high)} ${item.unit}. Mit regionaler Einordnung, Quelle und Preisvergleich für deutsche Großstädte.`,
+    description: `${item.name} 2026: Richtwert ${priceRange(item.low, item.high)} ${item.unit}. Mit Beispielrechnungen, Stadtvergleich, Kostentreibern, Angebots-Check und Quelle.`,
     alternates: { canonical: `/kosten/${service.slug}/leistung/${itemSlug}` },
   };
 }
@@ -67,8 +67,10 @@ export default async function PriceItemPage({
   const canonicalUrl = `${base}/kosten/${service.slug}/leistung/${itemSlug}`;
   const cityRegions = regions.filter((region) => region.value !== "de");
   const relatedItems = service.priceItems.filter((candidate) => candidate.name !== item.name).slice(0, 5);
-  const calculationExample = getCalculationExample(item);
+  const calculationExamples = getCalculationExamples(item);
+  const priceDrivers = getPriceDrivers(item, service.slug);
   const offerChecks = getOfferChecks(item);
+  const driverSummary = priceDrivers.map((driver) => driver.title).join(", ");
 
   const faqs = [
     {
@@ -81,8 +83,14 @@ export default async function PriceItemPage({
     },
     {
       question: `Welche Faktoren beeinflussen den Endpreis für ${item.name}?`,
-      answer: "Neben Region und Projektgröße wirken sich Materialqualität, Zugänglichkeit, vorhandener Bestand, Entsorgung, Sonderwünsche und der konkrete Leistungsumfang auf das Angebot aus.",
+      answer: `Zu den wichtigsten Kostentreibern zählen bei dieser Arbeit insbesondere ${driverSummary}. Der konkrete Leistungsumfang entscheidet darüber, welche Faktoren im einzelnen Angebot tatsächlich relevant sind.`,
     },
+    ...(calculationExamples.length > 0
+      ? [{
+          question: `Wie kann ich die Kosten für ${item.name} auf meine Menge hochrechnen?`,
+          answer: `Für eine erste Orientierung kann der Richtwert von ${priceRange(item.low, item.high)} ${item.unit} mit der geplanten Menge multipliziert werden. Die Beispielrechnungen auf dieser Seite zeigen mehrere Größenordnungen ohne Regionalfaktor und Zusatzleistungen.`,
+        }]
+      : []),
     {
       question: `Woher stammt der Richtwert für ${item.name}?`,
       answer: `Die Preisposition ist der öffentlich nachvollziehbaren Quelle „${source.name}“ zugeordnet. Das Prüfdatum der Quelle wird auf dieser Seite ausgewiesen.`,
@@ -108,6 +116,22 @@ export default async function PriceItemPage({
         name: faq.question,
         acceptedAnswer: { "@type": "Answer", text: faq.answer },
       })),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: `${item.name} Kosten 2026`,
+      url: canonicalUrl,
+      description: `${item.name}: Richtwert ${priceRange(item.low, item.high)} ${item.unit} mit Beispielrechnungen, regionaler Einordnung und Datenquelle.`,
+      isPartOf: {
+        "@type": "WebSite",
+        name: siteConfig.name,
+        url: base,
+      },
+      about: {
+        "@type": "Thing",
+        name: item.name,
+      },
     },
   ];
 
@@ -141,7 +165,21 @@ export default async function PriceItemPage({
       </section>
 
       <div className="shell articleShell">
-        <section className="contentCard proseCard">
+        <nav className="contentCard proseCard guideToc" aria-label="Inhaltsverzeichnis">
+          <span className="eyebrow">Schnellnavigation</span>
+          <h2>Inhalt</h2>
+          <ol>
+            <li><a href="#preis">Preis und Einordnung</a></li>
+            {calculationExamples.length > 0 ? <li><a href="#beispiele">Beispielrechnungen</a></li> : null}
+            <li><a href="#regionen">Preise nach Stadt</a></li>
+            <li><a href="#preisfaktoren">Kostentreiber</a></li>
+            <li><a href="#angebot">Angebote vergleichen</a></li>
+            <li><a href="#quelle">Quelle und Aktualität</a></li>
+            <li><a href="#faq">Häufige Fragen</a></li>
+          </ol>
+        </nav>
+
+        <section className="contentCard proseCard articleSection" id="preis">
           <span className="eyebrow">Preisübersicht</span>
           <h2>Was kostet {item.name}?</h2>
           <p>
@@ -153,32 +191,52 @@ export default async function PriceItemPage({
             Dieser Bereich ist keine Preisgarantie. Konkrete Angebote können insbesondere durch Projektgröße,
             Material, Zustand des Objekts, Anfahrt, Zugänglichkeit und zusätzliche Vorarbeiten abweichen.
           </p>
+          <div className="heroFacts">
+            <span><strong>{priceRange(item.low, item.high)}</strong> Richtwert</span>
+            <span><strong>{item.unit}</strong> Abrechnungseinheit</span>
+            <span><strong>{source.checkedAt}</strong> Quellenprüfung</span>
+          </div>
           <div className="heroActions">
             <Link className="primaryButton" href="/rechner/handwerkerkosten">Eigene Kosten berechnen</Link>
             <Link className="ghostButton" href={`/kosten/${service.slug}`}>Alle {service.shortTitle}-Preise</Link>
           </div>
         </section>
 
-        {calculationExample && (
-          <section className="contentCard proseCard">
-            <span className="eyebrow">Beispielrechnung</span>
-            <h2>{item.name}: Beispiel für {calculationExample.quantityLabel}</h2>
+        {calculationExamples.length > 0 && (
+          <section className="contentCard proseCard articleSection" id="beispiele">
+            <span className="eyebrow">Beispielrechnungen</span>
+            <h2>{item.name}: Kosten für verschiedene Mengen</h2>
             <p>
-              Wird der bundesweite Richtwert direkt auf <strong>{calculationExample.quantityLabel}</strong> hochgerechnet,
-              ergibt sich eine rechnerische Spanne von <strong>{priceRange(calculationExample.low, calculationExample.high)}</strong>.
+              Für eine schnelle Budgetorientierung wird derselbe bundesweite Richtwert auf drei typische Mengen
+              hochgerechnet. So lässt sich besser erkennen, in welcher Größenordnung das eigene Vorhaben liegen kann.
             </p>
-            <div className="heroFacts">
-              <span><strong>{calculationExample.quantityLabel}</strong> Beispielmenge</span>
-              <span><strong>{priceRange(item.low, item.high)}</strong> {item.unit}</span>
-              <span><strong>{priceRange(calculationExample.low, calculationExample.high)}</strong> rechnerisch gesamt</span>
+            <div className="priceTableWrap">
+              <table className="priceTable">
+                <thead>
+                  <tr>
+                    <th>Menge</th>
+                    <th>Ausgangswert</th>
+                    <th>Rechnerische Spanne</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {calculationExamples.map((example) => (
+                    <tr key={example.quantityLabel}>
+                      <td><strong>{example.quantityLabel}</strong></td>
+                      <td>{priceRange(item.low, item.high)} {item.unit}</td>
+                      <td><strong>{priceRange(example.low, example.high)}</strong></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
             <p className="tableNote">
-              Rechenbeispiel ohne regionalen Faktor und ohne zusätzliche Leistungen. Es ist kein Angebot und ersetzt keine konkrete Aufmaß- oder Projektkalkulation.
+              Rechenbeispiele ohne Regionalfaktor und ohne zusätzliche Leistungen. Sie sind keine Angebote und ersetzen keine konkrete Aufmaß- oder Projektkalkulation.
             </p>
           </section>
         )}
 
-        <section className="contentCard proseCard">
+        <section className="contentCard proseCard articleSection" id="regionen">
           <span className="eyebrow">Regionalmodell</span>
           <h2>{item.name} nach Stadt</h2>
           <p>
@@ -218,20 +276,27 @@ export default async function PriceItemPage({
             </table>
           </div>
           <p className="tableNote">Alle Werte beziehen sich auf dieselbe Einheit: {item.unit}.</p>
+          <Link className="textLink" href="/staedte">Alle Städte und Regionalfaktoren vergleichen →</Link>
         </section>
 
-        <section className="contentCard proseCard">
-          <span className="eyebrow">Preisfaktoren</span>
-          <h2>Was beeinflusst den tatsächlichen Preis?</h2>
+        <section className="contentCard proseCard articleSection" id="preisfaktoren">
+          <span className="eyebrow">Kostentreiber</span>
+          <h2>Was beeinflusst den Preis für {item.name}?</h2>
+          <p>
+            Die Preisspanne entsteht nicht nur durch regionale Unterschiede. Bei {service.shortTitle} sind je nach
+            konkreter Arbeit insbesondere die folgenden Punkte für den tatsächlichen Angebotspreis relevant.
+          </p>
           <div className="faqList">
-            <div className="faqItem"><h3>Projektumfang</h3><p>Größere Aufträge können andere Stück- oder Quadratmeterpreise haben als kleine Einzelarbeiten.</p></div>
-            <div className="faqItem"><h3>Bestand und Vorarbeiten</h3><p>Demontage, Ausgleich, Reparaturen, Schutzmaßnahmen oder Entsorgung können zusätzliche Kosten verursachen.</p></div>
-            <div className="faqItem"><h3>Material und Ausführung</h3><p>Standardprodukte und einfache Ausführung liegen meist niedriger als Premium-Materialien oder Sonderlösungen.</p></div>
-            <div className="faqItem"><h3>Region und Verfügbarkeit</h3><p>Lokales Lohnniveau, Auftragslage und Anfahrtswege können den Endpreis spürbar verändern.</p></div>
+            {priceDrivers.map((driver) => (
+              <div className="faqItem" key={driver.title}>
+                <h3>{driver.title}</h3>
+                <p>{driver.text}</p>
+              </div>
+            ))}
           </div>
         </section>
 
-        <section className="contentCard proseCard">
+        <section className="contentCard proseCard articleSection" id="angebot">
           <span className="eyebrow">Angebote vergleichen</span>
           <h2>Was sollte bei {item.name} im Angebot klar sein?</h2>
           <p>
@@ -246,9 +311,13 @@ export default async function PriceItemPage({
               </div>
             ))}
           </div>
+          <div className="heroActions">
+            <Link className="primaryButton" href="/rechner/handwerkerkosten">Kosten vorab berechnen</Link>
+            <Link className="ghostButton" href="/ratgeber/handwerker-stundensaetze">Handwerkerpreise besser verstehen</Link>
+          </div>
         </section>
 
-        <section className="contentCard proseCard">
+        <section className="contentCard proseCard articleSection" id="quelle">
           <span className="eyebrow">Quelle</span>
           <h2>Datenbasis für diesen Richtwert</h2>
           <p>
@@ -261,13 +330,17 @@ export default async function PriceItemPage({
               <span>Geprüft: {source.checkedAt}</span>
             </a>
           </div>
+          <div className="heroActions">
+            <Link className="ghostButton" href="/methodik">Methodik ansehen</Link>
+            <Link className="ghostButton" href="/quellen">Alle Quellen ansehen</Link>
+          </div>
           <p className="tableNote">
             Einen Fehler oder eine aktuellere Quelle können Sie an {" "}
             <a className="textLink" href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a> melden.
           </p>
         </section>
 
-        <section className="contentCard proseCard">
+        <section className="contentCard proseCard articleSection" id="faq">
           <span className="eyebrow">Häufige Fragen</span>
           <h2>FAQ zu {item.name}</h2>
           <div className="faqList">
@@ -281,7 +354,7 @@ export default async function PriceItemPage({
         </section>
 
         {relatedItems.length > 0 && (
-          <section className="contentCard proseCard">
+          <section className="contentCard proseCard articleSection" id="weitere-preise">
             <span className="eyebrow">Weitere Preise</span>
             <h2>Weitere {service.shortTitle}-Arbeiten</h2>
             <div className="sourceList">
@@ -291,6 +364,10 @@ export default async function PriceItemPage({
                   <span>{priceRange(related.low, related.high)} {related.unit}</span>
                 </Link>
               ))}
+            </div>
+            <div className="heroActions">
+              <Link className="primaryButton" href={`/kosten/${service.slug}`}>Alle {service.shortTitle}-Preise</Link>
+              <Link className="ghostButton" href="/kosten">Alle Gewerke vergleichen</Link>
             </div>
           </section>
         )}
