@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { handwerkerCalculatorHref } from "@/lib/calculator-links";
 import { getCalculationExample } from "@/lib/price-guidance";
 import { priceItemSlug } from "@/lib/price-slug";
 import { getRegion, getService, priceSources, regions, services } from "@/lib/pricing";
@@ -69,7 +70,13 @@ export default async function LocalCostPage({
   const baseUrl = siteConfig.url.replace(/\/$/, "");
   const canonicalUrl = `${baseUrl}/kosten/${service.slug}/${region.slug}`;
   const otherCities = regions.filter((item) => item.value !== "de" && item.slug !== region.slug);
-  const calculatorUrl = service.slug === "badsanierung" ? "/rechner/badsanierungskosten" : "/rechner/handwerkerkosten";
+  const calculatorUrl = service.slug === "badsanierung"
+    ? "/rechner/badsanierungskosten"
+    : handwerkerCalculatorHref({
+        serviceSlug: service.slug,
+        itemSlug: priceItemSlug(leadPrice.name),
+        region: region.value,
+      });
 
   const faqs = [
     {
@@ -160,19 +167,28 @@ export default async function LocalCostPage({
                   </tr>
                 </thead>
                 <tbody>
-                  {service.priceItems.map((item) => (
-                    <tr key={item.name}>
-                      <td>
-                        <Link className="priceItemLink" href={`/kosten/${service.slug}/leistung/${priceItemSlug(item.name)}`}>
-                          {item.name}
-                        </Link>
-                        {item.note ? <small>{item.note}</small> : null}
-                      </td>
-                      <td><strong>{priceRange(item.low * region.factor, item.high * region.factor)}</strong></td>
-                      <td>{priceRange(item.low, item.high)}</td>
-                      <td>{item.unit}</td>
-                    </tr>
-                  ))}
+                  {service.priceItems.map((item) => {
+                    const itemSlug = priceItemSlug(item.name);
+                    const itemCalculatorUrl = handwerkerCalculatorHref({
+                      serviceSlug: service.slug,
+                      itemSlug,
+                      region: region.value,
+                    });
+                    return (
+                      <tr key={item.name}>
+                        <td>
+                          <Link className="priceItemLink" href={`/kosten/${service.slug}/leistung/${itemSlug}`}>
+                            {item.name}
+                          </Link>
+                          {item.note ? <small>{item.note}</small> : null}
+                          <small><Link className="textLink" href={itemCalculatorUrl}>Im Rechner öffnen →</Link></small>
+                        </td>
+                        <td><strong>{priceRange(item.low * region.factor, item.high * region.factor)}</strong></td>
+                        <td>{priceRange(item.low, item.high)}</td>
+                        <td>{item.unit}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
