@@ -134,9 +134,12 @@ export const extraServices: Service[] = [
   },
 ];
 
+const baseServiceSlugs = new Set(baseServices.map((service) => service.slug));
+const uniqueExtraServices = extraServices.filter((service) => !baseServiceSlugs.has(service.slug));
+
 export const services: Service[] = [
   ...(baseServices as unknown as Service[]),
-  ...extraServices,
+  ...uniqueExtraServices,
 ];
 
 export { regions, renovationModel };
