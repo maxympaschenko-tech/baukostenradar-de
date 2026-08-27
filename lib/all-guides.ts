@@ -3,6 +3,7 @@ import { secondaryGuides } from "@/lib/guides-secondary";
 import { tertiaryGuides } from "@/lib/guides-tertiary";
 import { tradeGuides } from "@/lib/guides-trade";
 import { specialistGuides } from "@/lib/guides-specialists";
+import { opportunityGuides } from "@/lib/guides-opportunities";
 import { scenarioGuides } from "@/lib/guides-scenarios";
 import { catalogScenarioGuides } from "@/lib/guides-catalog-scenarios";
 
@@ -39,6 +40,7 @@ const secondaryClusterLinks: Record<string, Array<{ label: string; href: string 
     { label: "Dach sanieren Kosten pro m²", href: "/ratgeber/dach-sanieren-kosten-pro-qm" },
     { label: "Fenster austauschen Kosten", href: "/ratgeber/fenster-austauschen-kosten-haus" },
     { label: "Heizung erneuern Kosten", href: "/ratgeber/heizung-erneuern-kosten" },
+    { label: "Haustür einbauen Kosten", href: "/ratgeber/haustuer-einbauen-kosten" },
   ],
   "renovierungskosten-haus": [
     { label: "Renovierungskosten 100 m²", href: "/ratgeber/renovierungskosten-100-qm" },
@@ -85,12 +87,15 @@ const tertiaryClusterLinks: Record<string, Array<{ label: string; href: string }
 const tradeClusterLinks: Record<string, Array<{ label: string; href: string }>> = {
   "dach-sanieren-kosten-pro-qm": [
     { label: "Dach 150 m² Kosten", href: "/ratgeber/dach-150-qm-kosten" },
+    { label: "Dachrinne erneuern Kosten", href: "/ratgeber/dachrinne-erneuern-kosten" },
   ],
   "fenster-austauschen-kosten-haus": [
     { label: "20 Fenster austauschen Kosten", href: "/ratgeber/20-fenster-austauschen-kosten" },
+    { label: "Fenstereinbau Kosten", href: "/ratgeber/fenstereinbau-kosten" },
   ],
   "elektrik-erneuern-altbau": [
     { label: "Elektrik bei 100 m² erneuern", href: "/ratgeber/elektrik-erneuern-100-qm-kosten" },
+    { label: "Sicherungskasten erneuern Kosten", href: "/ratgeber/sicherungskasten-erneuern-kosten" },
   ],
   "heizung-erneuern-kosten": [
     { label: "Fußbodenheizung 100 m² Kosten", href: "/ratgeber/fussbodenheizung-100-qm-kosten" },
@@ -100,32 +105,53 @@ const tradeClusterLinks: Record<string, Array<{ label: string; href: string }>> 
   ],
 };
 
-const enrichedPrimaryGuides = primaryGuides.map((guide) => ({
-  ...guide,
-  related: [...guide.related, ...(primaryClusterLinks[guide.slug] ?? [])],
-}));
+const specialistClusterLinks: Record<string, Array<{ label: string; href: string }>> = {
+  "garten-anlegen-kosten": [
+    { label: "Einfahrt pflastern Kosten", href: "/ratgeber/einfahrt-pflastern-kosten" },
+    { label: "Terrasse pflastern Kosten", href: "/ratgeber/terrasse-pflastern-kosten" },
+    { label: "Baum fällen Kosten", href: "/ratgeber/baum-faellen-kosten" },
+    { label: "Rollrasen Kosten pro m²", href: "/ratgeber/rollrasen-kosten-pro-qm" },
+  ],
+  "bodenleger-kosten-pro-qm": [
+    { label: "Parkett abschleifen Kosten", href: "/ratgeber/parkett-abschleifen-kosten" },
+  ],
+  "daemmung-kosten-pro-qm": [
+    { label: "Fassadendämmung Kosten pro m²", href: "/ratgeber/fassadendaemmung-kosten-pro-qm" },
+  ],
+  "waermepumpe-kosten-2026": [
+    { label: "Wärmepumpe Wartung Kosten", href: "/ratgeber/waermepumpe-wartung-kosten" },
+  ],
+  "photovoltaik-kosten-2026": [
+    { label: "Stromspeicher Kosten pro kWh", href: "/ratgeber/stromspeicher-kosten-pro-kwh" },
+  ],
+};
 
-const enrichedSecondaryGuides = secondaryGuides.map((guide) => ({
-  ...guide,
-  related: [...guide.related, ...(secondaryClusterLinks[guide.slug] ?? [])],
-}));
+function addClusterLinks<T extends { slug: string; related: Array<{ label: string; href: string }> }>(
+  items: T[],
+  links: Record<string, Array<{ label: string; href: string }>>,
+) {
+  return items.map((item) => {
+    const combined = [...item.related, ...(links[item.slug] ?? [])];
+    return {
+      ...item,
+      related: combined.filter((link, index) => combined.findIndex((candidate) => candidate.href === link.href) === index),
+    };
+  });
+}
 
-const enrichedTertiaryGuides = tertiaryGuides.map((guide) => ({
-  ...guide,
-  related: [...guide.related, ...(tertiaryClusterLinks[guide.slug] ?? [])],
-}));
-
-const enrichedTradeGuides = tradeGuides.map((guide) => ({
-  ...guide,
-  related: [...guide.related, ...(tradeClusterLinks[guide.slug] ?? [])],
-}));
+const enrichedPrimaryGuides = addClusterLinks(primaryGuides, primaryClusterLinks);
+const enrichedSecondaryGuides = addClusterLinks(secondaryGuides, secondaryClusterLinks);
+const enrichedTertiaryGuides = addClusterLinks(tertiaryGuides, tertiaryClusterLinks);
+const enrichedTradeGuides = addClusterLinks(tradeGuides, tradeClusterLinks);
+const enrichedSpecialistGuides = addClusterLinks(specialistGuides, specialistClusterLinks);
 
 export const allGuides = [
   ...enrichedPrimaryGuides,
   ...enrichedSecondaryGuides,
   ...enrichedTertiaryGuides,
   ...enrichedTradeGuides,
-  ...specialistGuides,
+  ...enrichedSpecialistGuides,
+  ...opportunityGuides,
   ...scenarioGuides,
   ...catalogScenarioGuides,
 ];
