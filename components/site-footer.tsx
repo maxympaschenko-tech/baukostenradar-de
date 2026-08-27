@@ -18,7 +18,6 @@ export function SiteFooter() {
           <p>Aktuelle Richtwerte und Rechner für Renovierung und Handwerk in Deutschland.</p>
           <p className="footerContact">
             <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
-            <a href={`tel:${siteConfig.phone}`}>{siteConfig.phoneDisplay}</a>
           </p>
         </div>
         <div>
