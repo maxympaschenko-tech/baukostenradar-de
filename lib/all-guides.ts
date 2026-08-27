@@ -4,6 +4,7 @@ import { tertiaryGuides } from "@/lib/guides-tertiary";
 import { tradeGuides } from "@/lib/guides-trade";
 import { specialistGuides } from "@/lib/guides-specialists";
 import { opportunityGuides } from "@/lib/guides-opportunities";
+import { secondaryOpportunityGuides } from "@/lib/guides-opportunities-secondary";
 import { scenarioGuides } from "@/lib/guides-scenarios";
 import { catalogScenarioGuides } from "@/lib/guides-catalog-scenarios";
 
@@ -99,6 +100,7 @@ const tradeClusterLinks: Record<string, Array<{ label: string; href: string }>> 
   ],
   "heizung-erneuern-kosten": [
     { label: "Fußbodenheizung 100 m² Kosten", href: "/ratgeber/fussbodenheizung-100-qm-kosten" },
+    { label: "Heizkörper montieren Kosten", href: "/ratgeber/heizkoerper-montieren-kosten" },
   ],
   "bad-komplett-sanieren-kosten": [
     { label: "Bad 10 m² sanieren Kosten", href: "/ratgeber/bad-10-qm-sanieren-kosten" },
@@ -114,15 +116,31 @@ const specialistClusterLinks: Record<string, Array<{ label: string; href: string
   ],
   "bodenleger-kosten-pro-qm": [
     { label: "Parkett abschleifen Kosten", href: "/ratgeber/parkett-abschleifen-kosten" },
+    { label: "Parkett verlegen Kosten pro m²", href: "/ratgeber/parkett-verlegen-kosten-pro-qm" },
+    { label: "Laminat verlegen Kosten pro m²", href: "/ratgeber/laminat-verlegen-kosten-pro-qm" },
+  ],
+  "trockenbau-kosten-pro-qm": [
+    { label: "Trockenbauwand Kosten pro m²", href: "/ratgeber/trockenbauwand-kosten-pro-qm" },
   ],
   "daemmung-kosten-pro-qm": [
     { label: "Fassadendämmung Kosten pro m²", href: "/ratgeber/fassadendaemmung-kosten-pro-qm" },
+    { label: "Innendämmung Kosten pro m²", href: "/ratgeber/innendaemmung-kosten-pro-qm" },
   ],
   "waermepumpe-kosten-2026": [
     { label: "Wärmepumpe Wartung Kosten", href: "/ratgeber/waermepumpe-wartung-kosten" },
   ],
   "photovoltaik-kosten-2026": [
     { label: "Stromspeicher Kosten pro kWh", href: "/ratgeber/stromspeicher-kosten-pro-kwh" },
+  ],
+};
+
+const catalogScenarioClusterLinks: Record<string, Array<{ label: string; href: string }>> = {
+  "innenwand-mauern-kosten": [
+    { label: "Bodenplatte Kosten pro m²", href: "/ratgeber/bodenplatte-kosten-pro-qm" },
+  ],
+  "kueche-10-qm-renovieren-kosten": [
+    { label: "Küchenfronten erneuern Kosten", href: "/ratgeber/kuechenfronten-erneuern-kosten" },
+    { label: "Küchenarbeitsplatte Kosten", href: "/ratgeber/kuechenarbeitsplatte-kosten" },
   ],
 };
 
@@ -144,6 +162,7 @@ const enrichedSecondaryGuides = addClusterLinks(secondaryGuides, secondaryCluste
 const enrichedTertiaryGuides = addClusterLinks(tertiaryGuides, tertiaryClusterLinks);
 const enrichedTradeGuides = addClusterLinks(tradeGuides, tradeClusterLinks);
 const enrichedSpecialistGuides = addClusterLinks(specialistGuides, specialistClusterLinks);
+const enrichedCatalogScenarioGuides = addClusterLinks(catalogScenarioGuides, catalogScenarioClusterLinks);
 
 export const allGuides = [
   ...enrichedPrimaryGuides,
@@ -152,8 +171,9 @@ export const allGuides = [
   ...enrichedTradeGuides,
   ...enrichedSpecialistGuides,
   ...opportunityGuides,
+  ...secondaryOpportunityGuides,
   ...scenarioGuides,
-  ...catalogScenarioGuides,
+  ...enrichedCatalogScenarioGuides,
 ];
 
 export function getAnyGuide(slug: string) {
