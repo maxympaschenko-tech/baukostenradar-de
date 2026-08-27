@@ -174,4 +174,288 @@ export const septenaryOpportunityGuides: Guide[] = [
       { label: "Handwerkerkosten-Rechner", href: "/rechner/handwerkerkosten?gewerk=daemmung&leistung=einblasdaemmung-oberste-geschossdecke" },
     ],
   },
+  {
+    slug: "dachfenster-austauschen-kosten",
+    title: "Dachfenster austauschen Kosten 2026",
+    h1: "Dachfenster austauschen 2026: Kosten für den 1:1-Austausch",
+    description: "Dachfenster austauschen Kosten 2026: Richtwerte für 1:1-Austausch, manuelle und elektrische Ausführung, Zusatzarbeiten, Beispielbudgets und Angebotsvergleich.",
+    eyebrow: "Dachfenster-Austausch 2026",
+    intro: "Beim 1:1-Austausch bleibt die vorhandene Dachöffnung grundsätzlich erhalten. Dadurch ist der Aufwand meist geringer als bei einem komplett neuen oder vergrößerten Dachfenster, trotzdem hängen die Gesamtkosten stark von Fenstertyp und Ausstattung ab.",
+    keyFact: "1:1-Dachfenster-Austausch etwa 1.600-3.300 € pro Fenster als Orientierung vom manuellen Standard bis zur elektrischen Ausführung",
+    sections: [
+      {
+        heading: "Was kostet es, ein Dachfenster auszutauschen?",
+        paragraphs: [
+          "BauKostenRadar führt für den 1:1-Austausch eines Dachfensters etwa 1.600 bis 3.300 Euro pro Fenster als Orientierungsbereich. Der untere Bereich entspricht einem manuellen Standardfenster inklusive Montage, elektrische Ausführungen liegen deutlich höher.",
+          "Bei drei Dachfenstern ergibt sich damit eine grobe Budgetorientierung von rund 4.800 bis 9.900 Euro. Sondergrößen, zusätzliche Dämm- und Abdichtungsarbeiten oder Anpassungen der Innenverkleidung können darüber hinausgehen.",
+        ],
+        table: {
+          headers: ["Anzahl Dachfenster", "Budgetorientierung"],
+          rows: [
+            { cells: ["1 Fenster", "1.600-3.300 €"] },
+            { cells: ["2 Fenster", "3.200-6.600 €"] },
+            { cells: ["3 Fenster", "4.800-9.900 €"] },
+          ],
+        },
+      },
+      {
+        heading: "Warum ist 1:1 günstiger als ein Neueinbau?",
+        paragraphs: ["Bleiben Öffnung und Einbaumaß erhalten, sind deutlich weniger Eingriffe in Sparren, Dachdeckung und Innenausbau nötig. Genau deshalb sollte im Angebot klar stehen, ob wirklich ein 1:1-Austausch oder eine Vergrößerung geplant ist."],
+        bullets: [
+          "Fenstertyp und Hersteller",
+          "Größe und Verglasung",
+          "manuelle oder elektrische Bedienung",
+          "Eindeckrahmen und Anschlussmaterial",
+          "Dämmung und Abdichtung rund um das Fenster",
+          "Innenverkleidung und Entsorgung des Altfensters",
+        ],
+      },
+      {
+        heading: "Austausch, Neuverglasung oder Neueinbau vergleichen",
+        paragraphs: [
+          "Ist der Rahmen noch intakt, kann eine reine Neuverglasung deutlich günstiger sein. Bei undichten, verzogenen oder energetisch schwachen Bestandsfenstern ist der komplette Austausch meist die langfristigere Lösung.",
+          "Ein Neueinbau oder eine Vergrößerung ist eine andere Leistung und sollte nicht mit dem 1:1-Austauschpreis verglichen werden.",
+        ],
+      },
+    ],
+    faqs: [
+      { question: "Was kostet ein Dachfenster-Austausch 2026?", answer: "Als Orientierung führt BauKostenRadar etwa 1.600 bis 3.300 Euro pro Fenster vom manuellen Standard-Austausch bis zur elektrischen Ausführung." },
+      { question: "Was kosten drei Dachfenster im Austausch?", answer: "Rechnerisch ergibt der hinterlegte Richtwert etwa 4.800 bis 9.900 Euro, bevor besondere Zusatzarbeiten berücksichtigt werden." },
+      { question: "Ist ein 1:1-Austausch günstiger als ein neues größeres Dachfenster?", answer: "In der Regel ja, weil die bestehende Dachöffnung weiter genutzt wird und weniger Änderungen an der Dachkonstruktion nötig sind." },
+    ],
+    related: [
+      { label: "Dachfenster-Austausch Preisdetail", href: "/kosten/dachsanierung/leistung/dachfenster-1-1-austauschen" },
+      { label: "Dachfenster nachträglich einbauen", href: "/ratgeber/dachfenster-nachtraeglich-einbauen-kosten" },
+      { label: "Dach sanieren Kosten", href: "/ratgeber/dach-sanieren-kosten-pro-qm" },
+      { label: "Dachsanierung Kosten", href: "/kosten/dachsanierung" },
+      { label: "Handwerkerkosten-Rechner", href: "/rechner/handwerkerkosten?gewerk=dachsanierung&leistung=dachfenster-1-1-austauschen" },
+    ],
+  },
+  {
+    slug: "flachdach-warmdaemmung-kosten-pro-qm",
+    title: "Flachdach Warmdach Dämmung Kosten pro m² 2026",
+    h1: "Warmdach dämmen 2026: Kosten pro m² beim Flachdach",
+    description: "Flachdach Warmdach Kosten 2026: Richtwerte pro m² für Dämmung, Beispielbudgets, Dachaufbau, Abdichtung und Angebotsvergleich.",
+    eyebrow: "Flachdach Warmdach 2026",
+    intro: "Das Warmdach ist ein unbelüfteter Flachdachaufbau. Dämmung, Dampfsperre und Abdichtung müssen deshalb als funktionierendes Gesamtsystem geplant werden, damit keine Feuchtigkeit in der Konstruktion eingeschlossen wird.",
+    keyFact: "Flachdachdämmung als Warmdach etwa 100-180 €/m² bei 20 cm Dämmstärke als Richtwert",
+    sections: [
+      {
+        heading: "Was kostet ein Warmdach pro m²?",
+        paragraphs: [
+          "BauKostenRadar führt für die Dämmung eines Warmdachs etwa 100 bis 180 Euro pro Quadratmeter als Richtwert. Für 100 m² Flachdach entspricht das ungefähr 10.000 bis 18.000 Euro.",
+          "Bei einer kompletten Dachsanierung können Rückbau, neue Abdichtung, Gefälleausgleich, Attikaanschlüsse oder Entwässerung zusätzliche Kosten verursachen. Der Dämm-Richtwert ist deshalb nicht automatisch mit einem vollständigen Flachdach-Komplettpreis gleichzusetzen.",
+        ],
+        table: {
+          headers: ["Flachdachfläche", "Budgetorientierung Dämmung"],
+          rows: [
+            { cells: ["50 m²", "5.000-9.000 €"] },
+            { cells: ["100 m²", "10.000-18.000 €"] },
+            { cells: ["150 m²", "15.000-27.000 €"] },
+          ],
+        },
+      },
+      {
+        heading: "Was treibt den Warmdach-Preis?",
+        paragraphs: ["Nicht nur der Dämmstoff entscheidet. Besonders teuer werden Detailanschlüsse und eine gleichzeitig notwendige Erneuerung der Dachabdichtung."],
+        bullets: [
+          "Dämmstoff und Dämmstärke",
+          "Zustand der vorhandenen Abdichtung",
+          "Rückbau des alten Dachaufbaus",
+          "Gefälle und Entwässerung",
+          "Attika, Lichtkuppeln und Durchdringungen",
+          "Gerüst und Baustellenlogistik",
+        ],
+      },
+      {
+        heading: "Warmdach und Kaltdach getrennt kalkulieren",
+        paragraphs: [
+          "Warm- und Kaltdach unterscheiden sich konstruktiv. Ein bestehendes Kaltdach sollte nicht allein wegen eines niedrigeren oder höheren Quadratmeterpreises ohne fachliche Prüfung in ein Warmdach umgebaut werden.",
+          "Für einen sauberen Angebotsvergleich muss deshalb klar sein, welcher Dachaufbau vorhanden ist und welcher nach der Sanierung entstehen soll.",
+        ],
+      },
+    ],
+    faqs: [
+      { question: "Was kostet Warmdach-Dämmung pro m² 2026?", answer: "BauKostenRadar führt etwa 100 bis 180 Euro pro Quadratmeter als Richtwert für die Flachdachdämmung im Warmdach-Aufbau." },
+      { question: "Was kosten 100 m² Warmdach-Dämmung?", answer: "Mit dem hinterlegten Richtwert ergeben sich ungefähr 10.000 bis 18.000 Euro für die Dämmposition." },
+      { question: "Ist die neue Dachabdichtung immer im Richtwert enthalten?", answer: "Nicht automatisch als vollständige Dachsanierung. Rückbau und eine umfangreiche neue Abdichtung können zusätzliche Projektkosten erzeugen." },
+    ],
+    related: [
+      { label: "Warmdach Preisdetail", href: "/kosten/daemmung/leistung/flachdachdaemmung-warmdach" },
+      { label: "Kaltdach Dämmung Kosten", href: "/ratgeber/flachdach-kaltdaemmung-kosten-pro-qm" },
+      { label: "Dachdämmung Kosten", href: "/ratgeber/daemmung-kosten-pro-qm" },
+      { label: "Dämmung Kosten", href: "/kosten/daemmung" },
+      { label: "Handwerkerkosten-Rechner", href: "/rechner/handwerkerkosten?gewerk=daemmung&leistung=flachdachdaemmung-warmdach" },
+    ],
+  },
+  {
+    slug: "flachdach-kaltdaemmung-kosten-pro-qm",
+    title: "Flachdach Kaltdach Dämmung Kosten pro m² 2026",
+    h1: "Kaltdach dämmen 2026: Kosten pro m² beim Flachdach",
+    description: "Flachdach Kaltdach Kosten 2026: Richtwerte pro m² für Dämmung, Beispielbudgets, belüfteten Dachaufbau, Zugänglichkeit und Angebotsvergleich.",
+    eyebrow: "Flachdach Kaltdach 2026",
+    intro: "Beim Kaltdach bleibt zwischen Wärmedämmung und Dachhaut eine belüftete Ebene. Im Bestand kann dieser Aufbau sinnvoll sein, verlangt aber ausreichend funktionierende Lüftungsquerschnitte und eine konstruktiv passende Ausführung.",
+    keyFact: "Flachdachdämmung als Kaltdach etwa 90-160 €/m² bei 20 cm Dämmstärke als Richtwert",
+    sections: [
+      {
+        heading: "Was kostet ein Kaltdach pro m²?",
+        paragraphs: [
+          "BauKostenRadar führt für die Dämmung eines Kaltdachs etwa 90 bis 160 Euro pro Quadratmeter. Bei 100 m² Dachfläche entspricht das ungefähr 9.000 bis 16.000 Euro.",
+          "Entscheidend ist, wie gut der vorhandene Hohlraum erreichbar ist und ob Dachhaut, Lüftungsebene oder Innenbekleidung geöffnet werden müssen. Bei einer kompletten Sanierung kann der Gesamtpreis daher deutlich über der reinen Dämmposition liegen.",
+        ],
+        table: {
+          headers: ["Flachdachfläche", "Budgetorientierung Dämmung"],
+          rows: [
+            { cells: ["50 m²", "4.500-8.000 €"] },
+            { cells: ["100 m²", "9.000-16.000 €"] },
+            { cells: ["150 m²", "13.500-24.000 €"] },
+          ],
+        },
+      },
+      {
+        heading: "Welche Punkte beeinflussen den Preis?",
+        paragraphs: ["Bei Kaltdächern ist die Zugänglichkeit der belüfteten Konstruktion besonders wichtig. Ein theoretisch einfacher Dämmstoffeinbau kann durch schwierige Hohlräume deutlich aufwendiger werden."],
+        bullets: [
+          "Zugänglichkeit des Dachhohlraums",
+          "Dämmstoff und Dämmstärke",
+          "Erhalt oder Erneuerung der Lüftungsebene",
+          "Öffnen und Schließen der Dachhaut",
+          "Feuchteschäden in der Bestandskonstruktion",
+          "Anschlüsse und Durchdringungen",
+        ],
+      },
+      {
+        heading: "Umbau zum Warmdach nur nach fachlicher Prüfung",
+        paragraphs: [
+          "Ein Wechsel vom belüfteten Kaltdach zum unbelüfteten Warmdach verändert die bauphysikalische Funktionsweise des Dachs. Deshalb darf die Entscheidung nicht nur anhand des Quadratmeterpreises getroffen werden.",
+          "Vor einer Sanierung sollte geprüft werden, ob der bestehende Aufbau erhalten, verbessert oder vollständig neu aufgebaut wird.",
+        ],
+      },
+    ],
+    faqs: [
+      { question: "Was kostet Kaltdach-Dämmung pro m² 2026?", answer: "BauKostenRadar führt etwa 90 bis 160 Euro pro Quadratmeter als Richtwert für die Flachdachdämmung im Kaltdach-Aufbau." },
+      { question: "Was kosten 100 m² Kaltdach-Dämmung?", answer: "Mit dem hinterlegten Richtwert ergeben sich ungefähr 9.000 bis 16.000 Euro für die Dämmposition." },
+      { question: "Ist Kaltdach immer günstiger als Warmdach?", answer: "Der Richtwert liegt etwas niedriger, aber Zugänglichkeit, Dachzustand und notwendige Umbauten können den tatsächlichen Projektpreis stark verändern." },
+    ],
+    related: [
+      { label: "Kaltdach Preisdetail", href: "/kosten/daemmung/leistung/flachdachdaemmung-kaltdach" },
+      { label: "Warmdach Dämmung Kosten", href: "/ratgeber/flachdach-warmdaemmung-kosten-pro-qm" },
+      { label: "Dachdämmung Kosten", href: "/ratgeber/daemmung-kosten-pro-qm" },
+      { label: "Dämmung Kosten", href: "/kosten/daemmung" },
+      { label: "Handwerkerkosten-Rechner", href: "/rechner/handwerkerkosten?gewerk=daemmung&leistung=flachdachdaemmung-kaltdach" },
+    ],
+  },
+  {
+    slug: "kellerabdichtung-aussen-kosten-pro-qm",
+    title: "Kellerabdichtung außen Kosten pro m² 2026",
+    h1: "Keller von außen abdichten 2026: Kosten pro m²",
+    description: "Kellerabdichtung außen Kosten 2026: Richtwerte pro m² Wandfläche inklusive Aushub, Beispielbudgets, Abdichtung, Erdarbeiten und Angebotsvergleich.",
+    eyebrow: "Kellerabdichtung außen 2026",
+    intro: "Die Außenabdichtung gilt im Bestand als besonders gründliche Lösung, weil Feuchtigkeit bereits an der Außenseite der Kellerwand gestoppt wird. Der große Kostenblock ist häufig nicht das Abdichtungsmaterial selbst, sondern das Freilegen der Wand bis zur Fundamentsohle.",
+    keyFact: "Kellerabdichtung außen inklusive typischer Erdarbeiten etwa 300-600 €/m² Wandfläche",
+    sections: [
+      {
+        heading: "Was kostet Kellerabdichtung von außen pro m²?",
+        paragraphs: [
+          "BauKostenRadar führt für eine Kelleraußenabdichtung etwa 300 bis 600 Euro pro Quadratmeter Wandfläche. Bei 40 m² betroffener Kellerwand ergibt sich daraus eine erste Größenordnung von ungefähr 12.000 bis 24.000 Euro.",
+          "Der Preis hängt stark von Aushubtiefe, Boden, Zugänglichkeit und Wiederherstellung der Außenflächen ab. Bei Terrasse, enger Grundstücksgrenze oder aufwendiger Entsorgung kann der obere Bereich überschritten werden.",
+        ],
+        table: {
+          headers: ["Kellerwandfläche", "Budgetorientierung"],
+          rows: [
+            { cells: ["20 m²", "6.000-12.000 €"] },
+            { cells: ["40 m²", "12.000-24.000 €"] },
+            { cells: ["60 m²", "18.000-36.000 €"] },
+          ],
+        },
+      },
+      {
+        heading: "Welche Leistungen sollten im Angebot stehen?",
+        paragraphs: ["Gerade bei Außenabdichtungen sind Angebote nur vergleichbar, wenn Erd- und Abdichtungsarbeiten sauber aufgeschlüsselt sind."],
+        bullets: [
+          "Aushub und Freilegung der Kellerwand",
+          "Reinigung und Untergrundvorbereitung",
+          "Reparatur von Rissen und Schadstellen",
+          "Abdichtungssystem und Schutzschicht",
+          "optionale Perimeterdämmung",
+          "Verfüllung und Wiederherstellung von Gelände oder Belägen",
+        ],
+      },
+      {
+        heading: "Außenabdichtung und Perimeterdämmung sinnvoll kombinieren",
+        paragraphs: [
+          "Wenn die Kellerwand ohnehin freigelegt wird, kann eine zusätzliche Perimeterdämmung wirtschaftlich interessant sein. Die Dämmposition sollte im Angebot trotzdem separat ausgewiesen werden.",
+          "Vor der Sanierung muss außerdem die tatsächliche Feuchteursache geklärt sein. Aufsteigende Feuchtigkeit kann zusätzlich eine Horizontalsperre erfordern.",
+        ],
+      },
+    ],
+    faqs: [
+      { question: "Was kostet Kellerabdichtung außen pro m² 2026?", answer: "BauKostenRadar führt etwa 300 bis 600 Euro pro Quadratmeter Wandfläche als Richtwert inklusive der typischen aufwendigen Erdarbeiten." },
+      { question: "Was kosten 40 m² Kelleraußenwand?", answer: "Mit dem Richtwert ergibt sich eine erste Größenordnung von etwa 12.000 bis 24.000 Euro." },
+      { question: "Warum ist Außenabdichtung so teuer?", answer: "Das Freilegen der Kellerwand, Aushub, Baustellenzugang, Verfüllung und Wiederherstellung der Außenflächen verursachen einen großen Teil des Gesamtpreises." },
+    ],
+    related: [
+      { label: "Kellerabdichtung außen Preisdetail", href: "/kosten/kellerabdichtung/leistung/kellerabdichtung-aussen-inkl-aushub" },
+      { label: "Kellerabdichtung innen Kosten", href: "/ratgeber/kellerabdichtung-innen-kosten-pro-qm" },
+      { label: "Perimeterdämmung Kosten", href: "/ratgeber/perimeterdaemmung-kosten-pro-qm" },
+      { label: "Kellerabdichtung Kosten", href: "/kosten/kellerabdichtung" },
+      { label: "Handwerkerkosten-Rechner", href: "/rechner/handwerkerkosten?gewerk=kellerabdichtung&leistung=kellerabdichtung-aussen-inkl-aushub" },
+    ],
+  },
+  {
+    slug: "kellerabdichtung-innen-kosten-pro-qm",
+    title: "Kellerabdichtung innen Kosten pro m² 2026",
+    h1: "Keller von innen abdichten 2026: Kosten pro m²",
+    description: "Kellerabdichtung innen Kosten 2026: Richtwerte pro m² Wandfläche, Beispielbudgets, Einsatzgrenzen, Vorbereitung und Vergleich zur Außenabdichtung.",
+    eyebrow: "Kellerabdichtung innen 2026",
+    intro: "Eine Innenabdichtung kommt häufig dann infrage, wenn die Kelleraußenwand nicht oder nur mit unverhältnismäßigem Aufwand freigelegt werden kann. Sie ist günstiger als die Außenabdichtung, löst aber nicht jede Feuchteursache gleich gut.",
+    keyFact: "Kellerabdichtung innen etwa 80-200 €/m² Wandfläche als Richtwert",
+    sections: [
+      {
+        heading: "Was kostet Kellerabdichtung von innen pro m²?",
+        paragraphs: [
+          "BauKostenRadar führt für die Kellerabdichtung von innen etwa 80 bis 200 Euro pro Quadratmeter Wandfläche. Bei 40 m² betroffener Wandfläche entspricht das ungefähr 3.200 bis 8.000 Euro.",
+          "Die tatsächlichen Kosten hängen davon ab, wie stark Putz und Mauerwerk geschädigt sind, welches Abdichtungssystem eingesetzt wird und ob anschließend ein neuer Sanierputz oder Innenausbau erforderlich ist.",
+        ],
+        table: {
+          headers: ["Wandfläche", "Budgetorientierung"],
+          rows: [
+            { cells: ["20 m²", "1.600-4.000 €"] },
+            { cells: ["40 m²", "3.200-8.000 €"] },
+            { cells: ["60 m²", "4.800-12.000 €"] },
+          ],
+        },
+      },
+      {
+        heading: "Wann ist eine Innenabdichtung sinnvoll?",
+        paragraphs: ["Sie ist vor allem dann interessant, wenn eine Außenabdichtung wegen Bebauung, Grundstücksgrenzen oder sehr hohen Erdarbeiten nicht praktikabel ist."],
+        bullets: [
+          "Außenwand nicht zugänglich",
+          "akute Abdichtung von innen erforderlich",
+          "begrenztes Sanierungsbudget",
+          "Untergrund kann fachgerecht vorbereitet werden",
+          "Feuchteursache wurde vorher eindeutig bestimmt",
+        ],
+      },
+      {
+        heading: "Innenabdichtung ist nicht dasselbe wie Außenabdichtung",
+        paragraphs: [
+          "Die Innenabdichtung verhindert den Feuchteeintritt in den Raum, die Außenwand selbst bleibt jedoch weiterhin dem Erdreich und dessen Feuchtigkeit ausgesetzt. Deshalb sollte die Entscheidung technisch und nicht nur nach dem Preis getroffen werden.",
+          "Bei aufsteigender Feuchtigkeit kann zusätzlich eine Horizontalsperre notwendig sein. Vor Beginn sollte daher eine Ursachenanalyse erfolgen.",
+        ],
+      },
+    ],
+    faqs: [
+      { question: "Was kostet Kellerabdichtung innen pro m² 2026?", answer: "BauKostenRadar führt etwa 80 bis 200 Euro pro Quadratmeter Wandfläche als Richtwert." },
+      { question: "Was kosten 40 m² Innenabdichtung?", answer: "Mit dem hinterlegten Richtwert ergibt sich eine Budgetorientierung von ungefähr 3.200 bis 8.000 Euro." },
+      { question: "Ist Innenabdichtung so gut wie Außenabdichtung?", answer: "Sie kann technisch sinnvoll sein, wenn außen nicht gearbeitet werden kann, schützt das Mauerwerk jedoch anders. Die geeignete Methode hängt von der konkreten Feuchteursache ab." },
+    ],
+    related: [
+      { label: "Kellerabdichtung innen Preisdetail", href: "/kosten/kellerabdichtung/leistung/kellerabdichtung-innen" },
+      { label: "Kellerabdichtung außen Kosten", href: "/ratgeber/kellerabdichtung-aussen-kosten-pro-qm" },
+      { label: "Kellerdecke dämmen Kosten", href: "/ratgeber/daemmung-kellerdecke-kosten-pro-qm" },
+      { label: "Kellerabdichtung Kosten", href: "/kosten/kellerabdichtung" },
+      { label: "Handwerkerkosten-Rechner", href: "/rechner/handwerkerkosten?gewerk=kellerabdichtung&leistung=kellerabdichtung-innen" },
+    ],
+  },
 ];
