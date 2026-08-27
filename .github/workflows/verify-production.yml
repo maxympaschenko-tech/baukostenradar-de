@@ -246,7 +246,7 @@ jobs:
           grep -q 'Vorauswahl aus der vorherigen Kostenseite übernommen' /tmp/deep-trade-calculator.html
           grep -q 'Wände streichen' /tmp/deep-trade-calculator.html
           grep -q 'Berlin' /tmp/deep-trade-calculator.html
-          grep -q 'Menge: 25' /tmp/deep-trade-calculator.html
+          grep -Eq 'value="25"|value="25\.0"' /tmp/deep-trade-calculator.html
 
           for path in \
             '/kosten' \
