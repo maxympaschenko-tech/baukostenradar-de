@@ -1,0 +1,125 @@
+name: Verify catalog integrity
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-catalog:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify extended services and price items
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/kosten/tueren' -o /tmp/tueren.html
+          curl -sS --fail 'https://baukostenradar.de/kosten/estrich' -o /tmp/estrich.html
+          curl -sS --fail 'https://baukostenradar.de/kosten/maurer' -o /tmp/maurer.html
+          curl -sS --fail 'https://baukostenradar.de/kosten/treppen' -o /tmp/treppen.html
+          curl -sS --fail 'https://baukostenradar.de/kosten/kueche' -o /tmp/kueche.html
+
+          grep -q 'https://baukostenradar.de/kosten/tueren' /tmp/tueren.html
+          grep -q 'https://baukostenradar.de/kosten/estrich' /tmp/estrich.html
+          grep -q 'https://baukostenradar.de/kosten/maurer' /tmp/maurer.html
+          grep -q 'https://baukostenradar.de/kosten/treppen' /tmp/treppen.html
+          grep -q 'https://baukostenradar.de/kosten/kueche' /tmp/kueche.html
+
+          curl -sS --fail 'https://baukostenradar.de/kosten/tueren/leistung/innentuer-einbauen-inkl-zarge' -o /tmp/tueren-item.html
+          curl -sS --fail 'https://baukostenradar.de/kosten/estrich/leistung/zementestrich-komplett' -o /tmp/estrich-item.html
+          curl -sS --fail 'https://baukostenradar.de/kosten/maurer/leistung/mauerarbeiten-fertige-wand' -o /tmp/maurer-item.html
+          curl -sS --fail 'https://baukostenradar.de/kosten/treppen/leistung/holzstufe-schleifen-und-versiegeln' -o /tmp/treppen-item.html
+          curl -sS --fail 'https://baukostenradar.de/kosten/kueche/leistung/kuechen-renovierung-ohne-moebel' -o /tmp/kueche-item.html
+
+          grep -q 'Innentür einbauen inkl. Zarge' /tmp/tueren-item.html
+          grep -q 'Zementestrich komplett' /tmp/estrich-item.html
+          grep -q 'Mauerarbeiten fertige Wand' /tmp/maurer-item.html
+          grep -q 'Holzstufe schleifen und versiegeln' /tmp/treppen-item.html
+          grep -q 'Küchen-Renovierung ohne Möbel' /tmp/kueche-item.html
+
+      - name: Verify catalog guide silos and quantities
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/ratgeber/6-innentueren-austauschen-kosten' -o /tmp/tueren-guide.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber/estrich-100-qm-kosten' -o /tmp/estrich-guide.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber/innenwand-mauern-kosten' -o /tmp/maurer-guide.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber/14-treppenstufen-renovieren-kosten' -o /tmp/treppen-guide.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber/kueche-10-qm-renovieren-kosten' -o /tmp/kueche-guide.html
+
+          grep -q 'gewerk=tueren' /tmp/tueren-guide.html
+          grep -q 'leistung=innentuer-einbauen-inkl-zarge' /tmp/tueren-guide.html
+          grep -q 'menge=6' /tmp/tueren-guide.html
+          grep -q '/kosten/tueren/leistung/' /tmp/tueren-guide.html
+
+          grep -q 'gewerk=estrich' /tmp/estrich-guide.html
+          grep -q 'leistung=zementestrich-komplett' /tmp/estrich-guide.html
+          grep -q 'menge=100' /tmp/estrich-guide.html
+          grep -q '/kosten/estrich/leistung/' /tmp/estrich-guide.html
+
+          grep -q 'gewerk=maurer' /tmp/maurer-guide.html
+          grep -q 'leistung=mauerarbeiten-fertige-wand' /tmp/maurer-guide.html
+          grep -q 'menge=20' /tmp/maurer-guide.html
+          grep -q '/kosten/maurer/leistung/' /tmp/maurer-guide.html
+
+          grep -q 'gewerk=treppen' /tmp/treppen-guide.html
+          grep -q 'leistung=holzstufe-schleifen-und-versiegeln' /tmp/treppen-guide.html
+          grep -q 'menge=14' /tmp/treppen-guide.html
+          grep -q '/kosten/treppen/leistung/' /tmp/treppen-guide.html
+
+          grep -q 'gewerk=kueche' /tmp/kueche-guide.html
+          grep -q 'leistung=kuechen-renovierung-ohne-moebel' /tmp/kueche-guide.html
+          grep -q 'menge=10' /tmp/kueche-guide.html
+          grep -q '/kosten/kueche/leistung/' /tmp/kueche-guide.html
+
+      - name: Verify quantity deep links resolve in calculator
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          check_calculator() {
+            local url="$1"
+            local expected_value="$2"
+            local expected_text="$3"
+            local output="$4"
+            curl -sS --fail "$url" -o "$output"
+            grep -q 'https://baukostenradar.de/rechner/handwerkerkosten' "$output"
+            grep -q 'Vorauswahl aus der vorherigen Kostenseite übernommen' "$output"
+            grep -q "$expected_text" "$output"
+            grep -Eq "value=\"${expected_value}\"|value=\"${expected_value}\.0\"" "$output"
+          }
+
+          check_calculator 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=tueren&leistung=innentuer-einbauen-inkl-zarge&menge=6' '6' 'Innentür einbauen inkl. Zarge' /tmp/calc-tueren.html
+          check_calculator 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=estrich&leistung=zementestrich-komplett&menge=100' '100' 'Zementestrich komplett' /tmp/calc-estrich.html
+          check_calculator 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=maurer&leistung=mauerarbeiten-fertige-wand&menge=20' '20' 'Mauerarbeiten fertige Wand' /tmp/calc-maurer.html
+          check_calculator 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=treppen&leistung=holzstufe-schleifen-und-versiegeln&menge=14' '14' 'Holzstufe schleifen und versiegeln' /tmp/calc-treppen.html
+          check_calculator 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=kueche&leistung=kuechen-renovierung-ohne-moebel&menge=10' '10' 'Küchen-Renovierung ohne Möbel' /tmp/calc-kueche.html
+
+      - name: Verify extended catalog is indexed
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+
+          for path in \
+            '/kosten/tueren' \
+            '/kosten/estrich' \
+            '/kosten/maurer' \
+            '/kosten/treppen' \
+            '/kosten/kueche' \
+            '/kosten/tueren/leistung/innentuer-einbauen-inkl-zarge' \
+            '/kosten/estrich/leistung/zementestrich-komplett' \
+            '/kosten/maurer/leistung/mauerarbeiten-fertige-wand' \
+            '/kosten/treppen/leistung/holzstufe-schleifen-und-versiegeln' \
+            '/kosten/kueche/leistung/kuechen-renovierung-ohne-moebel' \
+            '/ratgeber/6-innentueren-austauschen-kosten' \
+            '/ratgeber/estrich-100-qm-kosten' \
+            '/ratgeber/innenwand-mauern-kosten' \
+            '/ratgeber/14-treppenstufen-renovieren-kosten' \
+            '/ratgeber/kueche-10-qm-renovieren-kosten'; do
+            grep -q "$path" /tmp/sitemap.xml
+          done
