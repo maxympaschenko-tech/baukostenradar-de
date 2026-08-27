@@ -18,20 +18,20 @@ jobs:
 
           declare -A guides=(
             [badsanierung]='/ratgeber/bad-komplett-sanieren-kosten'
-            [maler]='/ratgeber/wohnung-renovieren-kosten'
-            [fliesenleger]='/ratgeber/wohnung-renovieren-kosten'
+            [maler]='/ratgeber/maler-kosten-pro-qm'
+            [fliesenleger]='/ratgeber/fliesenleger-kosten-pro-qm'
             [elektriker]='/ratgeber/elektrik-erneuern-altbau'
             [dachsanierung]='/ratgeber/dach-sanieren-kosten-pro-qm'
-            [bodenleger]='/ratgeber/wohnung-renovieren-kosten'
-            [trockenbau]='/ratgeber/wohnung-renovieren-kosten'
-            [sanitaer]='/ratgeber/bad-komplett-sanieren-kosten'
-            [waermepumpe]='/ratgeber/heizung-erneuern-kosten'
-            [photovoltaik]='/ratgeber/sanierungskosten-einfamilienhaus'
-            [daemmung]='/ratgeber/haus-sanieren-kosten'
+            [bodenleger]='/ratgeber/bodenleger-kosten-pro-qm'
+            [trockenbau]='/ratgeber/trockenbau-kosten-pro-qm'
+            [sanitaer]='/ratgeber/sanitaer-kosten'
+            [waermepumpe]='/ratgeber/waermepumpe-kosten-2026'
+            [photovoltaik]='/ratgeber/photovoltaik-kosten-2026'
+            [daemmung]='/ratgeber/daemmung-kosten-pro-qm'
             [fenster]='/ratgeber/fenster-austauschen-kosten-haus'
             [heizung]='/ratgeber/heizung-erneuern-kosten'
-            [fassade]='/ratgeber/haus-sanieren-kosten'
-            [garten]='/ratgeber/arbeitskosten-materialkosten'
+            [fassade]='/ratgeber/fassade-sanieren-kosten'
+            [garten]='/ratgeber/garten-anlegen-kosten'
             [tueren]='/ratgeber/6-innentueren-austauschen-kosten'
             [estrich]='/ratgeber/estrich-100-qm-kosten'
             [maurer]='/ratgeber/innenwand-mauern-kosten'
@@ -62,20 +62,20 @@ jobs:
 
           declare -A guides=(
             [badsanierung]='/ratgeber/bad-komplett-sanieren-kosten'
-            [maler]='/ratgeber/wohnung-renovieren-kosten'
-            [fliesenleger]='/ratgeber/wohnung-renovieren-kosten'
+            [maler]='/ratgeber/maler-kosten-pro-qm'
+            [fliesenleger]='/ratgeber/fliesenleger-kosten-pro-qm'
             [elektriker]='/ratgeber/elektrik-erneuern-altbau'
             [dachsanierung]='/ratgeber/dach-sanieren-kosten-pro-qm'
-            [bodenleger]='/ratgeber/wohnung-renovieren-kosten'
-            [trockenbau]='/ratgeber/wohnung-renovieren-kosten'
-            [sanitaer]='/ratgeber/bad-komplett-sanieren-kosten'
-            [waermepumpe]='/ratgeber/heizung-erneuern-kosten'
-            [photovoltaik]='/ratgeber/sanierungskosten-einfamilienhaus'
-            [daemmung]='/ratgeber/haus-sanieren-kosten'
+            [bodenleger]='/ratgeber/bodenleger-kosten-pro-qm'
+            [trockenbau]='/ratgeber/trockenbau-kosten-pro-qm'
+            [sanitaer]='/ratgeber/sanitaer-kosten'
+            [waermepumpe]='/ratgeber/waermepumpe-kosten-2026'
+            [photovoltaik]='/ratgeber/photovoltaik-kosten-2026'
+            [daemmung]='/ratgeber/daemmung-kosten-pro-qm'
             [fenster]='/ratgeber/fenster-austauschen-kosten-haus'
             [heizung]='/ratgeber/heizung-erneuern-kosten'
-            [fassade]='/ratgeber/haus-sanieren-kosten'
-            [garten]='/ratgeber/arbeitskosten-materialkosten'
+            [fassade]='/ratgeber/fassade-sanieren-kosten'
+            [garten]='/ratgeber/garten-anlegen-kosten'
             [tueren]='/ratgeber/6-innentueren-austauschen-kosten'
             [estrich]='/ratgeber/estrich-100-qm-kosten'
             [maurer]='/ratgeber/innenwand-mauern-kosten'
@@ -119,14 +119,20 @@ jobs:
 
           guides=(
             bad-komplett-sanieren-kosten
-            wohnung-renovieren-kosten
+            maler-kosten-pro-qm
+            fliesenleger-kosten-pro-qm
             elektrik-erneuern-altbau
             dach-sanieren-kosten-pro-qm
-            heizung-erneuern-kosten
-            sanierungskosten-einfamilienhaus
-            haus-sanieren-kosten
+            bodenleger-kosten-pro-qm
+            trockenbau-kosten-pro-qm
+            sanitaer-kosten
+            waermepumpe-kosten-2026
+            photovoltaik-kosten-2026
+            daemmung-kosten-pro-qm
             fenster-austauschen-kosten-haus
-            arbeitskosten-materialkosten
+            heizung-erneuern-kosten
+            fassade-sanieren-kosten
+            garten-anlegen-kosten
             6-innentueren-austauschen-kosten
             estrich-100-qm-kosten
             innenwand-mauern-kosten
