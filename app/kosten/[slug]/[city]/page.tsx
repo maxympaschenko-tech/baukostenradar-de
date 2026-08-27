@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { handwerkerCalculatorHref } from "@/lib/calculator-links";
 import { getCalculationExample } from "@/lib/price-guidance";
+import { getServiceGuideLink } from "@/lib/price-guide-links";
 import { priceItemSlug } from "@/lib/price-slug";
 import { getRegion, getService, priceSources, regions, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
@@ -70,6 +71,7 @@ export default async function LocalCostPage({
   const baseUrl = siteConfig.url.replace(/\/$/, "");
   const canonicalUrl = `${baseUrl}/kosten/${service.slug}/${region.slug}`;
   const otherCities = regions.filter((item) => item.value !== "de" && item.slug !== region.slug);
+  const primaryGuide = getServiceGuideLink(service.slug);
   const calculatorUrl = service.slug === "badsanierung"
     ? "/rechner/badsanierungskosten"
     : handwerkerCalculatorHref({
@@ -232,6 +234,20 @@ export default async function LocalCostPage({
             <Link className="textLink" href={`/kosten/${service.slug}`}>Bundesweite {service.shortTitle}-Preise ansehen →</Link>
           </section>
 
+          <section className="contentCard" id="ratgeber">
+            <span className="eyebrow">Passender Ratgeber</span>
+            <h2>{primaryGuide.title}</h2>
+            <p>
+              Dieser Ratgeber vertieft die bundesweiten Kostenblöcke und typischen Kostentreiber für {service.shortTitle}.
+              Die Werte auf dieser Stadtseite bleiben davon getrennt: Für {region.label} wird ausschließlich der offen
+              ausgewiesene Regionalfaktor auf die bundesweite Preisbasis angewendet.
+            </p>
+            <div className="heroActions">
+              <Link className="primaryButton" href={primaryGuide.href}>{primaryGuide.cta}</Link>
+              <Link className="ghostButton" href={`/kosten/${service.slug}`}>Bundesweite Preise ansehen</Link>
+            </div>
+          </section>
+
           <section className="contentCard">
             <span className="eyebrow">Häufige Fragen</span>
             <h2>FAQ zu {service.shortTitle} in {region.label}</h2>
@@ -296,6 +312,7 @@ export default async function LocalCostPage({
             <strong className="bigMetric">{priceRange(adjustedLeadLow, adjustedLeadHigh)}</strong>
             <p>{leadPrice.unit}</p>
             <Link className="primaryButton" href={calculatorUrl}>Kosten berechnen</Link>
+            <Link className="textLink" href={primaryGuide.href}>Passenden Ratgeber öffnen →</Link>
             <Link className="textLink" href={`/kosten/${service.slug}`}>Deutschland vergleichen →</Link>
           </section>
         </aside>
