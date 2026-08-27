@@ -149,16 +149,6 @@ const itemGuideOverrides: Record<string, PriceGuideLink> = {
     title: "Laminat verlegen: Kosten pro m² und Nebenarbeiten",
     cta: "Laminat-Ratgeber öffnen",
   },
-  "daemmung:dachdaemmung-aufsparren": {
-    href: "/ratgeber/dach-sanieren-kosten-pro-qm",
-    title: "Dach sanieren: Dämmkosten pro m² einordnen",
-    cta: "Dach-Ratgeber öffnen",
-  },
-  "daemmung:dachdaemmung-zwischensparren": {
-    href: "/ratgeber/dach-sanieren-kosten-pro-qm",
-    title: "Dach sanieren: Dämmkosten pro m² einordnen",
-    cta: "Dach-Ratgeber öffnen",
-  },
   "daemmung:innendaemmung": {
     href: "/ratgeber/innendaemmung-kosten-pro-qm",
     title: "Innendämmung: Kosten pro m² und Planungsfaktoren",
@@ -248,6 +238,106 @@ const itemGuideOverrides: Record<string, PriceGuideLink> = {
     href: "/ratgeber/kuechenarbeitsplatte-kosten",
     title: "Küchenarbeitsplatte: Kosten nach Material und Aufwand",
     cta: "Arbeitsplatten-Ratgeber öffnen",
+  },
+  "maler:waende-streichen": {
+    href: "/ratgeber/waende-streichen-kosten-pro-qm",
+    title: "Wände streichen: Kosten pro m² Wandfläche",
+    cta: "Streichen-Ratgeber öffnen",
+  },
+  "maler:tapezieren-inkl-tapete": {
+    href: "/ratgeber/tapezieren-kosten-pro-qm",
+    title: "Tapezieren: Kosten pro m² inklusive Tapete",
+    cta: "Tapezieren-Ratgeber öffnen",
+  },
+  "maler:innenputz-glaetten-q3": {
+    href: "/ratgeber/innenputz-q3-kosten-pro-qm",
+    title: "Innenputz und Glätten Q3: Kosten pro m²",
+    cta: "Q3-Ratgeber öffnen",
+  },
+  "fliesenleger:standard-fliesen-verlegen": {
+    href: "/ratgeber/fliesen-verlegen-kosten-pro-qm",
+    title: "Standard-Fliesen verlegen: Arbeitskosten pro m²",
+    cta: "Fliesen-Ratgeber öffnen",
+  },
+  "fliesenleger:grossformat-ab-80-x-80-cm": {
+    href: "/ratgeber/grossformat-fliesen-verlegen-kosten",
+    title: "Großformat-Fliesen verlegen: Kosten pro m²",
+    cta: "Großformat-Ratgeber öffnen",
+  },
+  "elektriker:steckdose-installieren": {
+    href: "/ratgeber/steckdose-installieren-kosten",
+    title: "Steckdose installieren: Kosten pro Stück",
+    cta: "Steckdosen-Ratgeber öffnen",
+  },
+  "dachsanierung:neueindeckung-inkl-lattung": {
+    href: "/ratgeber/dach-neu-eindecken-kosten-pro-qm",
+    title: "Dach neu eindecken: Kosten pro m² inklusive Lattung",
+    cta: "Neueindeckungs-Ratgeber öffnen",
+  },
+  "bodenleger:vinylboden-klick-inkl-material": {
+    href: "/ratgeber/vinylboden-verlegen-kosten-pro-qm",
+    title: "Vinylboden verlegen: Klickvinyl inklusive Material",
+    cta: "Vinylboden-Ratgeber öffnen",
+  },
+  "trockenbau:verspachtelung-q4": {
+    href: "/ratgeber/verspachtelung-q4-kosten-pro-qm",
+    title: "Verspachtelung Q4: Kosten pro m²",
+    cta: "Q4-Ratgeber öffnen",
+  },
+  "waermepumpe:luft-wasser-waermepumpe-komplett": {
+    href: "/ratgeber/luft-wasser-waermepumpe-kosten",
+    title: "Luft-Wasser-Wärmepumpe: Komplettkosten vor Förderung",
+    cta: "Luft-Wasser-Ratgeber öffnen",
+  },
+  "photovoltaik:pv-anlage-10-kwp-inkl-installation": {
+    href: "/ratgeber/photovoltaik-10-kwp-kosten",
+    title: "Photovoltaik 10 kWp: Kosten inklusive Installation",
+    cta: "10-kWp-Ratgeber öffnen",
+  },
+  "photovoltaik:10-kwp-pv-ca-10-kwh-speicher": {
+    href: "/ratgeber/photovoltaik-mit-speicher-kosten",
+    title: "Photovoltaik mit Speicher: 10 kWp plus etwa 10 kWh",
+    cta: "PV-Speicher-Ratgeber öffnen",
+  },
+  "fenster:fenster-mit-3-fach-verglasung": {
+    href: "/ratgeber/fenster-3-fach-verglasung-kosten",
+    title: "Fenster mit 3-fach Verglasung: Kosten pro Fenster",
+    cta: "3-fach-Fenster-Ratgeber öffnen",
+  },
+  "heizung:gasheizung-austauschen": {
+    href: "/ratgeber/gasheizung-austauschen-kosten",
+    title: "Gasheizung austauschen: Kosten und Leistungsumfang",
+    cta: "Gasheizungs-Ratgeber öffnen",
+  },
+  "heizung:heizungswartung": {
+    href: "/ratgeber/heizungswartung-kosten",
+    title: "Heizungswartung: Kosten pro Wartung",
+    cta: "Heizungswartungs-Ratgeber öffnen",
+  },
+  "garten:doppelstabmattenzaun-inkl-montage": {
+    href: "/ratgeber/doppelstabmattenzaun-kosten-pro-meter",
+    title: "Doppelstabmattenzaun: Kosten pro Meter inklusive Montage",
+    cta: "Zaun-Ratgeber öffnen",
+  },
+  "estrich:trockenestrich": {
+    href: "/ratgeber/trockenestrich-kosten-pro-qm",
+    title: "Trockenestrich: Kosten pro m²",
+    cta: "Trockenestrich-Ratgeber öffnen",
+  },
+  "daemmung:dachdaemmung-zwischensparren": {
+    href: "/ratgeber/zwischensparrendaemmung-kosten-pro-qm",
+    title: "Zwischensparrendämmung: Kosten pro m²",
+    cta: "Zwischensparren-Ratgeber öffnen",
+  },
+  "daemmung:dachdaemmung-aufsparren": {
+    href: "/ratgeber/aufsparrendaemmung-kosten-pro-qm",
+    title: "Aufsparrendämmung: Kosten pro m²",
+    cta: "Aufsparren-Ratgeber öffnen",
+  },
+  "fassade:putz-fassade-neu": {
+    href: "/ratgeber/putzfassade-kosten-pro-qm",
+    title: "Putzfassade: Kosten pro m² inklusive Material",
+    cta: "Putzfassaden-Ratgeber öffnen",
   },
 };
 
