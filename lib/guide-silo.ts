@@ -10,6 +10,86 @@ export type GuideSilo = {
 
 const renovationServices = ["badsanierung", "elektriker", "dachsanierung", "fenster", "heizung", "bodenleger"];
 
+const opportunitySilos: Record<string, {
+  serviceSlugs: string[];
+  serviceSlug: string;
+  itemSlug: string;
+  calculatorLabel: string;
+}> = {
+  "einfahrt-pflastern-kosten": {
+    serviceSlugs: ["garten"],
+    serviceSlug: "garten",
+    itemSlug: "einfahrt-pflastern",
+    calculatorLabel: "Einfahrt berechnen",
+  },
+  "terrasse-pflastern-kosten": {
+    serviceSlugs: ["garten"],
+    serviceSlug: "garten",
+    itemSlug: "terrasse-pflastern-inkl-unterbau",
+    calculatorLabel: "Terrasse berechnen",
+  },
+  "baum-faellen-kosten": {
+    serviceSlugs: ["garten"],
+    serviceSlug: "garten",
+    itemSlug: "baumfaellung-mittelgross-inkl-entsorgung",
+    calculatorLabel: "Baumfällung berechnen",
+  },
+  "rollrasen-kosten-pro-qm": {
+    serviceSlugs: ["garten"],
+    serviceSlug: "garten",
+    itemSlug: "rollrasen-inkl-vorbereitung",
+    calculatorLabel: "Rollrasen berechnen",
+  },
+  "parkett-abschleifen-kosten": {
+    serviceSlugs: ["bodenleger", "maler"],
+    serviceSlug: "bodenleger",
+    itemSlug: "parkett-abschleifen-und-oelen",
+    calculatorLabel: "Parkettsanierung berechnen",
+  },
+  "sicherungskasten-erneuern-kosten": {
+    serviceSlugs: ["elektriker"],
+    serviceSlug: "elektriker",
+    itemSlug: "sicherungskasten-erneuern",
+    calculatorLabel: "Sicherungskasten berechnen",
+  },
+  "dachrinne-erneuern-kosten": {
+    serviceSlugs: ["dachsanierung", "fassade"],
+    serviceSlug: "dachsanierung",
+    itemSlug: "dachrinne-erneuern-zink",
+    calculatorLabel: "Dachrinne berechnen",
+  },
+  "haustuer-einbauen-kosten": {
+    serviceSlugs: ["tueren", "fenster", "fassade"],
+    serviceSlug: "tueren",
+    itemSlug: "haustuer-kunststoff-inkl-montage",
+    calculatorLabel: "Haustür berechnen",
+  },
+  "fassadendaemmung-kosten-pro-qm": {
+    serviceSlugs: ["daemmung", "fassade"],
+    serviceSlug: "daemmung",
+    itemSlug: "fassadendaemmung-wdvs",
+    calculatorLabel: "Fassadendämmung berechnen",
+  },
+  "waermepumpe-wartung-kosten": {
+    serviceSlugs: ["waermepumpe", "heizung"],
+    serviceSlug: "waermepumpe",
+    itemSlug: "wartung-waermepumpe",
+    calculatorLabel: "Wärmepumpen-Wartung berechnen",
+  },
+  "stromspeicher-kosten-pro-kwh": {
+    serviceSlugs: ["photovoltaik", "elektriker"],
+    serviceSlug: "photovoltaik",
+    itemSlug: "stromspeicher-lfp",
+    calculatorLabel: "Stromspeicher berechnen",
+  },
+  "fenstereinbau-kosten": {
+    serviceSlugs: ["fenster", "daemmung", "fassade"],
+    serviceSlug: "fenster",
+    itemSlug: "fenstereinbau",
+    calculatorLabel: "Fenstereinbau berechnen",
+  },
+};
+
 const scenarioCalculatorLinks: Record<string, Pick<GuideSilo, "calculatorHref" | "calculatorLabel">> = {
   "dach-150-qm-kosten": {
     calculatorHref: handwerkerCalculatorHref({
@@ -86,6 +166,19 @@ const scenarioCalculatorLinks: Record<string, Pick<GuideSilo, "calculatorHref" |
 };
 
 export function getGuideSilo(slug: string): GuideSilo {
+  const opportunity = opportunitySilos[slug];
+  if (opportunity) {
+    return {
+      serviceSlugs: opportunity.serviceSlugs,
+      calculatorHref: handwerkerCalculatorHref({
+        serviceSlug: opportunity.serviceSlug,
+        itemSlug: opportunity.itemSlug,
+      }),
+      calculatorLabel: opportunity.calculatorLabel,
+      regionalMode: "service",
+    };
+  }
+
   const scenarioCalculator = scenarioCalculatorLinks[slug];
 
   if (slug.includes("maler")) {
