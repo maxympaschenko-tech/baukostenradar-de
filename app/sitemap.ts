@@ -4,6 +4,9 @@ import { priceItemSlug } from "@/lib/price-slug";
 import { regions, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const contentUpdatedAt = new Date("2026-08-27T00:00:00+02:00");
 
 export default function sitemap(): MetadataRoute.Sitemap {
