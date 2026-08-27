@@ -124,10 +124,30 @@ const itemGuideOverrides: Record<string, PriceGuideLink> = {
     title: "Fußbodenheizung 100 m²: Kostenbeispiel 2026",
     cta: "Fußbodenheizungs-Ratgeber öffnen",
   },
+  "heizung:heizkoerper-montieren": {
+    href: "/ratgeber/heizkoerper-montieren-kosten",
+    title: "Heizkörper montieren: Kosten pro Stück und Zusatzarbeiten",
+    cta: "Heizkörper-Ratgeber öffnen",
+  },
   "maler:fassade-streichen-inkl-vorarbeiten": {
     href: "/ratgeber/fassade-sanieren-kosten",
     title: "Fassade sanieren: Anstrich und Vorarbeiten einordnen",
     cta: "Fassaden-Ratgeber öffnen",
+  },
+  "trockenbau:trockenbauwand-beidseitig-beplankt": {
+    href: "/ratgeber/trockenbauwand-kosten-pro-qm",
+    title: "Trockenbauwand: Kosten pro m² und Wandaufbau",
+    cta: "Trockenbauwand-Ratgeber öffnen",
+  },
+  "bodenleger:parkett-verlegen-inkl-material": {
+    href: "/ratgeber/parkett-verlegen-kosten-pro-qm",
+    title: "Parkett verlegen: Kosten pro m² inklusive Material",
+    cta: "Parkett-verlegen-Ratgeber öffnen",
+  },
+  "bodenleger:laminat-verlegen": {
+    href: "/ratgeber/laminat-verlegen-kosten-pro-qm",
+    title: "Laminat verlegen: Kosten pro m² und Nebenarbeiten",
+    cta: "Laminat-Ratgeber öffnen",
   },
   "daemmung:dachdaemmung-aufsparren": {
     href: "/ratgeber/dach-sanieren-kosten-pro-qm",
@@ -138,6 +158,11 @@ const itemGuideOverrides: Record<string, PriceGuideLink> = {
     href: "/ratgeber/dach-sanieren-kosten-pro-qm",
     title: "Dach sanieren: Dämmkosten pro m² einordnen",
     cta: "Dach-Ratgeber öffnen",
+  },
+  "daemmung:innendaemmung": {
+    href: "/ratgeber/innendaemmung-kosten-pro-qm",
+    title: "Innendämmung: Kosten pro m² und Planungsfaktoren",
+    cta: "Innendämmungs-Ratgeber öffnen",
   },
   "garten:einfahrt-pflastern": {
     href: "/ratgeber/einfahrt-pflastern-kosten",
@@ -205,14 +230,24 @@ const itemGuideOverrides: Record<string, PriceGuideLink> = {
     cta: "Fenstereinbau-Ratgeber öffnen",
   },
   "maurer:bodenplatte-standard": {
-    href: "/ratgeber/haus-sanieren-kosten",
-    title: "Haus sanieren: massive Bauteile im Gesamtbudget",
-    cta: "Haus-Sanierungs-Ratgeber öffnen",
+    href: "/ratgeber/bodenplatte-kosten-pro-qm",
+    title: "Bodenplatte: Kosten pro m² und Leistungsumfang",
+    cta: "Bodenplatten-Ratgeber öffnen",
   },
   "maurer:klinker-verblendmauerwerk": {
     href: "/ratgeber/haus-sanieren-kosten",
     title: "Haus sanieren: Klinker und Fassade im Gesamtbudget",
     cta: "Haus-Sanierungs-Ratgeber öffnen",
+  },
+  "kueche:kuechenfronten-austauschen-oder-lackieren": {
+    href: "/ratgeber/kuechenfronten-erneuern-kosten",
+    title: "Küchenfronten erneuern: Austausch oder Lackierung",
+    cta: "Küchenfronten-Ratgeber öffnen",
+  },
+  "kueche:neue-arbeitsplatte": {
+    href: "/ratgeber/kuechenarbeitsplatte-kosten",
+    title: "Küchenarbeitsplatte: Kosten nach Material und Aufwand",
+    cta: "Arbeitsplatten-Ratgeber öffnen",
   },
 };
 
