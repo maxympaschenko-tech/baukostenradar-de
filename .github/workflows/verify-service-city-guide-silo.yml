@@ -28,6 +28,7 @@ jobs:
             [waermepumpe]='/ratgeber/waermepumpe-kosten-2026'
             [photovoltaik]='/ratgeber/photovoltaik-kosten-2026'
             [daemmung]='/ratgeber/daemmung-kosten-pro-qm'
+            [kellerabdichtung]='/ratgeber/handwerker-stundensaetze'
             [fenster]='/ratgeber/fenster-austauschen-kosten-haus'
             [heizung]='/ratgeber/heizung-erneuern-kosten'
             [fassade]='/ratgeber/fassade-sanieren-kosten'
@@ -37,6 +38,7 @@ jobs:
             [maurer]='/ratgeber/innenwand-mauern-kosten'
             [treppen]='/ratgeber/14-treppenstufen-renovieren-kosten'
             [kueche]='/ratgeber/kueche-10-qm-renovieren-kosten'
+            [abriss-entsorgung]='/ratgeber/handwerker-stundensaetze'
           )
 
           for service in "${!guides[@]}"; do
@@ -47,7 +49,7 @@ jobs:
             ! grep -qi 'noindex' "$output"
           done
 
-      - name: Verify all 160 local trade pages
+      - name: Verify all 176 local trade pages
         shell: bash
         run: |
           set -euo pipefail
@@ -55,8 +57,8 @@ jobs:
           services=(
             badsanierung maler fliesenleger elektriker dachsanierung
             bodenleger trockenbau sanitaer waermepumpe photovoltaik
-            daemmung fenster heizung fassade garten
-            tueren estrich maurer treppen kueche
+            daemmung kellerabdichtung fenster heizung fassade garten
+            tueren estrich maurer treppen kueche abriss-entsorgung
           )
           cities=(berlin hamburg muenchen koeln frankfurt stuttgart duesseldorf leipzig)
 
@@ -72,6 +74,7 @@ jobs:
             [waermepumpe]='/ratgeber/waermepumpe-kosten-2026'
             [photovoltaik]='/ratgeber/photovoltaik-kosten-2026'
             [daemmung]='/ratgeber/daemmung-kosten-pro-qm'
+            [kellerabdichtung]='/ratgeber/handwerker-stundensaetze'
             [fenster]='/ratgeber/fenster-austauschen-kosten-haus'
             [heizung]='/ratgeber/heizung-erneuern-kosten'
             [fassade]='/ratgeber/fassade-sanieren-kosten'
@@ -81,6 +84,7 @@ jobs:
             [maurer]='/ratgeber/innenwand-mauern-kosten'
             [treppen]='/ratgeber/14-treppenstufen-renovieren-kosten'
             [kueche]='/ratgeber/kueche-10-qm-renovieren-kosten'
+            [abriss-entsorgung]='/ratgeber/handwerker-stundensaetze'
           )
 
           checked=0
@@ -98,7 +102,7 @@ jobs:
             done
           done
 
-          test "$checked" -eq 160
+          test "$checked" -eq 176
 
       - name: Verify all local trade pages are in sitemap
         shell: bash
@@ -107,10 +111,10 @@ jobs:
 
           curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
 
-          services='badsanierung|maler|fliesenleger|elektriker|dachsanierung|bodenleger|trockenbau|sanitaer|waermepumpe|photovoltaik|daemmung|fenster|heizung|fassade|garten|tueren|estrich|maurer|treppen|kueche'
+          services='badsanierung|maler|fliesenleger|elektriker|dachsanierung|bodenleger|trockenbau|sanitaer|waermepumpe|photovoltaik|daemmung|kellerabdichtung|fenster|heizung|fassade|garten|tueren|estrich|maurer|treppen|kueche|abriss-entsorgung'
           cities='berlin|hamburg|muenchen|koeln|frankfurt|stuttgart|duesseldorf|leipzig'
           count=$(grep -oE "https://baukostenradar.de/kosten/(${services})/(${cities})</loc>" /tmp/sitemap.xml | wc -l | tr -d ' ')
-          test "$count" -eq 160
+          test "$count" -eq 176
 
       - name: Verify referenced primary guides resolve
         shell: bash
@@ -129,6 +133,7 @@ jobs:
             waermepumpe-kosten-2026
             photovoltaik-kosten-2026
             daemmung-kosten-pro-qm
+            handwerker-stundensaetze
             fenster-austauschen-kosten-haus
             heizung-erneuern-kosten
             fassade-sanieren-kosten
