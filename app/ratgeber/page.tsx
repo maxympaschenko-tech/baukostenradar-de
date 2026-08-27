@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { allGuides } from "@/lib/all-guides";
+import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Ratgeber zu Sanierung, Renovierung & Handwerkerkosten 2026",
@@ -86,8 +87,39 @@ function guideBySlug(slug: string) {
 }
 
 export default function GuidesPage() {
+  const base = siteConfig.url.replace(/\/$/, "");
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Startseite", item: base },
+        { "@type": "ListItem", position: 2, name: "Ratgeber", item: `${base}/ratgeber` },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: "Baukosten-Ratgeber 2026",
+      url: `${base}/ratgeber`,
+      description: metadata.description,
+      mainEntity: {
+        "@type": "ItemList",
+        numberOfItems: allGuides.length,
+        itemListElement: allGuides.map((guide, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: guide.title,
+          url: `${base}/ratgeber/${guide.slug}`,
+        })),
+      },
+    },
+  ];
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+
       <section className="contentHero">
         <div className="shell">
           <nav className="visibleBreadcrumbs" aria-label="Breadcrumb">
@@ -109,11 +141,34 @@ export default function GuidesPage() {
         </div>
       </section>
 
+      <section className="section sectionAlt">
+        <div className="shell">
+          <div className="premiumSectionHeading">
+            <div>
+              <span className="eyebrow">So nutzt du BauKostenRadar</span>
+              <h2>Vom Thema zum belastbaren Budget</h2>
+              <p>Die Ratgeber erklären die Kostenlogik. Danach geht es direkt zu Einzelpreisen, Rechnern und regionalen Modellwerten.</p>
+            </div>
+          </div>
+          <div className="stepsList">
+            <div><strong>1</strong><span><b>Ratgeber wählen</b><small>Projektumfang, typische Kostenblöcke und Fallstricke verstehen.</small></span></div>
+            <div><strong>2</strong><span><b>Einzelpreise prüfen</b><small>Passende Gewerke und konkrete Preispositionen vergleichen.</small></span></div>
+            <div><strong>3</strong><span><b>Eigene Menge rechnen</b><small>Fläche, Stückzahl, Umfang und Qualitätsniveau im Rechner anpassen.</small></span></div>
+            <div><strong>4</strong><span><b>Region einordnen</b><small>Modellierte Richtwerte für deutsche Großstädte als Budgethilfe nutzen.</small></span></div>
+          </div>
+          <div className="heroActions">
+            <Link className="primaryButton" href="/kosten">Alle Handwerkerpreise</Link>
+            <Link className="ghostButton" href="/rechner">Alle Rechner</Link>
+            <Link className="ghostButton" href="/staedte">Städte vergleichen</Link>
+          </div>
+        </div>
+      </section>
+
       {guideGroups.map((group, index) => {
         const groupGuides = group.slugs.map(guideBySlug).filter((guide): guide is NonNullable<typeof guide> => Boolean(guide));
 
         return (
-          <section className={`section${index % 2 === 1 ? " sectionAlt" : ""}`} key={group.title}>
+          <section className={`section${index % 2 === 0 ? "" : " sectionAlt"}`} key={group.title}>
             <div className="shell">
               <div className="premiumSectionHeading">
                 <div>
@@ -155,7 +210,7 @@ export default function GuidesPage() {
           <div className="heroActions">
             <Link className="primaryButton" href="/rechner/renovierungskosten">Renovierung berechnen</Link>
             <Link className="ghostButton" href="/rechner/handwerkerkosten">Handwerkerkosten berechnen</Link>
-            <Link className="ghostButton" href="/kosten">Alle Preisbereiche</Link>
+            <Link className="ghostButton" href="/methodik">Methodik verstehen</Link>
           </div>
         </div>
       </section>
