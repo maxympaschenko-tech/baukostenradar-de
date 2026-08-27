@@ -172,6 +172,7 @@ jobs:
           curl -sS --fail 'https://baukostenradar.de/rechner/renovierungskosten' -o /tmp/renovation-calculator.html
           curl -sS --fail 'https://baukostenradar.de/rechner/handwerkerkosten' -o /tmp/trade-calculator.html
           curl -sS --fail 'https://baukostenradar.de/rechner/badsanierungskosten' -o /tmp/bath-calculator.html
+          curl -sS --fail 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=maler&leistung=waende-streichen&region=berlin' -o /tmp/deep-trade-calculator.html
 
           grep -q 'https://baukostenradar.de/kosten' /tmp/costs.html
           grep -q 'https://baukostenradar.de/kosten/maler' /tmp/service.html
@@ -184,8 +185,9 @@ jobs:
           grep -q 'https://baukostenradar.de/rechner/renovierungskosten' /tmp/renovation-calculator.html
           grep -q 'https://baukostenradar.de/rechner/handwerkerkosten' /tmp/trade-calculator.html
           grep -q 'https://baukostenradar.de/rechner/badsanierungskosten' /tmp/bath-calculator.html
+          grep -q 'https://baukostenradar.de/rechner/handwerkerkosten' /tmp/deep-trade-calculator.html
 
-          for page in /tmp/costs.html /tmp/service.html /tmp/item.html /tmp/city.html /tmp/local.html /tmp/guides.html /tmp/guide.html /tmp/calculators.html /tmp/renovation-calculator.html /tmp/trade-calculator.html /tmp/bath-calculator.html; do
+          for page in /tmp/costs.html /tmp/service.html /tmp/item.html /tmp/city.html /tmp/local.html /tmp/guides.html /tmp/guide.html /tmp/calculators.html /tmp/renovation-calculator.html /tmp/trade-calculator.html /tmp/bath-calculator.html /tmp/deep-trade-calculator.html; do
             if grep -qi 'noindex' "$page"; then
               echo "Unexpected noindex in $page" >&2
               exit 1
@@ -197,8 +199,13 @@ jobs:
           grep -q 'BreadcrumbList' /tmp/item.html
           grep -q 'FAQPage' /tmp/item.html
           grep -q 'Beispielrechnungen' /tmp/item.html
+          grep -q 'gewerk=maler' /tmp/item.html
+          grep -q 'leistung=waende-streichen' /tmp/item.html
           grep -q 'BreadcrumbList' /tmp/city.html
           grep -q 'BreadcrumbList' /tmp/local.html
+          grep -q 'gewerk=maler' /tmp/local.html
+          grep -q 'leistung=waende-streichen' /tmp/local.html
+          grep -q 'region=berlin' /tmp/local.html
           grep -q 'CollectionPage' /tmp/guides.html
           grep -q 'ItemList' /tmp/guides.html
           grep -q 'Article' /tmp/guide.html
@@ -219,6 +226,9 @@ jobs:
           grep -q 'Die Preisanker des Rechners im Detail' /tmp/bath-calculator.html
           grep -q '/kosten/badsanierung/leistung/' /tmp/bath-calculator.html
           grep -q '/kosten/badsanierung/berlin' /tmp/bath-calculator.html
+          grep -q 'Vorauswahl aus der vorherigen Kostenseite übernommen' /tmp/deep-trade-calculator.html
+          grep -q 'Wände streichen' /tmp/deep-trade-calculator.html
+          grep -q 'Berlin' /tmp/deep-trade-calculator.html
 
           for path in \
             '/kosten' \
