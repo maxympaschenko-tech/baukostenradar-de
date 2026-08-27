@@ -41,8 +41,8 @@ jobs:
             grep -q "https://baukostenradar.de/staedte/${city}" "$output"
             ! grep -qi 'noindex' "$output"
             grep -q 'ItemList' "$output"
+            grep -q '"numberOfItems":20' "$output"
             grep -q 'Preispositionen' "$output"
-            grep -q 'Alle 20 Gewerke' "$output"
             grep -q "region=${city}" "$output"
 
             for service in "${services[@]}"; do
@@ -76,6 +76,7 @@ jobs:
           for city in berlin hamburg muenchen koeln frankfurt stuttgart duesseldorf leipzig; do
             output="/tmp/calculator-${city}.html"
             curl -sS --fail "https://baukostenradar.de/rechner/handwerkerkosten?region=${city}" -o "$output"
-            grep -Eq "value=\"${city}\"|value=\"frankfurt\"" "$output"
+            grep -q 'Vorauswahl aus der vorherigen Kostenseite übernommen' "$output"
+            grep -q "/kosten/badsanierung/${city}" "$output"
             ! grep -qi 'noindex' "$output"
           done
