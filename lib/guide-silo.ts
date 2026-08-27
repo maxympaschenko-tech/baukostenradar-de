@@ -176,7 +176,7 @@ const scenarioCalculatorLinks: Record<string, Pick<GuideSilo, "calculatorHref" |
   "6-innentueren-austauschen-kosten": {
     calculatorHref: handwerkerCalculatorHref({
       serviceSlug: "tueren",
-      itemSlug: "innentuer-einbauen-inkl-zarge",
+      itemSlug: "innentuer-mit-zarge-inkl-montage",
       quantity: 6,
     }),
     calculatorLabel: "6 Innentüren berechnen",
@@ -184,7 +184,7 @@ const scenarioCalculatorLinks: Record<string, Pick<GuideSilo, "calculatorHref" |
   "estrich-100-qm-kosten": {
     calculatorHref: handwerkerCalculatorHref({
       serviceSlug: "estrich",
-      itemSlug: "zementestrich-komplett",
+      itemSlug: "zementestrich-verlegen",
       quantity: 100,
     }),
     calculatorLabel: "100 m² Estrich berechnen",
