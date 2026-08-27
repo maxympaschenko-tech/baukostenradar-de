@@ -16,6 +16,7 @@
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/lib/pricing": ["./lib/catalog.ts"],
+      "@/lib/price-guide-links": ["./lib/price-guide-links-catalog.ts"],
       "@/*": ["./*"]
     }
   },
