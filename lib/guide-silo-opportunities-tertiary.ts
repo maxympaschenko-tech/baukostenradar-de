@@ -146,7 +146,7 @@ export const tertiaryOpportunitySilos: Record<string, OpportunitySiloConfig> = {
   "fliessestrich-kosten-pro-qm": {
     serviceSlugs: ["estrich", "bodenleger"],
     serviceSlug: "estrich",
-    itemSlug: "fliessestrich",
+    itemSlug: "fliessestrich-verlegen",
     calculatorLabel: "Fließestrich berechnen",
   },
   "schnellestrich-kosten-pro-qm": {
@@ -185,16 +185,16 @@ export const tertiaryOpportunitySilos: Record<string, OpportunitySiloConfig> = {
     itemSlug: "innenabbruch-einfamilienhaus",
     calculatorLabel: "Innenabbruch berechnen",
   },
+  "industriehalle-abbrechen-kosten-pro-qm": {
+    serviceSlugs: ["abriss-entsorgung"],
+    serviceSlug: "abriss-entsorgung",
+    itemSlug: "industriehalle-abbrechen",
+    calculatorLabel: "Industrieabbruch berechnen",
+  },
   "bauschuttcontainer-30-m3-kosten": {
     serviceSlugs: ["abriss-entsorgung"],
     serviceSlug: "abriss-entsorgung",
     itemSlug: "bauschuttcontainer-30-m3",
     calculatorLabel: "Containerkosten berechnen",
-  },
-  "bauschutt-entsorgung-kosten-pro-tonne": {
-    serviceSlugs: ["abriss-entsorgung"],
-    serviceSlug: "abriss-entsorgung",
-    itemSlug: "entsorgung-bauschutt",
-    calculatorLabel: "Bauschuttentsorgung berechnen",
   },
 };
