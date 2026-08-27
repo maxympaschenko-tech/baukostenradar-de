@@ -30,6 +30,11 @@ export const quinaryItemGuideOverrides: Record<string, QuinaryPriceGuideLink> = 
     title: "Dachfenster nachträglich einbauen: Kosten pro Fenster",
     cta: "Dachfenster-Ratgeber öffnen",
   },
+  "dachsanierung:dachfenster-1-1-austauschen": {
+    href: "/ratgeber/dachfenster-austauschen-kosten",
+    title: "Dachfenster 1:1 austauschen: Kosten pro Fenster",
+    cta: "Dachfenster-Austausch öffnen",
+  },
   "daemmung:kellerdeckendaemmung-inkl-montage": {
     href: "/ratgeber/daemmung-kellerdecke-kosten-pro-qm",
     title: "Kellerdecke dämmen: Kosten pro m² inklusive Montage",
@@ -50,6 +55,16 @@ export const quinaryItemGuideOverrides: Record<string, QuinaryPriceGuideLink> = 
     title: "Untersparrendämmung: Kosten pro m² und Dachaufbau",
     cta: "Untersparren-Ratgeber öffnen",
   },
+  "daemmung:flachdachdaemmung-warmdach": {
+    href: "/ratgeber/flachdach-warmdaemmung-kosten-pro-qm",
+    title: "Flachdach Warmdach: Dämmkosten pro m²",
+    cta: "Warmdach-Ratgeber öffnen",
+  },
+  "daemmung:flachdachdaemmung-kaltdach": {
+    href: "/ratgeber/flachdach-kaltdaemmung-kosten-pro-qm",
+    title: "Flachdach Kaltdach: Dämmkosten pro m²",
+    cta: "Kaltdach-Ratgeber öffnen",
+  },
   "daemmung:perimeterdaemmung-kellerwand": {
     href: "/ratgeber/perimeterdaemmung-kosten-pro-qm",
     title: "Perimeterdämmung: Kosten pro m² plus Erdarbeiten",
@@ -59,6 +74,16 @@ export const quinaryItemGuideOverrides: Record<string, QuinaryPriceGuideLink> = 
     href: "/ratgeber/einblasdaemmung-geschossdecke-kosten-pro-qm",
     title: "Einblasdämmung der Geschossdecke: Kosten pro m²",
     cta: "Einblasdämmungs-Ratgeber öffnen",
+  },
+  "kellerabdichtung:kellerabdichtung-aussen-inkl-aushub": {
+    href: "/ratgeber/kellerabdichtung-aussen-kosten-pro-qm",
+    title: "Kellerabdichtung außen: Kosten pro m² inklusive Aushub",
+    cta: "Außenabdichtungs-Ratgeber öffnen",
+  },
+  "kellerabdichtung:kellerabdichtung-innen": {
+    href: "/ratgeber/kellerabdichtung-innen-kosten-pro-qm",
+    title: "Kellerabdichtung innen: Kosten pro m²",
+    cta: "Innenabdichtungs-Ratgeber öffnen",
   },
   "photovoltaik:pv-anlage-5-kwp-inkl-installation": {
     href: "/ratgeber/photovoltaik-5-kwp-kosten",
