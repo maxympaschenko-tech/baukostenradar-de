@@ -45,6 +45,21 @@ export const quinaryItemGuideOverrides: Record<string, QuinaryPriceGuideLink> = 
     title: "Oberste Geschossdecke dämmen: begehbar und nicht begehbar",
     cta: "Geschossdecken-Ratgeber öffnen",
   },
+  "daemmung:dachdaemmung-untersparren": {
+    href: "/ratgeber/untersparrendaemmung-kosten-pro-qm",
+    title: "Untersparrendämmung: Kosten pro m² und Dachaufbau",
+    cta: "Untersparren-Ratgeber öffnen",
+  },
+  "daemmung:perimeterdaemmung-kellerwand": {
+    href: "/ratgeber/perimeterdaemmung-kosten-pro-qm",
+    title: "Perimeterdämmung: Kosten pro m² plus Erdarbeiten",
+    cta: "Perimeter-Ratgeber öffnen",
+  },
+  "daemmung:einblasdaemmung-oberste-geschossdecke": {
+    href: "/ratgeber/einblasdaemmung-geschossdecke-kosten-pro-qm",
+    title: "Einblasdämmung der Geschossdecke: Kosten pro m²",
+    cta: "Einblasdämmungs-Ratgeber öffnen",
+  },
   "photovoltaik:pv-anlage-5-kwp-inkl-installation": {
     href: "/ratgeber/photovoltaik-5-kwp-kosten",
     title: "Photovoltaik 5 kWp: Startpreis und Leistungsumfang",
