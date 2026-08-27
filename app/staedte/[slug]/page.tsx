@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { handwerkerCalculatorHref } from "@/lib/calculator-links";
+import { getServiceGuideLink } from "@/lib/price-guide-links";
+import { priceItemSlug } from "@/lib/price-slug";
 import { getRegion, regions, renovationModel, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
+
+const featuredServiceSlugs = ["badsanierung", "dachsanierung", "elektriker", "fenster", "heizung", "kueche"];
+const priceCount = services.reduce((sum, service) => sum + service.priceItems.length, 0);
 
 function euro(value: number) {
   return new Intl.NumberFormat("de-DE", {
@@ -26,8 +32,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!region || region.value === "de") return {};
 
   return {
-    title: `Handwerker Kosten ${region.label} 2026`,
-    description: `Handwerker- und Renovierungskosten in ${region.label}: modellierte Richtwerte 2026, regionale Einordnung, Beispielbudgets und Preisübersicht nach Gewerken.`,
+    title: `Handwerker Kosten ${region.label} 2026: ${services.length} Gewerke`,
+    description: `Handwerker- und Renovierungskosten in ${region.label}: ${services.length} Gewerke, ${priceCount} Preispositionen, modellierte Richtwerte 2026, Rechner und regionale Einordnung.`,
     alternates: { canonical: `/staedte/${region.slug}` },
   };
 }
@@ -42,6 +48,13 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
   const baseUrl = siteConfig.url.replace(/\/$/, "");
   const canonicalUrl = `${baseUrl}/staedte/${region.slug}`;
   const otherCities = regions.filter((item) => item.value !== "de" && item.slug !== region.slug);
+  const featuredServices = featuredServiceSlugs
+    .map((serviceSlug) => services.find((service) => service.slug === serviceSlug))
+    .filter((service): service is NonNullable<typeof service> => Boolean(service));
+  const featuredGuides = featuredServices
+    .map((service) => ({ service, guide: getServiceGuideLink(service.slug) }))
+    .filter((entry, index, entries) => entries.findIndex((candidate) => candidate.guide.href === entry.guide.href) === index);
+  const regionalCalculatorHref = handwerkerCalculatorHref({ region: region.value });
 
   const normalRenovation = renovationModel.conditions.find((condition) => condition.value === "normal")!;
   const extensiveRenovation = renovationModel.conditions.find((condition) => condition.value === "extensive")!;
@@ -116,6 +129,18 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
         acceptedAnswer: { "@type": "Answer", text: faq.answer },
       })),
     },
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: `Handwerkerpreise nach Gewerk in ${region.label}`,
+      numberOfItems: services.length,
+      itemListElement: services.map((service, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: `${service.shortTitle} Kosten in ${region.label}`,
+        url: `${baseUrl}/kosten/${service.slug}/${region.slug}`,
+      })),
+    },
   ];
 
   return (
@@ -142,8 +167,13 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
           </p>
           <div className="heroFacts">
             <span><strong>{factorLabel}</strong> Regionalfaktor</span>
+            <span><strong>{services.length}</strong> Gewerke</span>
+            <span><strong>{priceCount}</strong> Preispositionen</span>
             <span><strong>2026</strong> Datenstand</span>
-            <span><strong>{services.length}</strong> Gewerke im Vergleich</span>
+          </div>
+          <div className="heroActions">
+            <Link className="primaryButton" href={regionalCalculatorHref}>Handwerkerkosten in {region.label} berechnen</Link>
+            <Link className="ghostButton" href="#gewerke">Gewerke in {region.label} ansehen</Link>
           </div>
         </div>
       </section>
@@ -186,6 +216,52 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
       <section className="section sectionAlt">
         <div className="shell">
           <div className="sectionHeading">
+            <span className="eyebrow">Häufig geplante Arbeiten</span>
+            <h2>Wichtige Gewerke in {region.label} direkt vergleichen</h2>
+            <p>
+              Diese sechs Bereiche führen direkt von der Stadtübersicht zur lokalen Gewerkseite, zum passenden
+              Kostenratgeber und in den Rechner mit bereits ausgewählter Region {region.label}.
+            </p>
+          </div>
+
+          <div className="directoryGrid">
+            {featuredServices.map((service) => {
+              const item = service.priceItems[0];
+              const guide = getServiceGuideLink(service.slug);
+              const calculatorHref = handwerkerCalculatorHref({
+                serviceSlug: service.slug,
+                itemSlug: priceItemSlug(item.name),
+                region: region.value,
+              });
+
+              return (
+                <article className="directoryCard" key={service.slug}>
+                  <span className="eyebrow">{service.shortTitle} in {region.label}</span>
+                  <h3>
+                    <Link href={`/kosten/${service.slug}/${region.slug}`}>
+                      {service.shortTitle}-Kosten in {region.label}
+                    </Link>
+                  </h3>
+                  <div className="miniPrice">
+                    <span>{item.name}</span>
+                    <strong>{priceRange(item.low * region.factor, item.high * region.factor)}</strong>
+                  </div>
+                  <p>{item.unit}, modellierter Richtwert für {region.label}.</p>
+                  <div className="heroActions">
+                    <Link className="textLink" href={`/kosten/${service.slug}/${region.slug}`}>Lokale Preise →</Link>
+                    <Link className="textLink" href={calculatorHref}>Berechnen →</Link>
+                    <Link className="textLink" href={guide.href}>Ratgeber →</Link>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="shell">
+          <div className="sectionHeading">
             <span className="eyebrow">Beispielbudgets</span>
             <h2>Was 100 m² Renovierung in {region.label} kosten können</h2>
             <p>
@@ -207,19 +283,20 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
 
           <div className="heroActions">
             <Link className="primaryButton" href="/rechner/renovierungskosten">Renovierungskosten berechnen</Link>
+            <Link className="ghostButton" href={regionalCalculatorHref}>Handwerkerkosten für {region.label}</Link>
             <Link className="ghostButton" href="/ratgeber/sanierungskosten-pro-qm">Sanierungskosten pro m²</Link>
           </div>
         </div>
       </section>
 
-      <section className="section">
+      <section className="section sectionAlt" id="gewerke">
         <div className="shell">
           <div className="sectionHeading">
-            <span className="eyebrow">Preisübersicht</span>
+            <span className="eyebrow">Alle {services.length} Gewerke</span>
             <h2>Handwerkerpreise nach Gewerk in {region.label}</h2>
             <p>
-              Für jedes Gewerk zeigen wir einen repräsentativen Startwert. Auf der Detailseite findest du die
-              vollständige Preistabelle, Quellen, lokale Modellierung und weitere Rechenbeispiele.
+              Für jedes Gewerk zeigen wir einen repräsentativen Startwert. Auf der lokalen Detailseite findest du die
+              vollständige Preistabelle, Quellen, Modellierung für {region.label}, Rechner und passende Ratgeber.
             </p>
           </div>
 
@@ -246,6 +323,36 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
           <div className="notice cityNotice">
             Die Stadtwerte sind keine lokal erhobenen Festpreise. Sie entstehen aus bundesweiten Richtwerten plus
             regionalem Modellfaktor. Für ein konkretes Projekt sollten mehrere lokale Angebote verglichen werden.
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="shell">
+          <div className="sectionHeading">
+            <span className="eyebrow">Kostenwissen</span>
+            <h2>Passende Ratgeber für Projekte in {region.label}</h2>
+            <p>
+              Die Ratgeber erklären die bundesweite Preisbasis, typische Kostenblöcke und Beispielbudgets. Die lokale
+              Einordnung für {region.label} erfolgt anschließend über die Stadt- und Gewerkseiten mit Regionalfaktor {factorLabel}.
+            </p>
+          </div>
+
+          <div className="directoryGrid">
+            {featuredGuides.map(({ service, guide }) => (
+              <article className="directoryCard" key={guide.href}>
+                <span className="eyebrow">{service.shortTitle}</span>
+                <h3><Link href={guide.href}>{guide.title}</Link></h3>
+                <p>Grundlagen, Preisblöcke und Beispiele für die Planung von {service.shortTitle.toLowerCase()}.</p>
+                <Link className="textLink" href={guide.href}>{guide.cta} →</Link>
+              </article>
+            ))}
+          </div>
+
+          <div className="heroActions">
+            <Link className="primaryButton" href="/ratgeber">Alle Ratgeber</Link>
+            <Link className="ghostButton" href="/ratgeber/handwerker-stundensaetze">Handwerker-Stundensätze 2026</Link>
+            <Link className="ghostButton" href="/ratgeber/arbeitskosten-materialkosten">Arbeits- und Materialkosten</Link>
           </div>
         </div>
       </section>
