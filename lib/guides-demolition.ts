@@ -62,11 +62,73 @@ export const demolitionGuides: Guide[] = [
     ],
     related: [
       { label: "Abriss & Entsorgung Kosten", href: "/kosten/abriss-entsorgung" },
+      { label: "Abbruchkosten pro m³", href: "/ratgeber/abbruch-kosten-pro-m3" },
       { label: "Innenabbruch Einfamilienhaus Kosten", href: "/ratgeber/innenabbruch-einfamilienhaus-kosten" },
       { label: "30 m³ Bauschuttcontainer Kosten", href: "/ratgeber/bauschuttcontainer-30-m3-kosten" },
       { label: "Kernsanierung Kosten", href: "/ratgeber/kernsanierung-kosten" },
       { label: "Haus sanieren Kosten", href: "/ratgeber/haus-sanieren-kosten" },
       { label: "Abrisskosten berechnen", href: "/rechner/handwerkerkosten?gewerk=abriss-entsorgung&leistung=einfamilienhaus-komplett-abreissen&menge=1" },
+    ],
+  },
+  {
+    slug: "abbruch-kosten-pro-m3",
+    title: "Abbruchkosten pro m³ 2026",
+    h1: "Abbruchkosten 2026: Preis pro m³ umbauter Raum",
+    description: "Abbruchkosten 2026 pro m³ umbauter Raum: Richtwert von 15-45 €/m³ inklusive Entsorgung, Beispielbudgets und wichtige Kostentreiber.",
+    eyebrow: "Abbruch pro m³ 2026",
+    intro: "Bei vollständigen Gebäudeabbrüchen kann der umbaute Raum als erste Rechengröße dienen. BauKostenRadar führt dafür eine eigene Preisposition pro Kubikmeter. Wichtig ist die Abgrenzung zur Wohnfläche: gerechnet wird das Gebäudevolumen, nicht die nutzbare Quadratmeterfläche.",
+    keyFact: "Abbruch nach umbautem Raum etwa 15-45 €/m³ inklusive Entsorgung",
+    sections: [
+      {
+        heading: "Was kostet Abbruch pro m³?",
+        paragraphs: [
+          "Die aktuelle BauKostenRadar-Datenbasis führt für Abbruch nach umbautem Raum etwa 15 bis 45 Euro pro Kubikmeter inklusive Entsorgung.",
+          "Bei 500 m³ umbautem Raum ergibt sich daraus rechnerisch eine erste Orientierung von etwa 7.500 bis 22.500 Euro. Der Wert ist eine Volumenrechnung und kein garantierter Komplettpreis für jedes Gebäude.",
+        ],
+        table: {
+          headers: ["Umbauter Raum", "Budgetorientierung"],
+          rows: [
+            { cells: ["300 m³", "4.500-13.500 €"] },
+            { cells: ["500 m³", "7.500-22.500 €"] },
+            { cells: ["800 m³", "12.000-36.000 €"] },
+          ],
+        },
+      },
+      {
+        heading: "Welche Faktoren verändern den Preis pro Kubikmeter?",
+        paragraphs: [
+          "Der Volumenwert verdichtet viele einzelne Arbeitsschritte. Je aufwendiger Rückbau, Sortierung und Abtransport sind, desto weniger aussagekräftig ist ein einzelner Durchschnittswert ohne Objektprüfung.",
+        ],
+        bullets: [
+          "Massive oder leichte Bauweise",
+          "Keller, Nebengebäude und besondere Konstruktionen",
+          "Zugänglichkeit für Abbruchtechnik",
+          "Materialtrennung und Entsorgungswege",
+          "Schadstoffverdacht oder besonders zu behandelnde Baustoffe",
+          "Sicherungsmaßnahmen und Nähe zu Nachbargebäuden",
+        ],
+      },
+      {
+        heading: "Umbauten Raum nicht mit Wohnfläche verwechseln",
+        paragraphs: [
+          "Kubikmeter umbauter Raum und Quadratmeter Wohnfläche sind unterschiedliche Größen. Für eine Volumenrechnung werden Gebäudeabmessungen und Höhen benötigt, nicht nur die Wohnfläche.",
+          "Wenn bereits ein konkreter Komplettpreis für den Abriss eines Einfamilienhauses vorliegt, sollte die m³-Rechnung als Plausibilitätscheck genutzt und nicht zusätzlich zum Projektpreis addiert werden.",
+        ],
+      },
+    ],
+    faqs: [
+      { question: "Was kostet Abbruch pro m³ 2026?", answer: "BauKostenRadar führt aktuell etwa 15 bis 45 Euro pro Kubikmeter umbauten Raum inklusive Entsorgung." },
+      { question: "Was kosten 500 m³ Abbruch?", answer: "Mit dem Richtwert ergeben sich rechnerisch etwa 7.500 bis 22.500 Euro." },
+      { question: "Ist Wohnfläche dasselbe wie umbauter Raum?", answer: "Nein. Wohnfläche wird in Quadratmetern angegeben, umbauter Raum in Kubikmetern und berücksichtigt das Gebäudevolumen." },
+      { question: "Kann ich den m³-Preis zum Hausabriss-Pauschalpreis addieren?", answer: "Nein. Beide Werte sind alternative Kalkulationsansätze für ähnliche Projektumfänge und sollten nicht doppelt gerechnet werden." },
+    ],
+    related: [
+      { label: "Abbruch nach umbautem Raum Preisdetail", href: "/kosten/abriss-entsorgung/leistung/abbruch-nach-umbautem-raum" },
+      { label: "Haus abreißen Kosten", href: "/ratgeber/haus-abreissen-kosten" },
+      { label: "Innenabbruch Einfamilienhaus Kosten", href: "/ratgeber/innenabbruch-einfamilienhaus-kosten" },
+      { label: "Bauschutt entsorgen Kosten pro Tonne", href: "/ratgeber/bauschutt-entsorgung-kosten-pro-tonne" },
+      { label: "Abriss & Entsorgung Kosten", href: "/kosten/abriss-entsorgung" },
+      { label: "Abbruch berechnen", href: "/rechner/handwerkerkosten?gewerk=abriss-entsorgung&leistung=abbruch-nach-umbautem-raum" },
     ],
   },
   {
@@ -122,6 +184,7 @@ export const demolitionGuides: Guide[] = [
     related: [
       { label: "Innenabbruch Preisdetail", href: "/kosten/abriss-entsorgung/leistung/innenabbruch-einfamilienhaus" },
       { label: "Haus abreißen Kosten", href: "/ratgeber/haus-abreissen-kosten" },
+      { label: "Abbruchkosten pro m³", href: "/ratgeber/abbruch-kosten-pro-m3" },
       { label: "30 m³ Bauschuttcontainer Kosten", href: "/ratgeber/bauschuttcontainer-30-m3-kosten" },
       { label: "Kernsanierung Kosten", href: "/ratgeber/kernsanierung-kosten" },
       { label: "Sanierung Reihenfolge", href: "/ratgeber/sanierung-reihenfolge" },
@@ -182,7 +245,69 @@ export const demolitionGuides: Guide[] = [
       { label: "Abriss & Entsorgung Kosten", href: "/kosten/abriss-entsorgung" },
       { label: "Haus abreißen Kosten", href: "/ratgeber/haus-abreissen-kosten" },
       { label: "Innenabbruch Einfamilienhaus Kosten", href: "/ratgeber/innenabbruch-einfamilienhaus-kosten" },
+      { label: "Bauschutt entsorgen Kosten pro Tonne", href: "/ratgeber/bauschutt-entsorgung-kosten-pro-tonne" },
       { label: "Containerkosten berechnen", href: "/rechner/handwerkerkosten?gewerk=abriss-entsorgung&leistung=bauschuttcontainer-30-m3&menge=1" },
+    ],
+  },
+  {
+    slug: "bauschutt-entsorgung-kosten-pro-tonne",
+    title: "Bauschutt entsorgen Kosten pro Tonne 2026",
+    h1: "Bauschutt entsorgen: Kosten 2026 pro Tonne",
+    description: "Bauschutt entsorgen Kosten 2026 pro Tonne: Richtwert von 120-260 €/t je nach Sortierung und Region, Beispielbudgets und Abgrenzung zu Containerkosten.",
+    eyebrow: "Bauschuttentsorgung 2026",
+    intro: "Bei Bauschutt hängt der Preis nicht nur vom Gewicht ab. Sortierung, Annahmebedingungen und regionale Entsorgungskosten beeinflussen den Tonnenpreis. BauKostenRadar führt deshalb eine eigene Entsorgungsposition pro Tonne neben dem separaten Container-Richtwert.",
+    keyFact: "Bauschutt entsorgen etwa 120-260 €/t je nach Sortierung und Region",
+    sections: [
+      {
+        heading: "Was kostet Bauschuttentsorgung pro Tonne?",
+        paragraphs: [
+          "Die aktuelle BauKostenRadar-Datenbasis führt für die Entsorgung von Bauschutt etwa 120 bis 260 Euro pro Tonne. Die hinterlegte Notiz nennt Sortierung und Region als wichtige Einflussfaktoren.",
+          "Bei fünf Tonnen ergibt sich daraus rechnerisch eine Orientierung von etwa 600 bis 1.300 Euro für diese Entsorgungsposition.",
+        ],
+        table: {
+          headers: ["Gewicht", "Budgetorientierung Entsorgung"],
+          rows: [
+            { cells: ["2 t", "240-520 €"] },
+            { cells: ["5 t", "600-1.300 €"] },
+            { cells: ["10 t", "1.200-2.600 €"] },
+          ],
+        },
+      },
+      {
+        heading: "Was beeinflusst den Preis je Tonne?",
+        paragraphs: [
+          "Sauber getrennte mineralische Abfälle können anders kalkuliert werden als gemischte Baustellenabfälle. Deshalb sollte vor der Entsorgung genau geklärt werden, welche Materialien angenommen werden.",
+        ],
+        bullets: [
+          "Sortenreiner oder gemischter Abfall",
+          "Regionale Deponie- und Verwertungspreise",
+          "Gesamtgewicht und Mindestmengen",
+          "Annahmebedingungen des Entsorgers",
+          "Zusätzliche Sortierarbeit",
+          "Transport, Container und Standzeit als mögliche separate Leistungen",
+        ],
+      },
+      {
+        heading: "Tonnenpreis und Containerpreis nicht doppelt rechnen",
+        paragraphs: [
+          "BauKostenRadar führt einen 30-m³-Bauschuttcontainer mit etwa 650 bis 1.450 Euro inklusive Entsorgung als eigene Komplettposition. Die tonnenbezogene Entsorgung ist daher nicht automatisch zusätzlich zu diesem Containerwert anzusetzen.",
+          "Außerdem lässt sich ein Container-Volumen nicht pauschal in Tonnen umrechnen. Das tatsächliche Gewicht hängt von Materialart, Stückigkeit und Befüllung ab.",
+        ],
+      },
+    ],
+    faqs: [
+      { question: "Was kostet Bauschutt entsorgen pro Tonne 2026?", answer: "BauKostenRadar führt aktuell etwa 120 bis 260 Euro pro Tonne, abhängig von Sortierung und Region." },
+      { question: "Was kostet die Entsorgung von 5 Tonnen Bauschutt?", answer: "Rechnerisch ergeben sich mit dem Richtwert etwa 600 bis 1.300 Euro für die Entsorgungsposition." },
+      { question: "Ist ein Container im Tonnenpreis enthalten?", answer: "Das sollte nicht vorausgesetzt werden. BauKostenRadar führt Container und tonnenbezogene Bauschuttentsorgung als getrennte Preispositionen." },
+      { question: "Wie viele Tonnen passen in 30 m³?", answer: "Das lässt sich ohne Materialart und tatsächliche Dichte nicht zuverlässig angeben. Volumen und Gewicht sollten deshalb nicht pauschal umgerechnet werden." },
+    ],
+    related: [
+      { label: "Bauschuttentsorgung Preisdetail", href: "/kosten/abriss-entsorgung/leistung/entsorgung-bauschutt" },
+      { label: "30 m³ Bauschuttcontainer Kosten", href: "/ratgeber/bauschuttcontainer-30-m3-kosten" },
+      { label: "Abbruchkosten pro m³", href: "/ratgeber/abbruch-kosten-pro-m3" },
+      { label: "Haus abreißen Kosten", href: "/ratgeber/haus-abreissen-kosten" },
+      { label: "Abriss & Entsorgung Kosten", href: "/kosten/abriss-entsorgung" },
+      { label: "Bauschuttentsorgung berechnen", href: "/rechner/handwerkerkosten?gewerk=abriss-entsorgung&leistung=entsorgung-bauschutt" },
     ],
   },
 ];
