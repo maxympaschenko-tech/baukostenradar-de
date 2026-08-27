@@ -9,6 +9,7 @@ import { tertiaryOpportunityGuides } from "@/lib/guides-opportunities-tertiary";
 import { quaternaryOpportunityGuides } from "@/lib/guides-opportunities-quaternary";
 import { quinaryOpportunityGuides } from "@/lib/guides-opportunities-quinary";
 import { senaryOpportunityGuides } from "@/lib/guides-opportunities-senary";
+import { septenaryOpportunityGuides } from "@/lib/guides-opportunities-septenary";
 import { comparisonGuides } from "@/lib/guides-comparisons";
 import { scenarioGuides } from "@/lib/guides-scenarios";
 import { catalogScenarioGuides } from "@/lib/guides-catalog-scenarios";
@@ -98,6 +99,7 @@ const tradeClusterLinks: Record<string, Array<{ label: string; href: string }>> 
     { label: "Gerüst Kosten pro m²", href: "/ratgeber/geruest-kosten-pro-qm" },
     { label: "Dachsanierung mit Aufsparrendämmung", href: "/ratgeber/dachsanierung-aufsparrendaemmung-kosten-pro-qm" },
     { label: "Dachfenster nachträglich einbauen", href: "/ratgeber/dachfenster-nachtraeglich-einbauen-kosten" },
+    { label: "Untersparrendämmung Kosten", href: "/ratgeber/untersparrendaemmung-kosten-pro-qm" },
   ],
   "fenster-austauschen-kosten-haus": [
     { label: "20 Fenster austauschen Kosten", href: "/ratgeber/20-fenster-austauschen-kosten" },
@@ -169,9 +171,12 @@ const specialistClusterLinks: Record<string, Array<{ label: string; href: string
     { label: "Innendämmung Kosten pro m²", href: "/ratgeber/innendaemmung-kosten-pro-qm" },
     { label: "Zwischensparrendämmung Kosten pro m²", href: "/ratgeber/zwischensparrendaemmung-kosten-pro-qm" },
     { label: "Aufsparrendämmung Kosten pro m²", href: "/ratgeber/aufsparrendaemmung-kosten-pro-qm" },
+    { label: "Untersparrendämmung Kosten pro m²", href: "/ratgeber/untersparrendaemmung-kosten-pro-qm" },
     { label: "Aufsparren oder Zwischensparren vergleichen", href: "/ratgeber/daemmung-aufsparren-oder-zwischensparren-kosten" },
     { label: "Kellerdecke dämmen Kosten", href: "/ratgeber/daemmung-kellerdecke-kosten-pro-qm" },
+    { label: "Perimeterdämmung Kosten", href: "/ratgeber/perimeterdaemmung-kosten-pro-qm" },
     { label: "Oberste Geschossdecke dämmen Kosten", href: "/ratgeber/daemmung-oberste-geschossdecke-kosten-pro-qm" },
+    { label: "Einblasdämmung Geschossdecke Kosten", href: "/ratgeber/einblasdaemmung-geschossdecke-kosten-pro-qm" },
   ],
   "waermepumpe-kosten-2026": [
     { label: "Wärmepumpe Wartung Kosten", href: "/ratgeber/waermepumpe-wartung-kosten" },
@@ -262,6 +267,7 @@ export const allGuides = [
   ...quaternaryOpportunityGuides,
   ...quinaryOpportunityGuides,
   ...senaryOpportunityGuides,
+  ...septenaryOpportunityGuides,
   ...comparisonGuides,
   ...scenarioGuides,
   ...enrichedCatalogScenarioGuides,
