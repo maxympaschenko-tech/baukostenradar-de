@@ -1,0 +1,105 @@
+name: Verify specialist guides
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-specialist-guides:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify all specialist guides are indexed
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          guides=(
+            maler-kosten-pro-qm
+            fliesenleger-kosten-pro-qm
+            bodenleger-kosten-pro-qm
+            trockenbau-kosten-pro-qm
+            sanitaer-kosten
+            waermepumpe-kosten-2026
+            photovoltaik-kosten-2026
+            daemmung-kosten-pro-qm
+            fassade-sanieren-kosten
+            garten-anlegen-kosten
+          )
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          total=$(grep -oE 'https://baukostenradar.de/ratgeber/[a-z0-9-]+</loc>' /tmp/sitemap.xml | sort -u | wc -l | tr -d ' ')
+          echo "Indexed guides: ${total}"
+          test "$total" -ge 38
+
+          for guide in "${guides[@]}"; do
+            grep -q "https://baukostenradar.de/ratgeber/${guide}</loc>" /tmp/sitemap.xml
+            output="/tmp/guide-${guide}.html"
+            curl -sS --fail "https://baukostenradar.de/ratgeber/${guide}" -o "$output"
+            grep -q "https://baukostenradar.de/ratgeber/${guide}" "$output"
+            grep -q '"@type":"Article"' "$output"
+            grep -q 'Passende Kosten in allen 8 Städten vergleichen' "$output"
+            grep -q 'Lokale Gewerkseiten' "$output"
+            ! grep -qi 'noindex' "$output"
+          done
+
+      - name: Verify dedicated service city and price links
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          check_mapping() {
+            local service="$1"
+            local guide="$2"
+            local item="$3"
+
+            curl -sS --fail "https://baukostenradar.de/kosten/${service}" -o /tmp/service.html
+            grep -q "/ratgeber/${guide}" /tmp/service.html
+
+            curl -sS --fail "https://baukostenradar.de/kosten/${service}/berlin" -o /tmp/city.html
+            grep -q "/ratgeber/${guide}" /tmp/city.html
+            grep -q 'Passender Ratgeber' /tmp/city.html
+
+            curl -sS --fail "https://baukostenradar.de/kosten/${service}/leistung/${item}" -o /tmp/item.html
+            grep -q "/ratgeber/${guide}" /tmp/item.html
+            grep -q 'Passender Ratgeber' /tmp/item.html
+          }
+
+          check_mapping maler maler-kosten-pro-qm waende-streichen
+          check_mapping fliesenleger fliesenleger-kosten-pro-qm standard-fliesen-verlegen
+          check_mapping bodenleger bodenleger-kosten-pro-qm vinylboden-klick-inkl-material
+          check_mapping trockenbau trockenbau-kosten-pro-qm trockenbauwand-beidseitig-beplankt
+          check_mapping sanitaer sanitaer-kosten sanitaerobjekte-armaturen-fuer-8-m2-bad
+          check_mapping waermepumpe waermepumpe-kosten-2026 luft-wasser-waermepumpe-komplett
+          check_mapping photovoltaik photovoltaik-kosten-2026 pv-anlage-10-kwp-inkl-installation
+          check_mapping daemmung daemmung-kosten-pro-qm fassadendaemmung-wdvs
+          check_mapping fassade fassade-sanieren-kosten putz-fassade-neu
+          check_mapping garten garten-anlegen-kosten terrasse-pflastern-inkl-unterbau
+
+      - name: Verify specialist reverse silo and calculators
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          declare -A services=(
+            [maler-kosten-pro-qm]=maler
+            [fliesenleger-kosten-pro-qm]=fliesenleger
+            [bodenleger-kosten-pro-qm]=bodenleger
+            [trockenbau-kosten-pro-qm]=trockenbau
+            [sanitaer-kosten]=sanitaer
+            [waermepumpe-kosten-2026]=waermepumpe
+            [photovoltaik-kosten-2026]=photovoltaik
+            [daemmung-kosten-pro-qm]=daemmung
+            [fassade-sanieren-kosten]=fassade
+            [garten-anlegen-kosten]=garten
+          )
+
+          for guide in "${!services[@]}"; do
+            service="${services[$guide]}"
+            curl -sS --fail "https://baukostenradar.de/ratgeber/${guide}" -o /tmp/guide.html
+            grep -q "/kosten/${service}/berlin" /tmp/guide.html
+            grep -q "/kosten/${service}/muenchen" /tmp/guide.html
+            grep -q "/rechner/handwerkerkosten?gewerk=${service}" /tmp/guide.html
+          done
