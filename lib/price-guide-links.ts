@@ -339,6 +339,106 @@ const itemGuideOverrides: Record<string, PriceGuideLink> = {
     title: "Putzfassade: Kosten pro m² inklusive Material",
     cta: "Putzfassaden-Ratgeber öffnen",
   },
+  "fliesenleger:mosaik-fliesen-verlegen": {
+    href: "/ratgeber/mosaik-fliesen-verlegen-kosten-pro-qm",
+    title: "Mosaikfliesen verlegen: Kosten pro m²",
+    cta: "Mosaik-Ratgeber öffnen",
+  },
+  "fliesenleger:naturstein-verlegen": {
+    href: "/ratgeber/naturstein-verlegen-kosten-pro-qm",
+    title: "Naturstein verlegen: Kosten pro m²",
+    cta: "Naturstein-Ratgeber öffnen",
+  },
+  "elektriker:lichtschalter-austauschen": {
+    href: "/ratgeber/lichtschalter-austauschen-kosten",
+    title: "Lichtschalter austauschen: Kosten pro Stück",
+    cta: "Lichtschalter-Ratgeber öffnen",
+  },
+  "dachsanierung:geruest-ca-4-wochen": {
+    href: "/ratgeber/geruest-kosten-pro-qm",
+    title: "Gerüst: Kosten pro m² für etwa vier Wochen",
+    cta: "Gerüst-Ratgeber öffnen",
+  },
+  "bodenleger:boden-sanierung-alt-raus-neu-rein": {
+    href: "/ratgeber/boden-sanieren-kosten-pro-qm",
+    title: "Bodensanierung: alt raus, neu rein",
+    cta: "Bodensanierungs-Ratgeber öffnen",
+  },
+  "sanitaer:demontage-entsorgung-altbad": {
+    href: "/ratgeber/bad-entkernen-kosten",
+    title: "Bad entkernen: Demontage und Entsorgung",
+    cta: "Bad-Rückbau-Ratgeber öffnen",
+  },
+  "photovoltaik:pv-anlage-15-kwp-inkl-installation": {
+    href: "/ratgeber/photovoltaik-15-kwp-kosten",
+    title: "Photovoltaik 15 kWp: Kosten inklusive Installation",
+    cta: "15-kWp-Ratgeber öffnen",
+  },
+  "fenster:fenster-mit-2-fach-verglasung": {
+    href: "/ratgeber/fenster-2-fach-verglasung-kosten",
+    title: "Fenster mit 2-fach Verglasung: Kosten pro Fenster",
+    cta: "2-fach-Fenster-Ratgeber öffnen",
+  },
+  "heizung:thermostat-installieren": {
+    href: "/ratgeber/thermostat-installieren-kosten",
+    title: "Thermostat installieren: Kosten pro Stück",
+    cta: "Thermostat-Ratgeber öffnen",
+  },
+  "fassade:fassaden-sanierung-bei-rissen": {
+    href: "/ratgeber/fassadenrisse-sanieren-kosten-pro-qm",
+    title: "Fassadenrisse sanieren: Kosten pro m²",
+    cta: "Risssanierungs-Ratgeber öffnen",
+  },
+  "fassade:vorgehaengte-hinterlueftete-fassade": {
+    href: "/ratgeber/vorgehaengte-hinterlueftete-fassade-kosten-pro-qm",
+    title: "Vorgehängte hinterlüftete Fassade: Kosten pro m²",
+    cta: "VHF-Ratgeber öffnen",
+  },
+  "garten:heckenschnitt": {
+    href: "/ratgeber/heckenschnitt-kosten-pro-meter",
+    title: "Heckenschnitt: Kosten pro laufendem Meter",
+    cta: "Heckenschnitt-Ratgeber öffnen",
+  },
+  "tueren:innentuer-einbauen-inkl-zarge": {
+    href: "/ratgeber/innentuer-einbauen-kosten",
+    title: "Innentür einbauen: Kosten inklusive Zarge",
+    cta: "Innentür-Ratgeber öffnen",
+  },
+  "tueren:tuer-lackieren-mit-zarge": {
+    href: "/ratgeber/tuer-lackieren-kosten",
+    title: "Tür lackieren: Kosten mit Zarge",
+    cta: "Türlackierungs-Ratgeber öffnen",
+  },
+  "estrich:calciumsulfat-anhydritestrich": {
+    href: "/ratgeber/anhydritestrich-kosten-pro-qm",
+    title: "Anhydritestrich: Kosten pro m²",
+    cta: "Anhydritestrich-Ratgeber öffnen",
+  },
+  "estrich:gussasphaltestrich": {
+    href: "/ratgeber/gussasphaltestrich-kosten-pro-qm",
+    title: "Gussasphaltestrich: Kosten pro m²",
+    cta: "Gussasphalt-Ratgeber öffnen",
+  },
+  "estrich:sichtestrich": {
+    href: "/ratgeber/sichtestrich-kosten-pro-qm",
+    title: "Sichtestrich: Kosten pro m²",
+    cta: "Sichtestrich-Ratgeber öffnen",
+  },
+  "treppen:holztreppe-schleifen-und-versiegeln": {
+    href: "/ratgeber/holztreppe-schleifen-kosten",
+    title: "Holztreppe schleifen und versiegeln: Kosten",
+    cta: "Holztreppen-Ratgeber öffnen",
+  },
+  "treppen:betontreppe-mit-neuem-belag": {
+    href: "/ratgeber/betontreppe-neuer-belag-kosten",
+    title: "Betontreppe mit neuem Belag: Kosten",
+    cta: "Betontreppen-Ratgeber öffnen",
+  },
+  "kueche:fliesenspiegel-erneuern": {
+    href: "/ratgeber/fliesenspiegel-erneuern-kosten",
+    title: "Fliesenspiegel erneuern: Kosten pro Küche",
+    cta: "Fliesenspiegel-Ratgeber öffnen",
+  },
 };
 
 export function getServiceGuideLink(serviceSlug: string): PriceGuideLink {
