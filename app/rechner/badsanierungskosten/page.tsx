@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BathCostCalculator } from "@/components/bath-cost-calculator";
-import { getService, priceSources } from "@/lib/pricing";
+import { priceItemSlug } from "@/lib/price-slug";
+import { getService, priceSources, regions } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Badsanierung Kosten Rechner 2026",
-  description: "Badsanierungskosten 2026 nach Badgröße und Region online berechnen. Mit transparentem m²-Richtwert, Regionalfaktor, Quellen und weiterführenden Kosten-Ratgebern.",
+  description: "Badsanierungskosten 2026 nach Badgröße und Region online berechnen. Mit transparentem m²-Richtwert, Regionalfaktor, Einzelpreisen, Quellen und Stadtvergleich.",
   alternates: { canonical: "/rechner/badsanierungskosten" },
 };
 
@@ -16,6 +17,7 @@ export default function BathCostCalculatorPage() {
   const wholeBathItem = service?.priceItems.find((item) => item.name === "Bad-Sanierung komplett");
   const sourceKeys = [...new Set([squareMeterItem?.sourceKey, wholeBathItem?.sourceKey].filter(Boolean))] as Array<keyof typeof priceSources>;
   const base = siteConfig.url.replace(/\/$/, "");
+  const cityRegions = regions.filter((region) => region.value !== "de").slice(0, 4);
 
   const faqs = [
     {
@@ -41,6 +43,16 @@ export default function BathCostCalculatorPage() {
         { "@type": "ListItem", position: 2, name: "Rechner", item: `${base}/rechner` },
         { "@type": "ListItem", position: 3, name: "Badsanierungskosten Rechner", item: `${base}/rechner/badsanierungskosten` },
       ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: "Badsanierung Kosten Rechner 2026",
+      url: `${base}/rechner/badsanierungskosten`,
+      applicationCategory: "FinanceApplication",
+      operatingSystem: "Web",
+      description: metadata.description,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
     },
     {
       "@context": "https://schema.org",
@@ -74,7 +86,7 @@ export default function BathCostCalculatorPage() {
           </p>
           <div className="heroFacts">
             <span><strong>1.000 - 2.500 €</strong> Basis pro m²</span>
-            <span><strong>8 Städte</strong> im Regionalmodell</span>
+            <span><strong>{regions.length - 1} Städte</strong> im Regionalmodell</span>
             <span><strong>2 Quellenanker</strong> transparent getrennt</span>
           </div>
         </div>
@@ -99,6 +111,40 @@ export default function BathCostCalculatorPage() {
         </section>
 
         <section className="contentCard proseCard">
+          <span className="eyebrow">Einzelpreise</span>
+          <h2>Die Preisanker des Rechners im Detail</h2>
+          <p>
+            Für die Berechnung und den Vergleich werden die zugrunde liegenden Preispositionen getrennt geführt.
+            Auf den Detailseiten finden Sie Quelle, Kostentreiber, Beispielrechnungen und regionale Einordnung.
+          </p>
+          <div className="sourceList">
+            {service?.priceItems.slice(0, 4).map((item) => (
+              <Link key={item.name} href={`/kosten/badsanierung/leistung/${priceItemSlug(item.name)}`}>
+                <strong>{item.name}</strong>
+                <span>{item.low.toLocaleString("de-DE")} - {item.high.toLocaleString("de-DE")} € {item.unit}</span>
+              </Link>
+            ))}
+          </div>
+          <Link className="textLink" href="/kosten/badsanierung">Alle Badsanierungspreise ansehen →</Link>
+        </section>
+
+        <section className="contentCard proseCard">
+          <span className="eyebrow">Regionale Einordnung</span>
+          <h2>Badsanierungskosten nach Stadt</h2>
+          <p>
+            Die Stadtseiten verwenden denselben Regionalfaktor wie der Rechner. Sie zeigen modellierte Richtwerte zur
+            Budgetorientierung und ausdrücklich keine lokal erhobenen Festpreise.
+          </p>
+          <div className="regionChips">
+            {cityRegions.map((region) => (
+              <Link className="regionChip" key={region.slug} href={`/kosten/badsanierung/${region.slug}`}>
+                Badsanierung {region.label}
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="contentCard proseCard">
           <span className="eyebrow">Weiterführende Planung</span>
           <h2>Badkosten im Gesamtbudget einordnen</h2>
           <p>
@@ -106,9 +152,13 @@ export default function BathCostCalculatorPage() {
             Ratgeber helfen dabei, den Badposten mit dem gesamten Renovierungsbudget zu vergleichen.
           </p>
           <div className="sourceList">
-            <Link href="/kosten/badsanierung">
-              <strong>Badsanierung Kosten 2026</strong>
-              <span>Einzelpositionen und Quellen im Detail</span>
+            <Link href="/ratgeber/bad-komplett-sanieren-kosten">
+              <strong>Bad komplett sanieren: Kosten 2026</strong>
+              <span>Leistungsumfang und typische Kostenblöcke im Detail</span>
+            </Link>
+            <Link href="/ratgeber/bad-10-qm-sanieren-kosten">
+              <strong>Bad 10 m² sanieren: Kosten</strong>
+              <span>Konkretes Flächenbeispiel für die Budgetplanung</span>
             </Link>
             <Link href="/ratgeber/sanierungskosten-pro-qm">
               <strong>Sanierungskosten pro m² 2026</strong>
