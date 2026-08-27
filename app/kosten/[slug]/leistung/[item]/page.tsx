@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { handwerkerCalculatorHref } from "@/lib/calculator-links";
 import { getCalculationExamples, getOfferChecks, getPriceDrivers } from "@/lib/price-guidance";
+import { getPriceGuideLink } from "@/lib/price-guide-links";
 import { getPriceItem, priceItemSlug } from "@/lib/price-slug";
 import { getService, priceSources, regions, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
@@ -67,6 +68,12 @@ export default async function PriceItemPage({
   const base = siteConfig.url.replace(/\/$/, "");
   const canonicalUrl = `${base}/kosten/${service.slug}/leistung/${itemSlug}`;
   const calculatorUrl = handwerkerCalculatorHref({ serviceSlug: service.slug, itemSlug });
+  const priceGuide = getPriceGuideLink({
+    serviceSlug: service.slug,
+    itemSlug,
+    itemName: item.name,
+    unit: item.unit,
+  });
   const cityRegions = regions.filter((region) => region.value !== "de");
   const relatedItems = service.priceItems.filter((candidate) => candidate.name !== item.name).slice(0, 5);
   const calculationExamples = getCalculationExamples(item);
@@ -176,6 +183,7 @@ export default async function PriceItemPage({
             <li><a href="#regionen">Preise nach Stadt</a></li>
             <li><a href="#preisfaktoren">Kostentreiber</a></li>
             <li><a href="#angebot">Angebote vergleichen</a></li>
+            <li><a href="#ratgeber">Passender Ratgeber</a></li>
             <li><a href="#quelle">Quelle und Aktualität</a></li>
             <li><a href="#faq">Häufige Fragen</a></li>
           </ol>
@@ -315,7 +323,20 @@ export default async function PriceItemPage({
           </div>
           <div className="heroActions">
             <Link className="primaryButton" href={calculatorUrl}>Kosten vorab berechnen</Link>
-            <Link className="ghostButton" href="/ratgeber/handwerker-stundensaetze">Handwerkerpreise besser verstehen</Link>
+          </div>
+        </section>
+
+        <section className="contentCard proseCard articleSection" id="ratgeber">
+          <span className="eyebrow">Passender Ratgeber</span>
+          <h2>{priceGuide.title}</h2>
+          <p>
+            Die einzelne Preisposition zeigt einen konkreten Richtwert. Der passende Ratgeber ordnet {item.name}
+            in den größeren Projektzusammenhang ein und zeigt weitere Kostenblöcke, Beispiele und Planungsfragen,
+            die für {service.shortTitle} relevant sein können.
+          </p>
+          <div className="heroActions">
+            <Link className="primaryButton" href={priceGuide.href}>{priceGuide.cta}</Link>
+            <Link className="ghostButton" href={`/kosten/${service.slug}`}>Alle {service.shortTitle}-Preise</Link>
           </div>
         </section>
 
