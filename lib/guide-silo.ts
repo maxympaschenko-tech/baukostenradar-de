@@ -88,6 +88,54 @@ const opportunitySilos: Record<string, {
     itemSlug: "fenstereinbau",
     calculatorLabel: "Fenstereinbau berechnen",
   },
+  "trockenbauwand-kosten-pro-qm": {
+    serviceSlugs: ["trockenbau", "maler"],
+    serviceSlug: "trockenbau",
+    itemSlug: "trockenbauwand-beidseitig-beplankt",
+    calculatorLabel: "Trockenbauwand berechnen",
+  },
+  "heizkoerper-montieren-kosten": {
+    serviceSlugs: ["heizung", "sanitaer"],
+    serviceSlug: "heizung",
+    itemSlug: "heizkoerper-montieren",
+    calculatorLabel: "Heizkörper berechnen",
+  },
+  "bodenplatte-kosten-pro-qm": {
+    serviceSlugs: ["maurer"],
+    serviceSlug: "maurer",
+    itemSlug: "bodenplatte-standard",
+    calculatorLabel: "Bodenplatte berechnen",
+  },
+  "kuechenfronten-erneuern-kosten": {
+    serviceSlugs: ["kueche", "maler"],
+    serviceSlug: "kueche",
+    itemSlug: "kuechenfronten-austauschen-oder-lackieren",
+    calculatorLabel: "Küchenfronten berechnen",
+  },
+  "kuechenarbeitsplatte-kosten": {
+    serviceSlugs: ["kueche", "sanitaer"],
+    serviceSlug: "kueche",
+    itemSlug: "neue-arbeitsplatte",
+    calculatorLabel: "Arbeitsplatte berechnen",
+  },
+  "parkett-verlegen-kosten-pro-qm": {
+    serviceSlugs: ["bodenleger", "estrich"],
+    serviceSlug: "bodenleger",
+    itemSlug: "parkett-verlegen-inkl-material",
+    calculatorLabel: "Parkett berechnen",
+  },
+  "laminat-verlegen-kosten-pro-qm": {
+    serviceSlugs: ["bodenleger", "estrich"],
+    serviceSlug: "bodenleger",
+    itemSlug: "laminat-verlegen",
+    calculatorLabel: "Laminat berechnen",
+  },
+  "innendaemmung-kosten-pro-qm": {
+    serviceSlugs: ["daemmung", "trockenbau", "fassade"],
+    serviceSlug: "daemmung",
+    itemSlug: "innendaemmung",
+    calculatorLabel: "Innendämmung berechnen",
+  },
 };
 
 const scenarioCalculatorLinks: Record<string, Pick<GuideSilo, "calculatorHref" | "calculatorLabel">> = {
