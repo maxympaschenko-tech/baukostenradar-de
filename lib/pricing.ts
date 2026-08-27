@@ -108,6 +108,21 @@ export const priceSources = {
     url: "https://www.energie-experten.org/erneuerbare-energien/photovoltaik/photovoltaikanlage/mit-speicher",
     checkedAt: "August 2026",
   },
+  obiDachfenster: {
+    name: "OBI - Dachfenster nachträglich einbauen 2026",
+    url: "https://www.obi.de/magazin/bauen/fenster/dachfenster-einbauen",
+    checkedAt: "27.08.2026",
+  },
+  adacEnergetischeSanierung: {
+    name: "ADAC - Energetische Sanierung 2026",
+    url: "https://www.adac.de/rund-ums-haus/energie/spartipps/energetische-sanierung/",
+    checkedAt: "27.08.2026",
+  },
+  co2Geschossdecke: {
+    name: "co2online - Oberste Geschossdecke dämmen",
+    url: "https://www.co2online.de/modernisieren-und-bauen/daemmung/daemmung-der-obersten-geschossdecke/",
+    checkedAt: "27.08.2026",
+  },
 } as const;
 
 export const services: Service[] = [
@@ -173,12 +188,13 @@ export const services: Service[] = [
     slug: "dachsanierung",
     title: "Dachsanierung Kosten 2026",
     shortTitle: "Dachsanierung",
-    description: "Richtwerte für Neueindeckung, Dämmung, Gerüst und typische Dacharbeiten in Deutschland.",
+    description: "Richtwerte für Neueindeckung, Dämmung, Dachfenster, Gerüst und typische Dacharbeiten in Deutschland.",
     unit: "m² / Projekt",
     icon: "⌂",
     priceItems: [
       { name: "Neueindeckung inkl. Lattung", low: 120, high: 250, unit: "pro m² Dachfläche", sourceKey: "d24Preisspiegel" },
       { name: "Dachsanierung inkl. Aufsparrendämmung", low: 250, high: 450, unit: "pro m²", sourceKey: "d24Preisspiegel" },
+      { name: "Dachfenster nachträglich einbauen", low: 1500, high: 4000, unit: "pro Fenster", note: "Gesamtkosten inklusive Fenster, Einbau und typischen Zusatzarbeiten; aufwendige Projekte können höher liegen", sourceKey: "obiDachfenster" },
       { name: "Gerüst, ca. 4 Wochen", low: 8, high: 15, unit: "pro m² Gerüstfläche", sourceKey: "d24Preisspiegel" },
       { name: "Dachrinne erneuern, Zink", low: 30, high: 60, unit: "pro lfd. Meter", sourceKey: "d24Preisspiegel" },
     ],
@@ -261,7 +277,7 @@ export const services: Service[] = [
     slug: "daemmung",
     title: "Dämmung Kosten 2026",
     shortTitle: "Dämmung",
-    description: "Preise für Dachdämmung, Fassadendämmung und Innendämmung in Deutschland pro Quadratmeter vergleichen.",
+    description: "Preise für Dach-, Fassaden-, Kellerdecken- und Geschossdeckendämmung in Deutschland pro Quadratmeter vergleichen.",
     unit: "m²",
     icon: "▨",
     priceItems: [
@@ -269,6 +285,9 @@ export const services: Service[] = [
       { name: "Dachdämmung Zwischensparren", low: 60, high: 120, unit: "pro m²", sourceKey: "handwerkerSanierung" },
       { name: "Fassadendämmung WDVS", low: 100, high: 200, unit: "pro m²", sourceKey: "handwerkerSanierung" },
       { name: "Innendämmung", low: 80, high: 150, unit: "pro m²", sourceKey: "handwerkerSanierung" },
+      { name: "Kellerdeckendämmung inkl. Montage", low: 40, high: 100, unit: "pro m²", note: "Preisbeispiel inklusive Montage; abhängig von Dämmstoff und Ausführung", sourceKey: "adacEnergetischeSanierung" },
+      { name: "Oberste Geschossdecke dämmen, nicht begehbar", low: 20, high: 35, unit: "pro m²", sourceKey: "co2Geschossdecke" },
+      { name: "Oberste Geschossdecke dämmen, begehbar", low: 40, high: 80, unit: "pro m²", sourceKey: "co2Geschossdecke" },
     ],
   },
   {
