@@ -13,6 +13,8 @@ import { septenaryOpportunityGuides } from "@/lib/guides-opportunities-septenary
 import { comparisonGuides } from "@/lib/guides-comparisons";
 import { scenarioGuides } from "@/lib/guides-scenarios";
 import { catalogScenarioGuides } from "@/lib/guides-catalog-scenarios";
+import { currentCatalogGuides } from "@/lib/guides-current-catalog";
+import { demolitionGuides } from "@/lib/guides-demolition";
 
 const primaryClusterLinks: Record<string, Array<{ label: string; href: string }>> = {
   "sanierungskosten-pro-qm": [
@@ -49,6 +51,7 @@ const secondaryClusterLinks: Record<string, Array<{ label: string; href: string 
     { label: "Heizung erneuern Kosten", href: "/ratgeber/heizung-erneuern-kosten" },
     { label: "Haustür einbauen Kosten", href: "/ratgeber/haustuer-einbauen-kosten" },
     { label: "Kellerabdichtung außen oder innen", href: "/ratgeber/kellerabdichtung-aussen-oder-innen-kosten" },
+    { label: "Haus abreißen Kosten", href: "/ratgeber/haus-abreissen-kosten" },
   ],
   "renovierungskosten-haus": [
     { label: "Renovierungskosten 100 m²", href: "/ratgeber/renovierungskosten-100-qm" },
@@ -64,6 +67,7 @@ const secondaryClusterLinks: Record<string, Array<{ label: string; href: string 
     { label: "Elektrik im Altbau erneuern", href: "/ratgeber/elektrik-erneuern-altbau" },
     { label: "Dach sanieren Kosten pro m²", href: "/ratgeber/dach-sanieren-kosten-pro-qm" },
     { label: "Estrich 100 m² Kosten", href: "/ratgeber/estrich-100-qm-kosten" },
+    { label: "Innenabbruch Einfamilienhaus", href: "/ratgeber/innenabbruch-einfamilienhaus-kosten" },
   ],
   "arbeitskosten-materialkosten": [
     { label: "Renovierungskosten 100 m²", href: "/ratgeber/renovierungskosten-100-qm" },
@@ -80,6 +84,7 @@ const tertiaryClusterLinks: Record<string, Array<{ label: string; href: string }
     { label: "Innenwand mauern Kosten", href: "/ratgeber/innenwand-mauern-kosten" },
     { label: "Estrich 100 m² Kosten", href: "/ratgeber/estrich-100-qm-kosten" },
     { label: "Kellerabdichtung außen oder innen", href: "/ratgeber/kellerabdichtung-aussen-oder-innen-kosten" },
+    { label: "Innenabbruch Einfamilienhaus", href: "/ratgeber/innenabbruch-einfamilienhaus-kosten" },
   ],
   "sanierungskosten-einfamilienhaus": [
     { label: "Dach sanieren Kosten pro m²", href: "/ratgeber/dach-sanieren-kosten-pro-qm" },
@@ -215,15 +220,15 @@ const catalogScenarioClusterLinks: Record<string, Array<{ label: string; href: s
   ],
   "6-innentueren-austauschen-kosten": [
     { label: "Innentür einbauen Kosten", href: "/ratgeber/innentuer-einbauen-kosten" },
-    { label: "Tür lackieren Kosten", href: "/ratgeber/tuer-lackieren-kosten" },
+    { label: "Haustür einbauen Kosten", href: "/ratgeber/haustuer-einbauen-kosten" },
   ],
   "estrich-100-qm-kosten": [
     { label: "Zementestrich Kosten pro m²", href: "/ratgeber/zementestrich-kosten-pro-qm" },
+    { label: "Fließestrich Kosten pro m²", href: "/ratgeber/fliessestrich-kosten-pro-qm" },
     { label: "Trockenestrich Kosten pro m²", href: "/ratgeber/trockenestrich-kosten-pro-qm" },
-    { label: "Anhydritestrich Kosten pro m²", href: "/ratgeber/anhydritestrich-kosten-pro-qm" },
-    { label: "Gussasphaltestrich Kosten pro m²", href: "/ratgeber/gussasphaltestrich-kosten-pro-qm" },
-    { label: "Sichtestrich Kosten pro m²", href: "/ratgeber/sichtestrich-kosten-pro-qm" },
-    { label: "Zementestrich oder Anhydrit vergleichen", href: "/ratgeber/estrich-zement-oder-anhydrit-kosten" },
+    { label: "Schnellestrich Kosten pro m²", href: "/ratgeber/schnellestrich-kosten-pro-qm" },
+    { label: "Bodenausgleich Kosten pro m²", href: "/ratgeber/bodenausgleich-kosten-pro-qm" },
+    { label: "Estrich-Rissreparatur Kosten", href: "/ratgeber/estrich-rissreparatur-kosten" },
   ],
   "14-treppenstufen-renovieren-kosten": [
     { label: "Treppenrenovierung Holzstufen-System", href: "/ratgeber/treppenrenovierung-holzstufen-system-kosten" },
@@ -262,7 +267,18 @@ const enrichedTradeGuides = addClusterLinks(tradeGuides, tradeClusterLinks);
 const enrichedSpecialistGuides = addClusterLinks(specialistGuides, specialistClusterLinks);
 const enrichedCatalogScenarioGuides = addClusterLinks(catalogScenarioGuides, catalogScenarioClusterLinks);
 
-export const allGuides = [
+const deprecatedCatalogGuideSlugs = new Set([
+  "innentuer-einbauen-kosten",
+  "tuer-lackieren-kosten",
+  "zementestrich-kosten-pro-qm",
+  "trockenestrich-kosten-pro-qm",
+  "anhydritestrich-kosten-pro-qm",
+  "gussasphaltestrich-kosten-pro-qm",
+  "sichtestrich-kosten-pro-qm",
+  "estrich-zement-oder-anhydrit-kosten",
+]);
+
+const legacyGuides = [
   ...enrichedPrimaryGuides,
   ...enrichedSecondaryGuides,
   ...enrichedTertiaryGuides,
@@ -278,6 +294,12 @@ export const allGuides = [
   ...comparisonGuides,
   ...scenarioGuides,
   ...enrichedCatalogScenarioGuides,
+];
+
+export const allGuides = [
+  ...legacyGuides.filter((guide) => !deprecatedCatalogGuideSlugs.has(guide.slug)),
+  ...currentCatalogGuides,
+  ...demolitionGuides,
 ];
 
 export function getAnyGuide(slug: string) {
