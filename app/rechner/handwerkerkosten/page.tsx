@@ -19,6 +19,12 @@ function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
+function validQuantity(value: string | undefined) {
+  if (!value) return undefined;
+  const parsed = Number(value.replace(",", "."));
+  return Number.isFinite(parsed) && parsed >= 0.1 && parsed <= 10000 ? parsed : undefined;
+}
+
 export default async function HandwerkerCostCalculatorPage({
   searchParams,
 }: {
@@ -28,6 +34,7 @@ export default async function HandwerkerCostCalculatorPage({
   const requestedServiceSlug = firstParam(query.gewerk);
   const requestedItemSlug = firstParam(query.leistung);
   const requestedRegion = firstParam(query.region);
+  const requestedQuantity = validQuantity(firstParam(query.menge));
 
   const selectedService = services.find((service) => service.slug === requestedServiceSlug);
   const validItemSlug = selectedService?.priceItems.some((item) => priceItemSlug(item.name) === requestedItemSlug)
@@ -98,6 +105,7 @@ export default async function HandwerkerCostCalculatorPage({
           initialServiceSlug={selectedService?.slug}
           initialItemSlug={validItemSlug}
           initialRegionValue={validRegion?.value}
+          initialQuantity={requestedQuantity}
         />
 
         <section className="contentCard proseCard">
