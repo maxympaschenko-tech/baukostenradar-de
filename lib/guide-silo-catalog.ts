@@ -177,6 +177,54 @@ const malerGuideSilos: Record<string, GuideSilo> = {
   },
 };
 
+const fliesenGuideSilos: Record<string, GuideSilo> = {
+  "fliesenleger-kosten-pro-qm": {
+    serviceSlugs: ["fliesenleger", "badsanierung", "sanitaer"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "fliesenleger",
+      itemSlug: "standard-fliesen-verlegen",
+    }),
+    calculatorLabel: "Fliesenlegerkosten berechnen",
+    regionalMode: "service",
+  },
+  "fliesen-verlegen-kosten-pro-qm": {
+    serviceSlugs: ["fliesenleger", "badsanierung"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "fliesenleger",
+      itemSlug: "standard-fliesen-verlegen",
+    }),
+    calculatorLabel: "Standardfliesen berechnen",
+    regionalMode: "service",
+  },
+  "grossformat-fliesen-verlegen-kosten": {
+    serviceSlugs: ["fliesenleger", "badsanierung"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "fliesenleger",
+      itemSlug: "grossformat-ab-80-x-80-cm",
+    }),
+    calculatorLabel: "Großformat-Fliesen berechnen",
+    regionalMode: "service",
+  },
+  "mosaik-fliesen-verlegen-kosten-pro-qm": {
+    serviceSlugs: ["fliesenleger", "badsanierung"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "fliesenleger",
+      itemSlug: "mosaik-fliesen-verlegen",
+    }),
+    calculatorLabel: "Mosaikfliesen berechnen",
+    regionalMode: "service",
+  },
+  "naturstein-verlegen-kosten-pro-qm": {
+    serviceSlugs: ["fliesenleger", "badsanierung"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "fliesenleger",
+      itemSlug: "naturstein-verlegen",
+    }),
+    calculatorLabel: "Naturstein berechnen",
+    regionalMode: "service",
+  },
+};
+
 const serviceAugments: Record<string, string[]> = {
   "klinkerfassade-kosten-pro-qm": ["maurer"],
 };
@@ -187,7 +235,8 @@ export function getGuideSilo(slug: string): GuideSilo {
     roofGuideSilos[slug] ??
     electricalGuideSilos[slug] ??
     bathGuideSilos[slug] ??
-    malerGuideSilos[slug];
+    malerGuideSilos[slug] ??
+    fliesenGuideSilos[slug];
   if (explicit) return explicit;
 
   const base = getBaseGuideSilo(slug);
