@@ -80,12 +80,74 @@ const electricalGuideSilos: Record<string, GuideSilo> = {
   },
 };
 
+const bathGuideSilos: Record<string, GuideSilo> = {
+  "bad-komplett-sanieren-kosten": {
+    serviceSlugs: ["badsanierung", "sanitaer", "fliesenleger"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "badsanierung",
+      itemSlug: "bad-neubau-sanierung",
+    }),
+    calculatorLabel: "Badkosten berechnen",
+    regionalMode: "service",
+  },
+  "bad-10-qm-sanieren-kosten": {
+    serviceSlugs: ["badsanierung", "sanitaer", "fliesenleger"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "badsanierung",
+      itemSlug: "bad-neubau-sanierung",
+      quantity: 10,
+    }),
+    calculatorLabel: "10 m² Bad berechnen",
+    regionalMode: "service",
+  },
+  "bad-entkernen-kosten": {
+    serviceSlugs: ["badsanierung", "sanitaer", "fliesenleger"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "sanitaer",
+      itemSlug: "demontage-entsorgung-altbad",
+    }),
+    calculatorLabel: "Bad-Rückbau berechnen",
+    regionalMode: "service",
+  },
+  "bad-komplett-verfliesen-kosten": {
+    serviceSlugs: ["badsanierung", "sanitaer", "fliesenleger"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "badsanierung",
+      itemSlug: "komplettverfliesung-bad",
+    }),
+    calculatorLabel: "Badverfliesung berechnen",
+    regionalMode: "service",
+  },
+  "bad-abdichten-kosten-pro-qm": {
+    serviceSlugs: ["badsanierung", "sanitaer", "fliesenleger"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "badsanierung",
+      itemSlug: "verbundabdichtung-nassbereich",
+    }),
+    calculatorLabel: "Badabdichtung berechnen",
+    regionalMode: "service",
+  },
+  "sanitaerobjekte-bad-kosten": {
+    serviceSlugs: ["badsanierung", "sanitaer", "fliesenleger"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "sanitaer",
+      itemSlug: "sanitaerobjekte-armaturen-fuer-8-m2-bad",
+    }),
+    calculatorLabel: "Sanitärobjekte berechnen",
+    regionalMode: "service",
+  },
+};
+
 const serviceAugments: Record<string, string[]> = {
   "klinkerfassade-kosten-pro-qm": ["maurer"],
 };
 
 export function getGuideSilo(slug: string): GuideSilo {
-  const explicit = doorGuideSilos[slug] ?? roofGuideSilos[slug] ?? electricalGuideSilos[slug];
+  const explicit =
+    doorGuideSilos[slug] ??
+    roofGuideSilos[slug] ??
+    electricalGuideSilos[slug] ??
+    bathGuideSilos[slug];
   if (explicit) return explicit;
 
   const base = getBaseGuideSilo(slug);
