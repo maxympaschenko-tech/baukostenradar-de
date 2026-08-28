@@ -99,6 +99,13 @@ const electricalGuideLinks = [
   { slug: "elektro-neuinstallation-kosten", label: "Elektro-Neuinstallation Kosten", href: "/ratgeber/elektro-neuinstallation-kosten" },
 ] as const;
 
+const malerGuideLinks = [
+  { slug: "maler-kosten-pro-qm", label: "Maler Kosten pro m²", href: "/ratgeber/maler-kosten-pro-qm" },
+  { slug: "waende-streichen-kosten-pro-qm", label: "Wände streichen Kosten pro m²", href: "/ratgeber/waende-streichen-kosten-pro-qm" },
+  { slug: "tapezieren-kosten-pro-qm", label: "Tapezieren Kosten pro m²", href: "/ratgeber/tapezieren-kosten-pro-qm" },
+  { slug: "innenputz-q3-kosten-pro-qm", label: "Innenputz Q3 Kosten pro m²", href: "/ratgeber/innenputz-q3-kosten-pro-qm" },
+] as const;
+
 function peers<T extends readonly { slug: string; label: string; href: string }[]>(links: T, slug: string) {
   return links
     .filter((link) => link.slug !== slug)
@@ -159,6 +166,10 @@ const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
   "steckdose-installieren-kosten": peers(electricalGuideLinks, "steckdose-installieren-kosten"),
   "lichtschalter-austauschen-kosten": peers(electricalGuideLinks, "lichtschalter-austauschen-kosten"),
   "elektro-neuinstallation-kosten": peers(electricalGuideLinks, "elektro-neuinstallation-kosten"),
+  "maler-kosten-pro-qm": peers(malerGuideLinks, "maler-kosten-pro-qm"),
+  "waende-streichen-kosten-pro-qm": peers(malerGuideLinks, "waende-streichen-kosten-pro-qm"),
+  "tapezieren-kosten-pro-qm": peers(malerGuideLinks, "tapezieren-kosten-pro-qm"),
+  "innenputz-q3-kosten-pro-qm": peers(malerGuideLinks, "innenputz-q3-kosten-pro-qm"),
 };
 
 const enrichedBaseGuides = baseAllGuides.map((guide) => {

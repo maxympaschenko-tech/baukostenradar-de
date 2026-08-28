@@ -1,0 +1,123 @@
+name: Verify Maler guide cluster
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-maler-guide-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify exact Maler price-item guide mappings
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'https://baukostenradar.de/kosten/maler' -o /tmp/maler.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+
+          grep -q 'https://baukostenradar.de/kosten/maler' /tmp/maler.html
+          ! grep -qi 'noindex' /tmp/maler.html
+
+          mappings=$(cat <<'EOF'
+          waende-streichen|waende-streichen-kosten-pro-qm
+          tapezieren-inkl-tapete|tapezieren-kosten-pro-qm
+          innenputz-glaetten-q3|innenputz-q3-kosten-pro-qm
+          EOF
+          )
+
+          checked=0
+          while IFS='|' read -r item guide; do
+            item="${item#${item%%[![:space:]]*}}"
+            [ -n "$item" ] || continue
+
+            echo "Checking Maler ${item} -> ${guide}"
+            item_url="https://baukostenradar.de/kosten/maler/leistung/${item}"
+            guide_url="https://baukostenradar.de/ratgeber/${guide}"
+            item_output="/tmp/maler-item-${item}.html"
+            guide_output="/tmp/maler-guide-${guide}.html"
+
+            grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Maler item missing in sitemap: ${item}"; exit 1; }
+            grep -q "/kosten/maler/leistung/${item}" /tmp/maler.html || { echo "Maler item missing on category: ${item}"; exit 1; }
+
+            curl -sS --fail "$item_url" -o "$item_output"
+            grep -q 'Passender Ratgeber' "$item_output" || { echo "Ratgeber block missing: ${item}"; exit 1; }
+            grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong Maler guide mapping: ${item} -> ${guide}"; exit 1; }
+            ! grep -qi 'noindex' "$item_output"
+
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Maler guide missing in sitemap: ${guide}"; exit 1; }
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "Maler guide missing from hub: ${guide}"; exit 1; }
+
+            curl -sS --fail "$guide_url" -o "$guide_output"
+            grep -q "$guide_url" "$guide_output" || { echo "Canonical missing: ${guide}"; exit 1; }
+            grep -q '"@type":"Article"' "$guide_output" || { echo "Article schema missing: ${guide}"; exit 1; }
+            grep -q '/kosten/maler' "$guide_output" || { echo "Maler service link missing: ${guide}"; exit 1; }
+            grep -q '/kosten/maler/berlin' "$guide_output" || { echo "Maler Berlin link missing: ${guide}"; exit 1; }
+            grep -q 'gewerk=maler' "$guide_output" || { echo "Maler calculator service missing: ${guide}"; exit 1; }
+            grep -q "leistung=${item}" "$guide_output" || { echo "Exact Maler calculator item missing: ${guide} expected ${item}"; exit 1; }
+            ! grep -qi 'noindex' "$guide_output"
+
+            checked=$((checked + 1))
+          done <<< "$mappings"
+
+          test "$checked" -eq 3
+          echo "Verified ${checked} exact Maler price-item guide mappings"
+
+      - name: Verify Maler parent guide and calculator
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          guide='maler-kosten-pro-qm'
+          guide_url="https://baukostenradar.de/ratgeber/${guide}"
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+          curl -sS --fail "$guide_url" -o /tmp/maler-parent.html
+
+          grep -q "${guide_url}</loc>" /tmp/sitemap.xml
+          grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+          grep -q "$guide_url" /tmp/maler-parent.html
+          grep -q '"@type":"Article"' /tmp/maler-parent.html
+          grep -q '/kosten/maler' /tmp/maler-parent.html
+          grep -q '/kosten/maler/berlin' /tmp/maler-parent.html
+          grep -q 'gewerk=maler' /tmp/maler-parent.html
+          grep -q 'leistung=waende-streichen' /tmp/maler-parent.html
+          ! grep -qi 'noindex' /tmp/maler-parent.html
+
+      - name: Verify Maler guide hub and internal-link silo
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+
+          guides=(
+            maler-kosten-pro-qm
+            waende-streichen-kosten-pro-qm
+            tapezieren-kosten-pro-qm
+            innenputz-q3-kosten-pro-qm
+          )
+
+          for source in "${guides[@]}"; do
+            guide_url="https://baukostenradar.de/ratgeber/${source}"
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Maler cluster guide missing in sitemap: ${source}"; exit 1; }
+            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Maler cluster guide missing from hub: ${source}"; exit 1; }
+
+            curl -sS --fail "$guide_url" -o "/tmp/${source}.html"
+            grep -q "$guide_url" "/tmp/${source}.html" || { echo "Canonical missing: ${source}"; exit 1; }
+            grep -q '"@type":"Article"' "/tmp/${source}.html" || { echo "Article schema missing: ${source}"; exit 1; }
+            ! grep -qi 'noindex' "/tmp/${source}.html"
+
+            for target in "${guides[@]}"; do
+              [ "$source" = "$target" ] && continue
+              grep -q "/ratgeber/${target}" "/tmp/${source}.html" || { echo "${source} missing Maler peer ${target}"; exit 1; }
+            done
+          done
+
+          echo "Verified Maler hub visibility and full peer-link silo"
