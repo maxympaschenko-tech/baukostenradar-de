@@ -43,6 +43,45 @@ const masonryRelatedLinks = {
   },
 } as const;
 
+const treppenGuideLinks = [
+  {
+    slug: "14-treppenstufen-renovieren-kosten",
+    label: "14 Treppenstufen renovieren Kosten",
+    href: "/ratgeber/14-treppenstufen-renovieren-kosten",
+  },
+  {
+    slug: "treppenrenovierung-holzstufen-system-kosten",
+    label: "Treppenrenovierung mit Holzstufen-System",
+    href: "/ratgeber/treppenrenovierung-holzstufen-system-kosten",
+  },
+  {
+    slug: "holztreppe-schleifen-kosten",
+    label: "Holztreppe schleifen Kosten",
+    href: "/ratgeber/holztreppe-schleifen-kosten",
+  },
+  {
+    slug: "treppen-stufenueberbau-gelaender-kosten",
+    label: "Stufenüberbau und Geländer Kosten",
+    href: "/ratgeber/treppen-stufenueberbau-gelaender-kosten",
+  },
+  {
+    slug: "betontreppe-neuer-belag-kosten",
+    label: "Betontreppe mit neuem Belag Kosten",
+    href: "/ratgeber/betontreppe-neuer-belag-kosten",
+  },
+  {
+    slug: "natursteintreppe-schleifen-kosten",
+    label: "Natursteintreppe schleifen Kosten",
+    href: "/ratgeber/natursteintreppe-schleifen-kosten",
+  },
+] as const;
+
+function treppenPeers(slug: string) {
+  return treppenGuideLinks
+    .filter((link) => link.slug !== slug)
+    .map(({ label, href }) => ({ label, href }));
+}
+
 const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
   "haustuer-einbauen-kosten": [doorRelatedLinks.kunststoff, doorRelatedLinks.rc2],
   "innentuer-einbauen-kosten": [doorRelatedLinks.kunststoff, doorRelatedLinks.rc2],
@@ -59,6 +98,12 @@ const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
     masonryRelatedLinks.bodenplatte,
     masonryRelatedLinks.klinkerCalculator,
   ],
+  "14-treppenstufen-renovieren-kosten": treppenPeers("14-treppenstufen-renovieren-kosten"),
+  "treppenrenovierung-holzstufen-system-kosten": treppenPeers("treppenrenovierung-holzstufen-system-kosten"),
+  "holztreppe-schleifen-kosten": treppenPeers("holztreppe-schleifen-kosten"),
+  "treppen-stufenueberbau-gelaender-kosten": treppenPeers("treppen-stufenueberbau-gelaender-kosten"),
+  "betontreppe-neuer-belag-kosten": treppenPeers("betontreppe-neuer-belag-kosten"),
+  "natursteintreppe-schleifen-kosten": treppenPeers("natursteintreppe-schleifen-kosten"),
 };
 
 const enrichedBaseGuides = baseAllGuides.map((guide) => {

@@ -40,6 +40,36 @@ const itemGuideOverrides: Record<string, PriceGuideLink> = {
     title: "Klinker-Verblendmauerwerk: Kosten pro m² und Fassadenaufbau",
     cta: "Klinker-Ratgeber öffnen",
   },
+  "treppen:treppenrenovierung-holzstufen-system": {
+    href: "/ratgeber/treppenrenovierung-holzstufen-system-kosten",
+    title: "Treppenrenovierung mit Holzstufen-System: Kosten 2026",
+    cta: "Holzstufen-System-Ratgeber öffnen",
+  },
+  "treppen:holztreppe-schleifen-und-versiegeln": {
+    href: "/ratgeber/holztreppe-schleifen-kosten",
+    title: "Holztreppe schleifen und versiegeln: Kosten 2026",
+    cta: "Holztreppen-Ratgeber öffnen",
+  },
+  "treppen:holztreppe-stufenueberbau-gelaender": {
+    href: "/ratgeber/treppen-stufenueberbau-gelaender-kosten",
+    title: "Holztreppe mit Stufenüberbau und Geländer: Kosten 2026",
+    cta: "Stufenüberbau-Ratgeber öffnen",
+  },
+  "treppen:betontreppe-mit-neuem-belag": {
+    href: "/ratgeber/betontreppe-neuer-belag-kosten",
+    title: "Betontreppe mit neuem Belag: Kosten 2026",
+    cta: "Betontreppen-Ratgeber öffnen",
+  },
+  "treppen:natursteintreppe-schleifen-und-polieren": {
+    href: "/ratgeber/natursteintreppe-schleifen-kosten",
+    title: "Natursteintreppe schleifen und polieren: Kosten 2026",
+    cta: "Naturstein-Ratgeber öffnen",
+  },
+  "treppen:holzstufe-schleifen-und-versiegeln": {
+    href: "/ratgeber/14-treppenstufen-renovieren-kosten",
+    title: "Holzstufen schleifen: Kostenbeispiel für 14 Treppenstufen",
+    cta: "14-Stufen-Ratgeber öffnen",
+  },
 };
 
 export function getServiceGuideLink(serviceSlug: string): PriceGuideLink {

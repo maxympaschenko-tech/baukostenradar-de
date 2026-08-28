@@ -48,7 +48,7 @@ const guideGroups = [
   },
   {
     eyebrow: "Innenausbau & Modernisierung",
-    title: "Türen, Treppen und Küche konkret kalkulieren",
+    title: "Türen und Küche konkret kalkulieren",
     description: "Typische Innenausbau-Projekte mit aktuellen Stück- und Projektpreisen, klarer Rechenbasis und direktem Weg zum Kostenrechner.",
     slugs: [
       "6-innentueren-austauschen-kosten",
@@ -56,8 +56,20 @@ const guideGroups = [
       "haustuer-einbauen-kosten",
       "haustuer-kunststoff-kosten",
       "haustuer-rc2-kosten",
-      "14-treppenstufen-renovieren-kosten",
       "kueche-10-qm-renovieren-kosten",
+    ],
+  },
+  {
+    eyebrow: "Treppen & Stufen",
+    title: "Treppen renovieren und Stufen aufarbeiten",
+    description: "Holzstufen-System, Schleifen und Versiegeln, Stufenüberbau, Betontreppe, Naturstein sowie ein konkretes 14-Stufen-Beispiel direkt vergleichen.",
+    slugs: [
+      "14-treppenstufen-renovieren-kosten",
+      "treppenrenovierung-holzstufen-system-kosten",
+      "holztreppe-schleifen-kosten",
+      "treppen-stufenueberbau-gelaender-kosten",
+      "betontreppe-neuer-belag-kosten",
+      "natursteintreppe-schleifen-kosten",
     ],
   },
   {
