@@ -225,6 +225,63 @@ const fliesenGuideSilos: Record<string, GuideSilo> = {
   },
 };
 
+const bodenGuideSilos: Record<string, GuideSilo> = {
+  "bodenleger-kosten-pro-qm": {
+    serviceSlugs: ["bodenleger", "estrich"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "bodenleger",
+      itemSlug: "vinylboden-klick-inkl-material",
+    }),
+    calculatorLabel: "Bodenlegerkosten berechnen",
+    regionalMode: "service",
+  },
+  "vinylboden-verlegen-kosten-pro-qm": {
+    serviceSlugs: ["bodenleger", "estrich"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "bodenleger",
+      itemSlug: "vinylboden-klick-inkl-material",
+    }),
+    calculatorLabel: "Vinylboden berechnen",
+    regionalMode: "service",
+  },
+  "parkett-verlegen-kosten-pro-qm": {
+    serviceSlugs: ["bodenleger", "estrich"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "bodenleger",
+      itemSlug: "parkett-verlegen-inkl-material",
+    }),
+    calculatorLabel: "Parkett verlegen berechnen",
+    regionalMode: "service",
+  },
+  "laminat-verlegen-kosten-pro-qm": {
+    serviceSlugs: ["bodenleger", "estrich"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "bodenleger",
+      itemSlug: "laminat-verlegen",
+    }),
+    calculatorLabel: "Laminat verlegen berechnen",
+    regionalMode: "service",
+  },
+  "boden-sanieren-kosten-pro-qm": {
+    serviceSlugs: ["bodenleger", "estrich"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "bodenleger",
+      itemSlug: "boden-sanierung-alt-raus-neu-rein",
+    }),
+    calculatorLabel: "Bodensanierung berechnen",
+    regionalMode: "service",
+  },
+  "parkett-abschleifen-kosten": {
+    serviceSlugs: ["bodenleger"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "bodenleger",
+      itemSlug: "parkett-abschleifen-und-oelen",
+    }),
+    calculatorLabel: "Parkett abschleifen berechnen",
+    regionalMode: "service",
+  },
+};
+
 const serviceAugments: Record<string, string[]> = {
   "klinkerfassade-kosten-pro-qm": ["maurer"],
 };
@@ -236,7 +293,8 @@ export function getGuideSilo(slug: string): GuideSilo {
     electricalGuideSilos[slug] ??
     bathGuideSilos[slug] ??
     malerGuideSilos[slug] ??
-    fliesenGuideSilos[slug];
+    fliesenGuideSilos[slug] ??
+    bodenGuideSilos[slug];
   if (explicit) return explicit;
 
   const base = getBaseGuideSilo(slug);
