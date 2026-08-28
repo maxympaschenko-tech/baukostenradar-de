@@ -1,0 +1,139 @@
+name: Verify electrical guide cluster
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-electrical-guide-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify exact electrical price-item guide mappings
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'https://baukostenradar.de/kosten/elektriker' -o /tmp/elektriker.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+
+          grep -q 'https://baukostenradar.de/kosten/elektriker' /tmp/elektriker.html
+          ! grep -qi 'noindex' /tmp/elektriker.html
+
+          mappings=$(cat <<'EOF'
+          steckdose-installieren|steckdose-installieren-kosten
+          lichtschalter-austauschen|lichtschalter-austauschen-kosten
+          sicherungskasten-erneuern|sicherungskasten-erneuern-kosten
+          komplett-neuinstallation|elektro-neuinstallation-kosten
+          EOF
+          )
+
+          checked=0
+          while IFS='|' read -r item guide; do
+            item="${item#${item%%[![:space:]]*}}"
+            [ -n "$item" ] || continue
+
+            echo "Checking Elektriker ${item} -> ${guide}"
+            item_url="https://baukostenradar.de/kosten/elektriker/leistung/${item}"
+            guide_url="https://baukostenradar.de/ratgeber/${guide}"
+            item_output="/tmp/elektriker-item-${item}.html"
+            guide_output="/tmp/elektriker-guide-${guide}.html"
+
+            grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Electrical item missing in sitemap: ${item}"; exit 1; }
+            grep -q "/kosten/elektriker/leistung/${item}" /tmp/elektriker.html || { echo "Electrical item missing on category: ${item}"; exit 1; }
+
+            curl -sS --fail "$item_url" -o "$item_output"
+            grep -q 'Passender Ratgeber' "$item_output" || { echo "Ratgeber block missing: ${item}"; exit 1; }
+            grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong electrical guide mapping: ${item} -> ${guide}"; exit 1; }
+            ! grep -qi 'noindex' "$item_output"
+
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Electrical guide missing in sitemap: ${guide}"; exit 1; }
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "Electrical guide missing from hub: ${guide}"; exit 1; }
+
+            curl -sS --fail "$guide_url" -o "$guide_output"
+            grep -q "$guide_url" "$guide_output" || { echo "Canonical missing: ${guide}"; exit 1; }
+            grep -q '"@type":"Article"' "$guide_output" || { echo "Article schema missing: ${guide}"; exit 1; }
+            grep -q '/kosten/elektriker' "$guide_output" || { echo "Elektriker service link missing: ${guide}"; exit 1; }
+            grep -q '/kosten/elektriker/berlin' "$guide_output" || { echo "Elektriker Berlin link missing: ${guide}"; exit 1; }
+            grep -q 'gewerk=elektriker' "$guide_output" || { echo "Elektriker calculator service missing: ${guide}"; exit 1; }
+            grep -q "leistung=${item}" "$guide_output" || { echo "Exact electrical calculator item missing: ${guide} expected ${item}"; exit 1; }
+            ! grep -qi 'noindex' "$guide_output"
+
+            checked=$((checked + 1))
+          done <<< "$mappings"
+
+          test "$checked" -eq 4
+          echo "Verified ${checked} exact electrical price-item guide mappings"
+
+      - name: Verify electrical hourly-rate guide mapping
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          item='elektriker-stundensatz'
+          item_url="https://baukostenradar.de/kosten/elektriker/leistung/${item}"
+          guide='handwerker-stundensaetze'
+          guide_url="https://baukostenradar.de/ratgeber/${guide}"
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'https://baukostenradar.de/kosten/elektriker' -o /tmp/elektriker.html
+          curl -sS --fail "$item_url" -o /tmp/elektriker-rate-item.html
+          curl -sS --fail "$guide_url" -o /tmp/rates-guide.html
+
+          grep -q "${item_url}</loc>" /tmp/sitemap.xml
+          grep -q "/kosten/elektriker/leistung/${item}" /tmp/elektriker.html
+          grep -q 'Passender Ratgeber' /tmp/elektriker-rate-item.html
+          grep -q "/ratgeber/${guide}" /tmp/elektriker-rate-item.html
+          ! grep -qi 'noindex' /tmp/elektriker-rate-item.html
+
+          grep -q "${guide_url}</loc>" /tmp/sitemap.xml
+          grep -q "$guide_url" /tmp/rates-guide.html
+          grep -q '"@type":"Article"' /tmp/rates-guide.html
+          ! grep -qi 'noindex' /tmp/rates-guide.html
+
+      - name: Verify electrical guide hub and internal-link silo
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+
+          guides=(
+            elektrik-erneuern-altbau
+            elektrik-erneuern-100-qm-kosten
+            elektro-neuinstallation-kosten
+            sicherungskasten-erneuern-kosten
+            steckdose-installieren-kosten
+            lichtschalter-austauschen-kosten
+          )
+
+          for source in "${guides[@]}"; do
+            guide_url="https://baukostenradar.de/ratgeber/${source}"
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Electrical cluster guide missing in sitemap: ${source}"; exit 1; }
+            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Electrical cluster guide missing from hub: ${source}"; exit 1; }
+
+            curl -sS --fail "$guide_url" -o "/tmp/${source}.html"
+            grep -q "$guide_url" "/tmp/${source}.html" || { echo "Canonical missing: ${source}"; exit 1; }
+            grep -q '"@type":"Article"' "/tmp/${source}.html" || { echo "Article schema missing: ${source}"; exit 1; }
+            ! grep -qi 'noindex' "/tmp/${source}.html"
+
+            for target in "${guides[@]}"; do
+              [ "$source" = "$target" ] && continue
+              grep -q "/ratgeber/${target}" "/tmp/${source}.html" || { echo "${source} missing electrical peer ${target}"; exit 1; }
+            done
+          done
+
+      - name: Verify exact calculators on broad electrical guides
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for guide in elektrik-erneuern-altbau elektrik-erneuern-100-qm-kosten; do
+            curl -sS --fail "https://baukostenradar.de/ratgeber/${guide}" -o "/tmp/${guide}-calculator.html"
+            grep -q 'gewerk=elektriker' "/tmp/${guide}-calculator.html" || { echo "Elektriker calculator service missing: ${guide}"; exit 1; }
+            grep -q 'leistung=komplett-neuinstallation' "/tmp/${guide}-calculator.html" || { echo "Exact complete-installation calculator missing: ${guide}"; exit 1; }
+          done
