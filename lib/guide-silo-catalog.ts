@@ -59,12 +59,33 @@ const roofGuideSilos: Record<string, GuideSilo> = {
   },
 };
 
+const electricalGuideSilos: Record<string, GuideSilo> = {
+  "elektrik-erneuern-altbau": {
+    serviceSlugs: ["elektriker"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "elektriker",
+      itemSlug: "komplett-neuinstallation",
+    }),
+    calculatorLabel: "Elektro-Neuinstallation berechnen",
+    regionalMode: "service",
+  },
+  "elektrik-erneuern-100-qm-kosten": {
+    serviceSlugs: ["elektriker"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "elektriker",
+      itemSlug: "komplett-neuinstallation",
+    }),
+    calculatorLabel: "Elektrik für 100 m² berechnen",
+    regionalMode: "service",
+  },
+};
+
 const serviceAugments: Record<string, string[]> = {
   "klinkerfassade-kosten-pro-qm": ["maurer"],
 };
 
 export function getGuideSilo(slug: string): GuideSilo {
-  const explicit = doorGuideSilos[slug] ?? roofGuideSilos[slug];
+  const explicit = doorGuideSilos[slug] ?? roofGuideSilos[slug] ?? electricalGuideSilos[slug];
   if (explicit) return explicit;
 
   const base = getBaseGuideSilo(slug);
