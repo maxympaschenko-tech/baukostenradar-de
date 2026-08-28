@@ -1,0 +1,99 @@
+name: Verify window guide cluster
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-window-guide-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify all window price items and guide mappings
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'https://baukostenradar.de/kosten/fenster' -o /tmp/fenster.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+
+          grep -q 'https://baukostenradar.de/kosten/fenster' /tmp/fenster.html
+          ! grep -qi 'noindex' /tmp/fenster.html
+
+          mappings=$(cat <<'EOF'
+          fenster-mit-2-fach-verglasung|fenster-2-fach-verglasung-kosten
+          fenster-mit-3-fach-verglasung|fenster-3-fach-verglasung-kosten
+          fenstereinbau|fenstereinbau-kosten
+          EOF
+          )
+
+          checked=0
+          while IFS='|' read -r item guide; do
+            item="${item#${item%%[![:space:]]*}}"
+            [ -n "$item" ] || continue
+
+            echo "Checking Fenster ${item} -> ${guide}"
+            item_url="https://baukostenradar.de/kosten/fenster/leistung/${item}"
+            guide_url="https://baukostenradar.de/ratgeber/${guide}"
+            item_output="/tmp/fenster-item-${item}.html"
+            guide_output="/tmp/fenster-guide-${guide}.html"
+
+            grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Window item missing in sitemap: ${item}"; exit 1; }
+            grep -q "/kosten/fenster/leistung/${item}" /tmp/fenster.html || { echo "Window item missing on category: ${item}"; exit 1; }
+
+            curl -sS --fail "$item_url" -o "$item_output"
+            grep -q 'Passender Ratgeber' "$item_output" || { echo "Ratgeber block missing: ${item}"; exit 1; }
+            grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong guide mapping: ${item} -> ${guide}"; exit 1; }
+            ! grep -qi 'noindex' "$item_output"
+
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Window guide missing in sitemap: ${guide}"; exit 1; }
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "Window guide missing from hub: ${guide}"; exit 1; }
+
+            curl -sS --fail "$guide_url" -o "$guide_output"
+            grep -q "$guide_url" "$guide_output" || { echo "Canonical missing: ${guide}"; exit 1; }
+            grep -q '"@type":"Article"' "$guide_output" || { echo "Article schema missing: ${guide}"; exit 1; }
+            grep -q '/kosten/fenster' "$guide_output" || { echo "Window service link missing: ${guide}"; exit 1; }
+            grep -q '/kosten/fenster/berlin' "$guide_output" || { echo "Window Berlin link missing: ${guide}"; exit 1; }
+            grep -q 'gewerk=fenster' "$guide_output" || { echo "Window calculator missing: ${guide}"; exit 1; }
+            grep -q "leistung=${item}" "$guide_output" || { echo "Exact calculator item missing: ${guide} expected ${item}"; exit 1; }
+            ! grep -qi 'noindex' "$guide_output"
+
+            checked=$((checked + 1))
+          done <<< "$mappings"
+
+          test "$checked" -eq 3
+
+      - name: Verify window guide hub and internal-link silo
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+
+          guides=(
+            fenster-austauschen-kosten-haus
+            20-fenster-austauschen-kosten
+            fenster-2-fach-verglasung-kosten
+            fenster-3-fach-verglasung-kosten
+            fenstereinbau-kosten
+          )
+
+          for source in "${guides[@]}"; do
+            guide_url="https://baukostenradar.de/ratgeber/${source}"
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Window cluster guide missing in sitemap: ${source}"; exit 1; }
+            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Window cluster guide missing from hub: ${source}"; exit 1; }
+
+            curl -sS --fail "$guide_url" -o "/tmp/${source}.html"
+            grep -q "$guide_url" "/tmp/${source}.html" || { echo "Canonical missing: ${source}"; exit 1; }
+            grep -q '"@type":"Article"' "/tmp/${source}.html" || { echo "Article schema missing: ${source}"; exit 1; }
+            ! grep -qi 'noindex' "/tmp/${source}.html"
+
+            for target in "${guides[@]}"; do
+              [ "$source" = "$target" ] && continue
+              grep -q "/ratgeber/${target}" "/tmp/${source}.html" || { echo "${source} missing window peer ${target}"; exit 1; }
+            done
+          done

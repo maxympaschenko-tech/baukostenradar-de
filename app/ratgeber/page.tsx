@@ -19,14 +19,20 @@ const guideGroups = [
   {
     eyebrow: "Konkrete Gewerke",
     title: "Große Einzelmaßnahmen realistisch kalkulieren",
-    description: "Kosten für Dach, Fenster, Elektrik, Heizung und komplette Badsanierung mit konkreten 2026-Richtwerten und Beispielbudgets.",
-    slugs: ["dach-sanieren-kosten-pro-qm", "fenster-austauschen-kosten-haus", "elektrik-erneuern-altbau", "heizung-erneuern-kosten", "bad-komplett-sanieren-kosten"],
+    description: "Kosten für Dach, Elektrik, Heizung und komplette Badsanierung mit konkreten 2026-Richtwerten und Beispielbudgets.",
+    slugs: ["dach-sanieren-kosten-pro-qm", "elektrik-erneuern-altbau", "heizung-erneuern-kosten", "bad-komplett-sanieren-kosten"],
   },
   {
     eyebrow: "Konkrete Projektgrößen",
     title: "Kosten für typische Flächen und Stückzahlen",
-    description: "Konkrete Rechenbeispiele für 150 m² Dach, 20 Fenster, 100 m² Elektrik, ein 10-m²-Bad und 100 m² Fußbodenheizung.",
-    slugs: ["dach-150-qm-kosten", "20-fenster-austauschen-kosten", "elektrik-erneuern-100-qm-kosten", "bad-10-qm-sanieren-kosten", "fussbodenheizung-100-qm-kosten"],
+    description: "Konkrete Rechenbeispiele für 150 m² Dach, 100 m² Elektrik, ein 10-m²-Bad und 100 m² Fußbodenheizung.",
+    slugs: ["dach-150-qm-kosten", "elektrik-erneuern-100-qm-kosten", "bad-10-qm-sanieren-kosten", "fussbodenheizung-100-qm-kosten"],
+  },
+  {
+    eyebrow: "Fenster & Verglasung",
+    title: "Fenster austauschen, Verglasung und Einbau kalkulieren",
+    description: "Gesamtprojekt, 20-Fenster-Beispiel, 2-fach- und 3-fach-Verglasung sowie Montagekosten pro Fenster direkt vergleichen.",
+    slugs: ["fenster-austauschen-kosten-haus", "20-fenster-austauschen-kosten", "fenster-2-fach-verglasung-kosten", "fenster-3-fach-verglasung-kosten", "fenstereinbau-kosten"],
   },
   {
     eyebrow: "Innenausbau & Modernisierung",

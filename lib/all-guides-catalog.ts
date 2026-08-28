@@ -62,6 +62,14 @@ const kitchenGuideLinks = [
   { slug: "premium-kueche-umbau-kosten", label: "Premium-Küche mit Umbau Kosten", href: "/ratgeber/premium-kueche-umbau-kosten" },
 ] as const;
 
+const windowGuideLinks = [
+  { slug: "fenster-austauschen-kosten-haus", label: "Fenster austauschen Kosten", href: "/ratgeber/fenster-austauschen-kosten-haus" },
+  { slug: "20-fenster-austauschen-kosten", label: "20 Fenster austauschen Kosten", href: "/ratgeber/20-fenster-austauschen-kosten" },
+  { slug: "fenster-2-fach-verglasung-kosten", label: "Fenster mit 2-fach Verglasung Kosten", href: "/ratgeber/fenster-2-fach-verglasung-kosten" },
+  { slug: "fenster-3-fach-verglasung-kosten", label: "Fenster mit 3-fach Verglasung Kosten", href: "/ratgeber/fenster-3-fach-verglasung-kosten" },
+  { slug: "fenstereinbau-kosten", label: "Fenstereinbau Kosten", href: "/ratgeber/fenstereinbau-kosten" },
+] as const;
+
 function peers<T extends readonly { slug: string; label: string; href: string }[]>(links: T, slug: string) {
   return links
     .filter((link) => link.slug !== slug)
@@ -97,6 +105,11 @@ const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
   "kueche-elektrogeraete-kosten": peers(kitchenGuideLinks, "kueche-elektrogeraete-kosten"),
   "einbaukueche-kosten": peers(kitchenGuideLinks, "einbaukueche-kosten"),
   "premium-kueche-umbau-kosten": peers(kitchenGuideLinks, "premium-kueche-umbau-kosten"),
+  "fenster-austauschen-kosten-haus": peers(windowGuideLinks, "fenster-austauschen-kosten-haus"),
+  "20-fenster-austauschen-kosten": peers(windowGuideLinks, "20-fenster-austauschen-kosten"),
+  "fenster-2-fach-verglasung-kosten": peers(windowGuideLinks, "fenster-2-fach-verglasung-kosten"),
+  "fenster-3-fach-verglasung-kosten": peers(windowGuideLinks, "fenster-3-fach-verglasung-kosten"),
+  "fenstereinbau-kosten": peers(windowGuideLinks, "fenstereinbau-kosten"),
 };
 
 const enrichedBaseGuides = baseAllGuides.map((guide) => {
