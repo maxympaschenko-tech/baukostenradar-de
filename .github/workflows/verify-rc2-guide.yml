@@ -1,4 +1,4 @@
-name: Verify RC2 door guide
+name: Verify door guide cluster
 
 on:
   workflow_run:
@@ -7,44 +7,74 @@ on:
   workflow_dispatch:
 
 jobs:
-  verify-rc2-guide:
+  verify-door-guides:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Verify RC2 guide silo
+      - name: Verify Haustür guide silo
         shell: bash
         run: |
           set -euo pipefail
 
-          guide='haustuer-rc2-kosten'
-          item='haustuer-holz-alu-rc2-inkl-montage'
+          sitemap='/tmp/sitemap.xml'
+          parent='/tmp/parent.html'
+          hub='/tmp/hub.html'
 
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
-          grep -q "https://baukostenradar.de/ratgeber/${guide}</loc>" /tmp/sitemap.xml
-          grep -q "https://baukostenradar.de/kosten/tueren/leistung/${item}</loc>" /tmp/sitemap.xml
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o "$sitemap"
+          curl -sS --fail 'https://baukostenradar.de/ratgeber/haustuer-einbauen-kosten' -o "$parent"
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o "$hub"
 
-          curl -sS --fail "https://baukostenradar.de/ratgeber/${guide}" -o /tmp/guide.html
-          grep -q "https://baukostenradar.de/ratgeber/${guide}" /tmp/guide.html
-          grep -q '"@type":"Article"' /tmp/guide.html
-          grep -q '3.500' /tmp/guide.html
-          grep -q '8.500' /tmp/guide.html
-          grep -q '/kosten/tueren/berlin' /tmp/guide.html
-          grep -q 'gewerk=tueren' /tmp/guide.html
-          grep -q "leistung=${item}" /tmp/guide.html
-          ! grep -qi 'noindex' /tmp/guide.html
+          verify_guide() {
+            local guide="$1"
+            local item="$2"
+            local low="$3"
+            local high="$4"
+            local title="$5"
+            local peer="$6"
+            local guide_html="/tmp/${guide}.html"
+            local item_html="/tmp/${item}.html"
 
-          curl -sS --fail "https://baukostenradar.de/kosten/tueren/leistung/${item}" -o /tmp/item.html
-          grep -q 'Passender Ratgeber' /tmp/item.html
-          grep -q "/ratgeber/${guide}" /tmp/item.html
-          ! grep -qi 'noindex' /tmp/item.html
+            grep -q "https://baukostenradar.de/ratgeber/${guide}</loc>" "$sitemap"
+            grep -q "https://baukostenradar.de/kosten/tueren/leistung/${item}</loc>" "$sitemap"
 
-          curl -sS --fail 'https://baukostenradar.de/ratgeber/haustuer-einbauen-kosten' -o /tmp/parent.html
-          grep -q "/ratgeber/${guide}" /tmp/parent.html
-          ! grep -qi 'noindex' /tmp/parent.html
+            curl -sS --fail "https://baukostenradar.de/ratgeber/${guide}" -o "$guide_html"
+            grep -q "https://baukostenradar.de/ratgeber/${guide}" "$guide_html"
+            grep -q '"@type":"Article"' "$guide_html"
+            grep -q "$low" "$guide_html"
+            grep -q "$high" "$guide_html"
+            grep -q '/kosten/tueren/berlin' "$guide_html"
+            grep -q 'gewerk=tueren' "$guide_html"
+            grep -q "leistung=${item}" "$guide_html"
+            grep -q "/ratgeber/${peer}" "$guide_html"
+            ! grep -qi 'noindex' "$guide_html"
 
-          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/hub.html
-          grep -q "/ratgeber/${guide}" /tmp/hub.html
-          grep -q 'Haustür Holz/Alu RC2 Kosten 2026' /tmp/hub.html
-          ! grep -qi 'noindex' /tmp/hub.html
+            curl -sS --fail "https://baukostenradar.de/kosten/tueren/leistung/${item}" -o "$item_html"
+            grep -q 'Passender Ratgeber' "$item_html"
+            grep -q "/ratgeber/${guide}" "$item_html"
+            ! grep -qi 'noindex' "$item_html"
 
-          echo 'RC2 guide, exact price item, calculator, parent backlink and Ratgeber hub visibility verified'
+            grep -q "/ratgeber/${guide}" "$parent"
+            grep -q "/ratgeber/${guide}" "$hub"
+            grep -q "$title" "$hub"
+          }
+
+          verify_guide \
+            'haustuer-kunststoff-kosten' \
+            'haustuer-kunststoff-inkl-montage' \
+            '1.500' \
+            '3.500' \
+            'Haustür Kunststoff Kosten 2026' \
+            'haustuer-rc2-kosten'
+
+          verify_guide \
+            'haustuer-rc2-kosten' \
+            'haustuer-holz-alu-rc2-inkl-montage' \
+            '3.500' \
+            '8.500' \
+            'Haustür Holz/Alu RC2 Kosten 2026' \
+            'haustuer-kunststoff-kosten'
+
+          ! grep -qi 'noindex' "$parent"
+          ! grep -qi 'noindex' "$hub"
+
+          echo 'Kunststoff and RC2 Haustür guides, exact price items, calculators, mutual links, parent backlinks and hub visibility verified'

@@ -8,22 +8,29 @@ import {
 
 export type { GuideSilo } from "./guide-silo";
 
-const rc2GuideSlug = "haustuer-rc2-kosten";
+const doorGuideSilos: Record<string, GuideSilo> = {
+  "haustuer-kunststoff-kosten": {
+    serviceSlugs: ["tueren", "fenster", "fassade"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "tueren",
+      itemSlug: "haustuer-kunststoff-inkl-montage",
+    }),
+    calculatorLabel: "Kunststoff-Haustür berechnen",
+    regionalMode: "service",
+  },
+  "haustuer-rc2-kosten": {
+    serviceSlugs: ["tueren", "fenster", "fassade"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "tueren",
+      itemSlug: "haustuer-holz-alu-rc2-inkl-montage",
+    }),
+    calculatorLabel: "RC2-Haustür berechnen",
+    regionalMode: "service",
+  },
+};
 
 export function getGuideSilo(slug: string): GuideSilo {
-  if (slug === rc2GuideSlug) {
-    return {
-      serviceSlugs: ["tueren", "fenster", "fassade"],
-      calculatorHref: handwerkerCalculatorHref({
-        serviceSlug: "tueren",
-        itemSlug: "haustuer-holz-alu-rc2-inkl-montage",
-      }),
-      calculatorLabel: "RC2-Haustür berechnen",
-      regionalMode: "service",
-    };
-  }
-
-  return getBaseGuideSilo(slug);
+  return doorGuideSilos[slug] ?? getBaseGuideSilo(slug);
 }
 
 export function getGuideSiloServices(slug: string) {

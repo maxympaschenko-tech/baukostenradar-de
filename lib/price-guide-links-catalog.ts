@@ -20,6 +20,11 @@ const serviceGuideOverrides: Record<string, PriceGuideLink> = {
 };
 
 const itemGuideOverrides: Record<string, PriceGuideLink> = {
+  "tueren:haustuer-kunststoff-inkl-montage": {
+    href: "/ratgeber/haustuer-kunststoff-kosten",
+    title: "Haustür Kunststoff: Kosten und Montage 2026",
+    cta: "Kunststoff-Haustür-Ratgeber öffnen",
+  },
   "tueren:haustuer-holz-alu-rc2-inkl-montage": {
     href: "/ratgeber/haustuer-rc2-kosten",
     title: "Haustür Holz/Alu RC2: Kosten und Montage 2026",
