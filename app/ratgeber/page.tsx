@@ -18,15 +18,15 @@ const guideGroups = [
   },
   {
     eyebrow: "Konkrete Gewerke",
-    title: "Große Einzelmaßnahmen realistisch kalkulieren",
-    description: "Kosten für Elektrik und komplette Badsanierung mit konkreten 2026-Richtwerten und Beispielbudgets.",
-    slugs: ["elektrik-erneuern-altbau", "bad-komplett-sanieren-kosten"],
+    title: "Badsanierung realistisch kalkulieren",
+    description: "Komplette Badsanierung mit konkreten 2026-Richtwerten und nachvollziehbaren Kostenblöcken einordnen.",
+    slugs: ["bad-komplett-sanieren-kosten"],
   },
   {
     eyebrow: "Konkrete Projektgrößen",
-    title: "Kosten für typische Flächen und Stückzahlen",
-    description: "Konkrete Rechenbeispiele für 100 m² Elektrik und ein 10-m²-Bad.",
-    slugs: ["elektrik-erneuern-100-qm-kosten", "bad-10-qm-sanieren-kosten"],
+    title: "Kosten für eine typische Badgröße",
+    description: "Konkretes Rechenbeispiel für die Sanierung eines 10-m²-Bads mit aktuellen Richtwerten.",
+    slugs: ["bad-10-qm-sanieren-kosten"],
   },
   {
     eyebrow: "Dach & Dachsanierung",
@@ -48,6 +48,12 @@ const guideGroups = [
     title: "Fenster austauschen, Verglasung und Einbau kalkulieren",
     description: "Gesamtprojekt, 20-Fenster-Beispiel, 2-fach- und 3-fach-Verglasung sowie Montagekosten pro Fenster direkt vergleichen.",
     slugs: ["fenster-austauschen-kosten-haus", "20-fenster-austauschen-kosten", "fenster-2-fach-verglasung-kosten", "fenster-3-fach-verglasung-kosten", "fenstereinbau-kosten"],
+  },
+  {
+    eyebrow: "Elektrik & Elektroinstallation",
+    title: "Elektrik erneuern, Verteiler, Steckdosen und Schalter kalkulieren",
+    description: "Altbau und 100-m²-Projekt, komplette Neuinstallation, Sicherungskasten, Steckdosen und Lichtschalter als zusammenhängendes Elektro-Budget vergleichen.",
+    slugs: ["elektrik-erneuern-altbau", "elektrik-erneuern-100-qm-kosten", "elektro-neuinstallation-kosten", "sicherungskasten-erneuern-kosten", "steckdose-installieren-kosten", "lichtschalter-austauschen-kosten"],
   },
   {
     eyebrow: "Heizung & Wärme",
