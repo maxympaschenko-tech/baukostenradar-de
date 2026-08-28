@@ -44,40 +44,26 @@ const masonryRelatedLinks = {
 } as const;
 
 const treppenGuideLinks = [
-  {
-    slug: "14-treppenstufen-renovieren-kosten",
-    label: "14 Treppenstufen renovieren Kosten",
-    href: "/ratgeber/14-treppenstufen-renovieren-kosten",
-  },
-  {
-    slug: "treppenrenovierung-holzstufen-system-kosten",
-    label: "Treppenrenovierung mit Holzstufen-System",
-    href: "/ratgeber/treppenrenovierung-holzstufen-system-kosten",
-  },
-  {
-    slug: "holztreppe-schleifen-kosten",
-    label: "Holztreppe schleifen Kosten",
-    href: "/ratgeber/holztreppe-schleifen-kosten",
-  },
-  {
-    slug: "treppen-stufenueberbau-gelaender-kosten",
-    label: "Stufenüberbau und Geländer Kosten",
-    href: "/ratgeber/treppen-stufenueberbau-gelaender-kosten",
-  },
-  {
-    slug: "betontreppe-neuer-belag-kosten",
-    label: "Betontreppe mit neuem Belag Kosten",
-    href: "/ratgeber/betontreppe-neuer-belag-kosten",
-  },
-  {
-    slug: "natursteintreppe-schleifen-kosten",
-    label: "Natursteintreppe schleifen Kosten",
-    href: "/ratgeber/natursteintreppe-schleifen-kosten",
-  },
+  { slug: "14-treppenstufen-renovieren-kosten", label: "14 Treppenstufen renovieren Kosten", href: "/ratgeber/14-treppenstufen-renovieren-kosten" },
+  { slug: "treppenrenovierung-holzstufen-system-kosten", label: "Treppenrenovierung mit Holzstufen-System", href: "/ratgeber/treppenrenovierung-holzstufen-system-kosten" },
+  { slug: "holztreppe-schleifen-kosten", label: "Holztreppe schleifen Kosten", href: "/ratgeber/holztreppe-schleifen-kosten" },
+  { slug: "treppen-stufenueberbau-gelaender-kosten", label: "Stufenüberbau und Geländer Kosten", href: "/ratgeber/treppen-stufenueberbau-gelaender-kosten" },
+  { slug: "betontreppe-neuer-belag-kosten", label: "Betontreppe mit neuem Belag Kosten", href: "/ratgeber/betontreppe-neuer-belag-kosten" },
+  { slug: "natursteintreppe-schleifen-kosten", label: "Natursteintreppe schleifen Kosten", href: "/ratgeber/natursteintreppe-schleifen-kosten" },
 ] as const;
 
-function treppenPeers(slug: string) {
-  return treppenGuideLinks
+const kitchenGuideLinks = [
+  { slug: "kueche-10-qm-renovieren-kosten", label: "10 m² Küche renovieren Kosten", href: "/ratgeber/kueche-10-qm-renovieren-kosten" },
+  { slug: "kuechenfronten-erneuern-kosten", label: "Küchenfronten erneuern Kosten", href: "/ratgeber/kuechenfronten-erneuern-kosten" },
+  { slug: "kuechenarbeitsplatte-kosten", label: "Küchenarbeitsplatte erneuern Kosten", href: "/ratgeber/kuechenarbeitsplatte-kosten" },
+  { slug: "fliesenspiegel-erneuern-kosten", label: "Fliesenspiegel erneuern Kosten", href: "/ratgeber/fliesenspiegel-erneuern-kosten" },
+  { slug: "kueche-elektrogeraete-kosten", label: "Küchengeräte Kosten", href: "/ratgeber/kueche-elektrogeraete-kosten" },
+  { slug: "einbaukueche-kosten", label: "Einbauküche Kosten", href: "/ratgeber/einbaukueche-kosten" },
+  { slug: "premium-kueche-umbau-kosten", label: "Premium-Küche mit Umbau Kosten", href: "/ratgeber/premium-kueche-umbau-kosten" },
+] as const;
+
+function peers<T extends readonly { slug: string; label: string; href: string }[]>(links: T, slug: string) {
+  return links
     .filter((link) => link.slug !== slug)
     .map(({ label, href }) => ({ label, href }));
 }
@@ -98,12 +84,19 @@ const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
     masonryRelatedLinks.bodenplatte,
     masonryRelatedLinks.klinkerCalculator,
   ],
-  "14-treppenstufen-renovieren-kosten": treppenPeers("14-treppenstufen-renovieren-kosten"),
-  "treppenrenovierung-holzstufen-system-kosten": treppenPeers("treppenrenovierung-holzstufen-system-kosten"),
-  "holztreppe-schleifen-kosten": treppenPeers("holztreppe-schleifen-kosten"),
-  "treppen-stufenueberbau-gelaender-kosten": treppenPeers("treppen-stufenueberbau-gelaender-kosten"),
-  "betontreppe-neuer-belag-kosten": treppenPeers("betontreppe-neuer-belag-kosten"),
-  "natursteintreppe-schleifen-kosten": treppenPeers("natursteintreppe-schleifen-kosten"),
+  "14-treppenstufen-renovieren-kosten": peers(treppenGuideLinks, "14-treppenstufen-renovieren-kosten"),
+  "treppenrenovierung-holzstufen-system-kosten": peers(treppenGuideLinks, "treppenrenovierung-holzstufen-system-kosten"),
+  "holztreppe-schleifen-kosten": peers(treppenGuideLinks, "holztreppe-schleifen-kosten"),
+  "treppen-stufenueberbau-gelaender-kosten": peers(treppenGuideLinks, "treppen-stufenueberbau-gelaender-kosten"),
+  "betontreppe-neuer-belag-kosten": peers(treppenGuideLinks, "betontreppe-neuer-belag-kosten"),
+  "natursteintreppe-schleifen-kosten": peers(treppenGuideLinks, "natursteintreppe-schleifen-kosten"),
+  "kueche-10-qm-renovieren-kosten": peers(kitchenGuideLinks, "kueche-10-qm-renovieren-kosten"),
+  "kuechenfronten-erneuern-kosten": peers(kitchenGuideLinks, "kuechenfronten-erneuern-kosten"),
+  "kuechenarbeitsplatte-kosten": peers(kitchenGuideLinks, "kuechenarbeitsplatte-kosten"),
+  "fliesenspiegel-erneuern-kosten": peers(kitchenGuideLinks, "fliesenspiegel-erneuern-kosten"),
+  "kueche-elektrogeraete-kosten": peers(kitchenGuideLinks, "kueche-elektrogeraete-kosten"),
+  "einbaukueche-kosten": peers(kitchenGuideLinks, "einbaukueche-kosten"),
+  "premium-kueche-umbau-kosten": peers(kitchenGuideLinks, "premium-kueche-umbau-kosten"),
 };
 
 const enrichedBaseGuides = baseAllGuides.map((guide) => {

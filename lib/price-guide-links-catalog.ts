@@ -70,6 +70,41 @@ const itemGuideOverrides: Record<string, PriceGuideLink> = {
     title: "Holzstufen schleifen: Kostenbeispiel für 14 Treppenstufen",
     cta: "14-Stufen-Ratgeber öffnen",
   },
+  "kueche:kuechen-renovierung-ohne-moebel": {
+    href: "/ratgeber/kueche-10-qm-renovieren-kosten",
+    title: "Küche renovieren: Kostenbeispiel für 10 m²",
+    cta: "10-m²-Küchen-Ratgeber öffnen",
+  },
+  "kueche:kuechenfronten-austauschen-oder-lackieren": {
+    href: "/ratgeber/kuechenfronten-erneuern-kosten",
+    title: "Küchenfronten austauschen oder lackieren: Kosten 2026",
+    cta: "Küchenfronten-Ratgeber öffnen",
+  },
+  "kueche:neue-arbeitsplatte": {
+    href: "/ratgeber/kuechenarbeitsplatte-kosten",
+    title: "Neue Küchenarbeitsplatte: Kosten 2026",
+    cta: "Arbeitsplatten-Ratgeber öffnen",
+  },
+  "kueche:neue-elektrogeraete": {
+    href: "/ratgeber/kueche-elektrogeraete-kosten",
+    title: "Neue Küchengeräte: Kosten 2026",
+    cta: "Küchengeräte-Ratgeber öffnen",
+  },
+  "kueche:fliesenspiegel-erneuern": {
+    href: "/ratgeber/fliesenspiegel-erneuern-kosten",
+    title: "Fliesenspiegel erneuern: Kosten 2026",
+    cta: "Fliesenspiegel-Ratgeber öffnen",
+  },
+  "kueche:komplett-neue-einbaukueche": {
+    href: "/ratgeber/einbaukueche-kosten",
+    title: "Komplett neue Einbauküche: Kosten 2026",
+    cta: "Einbauküchen-Ratgeber öffnen",
+  },
+  "kueche:premium-kueche-mit-umbau": {
+    href: "/ratgeber/premium-kueche-umbau-kosten",
+    title: "Premium-Küche mit Umbau: Kosten 2026",
+    cta: "Premium-Küchen-Ratgeber öffnen",
+  },
 };
 
 export function getServiceGuideLink(serviceSlug: string): PriceGuideLink {
