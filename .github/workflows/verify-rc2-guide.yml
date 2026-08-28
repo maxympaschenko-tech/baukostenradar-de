@@ -42,4 +42,9 @@ jobs:
           grep -q "/ratgeber/${guide}" /tmp/parent.html
           ! grep -qi 'noindex' /tmp/parent.html
 
-          echo 'RC2 guide, exact price item, calculator and parent backlink verified'
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/hub.html
+          grep -q "/ratgeber/${guide}" /tmp/hub.html
+          grep -q 'Haustür Holz/Alu RC2 Kosten 2026' /tmp/hub.html
+          ! grep -qi 'noindex' /tmp/hub.html
+
+          echo 'RC2 guide, exact price item, calculator, parent backlink and Ratgeber hub visibility verified'
