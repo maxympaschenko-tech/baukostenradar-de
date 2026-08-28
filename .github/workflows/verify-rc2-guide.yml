@@ -1,0 +1,45 @@
+name: Verify RC2 door guide
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-rc2-guide:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify RC2 guide silo
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          guide='haustuer-rc2-kosten'
+          item='haustuer-holz-alu-rc2-inkl-montage'
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          grep -q "https://baukostenradar.de/ratgeber/${guide}</loc>" /tmp/sitemap.xml
+          grep -q "https://baukostenradar.de/kosten/tueren/leistung/${item}</loc>" /tmp/sitemap.xml
+
+          curl -sS --fail "https://baukostenradar.de/ratgeber/${guide}" -o /tmp/guide.html
+          grep -q "https://baukostenradar.de/ratgeber/${guide}" /tmp/guide.html
+          grep -q '"@type":"Article"' /tmp/guide.html
+          grep -q '3.500' /tmp/guide.html
+          grep -q '8.500' /tmp/guide.html
+          grep -q '/kosten/tueren/berlin' /tmp/guide.html
+          grep -q 'gewerk=tueren' /tmp/guide.html
+          grep -q "leistung=${item}" /tmp/guide.html
+          ! grep -qi 'noindex' /tmp/guide.html
+
+          curl -sS --fail "https://baukostenradar.de/kosten/tueren/leistung/${item}" -o /tmp/item.html
+          grep -q 'Passender Ratgeber' /tmp/item.html
+          grep -q "/ratgeber/${guide}" /tmp/item.html
+          ! grep -qi 'noindex' /tmp/item.html
+
+          curl -sS --fail 'https://baukostenradar.de/ratgeber/haustuer-einbauen-kosten' -o /tmp/parent.html
+          grep -q "/ratgeber/${guide}" /tmp/parent.html
+          ! grep -qi 'noindex' /tmp/parent.html
+
+          echo 'RC2 guide, exact price item, calculator and parent backlink verified'
