@@ -138,6 +138,45 @@ const bathGuideSilos: Record<string, GuideSilo> = {
   },
 };
 
+const malerGuideSilos: Record<string, GuideSilo> = {
+  "maler-kosten-pro-qm": {
+    serviceSlugs: ["maler", "trockenbau", "fassade"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "maler",
+      itemSlug: "waende-streichen",
+    }),
+    calculatorLabel: "Malerarbeiten berechnen",
+    regionalMode: "service",
+  },
+  "waende-streichen-kosten-pro-qm": {
+    serviceSlugs: ["maler", "trockenbau"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "maler",
+      itemSlug: "waende-streichen",
+    }),
+    calculatorLabel: "Wände streichen berechnen",
+    regionalMode: "service",
+  },
+  "tapezieren-kosten-pro-qm": {
+    serviceSlugs: ["maler", "trockenbau"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "maler",
+      itemSlug: "tapezieren-inkl-tapete",
+    }),
+    calculatorLabel: "Tapezieren berechnen",
+    regionalMode: "service",
+  },
+  "innenputz-q3-kosten-pro-qm": {
+    serviceSlugs: ["maler", "trockenbau"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "maler",
+      itemSlug: "innenputz-glaetten-q3",
+    }),
+    calculatorLabel: "Innenputz Q3 berechnen",
+    regionalMode: "service",
+  },
+};
+
 const serviceAugments: Record<string, string[]> = {
   "klinkerfassade-kosten-pro-qm": ["maurer"],
 };
@@ -147,7 +186,8 @@ export function getGuideSilo(slug: string): GuideSilo {
     doorGuideSilos[slug] ??
     roofGuideSilos[slug] ??
     electricalGuideSilos[slug] ??
-    bathGuideSilos[slug];
+    bathGuideSilos[slug] ??
+    malerGuideSilos[slug];
   if (explicit) return explicit;
 
   const base = getBaseGuideSilo(slug);
