@@ -98,19 +98,49 @@ jobs:
         run: |
           set -euo pipefail
 
-          services=$(curl --fail-with-body --silent --show-error \
-            -X POST 'https://adm.tools/action/get_services/' \
-            -H "Authorization: Bearer $ADMTOOLS_TOKEN" \
-            -d 'type=host')
+          # GitHub secret must contain the raw token. Be tolerant if an older
+          # secret was saved as "Bearer <token>" and never print the token.
+          token="$(printf '%s' "$ADMTOOLS_TOKEN" | tr -d '\r\n')"
+          if [[ "$token" == Bearer\ * ]]; then
+            token="${token#Bearer }"
+          fi
+          if [[ -z "$token" ]]; then
+            echo "ADMTOOLS_TOKEN is empty after normalization." >&2
+            exit 1
+          fi
 
-          host_id=$(printf '%s' "$services" | jq -r --arg domain 'baukostenradar.de' '
+          api_post() {
+            local path="$1"
+            local post_data="$2"
+            local output="$3"
+            curl --silent --show-error \
+              --connect-timeout 15 \
+              --max-time 30 \
+              -o "$output" \
+              -w '%{http_code}' \
+              -X POST "https://adm.tools/action/${path}/" \
+              -H "Authorization: Bearer $token" \
+              -d "$post_data" || true
+          }
+
+          services_file=$(mktemp)
+          services_code=$(api_post 'get_services' 'type=host' "$services_file")
+          if [[ ! "$services_code" =~ ^2 ]]; then
+            echo "ADM.TOOLS get_services returned HTTP ${services_code}." >&2
+            if [[ "$services_code" == "401" || "$services_code" == "403" ]]; then
+              echo "Refresh the ADMTOOLS_TOKEN secret and check API IP restrictions in adm.tools." >&2
+            fi
+            exit 1
+          fi
+
+          host_id=$(jq -r --arg domain 'baukostenradar.de' '
             [
               .. | objects
               | select((tojson | contains($domain)))
               | (.host_id // .id // empty)
               | tostring
             ][0] // empty
-          ')
+          ' "$services_file")
 
           if [[ -z "$host_id" ]]; then
             echo "Could not resolve ADM.TOOLS host id from get_services." >&2
@@ -119,17 +149,36 @@ jobs:
 
           echo "Resolved ADM.TOOLS host id."
 
-          restart=$(curl --fail-with-body --silent --show-error \
-            -X POST 'https://adm.tools/action/hosting/account/nodejs/reload/' \
-            -H "Authorization: Bearer $ADMTOOLS_TOKEN" \
-            -d "host_id=$host_id")
-
-          if ! printf '%s' "$restart" | jq -e '.result == true' >/dev/null 2>&1; then
-            echo "ADM.TOOLS restart request failed." >&2
-            exit 1
+          # Prefer the current web-application systemd API documented by the hoster.
+          info_file=$(mktemp)
+          info_code=$(api_post 'hosting/account/app/systemd/info' "host_id=$host_id" "$info_file")
+          systemd_id=""
+          if [[ "$info_code" =~ ^2 ]]; then
+            systemd_id=$(jq -r '[.. | objects | (.systemd_id? // empty) | tostring][0] // empty' "$info_file" 2>/dev/null || true)
           fi
 
-          echo "Node.js application restart requested successfully."
+          if [[ -n "$systemd_id" ]]; then
+            restart_file=$(mktemp)
+            restart_code=$(api_post 'hosting/account/app/systemd/restart' "systemd_id=$systemd_id" "$restart_file")
+            if [[ "$restart_code" =~ ^2 ]] && jq -e '.result == true' "$restart_file" >/dev/null 2>&1; then
+              echo "Web application restart requested through systemd API."
+              exit 0
+            fi
+            echo "Systemd restart endpoint did not confirm success (HTTP ${restart_code}); trying legacy Node.js reload." >&2
+          else
+            echo "No systemd_id returned (HTTP ${info_code}); trying legacy Node.js reload." >&2
+          fi
+
+          # Compatibility fallback for hosting accounts still exposed through the legacy Node.js API.
+          legacy_file=$(mktemp)
+          legacy_code=$(api_post 'hosting/account/nodejs/reload' "host_id=$host_id" "$legacy_file")
+          if [[ "$legacy_code" =~ ^2 ]] && jq -e '.result == true' "$legacy_file" >/dev/null 2>&1; then
+            echo "Node.js application restart requested through legacy API."
+            exit 0
+          fi
+
+          echo "ADM.TOOLS restart failed through both current and legacy APIs (legacy HTTP ${legacy_code})." >&2
+          exit 1
 
       - name: Verify exact production commit
         shell: bash
