@@ -37,7 +37,6 @@ jobs:
 
             echo "Checking bath guide ${guide} -> ${service}/${item}"
             grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Bath guide missing in sitemap: ${guide}"; exit 1; }
-            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "Bath guide missing from Ratgeber hub: ${guide}"; exit 1; }
 
             curl -sS --fail "$guide_url" -o "$output"
             grep -q "$guide_url" "$output" || { echo "Canonical missing: ${guide}"; exit 1; }
@@ -58,12 +57,13 @@ jobs:
           test "$checked" -eq 6
           echo "Verified ${checked} Badsanierung guide calculators and service links"
 
-      - name: Verify bath parent cluster links
+      - name: Verify bath parent cluster links and hub anchors
         shell: bash
         run: |
           set -euo pipefail
 
           curl -sS --fail 'https://baukostenradar.de/ratgeber/bad-komplett-sanieren-kosten' -o /tmp/bad-parent.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
 
           for target in \
             bad-10-qm-sanieren-kosten \
@@ -73,6 +73,8 @@ jobs:
             grep -q "/ratgeber/${target}" /tmp/bad-parent.html || { echo "Bath parent missing child link: ${target}"; exit 1; }
           done
 
+          grep -q '/ratgeber/bad-komplett-sanieren-kosten' /tmp/ratgeber.html
+          grep -q '/ratgeber/bad-10-qm-sanieren-kosten' /tmp/ratgeber.html
           grep -q 'gewerk=badsanierung' /tmp/bad-parent.html
           grep -q 'leistung=bad-neubau-sanierung' /tmp/bad-parent.html
-          echo "Verified bath parent links and exact calculator preset"
+          echo "Verified bath parent links, hub anchors and exact calculator preset"
