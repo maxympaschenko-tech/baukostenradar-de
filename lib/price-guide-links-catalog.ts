@@ -35,6 +35,11 @@ const itemGuideOverrides: Record<string, PriceGuideLink> = {
     title: "Haustür Holz/Alu RC2: Kosten und Montage 2026",
     cta: "RC2-Haustür-Ratgeber öffnen",
   },
+  "maurer:klinker-verblendmauerwerk": {
+    href: "/ratgeber/klinkerfassade-kosten-pro-qm",
+    title: "Klinker-Verblendmauerwerk: Kosten pro m² und Fassadenaufbau",
+    cta: "Klinker-Ratgeber öffnen",
+  },
 };
 
 export function getServiceGuideLink(serviceSlug: string): PriceGuideLink {

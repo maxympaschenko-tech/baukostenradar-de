@@ -38,8 +38,22 @@ const doorGuideSilos: Record<string, GuideSilo> = {
   },
 };
 
+const serviceAugments: Record<string, string[]> = {
+  "klinkerfassade-kosten-pro-qm": ["maurer"],
+};
+
 export function getGuideSilo(slug: string): GuideSilo {
-  return doorGuideSilos[slug] ?? getBaseGuideSilo(slug);
+  const explicit = doorGuideSilos[slug];
+  if (explicit) return explicit;
+
+  const base = getBaseGuideSilo(slug);
+  const extraServices = serviceAugments[slug];
+  if (!extraServices) return base;
+
+  return {
+    ...base,
+    serviceSlugs: [...new Set([...base.serviceSlugs, ...extraServices])],
+  };
 }
 
 export function getGuideSiloServices(slug: string) {

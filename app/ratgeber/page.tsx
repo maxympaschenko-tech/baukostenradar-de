@@ -48,7 +48,7 @@ const guideGroups = [
   },
   {
     eyebrow: "Innenausbau & Modernisierung",
-    title: "Türen, Mauern, Treppen und Küche konkret kalkulieren",
+    title: "Türen, Treppen und Küche konkret kalkulieren",
     description: "Typische Innenausbau-Projekte mit aktuellen Stück- und Projektpreisen, klarer Rechenbasis und direktem Weg zum Kostenrechner.",
     slugs: [
       "6-innentueren-austauschen-kosten",
@@ -56,9 +56,21 @@ const guideGroups = [
       "haustuer-einbauen-kosten",
       "haustuer-kunststoff-kosten",
       "haustuer-rc2-kosten",
-      "innenwand-mauern-kosten",
       "14-treppenstufen-renovieren-kosten",
       "kueche-10-qm-renovieren-kosten",
+    ],
+  },
+  {
+    eyebrow: "Mauerwerk & Rohbau",
+    title: "Mauerwerk, Klinker und Bodenplatte kalkulieren",
+    description: "Maurerarbeiten nach Material und Bauteil vergleichen: Innenwand, Kalksandstein, Poroton, Porenbeton, Klinker-Verblendmauerwerk und Bodenplatte.",
+    slugs: [
+      "innenwand-mauern-kosten",
+      "kalksandstein-mauerwerk-kosten-pro-qm",
+      "poroton-mauerwerk-kosten-pro-qm",
+      "porenbeton-mauerwerk-kosten-pro-qm",
+      "klinkerfassade-kosten-pro-qm",
+      "bodenplatte-kosten-pro-qm",
     ],
   },
   {

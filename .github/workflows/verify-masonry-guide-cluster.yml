@@ -1,0 +1,106 @@
+name: Verify masonry guide cluster
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-masonry-guide-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Maurer catalog and guide mappings
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'https://baukostenradar.de/kosten/maurer' -o /tmp/maurer.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+
+          grep -q 'https://baukostenradar.de/kosten/maurer' /tmp/maurer.html
+          ! grep -qi 'noindex' /tmp/maurer.html
+
+          items=(
+            maurer-stundensatz
+            mauerarbeiten-fertige-wand
+            kalksandstein-mauerwerk
+            poroton-mauerwerk
+            porenbeton-mauerwerk
+            klinker-verblendmauerwerk
+            bodenplatte-standard
+          )
+
+          for item in "${items[@]}"; do
+            grep -q "https://baukostenradar.de/kosten/maurer/leistung/${item}</loc>" /tmp/sitemap.xml || { echo "Missing Maurer item in sitemap: ${item}"; exit 1; }
+            grep -q "/kosten/maurer/leistung/${item}" /tmp/maurer.html || { echo "Missing Maurer item on category: ${item}"; exit 1; }
+          done
+
+          mappings=$(cat <<'EOF'
+          mauerarbeiten-fertige-wand|innenwand-mauern-kosten
+          kalksandstein-mauerwerk|kalksandstein-mauerwerk-kosten-pro-qm
+          poroton-mauerwerk|poroton-mauerwerk-kosten-pro-qm
+          porenbeton-mauerwerk|porenbeton-mauerwerk-kosten-pro-qm
+          klinker-verblendmauerwerk|klinkerfassade-kosten-pro-qm
+          bodenplatte-standard|bodenplatte-kosten-pro-qm
+          EOF
+          )
+
+          checked=0
+          while IFS='|' read -r item guide; do
+            item="${item#${item%%[![:space:]]*}}"
+            [ -n "$item" ] || continue
+
+            item_output="/tmp/maurer-item-${item}.html"
+            guide_output="/tmp/maurer-guide-${guide}.html"
+
+            curl -sS --fail "https://baukostenradar.de/kosten/maurer/leistung/${item}" -o "$item_output"
+            grep -q 'Passender Ratgeber' "$item_output" || { echo "Ratgeber block missing: ${item}"; exit 1; }
+            grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong guide mapping: ${item} -> ${guide}"; exit 1; }
+            ! grep -qi 'noindex' "$item_output"
+
+            grep -q "https://baukostenradar.de/ratgeber/${guide}</loc>" /tmp/sitemap.xml || { echo "Guide missing in sitemap: ${guide}"; exit 1; }
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "Guide missing from Ratgeber hub: ${guide}"; exit 1; }
+
+            curl -sS --fail "https://baukostenradar.de/ratgeber/${guide}" -o "$guide_output"
+            grep -q "https://baukostenradar.de/ratgeber/${guide}" "$guide_output" || { echo "Canonical missing: ${guide}"; exit 1; }
+            grep -q '"@type":"Article"' "$guide_output" || { echo "Article schema missing: ${guide}"; exit 1; }
+            grep -q '/kosten/maurer' "$guide_output" || { echo "Maurer link missing: ${guide}"; exit 1; }
+            grep -q '/kosten/maurer/berlin' "$guide_output" || { echo "Maurer Berlin link missing: ${guide}"; exit 1; }
+            ! grep -qi 'noindex' "$guide_output"
+
+            checked=$((checked + 1))
+          done <<< "$mappings"
+
+          test "$checked" -eq 6
+
+      - name: Verify Klinker dual-service intent and masonry backlinks
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/ratgeber/klinkerfassade-kosten-pro-qm' -o /tmp/klinker.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber/innenwand-mauern-kosten' -o /tmp/innenwand.html
+
+          grep -q '90-160' /tmp/klinker.html
+          grep -q '120-280' /tmp/klinker.html
+          grep -q '/kosten/maurer/leistung/klinker-verblendmauerwerk' /tmp/klinker.html
+          grep -q 'gewerk=maurer' /tmp/klinker.html
+          grep -q 'leistung=klinker-verblendmauerwerk' /tmp/klinker.html
+          grep -q 'gewerk=fassade' /tmp/klinker.html
+          grep -q 'leistung=klinker-verblendung' /tmp/klinker.html
+          grep -q '/ratgeber/innenwand-mauern-kosten' /tmp/klinker.html
+
+          siblings=(
+            kalksandstein-mauerwerk-kosten-pro-qm
+            poroton-mauerwerk-kosten-pro-qm
+            porenbeton-mauerwerk-kosten-pro-qm
+            klinkerfassade-kosten-pro-qm
+            bodenplatte-kosten-pro-qm
+          )
+
+          for sibling in "${siblings[@]}"; do
+            grep -q "/ratgeber/${sibling}" /tmp/innenwand.html || { echo "Innenwand parent missing backlink to ${sibling}"; exit 1; }
+          done
