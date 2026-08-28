@@ -106,6 +106,14 @@ const malerGuideLinks = [
   { slug: "innenputz-q3-kosten-pro-qm", label: "Innenputz Q3 Kosten pro m²", href: "/ratgeber/innenputz-q3-kosten-pro-qm" },
 ] as const;
 
+const fliesenGuideLinks = [
+  { slug: "fliesenleger-kosten-pro-qm", label: "Fliesenleger Kosten pro m²", href: "/ratgeber/fliesenleger-kosten-pro-qm" },
+  { slug: "fliesen-verlegen-kosten-pro-qm", label: "Standard-Fliesen verlegen Kosten", href: "/ratgeber/fliesen-verlegen-kosten-pro-qm" },
+  { slug: "grossformat-fliesen-verlegen-kosten", label: "Großformat-Fliesen verlegen Kosten", href: "/ratgeber/grossformat-fliesen-verlegen-kosten" },
+  { slug: "mosaik-fliesen-verlegen-kosten-pro-qm", label: "Mosaikfliesen verlegen Kosten", href: "/ratgeber/mosaik-fliesen-verlegen-kosten-pro-qm" },
+  { slug: "naturstein-verlegen-kosten-pro-qm", label: "Naturstein verlegen Kosten", href: "/ratgeber/naturstein-verlegen-kosten-pro-qm" },
+] as const;
+
 function peers<T extends readonly { slug: string; label: string; href: string }[]>(links: T, slug: string) {
   return links
     .filter((link) => link.slug !== slug)
@@ -170,6 +178,11 @@ const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
   "waende-streichen-kosten-pro-qm": peers(malerGuideLinks, "waende-streichen-kosten-pro-qm"),
   "tapezieren-kosten-pro-qm": peers(malerGuideLinks, "tapezieren-kosten-pro-qm"),
   "innenputz-q3-kosten-pro-qm": peers(malerGuideLinks, "innenputz-q3-kosten-pro-qm"),
+  "fliesenleger-kosten-pro-qm": peers(fliesenGuideLinks, "fliesenleger-kosten-pro-qm"),
+  "fliesen-verlegen-kosten-pro-qm": peers(fliesenGuideLinks, "fliesen-verlegen-kosten-pro-qm"),
+  "grossformat-fliesen-verlegen-kosten": peers(fliesenGuideLinks, "grossformat-fliesen-verlegen-kosten"),
+  "mosaik-fliesen-verlegen-kosten-pro-qm": peers(fliesenGuideLinks, "mosaik-fliesen-verlegen-kosten-pro-qm"),
+  "naturstein-verlegen-kosten-pro-qm": peers(fliesenGuideLinks, "naturstein-verlegen-kosten-pro-qm"),
 };
 
 const enrichedBaseGuides = baseAllGuides.map((guide) => {
