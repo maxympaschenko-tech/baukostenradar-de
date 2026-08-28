@@ -5,7 +5,7 @@ import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Ratgeber zu Sanierung, Renovierung & Handwerkerkosten 2026",
-  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Malerarbeiten, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
+  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Malerarbeiten, Fliesen, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
   alternates: { canonical: "/ratgeber" },
 };
 
@@ -66,6 +66,12 @@ const guideGroups = [
     title: "Malerarbeiten, Streichen und Tapezieren kalkulieren",
     description: "Malerpreise pro Quadratmeter, Wände streichen, Tapezieren und Q3-Glätten mit aktuellen Richtwerten und direktem Weg zum Kostenrechner vergleichen.",
     slugs: ["maler-kosten-pro-qm", "waende-streichen-kosten-pro-qm", "tapezieren-kosten-pro-qm", "innenputz-q3-kosten-pro-qm"],
+  },
+  {
+    eyebrow: "Fliesen & Naturstein",
+    title: "Fliesenleger, Großformat, Mosaik und Naturstein kalkulieren",
+    description: "Standardfliesen, Großformat, Mosaik und Naturstein mit aktuellen Arbeitskosten pro Quadratmeter, passenden Preispositionen und exakten Rechner-Presets vergleichen.",
+    slugs: ["fliesenleger-kosten-pro-qm", "fliesen-verlegen-kosten-pro-qm", "grossformat-fliesen-verlegen-kosten", "mosaik-fliesen-verlegen-kosten-pro-qm", "naturstein-verlegen-kosten-pro-qm"],
   },
   {
     eyebrow: "Innenausbau & Modernisierung",
