@@ -9,6 +9,15 @@ import {
 export type { GuideSilo } from "./guide-silo";
 
 const doorGuideSilos: Record<string, GuideSilo> = {
+  "innentuer-einbauen-kosten": {
+    serviceSlugs: ["tueren"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "tueren",
+      itemSlug: "innentuer-mit-zarge-inkl-montage",
+    }),
+    calculatorLabel: "Innentür berechnen",
+    regionalMode: "service",
+  },
   "haustuer-kunststoff-kosten": {
     serviceSlugs: ["tueren", "fenster", "fassade"],
     calculatorHref: handwerkerCalculatorHref({

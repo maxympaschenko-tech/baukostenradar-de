@@ -11,18 +11,20 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Verify Haustür guide silo
+      - name: Verify Türen guide silo
         shell: bash
         run: |
           set -euo pipefail
 
           sitemap='/tmp/sitemap.xml'
-          parent='/tmp/parent.html'
+          parent='/tmp/haustuer-parent.html'
           hub='/tmp/hub.html'
+          category='/tmp/tueren.html'
 
           curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o "$sitemap"
           curl -sS --fail 'https://baukostenradar.de/ratgeber/haustuer-einbauen-kosten' -o "$parent"
           curl -sS --fail 'https://baukostenradar.de/ratgeber' -o "$hub"
+          curl -sS --fail 'https://baukostenradar.de/kosten/tueren' -o "$category"
 
           verify_guide() {
             local guide="$1"
@@ -53,10 +55,18 @@ jobs:
             grep -q "/ratgeber/${guide}" "$item_html"
             ! grep -qi 'noindex' "$item_html"
 
-            grep -q "/ratgeber/${guide}" "$parent"
+            grep -q "/kosten/tueren/leistung/${item}" "$category"
             grep -q "/ratgeber/${guide}" "$hub"
             grep -q "$title" "$hub"
           }
+
+          verify_guide \
+            'innentuer-einbauen-kosten' \
+            'innentuer-mit-zarge-inkl-montage' \
+            '320' \
+            '950' \
+            'Innentür einbauen Kosten 2026' \
+            'haustuer-kunststoff-kosten'
 
           verify_guide \
             'haustuer-kunststoff-kosten' \
@@ -74,7 +84,13 @@ jobs:
             'Haustür Holz/Alu RC2 Kosten 2026' \
             'haustuer-kunststoff-kosten'
 
+          grep -q '/ratgeber/haustuer-kunststoff-kosten' "$parent"
+          grep -q '/ratgeber/haustuer-rc2-kosten' "$parent"
+          grep -q '/ratgeber/haustuer-rc2-kosten' '/tmp/innentuer-einbauen-kosten.html'
+          grep -q '/ratgeber/6-innentueren-austauschen-kosten' '/tmp/innentuer-einbauen-kosten.html'
+
           ! grep -qi 'noindex' "$parent"
           ! grep -qi 'noindex' "$hub"
+          ! grep -qi 'noindex' "$category"
 
-          echo 'Kunststoff and RC2 Haustür guides, exact price items, calculators, mutual links, parent backlinks and hub visibility verified'
+          echo 'All 3 Türen price items, dedicated guides, calculator presets, internal links, price backlinks and hub visibility verified'

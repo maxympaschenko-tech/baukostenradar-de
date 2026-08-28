@@ -20,6 +20,11 @@ const serviceGuideOverrides: Record<string, PriceGuideLink> = {
 };
 
 const itemGuideOverrides: Record<string, PriceGuideLink> = {
+  "tueren:innentuer-mit-zarge-inkl-montage": {
+    href: "/ratgeber/innentuer-einbauen-kosten",
+    title: "Innentür mit Zarge: Kosten und Montage 2026",
+    cta: "Innentür-Ratgeber öffnen",
+  },
   "tueren:haustuer-kunststoff-inkl-montage": {
     href: "/ratgeber/haustuer-kunststoff-kosten",
     title: "Haustür Kunststoff: Kosten und Montage 2026",
