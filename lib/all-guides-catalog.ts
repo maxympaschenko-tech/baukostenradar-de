@@ -114,6 +114,15 @@ const fliesenGuideLinks = [
   { slug: "naturstein-verlegen-kosten-pro-qm", label: "Naturstein verlegen Kosten", href: "/ratgeber/naturstein-verlegen-kosten-pro-qm" },
 ] as const;
 
+const bodenGuideLinks = [
+  { slug: "bodenleger-kosten-pro-qm", label: "Bodenleger Kosten pro m²", href: "/ratgeber/bodenleger-kosten-pro-qm" },
+  { slug: "vinylboden-verlegen-kosten-pro-qm", label: "Vinylboden verlegen Kosten pro m²", href: "/ratgeber/vinylboden-verlegen-kosten-pro-qm" },
+  { slug: "parkett-verlegen-kosten-pro-qm", label: "Parkett verlegen Kosten pro m²", href: "/ratgeber/parkett-verlegen-kosten-pro-qm" },
+  { slug: "laminat-verlegen-kosten-pro-qm", label: "Laminat verlegen Kosten pro m²", href: "/ratgeber/laminat-verlegen-kosten-pro-qm" },
+  { slug: "boden-sanieren-kosten-pro-qm", label: "Bodensanierung Kosten pro m²", href: "/ratgeber/boden-sanieren-kosten-pro-qm" },
+  { slug: "parkett-abschleifen-kosten", label: "Parkett abschleifen Kosten pro m²", href: "/ratgeber/parkett-abschleifen-kosten" },
+] as const;
+
 function peers<T extends readonly { slug: string; label: string; href: string }[]>(links: T, slug: string) {
   return links
     .filter((link) => link.slug !== slug)
@@ -183,6 +192,12 @@ const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
   "grossformat-fliesen-verlegen-kosten": peers(fliesenGuideLinks, "grossformat-fliesen-verlegen-kosten"),
   "mosaik-fliesen-verlegen-kosten-pro-qm": peers(fliesenGuideLinks, "mosaik-fliesen-verlegen-kosten-pro-qm"),
   "naturstein-verlegen-kosten-pro-qm": peers(fliesenGuideLinks, "naturstein-verlegen-kosten-pro-qm"),
+  "bodenleger-kosten-pro-qm": peers(bodenGuideLinks, "bodenleger-kosten-pro-qm"),
+  "vinylboden-verlegen-kosten-pro-qm": peers(bodenGuideLinks, "vinylboden-verlegen-kosten-pro-qm"),
+  "parkett-verlegen-kosten-pro-qm": peers(bodenGuideLinks, "parkett-verlegen-kosten-pro-qm"),
+  "laminat-verlegen-kosten-pro-qm": peers(bodenGuideLinks, "laminat-verlegen-kosten-pro-qm"),
+  "boden-sanieren-kosten-pro-qm": peers(bodenGuideLinks, "boden-sanieren-kosten-pro-qm"),
+  "parkett-abschleifen-kosten": peers(bodenGuideLinks, "parkett-abschleifen-kosten"),
 };
 
 const enrichedBaseGuides = baseAllGuides.map((guide) => {
