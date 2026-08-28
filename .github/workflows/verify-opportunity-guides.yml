@@ -26,7 +26,7 @@ jobs:
           parkett-abschleifen-kosten|bodenleger|parkett-abschleifen-und-oelen|bodenleger-kosten-pro-qm
           sicherungskasten-erneuern-kosten|elektriker|sicherungskasten-erneuern|elektrik-erneuern-altbau
           dachrinne-erneuern-kosten|dachsanierung|dachrinne-erneuern-zink|dach-sanieren-kosten-pro-qm
-          haustuer-einbauen-kosten|tueren|haustuer-kunststoff-inkl-montage|haus-sanieren-kosten
+          haustuer-kunststoff-kosten|tueren|haustuer-kunststoff-inkl-montage|haustuer-einbauen-kosten
           fassadendaemmung-kosten-pro-qm|daemmung|fassadendaemmung-wdvs|daemmung-kosten-pro-qm
           waermepumpe-wartung-kosten|waermepumpe|wartung-waermepumpe|waermepumpe-kosten-2026
           stromspeicher-kosten-pro-kwh|photovoltaik|stromspeicher-lfp|photovoltaik-kosten-2026
