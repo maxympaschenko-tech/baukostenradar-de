@@ -70,6 +70,17 @@ const windowGuideLinks = [
   { slug: "fenstereinbau-kosten", label: "Fenstereinbau Kosten", href: "/ratgeber/fenstereinbau-kosten" },
 ] as const;
 
+const roofGuideLinks = [
+  { slug: "dach-sanieren-kosten-pro-qm", label: "Dach sanieren Kosten pro m²", href: "/ratgeber/dach-sanieren-kosten-pro-qm" },
+  { slug: "dach-150-qm-kosten", label: "150 m² Dach sanieren Kosten", href: "/ratgeber/dach-150-qm-kosten" },
+  { slug: "dach-neu-eindecken-kosten-pro-qm", label: "Dach neu eindecken Kosten pro m²", href: "/ratgeber/dach-neu-eindecken-kosten-pro-qm" },
+  { slug: "dachsanierung-aufsparrendaemmung-kosten-pro-qm", label: "Dachsanierung mit Aufsparrendämmung Kosten", href: "/ratgeber/dachsanierung-aufsparrendaemmung-kosten-pro-qm" },
+  { slug: "dachfenster-nachtraeglich-einbauen-kosten", label: "Dachfenster nachträglich einbauen Kosten", href: "/ratgeber/dachfenster-nachtraeglich-einbauen-kosten" },
+  { slug: "dachfenster-austauschen-kosten", label: "Dachfenster austauschen Kosten", href: "/ratgeber/dachfenster-austauschen-kosten" },
+  { slug: "geruest-kosten-pro-qm", label: "Gerüst Kosten pro m²", href: "/ratgeber/geruest-kosten-pro-qm" },
+  { slug: "dachrinne-erneuern-kosten", label: "Dachrinne erneuern Kosten", href: "/ratgeber/dachrinne-erneuern-kosten" },
+] as const;
+
 function peers<T extends readonly { slug: string; label: string; href: string }[]>(links: T, slug: string) {
   return links
     .filter((link) => link.slug !== slug)
@@ -110,6 +121,14 @@ const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
   "fenster-2-fach-verglasung-kosten": peers(windowGuideLinks, "fenster-2-fach-verglasung-kosten"),
   "fenster-3-fach-verglasung-kosten": peers(windowGuideLinks, "fenster-3-fach-verglasung-kosten"),
   "fenstereinbau-kosten": peers(windowGuideLinks, "fenstereinbau-kosten"),
+  "dach-sanieren-kosten-pro-qm": peers(roofGuideLinks, "dach-sanieren-kosten-pro-qm"),
+  "dach-150-qm-kosten": peers(roofGuideLinks, "dach-150-qm-kosten"),
+  "dach-neu-eindecken-kosten-pro-qm": peers(roofGuideLinks, "dach-neu-eindecken-kosten-pro-qm"),
+  "dachsanierung-aufsparrendaemmung-kosten-pro-qm": peers(roofGuideLinks, "dachsanierung-aufsparrendaemmung-kosten-pro-qm"),
+  "dachfenster-nachtraeglich-einbauen-kosten": peers(roofGuideLinks, "dachfenster-nachtraeglich-einbauen-kosten"),
+  "dachfenster-austauschen-kosten": peers(roofGuideLinks, "dachfenster-austauschen-kosten"),
+  "geruest-kosten-pro-qm": peers(roofGuideLinks, "geruest-kosten-pro-qm"),
+  "dachrinne-erneuern-kosten": peers(roofGuideLinks, "dachrinne-erneuern-kosten"),
 };
 
 const enrichedBaseGuides = baseAllGuides.map((guide) => {

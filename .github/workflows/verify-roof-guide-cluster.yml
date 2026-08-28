@@ -1,0 +1,106 @@
+name: Verify roof guide cluster
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-roof-guide-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify all roof price items and exact guide mappings
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'https://baukostenradar.de/kosten/dachsanierung' -o /tmp/dachsanierung.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+
+          grep -q 'https://baukostenradar.de/kosten/dachsanierung' /tmp/dachsanierung.html
+          ! grep -qi 'noindex' /tmp/dachsanierung.html
+
+          mappings=$(cat <<'EOF'
+          neueindeckung-inkl-lattung|dach-neu-eindecken-kosten-pro-qm
+          dachsanierung-inkl-aufsparrendaemmung|dachsanierung-aufsparrendaemmung-kosten-pro-qm
+          dachfenster-nachtraeglich-einbauen|dachfenster-nachtraeglich-einbauen-kosten
+          dachfenster-1-1-austauschen|dachfenster-austauschen-kosten
+          geruest-ca-4-wochen|geruest-kosten-pro-qm
+          dachrinne-erneuern-zink|dachrinne-erneuern-kosten
+          EOF
+          )
+
+          checked=0
+          while IFS='|' read -r item guide; do
+            item="${item#${item%%[![:space:]]*}}"
+            [ -n "$item" ] || continue
+
+            echo "Checking Dachsanierung ${item} -> ${guide}"
+            item_url="https://baukostenradar.de/kosten/dachsanierung/leistung/${item}"
+            guide_url="https://baukostenradar.de/ratgeber/${guide}"
+            item_output="/tmp/roof-item-${item}.html"
+            guide_output="/tmp/roof-guide-${guide}.html"
+
+            grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Roof item missing in sitemap: ${item}"; exit 1; }
+            grep -q "/kosten/dachsanierung/leistung/${item}" /tmp/dachsanierung.html || { echo "Roof item missing on category: ${item}"; exit 1; }
+
+            curl -sS --fail "$item_url" -o "$item_output"
+            grep -q 'Passender Ratgeber' "$item_output" || { echo "Ratgeber block missing: ${item}"; exit 1; }
+            grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong guide mapping: ${item} -> ${guide}"; exit 1; }
+            ! grep -qi 'noindex' "$item_output"
+
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Roof guide missing in sitemap: ${guide}"; exit 1; }
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "Roof guide missing from hub: ${guide}"; exit 1; }
+
+            curl -sS --fail "$guide_url" -o "$guide_output"
+            grep -q "$guide_url" "$guide_output" || { echo "Canonical missing: ${guide}"; exit 1; }
+            grep -q '"@type":"Article"' "$guide_output" || { echo "Article schema missing: ${guide}"; exit 1; }
+            grep -q '/kosten/dachsanierung' "$guide_output" || { echo "Roof service link missing: ${guide}"; exit 1; }
+            grep -q '/kosten/dachsanierung/berlin' "$guide_output" || { echo "Roof Berlin link missing: ${guide}"; exit 1; }
+            grep -q 'gewerk=dachsanierung' "$guide_output" || { echo "Roof calculator service missing: ${guide}"; exit 1; }
+            grep -q "leistung=${item}" "$guide_output" || { echo "Exact calculator item missing: ${guide} expected ${item}"; exit 1; }
+            ! grep -qi 'noindex' "$guide_output"
+
+            checked=$((checked + 1))
+          done <<< "$mappings"
+
+          test "$checked" -eq 6
+          echo "Verified ${checked} roof price items and exact guides"
+
+      - name: Verify roof guide hub and internal-link silo
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+
+          guides=(
+            dach-sanieren-kosten-pro-qm
+            dach-150-qm-kosten
+            dach-neu-eindecken-kosten-pro-qm
+            dachsanierung-aufsparrendaemmung-kosten-pro-qm
+            dachfenster-nachtraeglich-einbauen-kosten
+            dachfenster-austauschen-kosten
+            geruest-kosten-pro-qm
+            dachrinne-erneuern-kosten
+          )
+
+          for source in "${guides[@]}"; do
+            guide_url="https://baukostenradar.de/ratgeber/${source}"
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Roof cluster guide missing in sitemap: ${source}"; exit 1; }
+            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Roof cluster guide missing from hub: ${source}"; exit 1; }
+
+            curl -sS --fail "$guide_url" -o "/tmp/${source}.html"
+            grep -q "$guide_url" "/tmp/${source}.html" || { echo "Canonical missing: ${source}"; exit 1; }
+            grep -q '"@type":"Article"' "/tmp/${source}.html" || { echo "Article schema missing: ${source}"; exit 1; }
+            ! grep -qi 'noindex' "/tmp/${source}.html"
+
+            for target in "${guides[@]}"; do
+              [ "$source" = "$target" ] && continue
+              grep -q "/ratgeber/${target}" "/tmp/${source}.html" || { echo "${source} missing roof peer ${target}"; exit 1; }
+            done
+          done

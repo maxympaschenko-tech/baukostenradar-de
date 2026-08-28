@@ -38,12 +38,33 @@ const doorGuideSilos: Record<string, GuideSilo> = {
   },
 };
 
+const roofGuideSilos: Record<string, GuideSilo> = {
+  "dachfenster-nachtraeglich-einbauen-kosten": {
+    serviceSlugs: ["dachsanierung", "fenster", "daemmung"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "dachsanierung",
+      itemSlug: "dachfenster-nachtraeglich-einbauen",
+    }),
+    calculatorLabel: "Dachfenster nachträglich einbauen berechnen",
+    regionalMode: "service",
+  },
+  "dachfenster-austauschen-kosten": {
+    serviceSlugs: ["dachsanierung", "fenster", "daemmung"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "dachsanierung",
+      itemSlug: "dachfenster-1-1-austauschen",
+    }),
+    calculatorLabel: "Dachfenster austauschen berechnen",
+    regionalMode: "service",
+  },
+};
+
 const serviceAugments: Record<string, string[]> = {
   "klinkerfassade-kosten-pro-qm": ["maurer"],
 };
 
 export function getGuideSilo(slug: string): GuideSilo {
-  const explicit = doorGuideSilos[slug];
+  const explicit = doorGuideSilos[slug] ?? roofGuideSilos[slug];
   if (explicit) return explicit;
 
   const base = getBaseGuideSilo(slug);

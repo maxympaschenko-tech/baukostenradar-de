@@ -19,14 +19,29 @@ const guideGroups = [
   {
     eyebrow: "Konkrete Gewerke",
     title: "Große Einzelmaßnahmen realistisch kalkulieren",
-    description: "Kosten für Dach, Elektrik, Heizung und komplette Badsanierung mit konkreten 2026-Richtwerten und Beispielbudgets.",
-    slugs: ["dach-sanieren-kosten-pro-qm", "elektrik-erneuern-altbau", "heizung-erneuern-kosten", "bad-komplett-sanieren-kosten"],
+    description: "Kosten für Elektrik, Heizung und komplette Badsanierung mit konkreten 2026-Richtwerten und Beispielbudgets.",
+    slugs: ["elektrik-erneuern-altbau", "heizung-erneuern-kosten", "bad-komplett-sanieren-kosten"],
   },
   {
     eyebrow: "Konkrete Projektgrößen",
     title: "Kosten für typische Flächen und Stückzahlen",
-    description: "Konkrete Rechenbeispiele für 150 m² Dach, 100 m² Elektrik, ein 10-m²-Bad und 100 m² Fußbodenheizung.",
-    slugs: ["dach-150-qm-kosten", "elektrik-erneuern-100-qm-kosten", "bad-10-qm-sanieren-kosten", "fussbodenheizung-100-qm-kosten"],
+    description: "Konkrete Rechenbeispiele für 100 m² Elektrik, ein 10-m²-Bad und 100 m² Fußbodenheizung.",
+    slugs: ["elektrik-erneuern-100-qm-kosten", "bad-10-qm-sanieren-kosten", "fussbodenheizung-100-qm-kosten"],
+  },
+  {
+    eyebrow: "Dach & Dachsanierung",
+    title: "Dachsanierung, Dämmung und Dachdetails kalkulieren",
+    description: "Gesamtsanierung, 150-m²-Beispiel, Neueindeckung, Aufsparrendämmung, Dachfenster, Gerüst und Dachrinne direkt vergleichen.",
+    slugs: [
+      "dach-sanieren-kosten-pro-qm",
+      "dach-150-qm-kosten",
+      "dach-neu-eindecken-kosten-pro-qm",
+      "dachsanierung-aufsparrendaemmung-kosten-pro-qm",
+      "dachfenster-nachtraeglich-einbauen-kosten",
+      "dachfenster-austauschen-kosten",
+      "geruest-kosten-pro-qm",
+      "dachrinne-erneuern-kosten",
+    ],
   },
   {
     eyebrow: "Fenster & Verglasung",
