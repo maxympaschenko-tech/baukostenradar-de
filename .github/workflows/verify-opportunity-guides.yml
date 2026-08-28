@@ -11,213 +11,142 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Verify all opportunity guides and item mappings
+      - name: Verify current opportunity guides and exact item mappings
         shell: bash
         run: |
           set -euo pipefail
 
           curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
 
-          check_opportunity() {
-            local guide="$1"
-            local service="$2"
-            local item="$3"
+          opportunities=$(cat <<'EOF'
+          einfahrt-pflastern-kosten|garten|einfahrt-pflastern|garten-anlegen-kosten
+          terrasse-pflastern-kosten|garten|terrasse-pflastern-inkl-unterbau|garten-anlegen-kosten
+          baum-faellen-kosten|garten|baumfaellung-mittelgross-inkl-entsorgung|garten-anlegen-kosten
+          rollrasen-kosten-pro-qm|garten|rollrasen-inkl-vorbereitung|garten-anlegen-kosten
+          parkett-abschleifen-kosten|bodenleger|parkett-abschleifen-und-oelen|bodenleger-kosten-pro-qm
+          sicherungskasten-erneuern-kosten|elektriker|sicherungskasten-erneuern|elektrik-erneuern-altbau
+          dachrinne-erneuern-kosten|dachsanierung|dachrinne-erneuern-zink|dach-sanieren-kosten-pro-qm
+          haustuer-einbauen-kosten|tueren|haustuer-kunststoff-inkl-montage|haus-sanieren-kosten
+          fassadendaemmung-kosten-pro-qm|daemmung|fassadendaemmung-wdvs|daemmung-kosten-pro-qm
+          waermepumpe-wartung-kosten|waermepumpe|wartung-waermepumpe|waermepumpe-kosten-2026
+          stromspeicher-kosten-pro-kwh|photovoltaik|stromspeicher-lfp|photovoltaik-kosten-2026
+          fenstereinbau-kosten|fenster|fenstereinbau|fenster-austauschen-kosten-haus
+          trockenbauwand-kosten-pro-qm|trockenbau|trockenbauwand-beidseitig-beplankt|trockenbau-kosten-pro-qm
+          heizkoerper-montieren-kosten|heizung|heizkoerper-montieren|heizung-erneuern-kosten
+          bodenplatte-kosten-pro-qm|maurer|bodenplatte-standard|innenwand-mauern-kosten
+          kuechenfronten-erneuern-kosten|kueche|kuechenfronten-austauschen-oder-lackieren|kueche-10-qm-renovieren-kosten
+          kuechenarbeitsplatte-kosten|kueche|neue-arbeitsplatte|kueche-10-qm-renovieren-kosten
+          parkett-verlegen-kosten-pro-qm|bodenleger|parkett-verlegen-inkl-material|bodenleger-kosten-pro-qm
+          laminat-verlegen-kosten-pro-qm|bodenleger|laminat-verlegen|bodenleger-kosten-pro-qm
+          innendaemmung-kosten-pro-qm|daemmung|innendaemmung|daemmung-kosten-pro-qm
+          waende-streichen-kosten-pro-qm|maler|waende-streichen|maler-kosten-pro-qm
+          tapezieren-kosten-pro-qm|maler|tapezieren-inkl-tapete|maler-kosten-pro-qm
+          innenputz-q3-kosten-pro-qm|maler|innenputz-glaetten-q3|maler-kosten-pro-qm
+          fliesen-verlegen-kosten-pro-qm|fliesenleger|standard-fliesen-verlegen|fliesenleger-kosten-pro-qm
+          grossformat-fliesen-verlegen-kosten|fliesenleger|grossformat-ab-80-x-80-cm|fliesenleger-kosten-pro-qm
+          steckdose-installieren-kosten|elektriker|steckdose-installieren|elektrik-erneuern-altbau
+          dach-neu-eindecken-kosten-pro-qm|dachsanierung|neueindeckung-inkl-lattung|dach-sanieren-kosten-pro-qm
+          vinylboden-verlegen-kosten-pro-qm|bodenleger|vinylboden-klick-inkl-material|bodenleger-kosten-pro-qm
+          verspachtelung-q4-kosten-pro-qm|trockenbau|verspachtelung-q4|trockenbau-kosten-pro-qm
+          luft-wasser-waermepumpe-kosten|waermepumpe|luft-wasser-waermepumpe-komplett|waermepumpe-kosten-2026
+          photovoltaik-10-kwp-kosten|photovoltaik|pv-anlage-10-kwp-inkl-installation|photovoltaik-kosten-2026
+          photovoltaik-mit-speicher-kosten|photovoltaik|10-kwp-pv-ca-10-kwh-speicher|photovoltaik-kosten-2026
+          fenster-3-fach-verglasung-kosten|fenster|fenster-mit-3-fach-verglasung|fenster-austauschen-kosten-haus
+          gasheizung-austauschen-kosten|heizung|gasheizung-austauschen|heizung-erneuern-kosten
+          heizungswartung-kosten|heizung|heizungswartung|heizung-erneuern-kosten
+          doppelstabmattenzaun-kosten-pro-meter|garten|doppelstabmattenzaun-inkl-montage|garten-anlegen-kosten
+          trockenestrich-kosten-pro-qm|estrich|trockenestrich-verlegen|estrich-100-qm-kosten
+          zwischensparrendaemmung-kosten-pro-qm|daemmung|dachdaemmung-zwischensparren|daemmung-kosten-pro-qm
+          aufsparrendaemmung-kosten-pro-qm|daemmung|dachdaemmung-aufsparren|daemmung-kosten-pro-qm
+          putzfassade-kosten-pro-qm|fassade|putz-fassade-neu|fassade-sanieren-kosten
+          mosaik-fliesen-verlegen-kosten-pro-qm|fliesenleger|mosaik-fliesen-verlegen|fliesenleger-kosten-pro-qm
+          naturstein-verlegen-kosten-pro-qm|fliesenleger|naturstein-verlegen|fliesenleger-kosten-pro-qm
+          lichtschalter-austauschen-kosten|elektriker|lichtschalter-austauschen|elektrik-erneuern-altbau
+          geruest-kosten-pro-qm|dachsanierung|geruest-ca-4-wochen|dach-sanieren-kosten-pro-qm
+          boden-sanieren-kosten-pro-qm|bodenleger|boden-sanierung-alt-raus-neu-rein|bodenleger-kosten-pro-qm
+          bad-entkernen-kosten|sanitaer|demontage-entsorgung-altbad|bad-komplett-sanieren-kosten
+          photovoltaik-15-kwp-kosten|photovoltaik|pv-anlage-15-kwp-inkl-installation|photovoltaik-kosten-2026
+          fenster-2-fach-verglasung-kosten|fenster|fenster-mit-2-fach-verglasung|fenster-austauschen-kosten-haus
+          thermostat-installieren-kosten|heizung|thermostat-installieren|heizung-erneuern-kosten
+          fassadenrisse-sanieren-kosten-pro-qm|fassade|fassaden-sanierung-bei-rissen|fassade-sanieren-kosten
+          vorgehaengte-hinterlueftete-fassade-kosten-pro-qm|fassade|vorgehaengte-hinterlueftete-fassade|fassade-sanieren-kosten
+          heckenschnitt-kosten-pro-meter|garten|heckenschnitt|garten-anlegen-kosten
+          innentuer-einbauen-kosten|tueren|innentuer-mit-zarge-inkl-montage|6-innentueren-austauschen-kosten
+          fliessestrich-kosten-pro-qm|estrich|fliessestrich-verlegen|estrich-100-qm-kosten
+          holztreppe-schleifen-kosten|treppen|holztreppe-schleifen-und-versiegeln|14-treppenstufen-renovieren-kosten
+          betontreppe-neuer-belag-kosten|treppen|betontreppe-mit-neuem-belag|14-treppenstufen-renovieren-kosten
+          fliesenspiegel-erneuern-kosten|kueche|fliesenspiegel-erneuern|kueche-10-qm-renovieren-kosten
+          bad-komplett-verfliesen-kosten|badsanierung|komplettverfliesung-bad|bad-komplett-sanieren-kosten
+          bad-abdichten-kosten-pro-qm|badsanierung|verbundabdichtung-nassbereich|bad-komplett-sanieren-kosten
+          elektro-neuinstallation-kosten|elektriker|komplett-neuinstallation|elektrik-erneuern-altbau
+          dachsanierung-aufsparrendaemmung-kosten-pro-qm|dachsanierung|dachsanierung-inkl-aufsparrendaemmung|dach-sanieren-kosten-pro-qm
+          photovoltaik-5-kwp-kosten|photovoltaik|pv-anlage-5-kwp-inkl-installation|photovoltaik-kosten-2026
+          fassade-streichen-kosten-pro-qm|fassade|fassade-streichen-inkl-vorarbeiten|fassade-sanieren-kosten
+          klinkerfassade-kosten-pro-qm|fassade|klinker-verblendung|fassade-sanieren-kosten
+          zementestrich-kosten-pro-qm|estrich|zementestrich-verlegen|estrich-100-qm-kosten
+          kalksandstein-mauerwerk-kosten-pro-qm|maurer|kalksandstein-mauerwerk|innenwand-mauern-kosten
+          poroton-mauerwerk-kosten-pro-qm|maurer|poroton-mauerwerk|innenwand-mauern-kosten
+          porenbeton-mauerwerk-kosten-pro-qm|maurer|porenbeton-mauerwerk|innenwand-mauern-kosten
+          treppenrenovierung-holzstufen-system-kosten|treppen|treppenrenovierung-holzstufen-system|14-treppenstufen-renovieren-kosten
+          treppen-stufenueberbau-gelaender-kosten|treppen|holztreppe-stufenueberbau-gelaender|14-treppenstufen-renovieren-kosten
+          natursteintreppe-schleifen-kosten|treppen|natursteintreppe-schleifen-und-polieren|14-treppenstufen-renovieren-kosten
+          sanitaerobjekte-bad-kosten|sanitaer|sanitaerobjekte-armaturen-fuer-8-m2-bad|sanitaer-kosten
+          kueche-elektrogeraete-kosten|kueche|neue-elektrogeraete|kueche-10-qm-renovieren-kosten
+          einbaukueche-kosten|kueche|komplett-neue-einbaukueche|kueche-10-qm-renovieren-kosten
+          premium-kueche-umbau-kosten|kueche|premium-kueche-mit-umbau|kueche-10-qm-renovieren-kosten
+          schnellestrich-kosten-pro-qm|estrich|schnellestrich|estrich-100-qm-kosten
+          bodenausgleich-kosten-pro-qm|estrich|bodenausgleich-5-20-mm|estrich-100-qm-kosten
+          estrich-rissreparatur-kosten|estrich|estrich-rissreparatur|estrich-100-qm-kosten
+          EOF
+          )
 
-            grep -q "https://baukostenradar.de/ratgeber/${guide}</loc>" /tmp/sitemap.xml
+          checked=0
+          while IFS='|' read -r guide service item parent; do
+            guide="${guide#${guide%%[![:space:]]*}}"
+            [ -n "$guide" ] || continue
+            echo "Checking ${guide} -> ${service}/${item}"
 
-            local guide_output="/tmp/guide-${guide}.html"
+            grep -q "https://baukostenradar.de/ratgeber/${guide}</loc>" /tmp/sitemap.xml || { echo "Missing guide in sitemap: ${guide}"; exit 1; }
+
+            guide_output="/tmp/guide-${guide}.html"
             curl -sS --fail "https://baukostenradar.de/ratgeber/${guide}" -o "$guide_output"
-            grep -q "https://baukostenradar.de/ratgeber/${guide}" "$guide_output"
-            grep -q '"@type":"Article"' "$guide_output"
-            grep -q "/kosten/${service}" "$guide_output"
-            grep -q "/kosten/${service}/berlin" "$guide_output"
-            grep -q "gewerk=${service}" "$guide_output"
-            grep -q "leistung=${item}" "$guide_output"
-            ! grep -qi 'noindex' "$guide_output"
+            grep -q "https://baukostenradar.de/ratgeber/${guide}" "$guide_output" || { echo "Canonical missing: ${guide}"; exit 1; }
+            grep -q '"@type":"Article"' "$guide_output" || { echo "Article schema missing: ${guide}"; exit 1; }
+            grep -q "/kosten/${service}" "$guide_output" || { echo "Service link missing: ${guide}"; exit 1; }
+            grep -q "/kosten/${service}/berlin" "$guide_output" || { echo "Berlin link missing: ${guide}"; exit 1; }
+            grep -q "gewerk=${service}" "$guide_output" || { echo "Calculator service missing: ${guide}"; exit 1; }
+            grep -q "leistung=${item}" "$guide_output" || { echo "Calculator item missing: ${guide} expected ${item}"; exit 1; }
+            ! grep -qi 'noindex' "$guide_output" || { echo "Unexpected noindex: ${guide}"; exit 1; }
 
-            local item_output="/tmp/item-${service}-${item}.html"
+            item_output="/tmp/item-${service}-${item}.html"
             curl -sS --fail "https://baukostenradar.de/kosten/${service}/leistung/${item}" -o "$item_output"
-            grep -q 'Passender Ratgeber' "$item_output"
-            grep -q "/ratgeber/${guide}" "$item_output"
-            ! grep -qi 'noindex' "$item_output"
-          }
+            grep -q 'Passender Ratgeber' "$item_output" || { echo "Ratgeber block missing on ${service}/${item}"; exit 1; }
+            grep -q "/ratgeber/${guide}" "$item_output" || { echo "Exact guide mapping missing on ${service}/${item}: ${guide}"; exit 1; }
+            ! grep -qi 'noindex' "$item_output" || { echo "Unexpected item noindex: ${service}/${item}"; exit 1; }
 
-          check_opportunity einfahrt-pflastern-kosten garten einfahrt-pflastern
-          check_opportunity terrasse-pflastern-kosten garten terrasse-pflastern-inkl-unterbau
-          check_opportunity baum-faellen-kosten garten baumfaellung-mittelgross-inkl-entsorgung
-          check_opportunity rollrasen-kosten-pro-qm garten rollrasen-inkl-vorbereitung
-          check_opportunity parkett-abschleifen-kosten bodenleger parkett-abschleifen-und-oelen
-          check_opportunity sicherungskasten-erneuern-kosten elektriker sicherungskasten-erneuern
-          check_opportunity dachrinne-erneuern-kosten dachsanierung dachrinne-erneuern-zink
-          check_opportunity haustuer-einbauen-kosten tueren haustuer-kunststoff-inkl-montage
-          check_opportunity fassadendaemmung-kosten-pro-qm daemmung fassadendaemmung-wdvs
-          check_opportunity waermepumpe-wartung-kosten waermepumpe wartung-waermepumpe
-          check_opportunity stromspeicher-kosten-pro-kwh photovoltaik stromspeicher-lfp
-          check_opportunity fenstereinbau-kosten fenster fenstereinbau
-          check_opportunity trockenbauwand-kosten-pro-qm trockenbau trockenbauwand-beidseitig-beplankt
-          check_opportunity heizkoerper-montieren-kosten heizung heizkoerper-montieren
-          check_opportunity bodenplatte-kosten-pro-qm maurer bodenplatte-standard
-          check_opportunity kuechenfronten-erneuern-kosten kueche kuechenfronten-austauschen-oder-lackieren
-          check_opportunity kuechenarbeitsplatte-kosten kueche neue-arbeitsplatte
-          check_opportunity parkett-verlegen-kosten-pro-qm bodenleger parkett-verlegen-inkl-material
-          check_opportunity laminat-verlegen-kosten-pro-qm bodenleger laminat-verlegen
-          check_opportunity innendaemmung-kosten-pro-qm daemmung innendaemmung
+            parent_output="/tmp/parent-${parent}.html"
+            curl -sS --fail "https://baukostenradar.de/ratgeber/${parent}" -o "$parent_output"
+            grep -q "/ratgeber/${guide}" "$parent_output" || { echo "Parent ${parent} does not link to ${guide}"; exit 1; }
 
-          check_opportunity waende-streichen-kosten-pro-qm maler waende-streichen
-          check_opportunity tapezieren-kosten-pro-qm maler tapezieren-inkl-tapete
-          check_opportunity innenputz-q3-kosten-pro-qm maler innenputz-glaetten-q3
-          check_opportunity fliesen-verlegen-kosten-pro-qm fliesenleger standard-fliesen-verlegen
-          check_opportunity grossformat-fliesen-verlegen-kosten fliesenleger grossformat-ab-80-x-80-cm
-          check_opportunity steckdose-installieren-kosten elektriker steckdose-installieren
-          check_opportunity dach-neu-eindecken-kosten-pro-qm dachsanierung neueindeckung-inkl-lattung
-          check_opportunity vinylboden-verlegen-kosten-pro-qm bodenleger vinylboden-klick-inkl-material
-          check_opportunity verspachtelung-q4-kosten-pro-qm trockenbau verspachtelung-q4
-          check_opportunity luft-wasser-waermepumpe-kosten waermepumpe luft-wasser-waermepumpe-komplett
-          check_opportunity photovoltaik-10-kwp-kosten photovoltaik pv-anlage-10-kwp-inkl-installation
-          check_opportunity photovoltaik-mit-speicher-kosten photovoltaik 10-kwp-pv-ca-10-kwh-speicher
-          check_opportunity fenster-3-fach-verglasung-kosten fenster fenster-mit-3-fach-verglasung
-          check_opportunity gasheizung-austauschen-kosten heizung gasheizung-austauschen
-          check_opportunity heizungswartung-kosten heizung heizungswartung
-          check_opportunity doppelstabmattenzaun-kosten-pro-meter garten doppelstabmattenzaun-inkl-montage
-          check_opportunity trockenestrich-kosten-pro-qm estrich trockenestrich
-          check_opportunity zwischensparrendaemmung-kosten-pro-qm daemmung dachdaemmung-zwischensparren
-          check_opportunity aufsparrendaemmung-kosten-pro-qm daemmung dachdaemmung-aufsparren
-          check_opportunity putzfassade-kosten-pro-qm fassade putz-fassade-neu
+            checked=$((checked + 1))
+          done <<< "$opportunities"
 
-          check_opportunity mosaik-fliesen-verlegen-kosten-pro-qm fliesenleger mosaik-fliesen-verlegen
-          check_opportunity naturstein-verlegen-kosten-pro-qm fliesenleger naturstein-verlegen
-          check_opportunity lichtschalter-austauschen-kosten elektriker lichtschalter-austauschen
-          check_opportunity geruest-kosten-pro-qm dachsanierung geruest-ca-4-wochen
-          check_opportunity boden-sanieren-kosten-pro-qm bodenleger boden-sanierung-alt-raus-neu-rein
-          check_opportunity bad-entkernen-kosten sanitaer demontage-entsorgung-altbad
-          check_opportunity photovoltaik-15-kwp-kosten photovoltaik pv-anlage-15-kwp-inkl-installation
-          check_opportunity fenster-2-fach-verglasung-kosten fenster fenster-mit-2-fach-verglasung
-          check_opportunity thermostat-installieren-kosten heizung thermostat-installieren
-          check_opportunity fassadenrisse-sanieren-kosten-pro-qm fassade fassaden-sanierung-bei-rissen
-          check_opportunity vorgehaengte-hinterlueftete-fassade-kosten-pro-qm fassade vorgehaengte-hinterlueftete-fassade
-          check_opportunity heckenschnitt-kosten-pro-meter garten heckenschnitt
-          check_opportunity innentuer-einbauen-kosten tueren innentuer-einbauen-inkl-zarge
-          check_opportunity tuer-lackieren-kosten tueren tuer-lackieren-mit-zarge
-          check_opportunity anhydritestrich-kosten-pro-qm estrich calciumsulfat-anhydritestrich
-          check_opportunity gussasphaltestrich-kosten-pro-qm estrich gussasphaltestrich
-          check_opportunity sichtestrich-kosten-pro-qm estrich sichtestrich
-          check_opportunity holztreppe-schleifen-kosten treppen holztreppe-schleifen-und-versiegeln
-          check_opportunity betontreppe-neuer-belag-kosten treppen betontreppe-mit-neuem-belag
-          check_opportunity fliesenspiegel-erneuern-kosten kueche fliesenspiegel-erneuern
+          test "$checked" -eq 78
+          echo "Verified ${checked} current opportunity guides, exact price-item mappings and parent links"
 
-          check_opportunity bad-komplett-verfliesen-kosten badsanierung komplettverfliesung-bad
-          check_opportunity bad-abdichten-kosten-pro-qm badsanierung verbundabdichtung-nassbereich
-          check_opportunity elektro-neuinstallation-kosten elektriker komplett-neuinstallation
-          check_opportunity dachsanierung-aufsparrendaemmung-kosten-pro-qm dachsanierung dachsanierung-inkl-aufsparrendaemmung
-          check_opportunity photovoltaik-5-kwp-kosten photovoltaik pv-anlage-5-kwp-inkl-installation
-          check_opportunity fassade-streichen-kosten-pro-qm fassade fassade-streichen-inkl-vorarbeiten
-          check_opportunity klinkerfassade-kosten-pro-qm fassade klinker-verblendung
-          check_opportunity zementestrich-kosten-pro-qm estrich zementestrich-komplett
-          check_opportunity kalksandstein-mauerwerk-kosten-pro-qm maurer kalksandstein-mauerwerk
-          check_opportunity poroton-mauerwerk-kosten-pro-qm maurer poroton-mauerwerk
-          check_opportunity porenbeton-mauerwerk-kosten-pro-qm maurer porenbeton-mauerwerk
-          check_opportunity treppenrenovierung-holzstufen-system-kosten treppen treppenrenovierung-holzstufen-system
-          check_opportunity treppen-stufenueberbau-gelaender-kosten treppen holztreppe-stufenueberbau-gelaender
-          check_opportunity natursteintreppe-schleifen-kosten treppen natursteintreppe-schleifen-und-polieren
-          check_opportunity sanitaerobjekte-bad-kosten sanitaer sanitaerobjekte-armaturen-fuer-8-m2-bad
-          check_opportunity kueche-elektrogeraete-kosten kueche neue-elektrogeraete
-          check_opportunity einbaukueche-kosten kueche komplett-neue-einbaukueche
-          check_opportunity premium-kueche-umbau-kosten kueche premium-kueche-mit-umbau
-
-          echo 'Verified 78 opportunity guides and exact price-item mappings'
-
-      - name: Verify parent guides link into the long-tail cluster
+      - name: Verify deprecated catalog guides stay out of sitemap
         shell: bash
         run: |
           set -euo pipefail
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
 
-          check_parent() {
-            local parent="$1"
-            local child="$2"
-            curl -sS --fail "https://baukostenradar.de/ratgeber/${parent}" -o /tmp/parent.html
-            grep -q "/ratgeber/${child}" /tmp/parent.html
-          }
+          deprecated=(
+            tuer-lackieren-kosten
+            anhydritestrich-kosten-pro-qm
+            gussasphaltestrich-kosten-pro-qm
+            sichtestrich-kosten-pro-qm
+          )
 
-          check_parent garten-anlegen-kosten einfahrt-pflastern-kosten
-          check_parent garten-anlegen-kosten terrasse-pflastern-kosten
-          check_parent garten-anlegen-kosten baum-faellen-kosten
-          check_parent garten-anlegen-kosten rollrasen-kosten-pro-qm
-          check_parent bodenleger-kosten-pro-qm parkett-abschleifen-kosten
-          check_parent elektrik-erneuern-altbau sicherungskasten-erneuern-kosten
-          check_parent dach-sanieren-kosten-pro-qm dachrinne-erneuern-kosten
-          check_parent haus-sanieren-kosten haustuer-einbauen-kosten
-          check_parent daemmung-kosten-pro-qm fassadendaemmung-kosten-pro-qm
-          check_parent waermepumpe-kosten-2026 waermepumpe-wartung-kosten
-          check_parent photovoltaik-kosten-2026 stromspeicher-kosten-pro-kwh
-          check_parent fenster-austauschen-kosten-haus fenstereinbau-kosten
-          check_parent trockenbau-kosten-pro-qm trockenbauwand-kosten-pro-qm
-          check_parent heizung-erneuern-kosten heizkoerper-montieren-kosten
-          check_parent innenwand-mauern-kosten bodenplatte-kosten-pro-qm
-          check_parent kueche-10-qm-renovieren-kosten kuechenfronten-erneuern-kosten
-          check_parent kueche-10-qm-renovieren-kosten kuechenarbeitsplatte-kosten
-          check_parent bodenleger-kosten-pro-qm parkett-verlegen-kosten-pro-qm
-          check_parent bodenleger-kosten-pro-qm laminat-verlegen-kosten-pro-qm
-          check_parent daemmung-kosten-pro-qm innendaemmung-kosten-pro-qm
-
-          check_parent maler-kosten-pro-qm waende-streichen-kosten-pro-qm
-          check_parent maler-kosten-pro-qm tapezieren-kosten-pro-qm
-          check_parent maler-kosten-pro-qm innenputz-q3-kosten-pro-qm
-          check_parent fliesenleger-kosten-pro-qm fliesen-verlegen-kosten-pro-qm
-          check_parent fliesenleger-kosten-pro-qm grossformat-fliesen-verlegen-kosten
-          check_parent elektrik-erneuern-altbau steckdose-installieren-kosten
-          check_parent dach-sanieren-kosten-pro-qm dach-neu-eindecken-kosten-pro-qm
-          check_parent bodenleger-kosten-pro-qm vinylboden-verlegen-kosten-pro-qm
-          check_parent trockenbau-kosten-pro-qm verspachtelung-q4-kosten-pro-qm
-          check_parent waermepumpe-kosten-2026 luft-wasser-waermepumpe-kosten
-          check_parent photovoltaik-kosten-2026 photovoltaik-10-kwp-kosten
-          check_parent photovoltaik-kosten-2026 photovoltaik-mit-speicher-kosten
-          check_parent fenster-austauschen-kosten-haus fenster-3-fach-verglasung-kosten
-          check_parent heizung-erneuern-kosten gasheizung-austauschen-kosten
-          check_parent heizung-erneuern-kosten heizungswartung-kosten
-          check_parent garten-anlegen-kosten doppelstabmattenzaun-kosten-pro-meter
-          check_parent estrich-100-qm-kosten trockenestrich-kosten-pro-qm
-          check_parent daemmung-kosten-pro-qm zwischensparrendaemmung-kosten-pro-qm
-          check_parent daemmung-kosten-pro-qm aufsparrendaemmung-kosten-pro-qm
-          check_parent fassade-sanieren-kosten putzfassade-kosten-pro-qm
-
-          check_parent fliesenleger-kosten-pro-qm mosaik-fliesen-verlegen-kosten-pro-qm
-          check_parent fliesenleger-kosten-pro-qm naturstein-verlegen-kosten-pro-qm
-          check_parent elektrik-erneuern-altbau lichtschalter-austauschen-kosten
-          check_parent dach-sanieren-kosten-pro-qm geruest-kosten-pro-qm
-          check_parent bodenleger-kosten-pro-qm boden-sanieren-kosten-pro-qm
-          check_parent bad-komplett-sanieren-kosten bad-entkernen-kosten
-          check_parent photovoltaik-kosten-2026 photovoltaik-15-kwp-kosten
-          check_parent fenster-austauschen-kosten-haus fenster-2-fach-verglasung-kosten
-          check_parent heizung-erneuern-kosten thermostat-installieren-kosten
-          check_parent fassade-sanieren-kosten fassadenrisse-sanieren-kosten-pro-qm
-          check_parent fassade-sanieren-kosten vorgehaengte-hinterlueftete-fassade-kosten-pro-qm
-          check_parent garten-anlegen-kosten heckenschnitt-kosten-pro-meter
-          check_parent 6-innentueren-austauschen-kosten innentuer-einbauen-kosten
-          check_parent 6-innentueren-austauschen-kosten tuer-lackieren-kosten
-          check_parent estrich-100-qm-kosten anhydritestrich-kosten-pro-qm
-          check_parent estrich-100-qm-kosten gussasphaltestrich-kosten-pro-qm
-          check_parent estrich-100-qm-kosten sichtestrich-kosten-pro-qm
-          check_parent 14-treppenstufen-renovieren-kosten holztreppe-schleifen-kosten
-          check_parent 14-treppenstufen-renovieren-kosten betontreppe-neuer-belag-kosten
-          check_parent kueche-10-qm-renovieren-kosten fliesenspiegel-erneuern-kosten
-
-          check_parent bad-komplett-sanieren-kosten bad-komplett-verfliesen-kosten
-          check_parent bad-komplett-sanieren-kosten bad-abdichten-kosten-pro-qm
-          check_parent elektrik-erneuern-altbau elektro-neuinstallation-kosten
-          check_parent dach-sanieren-kosten-pro-qm dachsanierung-aufsparrendaemmung-kosten-pro-qm
-          check_parent photovoltaik-kosten-2026 photovoltaik-5-kwp-kosten
-          check_parent fassade-sanieren-kosten fassade-streichen-kosten-pro-qm
-          check_parent fassade-sanieren-kosten klinkerfassade-kosten-pro-qm
-          check_parent estrich-100-qm-kosten zementestrich-kosten-pro-qm
-          check_parent innenwand-mauern-kosten kalksandstein-mauerwerk-kosten-pro-qm
-          check_parent innenwand-mauern-kosten poroton-mauerwerk-kosten-pro-qm
-          check_parent innenwand-mauern-kosten porenbeton-mauerwerk-kosten-pro-qm
-          check_parent 14-treppenstufen-renovieren-kosten treppenrenovierung-holzstufen-system-kosten
-          check_parent 14-treppenstufen-renovieren-kosten treppen-stufenueberbau-gelaender-kosten
-          check_parent 14-treppenstufen-renovieren-kosten natursteintreppe-schleifen-kosten
-          check_parent sanitaer-kosten sanitaerobjekte-bad-kosten
-          check_parent kueche-10-qm-renovieren-kosten kueche-elektrogeraete-kosten
-          check_parent kueche-10-qm-renovieren-kosten einbaukueche-kosten
-          check_parent kueche-10-qm-renovieren-kosten premium-kueche-umbau-kosten
-
-          echo 'Verified parent-to-opportunity Ratgeber links for all 78 guides'
+          for guide in "${deprecated[@]}"; do
+            ! grep -q "https://baukostenradar.de/ratgeber/${guide}</loc>" /tmp/sitemap.xml
+          done
