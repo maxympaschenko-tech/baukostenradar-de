@@ -19,6 +19,14 @@ const serviceGuideOverrides: Record<string, PriceGuideLink> = {
   },
 };
 
+const itemGuideOverrides: Record<string, PriceGuideLink> = {
+  "tueren:haustuer-holz-alu-rc2-inkl-montage": {
+    href: "/ratgeber/haustuer-rc2-kosten",
+    title: "Haustür Holz/Alu RC2: Kosten und Montage 2026",
+    cta: "RC2-Haustür-Ratgeber öffnen",
+  },
+};
+
 export function getServiceGuideLink(serviceSlug: string): PriceGuideLink {
   return serviceGuideOverrides[serviceSlug] ?? getBaseServiceGuideLink(serviceSlug);
 }
@@ -29,6 +37,10 @@ export function getPriceGuideLink(options: {
   itemName: string;
   unit: string;
 }): PriceGuideLink {
+  const key = `${options.serviceSlug}:${options.itemSlug}`;
+  const itemOverride = itemGuideOverrides[key];
+  if (itemOverride) return itemOverride;
+
   const baseLink = getBasePriceGuideLink(options);
   if (baseLink.href !== "/ratgeber/handwerker-stundensaetze") return baseLink;
   return serviceGuideOverrides[options.serviceSlug] ?? baseLink;
