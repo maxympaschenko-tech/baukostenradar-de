@@ -1,0 +1,78 @@
+name: Verify Badsanierung guide cluster
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-bath-guide-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify exact bath guide calculators and service silo
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+
+          mappings=$(cat <<'EOF'
+          bad-komplett-sanieren-kosten|badsanierung|bad-neubau-sanierung|
+          bad-10-qm-sanieren-kosten|badsanierung|bad-neubau-sanierung|10
+          bad-entkernen-kosten|sanitaer|demontage-entsorgung-altbad|
+          bad-komplett-verfliesen-kosten|badsanierung|komplettverfliesung-bad|
+          bad-abdichten-kosten-pro-qm|badsanierung|verbundabdichtung-nassbereich|
+          sanitaerobjekte-bad-kosten|sanitaer|sanitaerobjekte-armaturen-fuer-8-m2-bad|
+          EOF
+          )
+
+          checked=0
+          while IFS='|' read -r guide service item quantity; do
+            [ -n "$guide" ] || continue
+            guide_url="https://baukostenradar.de/ratgeber/${guide}"
+            output="/tmp/${guide}.html"
+
+            echo "Checking bath guide ${guide} -> ${service}/${item}"
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Bath guide missing in sitemap: ${guide}"; exit 1; }
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "Bath guide missing from Ratgeber hub: ${guide}"; exit 1; }
+
+            curl -sS --fail "$guide_url" -o "$output"
+            grep -q "$guide_url" "$output" || { echo "Canonical missing: ${guide}"; exit 1; }
+            grep -q '"@type":"Article"' "$output" || { echo "Article schema missing: ${guide}"; exit 1; }
+            grep -q "/kosten/badsanierung" "$output" || { echo "Badsanierung service link missing: ${guide}"; exit 1; }
+            grep -q "/kosten/badsanierung/berlin" "$output" || { echo "Badsanierung Berlin link missing: ${guide}"; exit 1; }
+            grep -q "gewerk=${service}" "$output" || { echo "Calculator service missing: ${guide}"; exit 1; }
+            grep -q "leistung=${item}" "$output" || { echo "Exact calculator item missing: ${guide} expected ${item}"; exit 1; }
+
+            if [ -n "$quantity" ]; then
+              grep -q "menge=${quantity}" "$output" || { echo "Exact calculator quantity missing: ${guide} expected ${quantity}"; exit 1; }
+            fi
+
+            ! grep -qi 'noindex' "$output"
+            checked=$((checked + 1))
+          done <<< "$mappings"
+
+          test "$checked" -eq 6
+          echo "Verified ${checked} Badsanierung guide calculators and service links"
+
+      - name: Verify bath parent cluster links
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/ratgeber/bad-komplett-sanieren-kosten' -o /tmp/bad-parent.html
+
+          for target in \
+            bad-10-qm-sanieren-kosten \
+            bad-entkernen-kosten \
+            bad-komplett-verfliesen-kosten \
+            bad-abdichten-kosten-pro-qm; do
+            grep -q "/ratgeber/${target}" /tmp/bad-parent.html || { echo "Bath parent missing child link: ${target}"; exit 1; }
+          done
+
+          grep -q 'gewerk=badsanierung' /tmp/bad-parent.html
+          grep -q 'leistung=bad-neubau-sanierung' /tmp/bad-parent.html
+          echo "Verified bath parent links and exact calculator preset"
