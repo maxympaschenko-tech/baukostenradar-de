@@ -5,7 +5,7 @@ import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Ratgeber zu Sanierung, Renovierung & Handwerkerkosten 2026",
-  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
+  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Malerarbeiten, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
   alternates: { canonical: "/ratgeber" },
 };
 
@@ -60,6 +60,12 @@ const guideGroups = [
     title: "Heizung erneuern, Fußbodenheizung und Wartung kalkulieren",
     description: "Gesamterneuerung, Gasheizung, 100-m²-Fußbodenheizung, Heizkörper, Thermostate und Wartung als zusammenhängendes Heizungsbudget vergleichen.",
     slugs: ["heizung-erneuern-kosten", "fussbodenheizung-100-qm-kosten", "gasheizung-austauschen-kosten", "heizkoerper-montieren-kosten", "thermostat-installieren-kosten", "heizungswartung-kosten"],
+  },
+  {
+    eyebrow: "Maler & Oberflächen",
+    title: "Malerarbeiten, Streichen und Tapezieren kalkulieren",
+    description: "Malerpreise pro Quadratmeter, Wände streichen, Tapezieren und Q3-Glätten mit aktuellen Richtwerten und direktem Weg zum Kostenrechner vergleichen.",
+    slugs: ["maler-kosten-pro-qm", "waende-streichen-kosten-pro-qm", "tapezieren-kosten-pro-qm", "innenputz-q3-kosten-pro-qm"],
   },
   {
     eyebrow: "Innenausbau & Modernisierung",
