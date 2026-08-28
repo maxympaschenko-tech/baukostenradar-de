@@ -19,14 +19,14 @@ const guideGroups = [
   {
     eyebrow: "Konkrete Gewerke",
     title: "Große Einzelmaßnahmen realistisch kalkulieren",
-    description: "Kosten für Elektrik, Heizung und komplette Badsanierung mit konkreten 2026-Richtwerten und Beispielbudgets.",
-    slugs: ["elektrik-erneuern-altbau", "heizung-erneuern-kosten", "bad-komplett-sanieren-kosten"],
+    description: "Kosten für Elektrik und komplette Badsanierung mit konkreten 2026-Richtwerten und Beispielbudgets.",
+    slugs: ["elektrik-erneuern-altbau", "bad-komplett-sanieren-kosten"],
   },
   {
     eyebrow: "Konkrete Projektgrößen",
     title: "Kosten für typische Flächen und Stückzahlen",
-    description: "Konkrete Rechenbeispiele für 100 m² Elektrik, ein 10-m²-Bad und 100 m² Fußbodenheizung.",
-    slugs: ["elektrik-erneuern-100-qm-kosten", "bad-10-qm-sanieren-kosten", "fussbodenheizung-100-qm-kosten"],
+    description: "Konkrete Rechenbeispiele für 100 m² Elektrik und ein 10-m²-Bad.",
+    slugs: ["elektrik-erneuern-100-qm-kosten", "bad-10-qm-sanieren-kosten"],
   },
   {
     eyebrow: "Dach & Dachsanierung",
@@ -48,6 +48,12 @@ const guideGroups = [
     title: "Fenster austauschen, Verglasung und Einbau kalkulieren",
     description: "Gesamtprojekt, 20-Fenster-Beispiel, 2-fach- und 3-fach-Verglasung sowie Montagekosten pro Fenster direkt vergleichen.",
     slugs: ["fenster-austauschen-kosten-haus", "20-fenster-austauschen-kosten", "fenster-2-fach-verglasung-kosten", "fenster-3-fach-verglasung-kosten", "fenstereinbau-kosten"],
+  },
+  {
+    eyebrow: "Heizung & Wärme",
+    title: "Heizung erneuern, Fußbodenheizung und Wartung kalkulieren",
+    description: "Gesamterneuerung, Gasheizung, 100-m²-Fußbodenheizung, Heizkörper, Thermostate und Wartung als zusammenhängendes Heizungsbudget vergleichen.",
+    slugs: ["heizung-erneuern-kosten", "fussbodenheizung-100-qm-kosten", "gasheizung-austauschen-kosten", "heizkoerper-montieren-kosten", "thermostat-installieren-kosten", "heizungswartung-kosten"],
   },
   {
     eyebrow: "Innenausbau & Modernisierung",

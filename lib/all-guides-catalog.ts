@@ -81,6 +81,15 @@ const roofGuideLinks = [
   { slug: "dachrinne-erneuern-kosten", label: "Dachrinne erneuern Kosten", href: "/ratgeber/dachrinne-erneuern-kosten" },
 ] as const;
 
+const heatingGuideLinks = [
+  { slug: "heizung-erneuern-kosten", label: "Heizung erneuern Kosten", href: "/ratgeber/heizung-erneuern-kosten" },
+  { slug: "fussbodenheizung-100-qm-kosten", label: "100 m² Fußbodenheizung Kosten", href: "/ratgeber/fussbodenheizung-100-qm-kosten" },
+  { slug: "gasheizung-austauschen-kosten", label: "Gasheizung austauschen Kosten", href: "/ratgeber/gasheizung-austauschen-kosten" },
+  { slug: "heizkoerper-montieren-kosten", label: "Heizkörper montieren Kosten", href: "/ratgeber/heizkoerper-montieren-kosten" },
+  { slug: "thermostat-installieren-kosten", label: "Thermostat installieren Kosten", href: "/ratgeber/thermostat-installieren-kosten" },
+  { slug: "heizungswartung-kosten", label: "Heizungswartung Kosten", href: "/ratgeber/heizungswartung-kosten" },
+] as const;
+
 function peers<T extends readonly { slug: string; label: string; href: string }[]>(links: T, slug: string) {
   return links
     .filter((link) => link.slug !== slug)
@@ -129,6 +138,12 @@ const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
   "dachfenster-austauschen-kosten": peers(roofGuideLinks, "dachfenster-austauschen-kosten"),
   "geruest-kosten-pro-qm": peers(roofGuideLinks, "geruest-kosten-pro-qm"),
   "dachrinne-erneuern-kosten": peers(roofGuideLinks, "dachrinne-erneuern-kosten"),
+  "heizung-erneuern-kosten": peers(heatingGuideLinks, "heizung-erneuern-kosten"),
+  "fussbodenheizung-100-qm-kosten": peers(heatingGuideLinks, "fussbodenheizung-100-qm-kosten"),
+  "gasheizung-austauschen-kosten": peers(heatingGuideLinks, "gasheizung-austauschen-kosten"),
+  "heizkoerper-montieren-kosten": peers(heatingGuideLinks, "heizkoerper-montieren-kosten"),
+  "thermostat-installieren-kosten": peers(heatingGuideLinks, "thermostat-installieren-kosten"),
+  "heizungswartung-kosten": peers(heatingGuideLinks, "heizungswartung-kosten"),
 };
 
 const enrichedBaseGuides = baseAllGuides.map((guide) => {
