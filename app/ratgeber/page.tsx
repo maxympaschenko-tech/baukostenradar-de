@@ -54,6 +54,7 @@ const guideGroups = [
       "6-innentueren-austauschen-kosten",
       "innentuer-einbauen-kosten",
       "haustuer-einbauen-kosten",
+      "haustuer-rc2-kosten",
       "innenwand-mauern-kosten",
       "14-treppenstufen-renovieren-kosten",
       "kueche-10-qm-renovieren-kosten",
