@@ -90,6 +90,15 @@ const heatingGuideLinks = [
   { slug: "heizungswartung-kosten", label: "Heizungswartung Kosten", href: "/ratgeber/heizungswartung-kosten" },
 ] as const;
 
+const electricalGuideLinks = [
+  { slug: "elektrik-erneuern-altbau", label: "Elektrik im Altbau erneuern", href: "/ratgeber/elektrik-erneuern-altbau" },
+  { slug: "elektrik-erneuern-100-qm-kosten", label: "Elektrik bei 100 m² erneuern", href: "/ratgeber/elektrik-erneuern-100-qm-kosten" },
+  { slug: "sicherungskasten-erneuern-kosten", label: "Sicherungskasten erneuern Kosten", href: "/ratgeber/sicherungskasten-erneuern-kosten" },
+  { slug: "steckdose-installieren-kosten", label: "Steckdose installieren Kosten", href: "/ratgeber/steckdose-installieren-kosten" },
+  { slug: "lichtschalter-austauschen-kosten", label: "Lichtschalter austauschen Kosten", href: "/ratgeber/lichtschalter-austauschen-kosten" },
+  { slug: "elektro-neuinstallation-kosten", label: "Elektro-Neuinstallation Kosten", href: "/ratgeber/elektro-neuinstallation-kosten" },
+] as const;
+
 function peers<T extends readonly { slug: string; label: string; href: string }[]>(links: T, slug: string) {
   return links
     .filter((link) => link.slug !== slug)
@@ -144,6 +153,12 @@ const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
   "heizkoerper-montieren-kosten": peers(heatingGuideLinks, "heizkoerper-montieren-kosten"),
   "thermostat-installieren-kosten": peers(heatingGuideLinks, "thermostat-installieren-kosten"),
   "heizungswartung-kosten": peers(heatingGuideLinks, "heizungswartung-kosten"),
+  "elektrik-erneuern-altbau": peers(electricalGuideLinks, "elektrik-erneuern-altbau"),
+  "elektrik-erneuern-100-qm-kosten": peers(electricalGuideLinks, "elektrik-erneuern-100-qm-kosten"),
+  "sicherungskasten-erneuern-kosten": peers(electricalGuideLinks, "sicherungskasten-erneuern-kosten"),
+  "steckdose-installieren-kosten": peers(electricalGuideLinks, "steckdose-installieren-kosten"),
+  "lichtschalter-austauschen-kosten": peers(electricalGuideLinks, "lichtschalter-austauschen-kosten"),
+  "elektro-neuinstallation-kosten": peers(electricalGuideLinks, "elektro-neuinstallation-kosten"),
 };
 
 const enrichedBaseGuides = baseAllGuides.map((guide) => {
