@@ -1,0 +1,76 @@
+name: Verify Kellerabdichtung pricing expansion
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-kellerabdichtung-pricing:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Kellerabdichtung production pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          fetch_with_retry() {
+            local url="$1" output="$2"
+            for i in 1 2 3 4 5; do
+              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then return 0; fi
+              [[ "$i" == "5" ]] && return 1
+              sleep 4
+            done
+          }
+          fetch_with_retry 'https://baukostenradar.de/kosten/kellerabdichtung' /tmp/main.html
+          fetch_with_retry 'https://baukostenradar.de/kosten/kellerabdichtung/muenchen' /tmp/city.html
+          fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
+          fetch_with_retry 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+
+      - name: Verify source-backed Kellerabdichtung data
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import re
+          from html.parser import HTMLParser
+
+          class TextParser(HTMLParser):
+              def __init__(self): super().__init__(); self.parts = []
+              def handle_data(self, data):
+                  value = data.strip()
+                  if value: self.parts.append(value)
+
+          def text(path):
+              parser = TextParser()
+              with open(path, encoding='utf-8') as handle: parser.feed(handle.read())
+              return re.sub(r'\s+', ' ', ' '.join(parser.parts))
+
+          main = text('/tmp/main.html')
+          city = text('/tmp/city.html')
+          quellen = text('/tmp/quellen.html')
+          sitemap = open('/tmp/sitemap.xml', encoding='utf-8').read()
+
+          expected_main = (
+              '14 Preispositionen', '3 geprüfte Quellen',
+              'Keller außen komplett abdichten Einfamilienhaus',
+              'Perimeterdämmung bei Kellerabdichtung', 'Ringdrainage am Keller',
+              'Horizontalsperre per Injektionsverfahren', 'Horizontalsperre hochwertige Injektion',
+              'Sanierputz bei feuchter Kellerwand', 'Kellerboden mit Sperrschicht und Estrich',
+              'Kellerwand von innen dämmen', 'Schimmel im Keller fachgerecht beseitigen',
+              'Geschädigtes Kellermauerwerk austauschen', 'Keller trockenlegen mit Elektroosmose',
+              'Blauarbeit - Kellersanierung Kosten 2026', 'MyHammer - Kellersanierung Kosten 2026',
+          )
+          for needle in expected_main:
+              if needle not in main: raise SystemExit(f'Missing Kellerabdichtung signal: {needle}')
+
+          for needle in ('Kellerabdichtung Kosten in München 2026', 'Ringdrainage am Keller', 'Horizontalsperre per Injektionsverfahren', 'Schimmel im Keller fachgerecht beseitigen'):
+              if needle not in city: raise SystemExit(f'Missing München Kellerabdichtung signal: {needle}')
+
+          for needle in ('Blauarbeit - Kellersanierung Kosten 2026', 'MyHammer - Kellersanierung Kosten 2026'):
+              if needle not in quellen: raise SystemExit(f'Missing Kellerabdichtung source: {needle}')
+
+          for needle in ('/kosten/kellerabdichtung/leistung/ringdrainage-am-keller', '/kosten/kellerabdichtung/leistung/horizontalsperre-per-injektionsverfahren', '/kosten/kellerabdichtung/leistung/schimmel-im-keller-fachgerecht-beseitigen'):
+              if needle not in sitemap: raise SystemExit(f'Missing Kellerabdichtung URL: {needle}')
+          PY

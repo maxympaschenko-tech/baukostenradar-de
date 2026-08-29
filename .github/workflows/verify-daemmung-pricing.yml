@@ -1,0 +1,80 @@
+name: Verify Dämmung pricing expansion
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-daemmung-pricing:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Dämmung production pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          fetch_with_retry() {
+            local url="$1" output="$2"
+            for i in 1 2 3 4 5; do
+              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then return 0; fi
+              [[ "$i" == "5" ]] && return 1
+              sleep 4
+            done
+          }
+          fetch_with_retry 'https://baukostenradar.de/kosten/daemmung' /tmp/main.html
+          fetch_with_retry 'https://baukostenradar.de/kosten/daemmung/muenchen' /tmp/city.html
+          fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
+          fetch_with_retry 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+
+      - name: Verify source-backed Dämmung data
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import re
+          from html.parser import HTMLParser
+
+          class TextParser(HTMLParser):
+              def __init__(self): super().__init__(); self.parts = []
+              def handle_data(self, data):
+                  value = data.strip()
+                  if value: self.parts.append(value)
+
+          def text(path):
+              parser = TextParser()
+              with open(path, encoding='utf-8') as handle: parser.feed(handle.read())
+              return re.sub(r'\s+', ' ', ' '.join(parser.parts))
+
+          main = text('/tmp/main.html')
+          city = text('/tmp/city.html')
+          quellen = text('/tmp/quellen.html')
+          sitemap = open('/tmp/sitemap.xml', encoding='utf-8').read()
+
+          expected_main = (
+              '23 Preispositionen', '9 geprüfte Quellen',
+              'Kerndämmung Einblasdämmung Fassade', 'WDVS mit EPS Styropor',
+              'WDVS mit Mineralwolle', 'WDVS mit Holzfaser',
+              'Vorgehängte hinterlüftete Fassadendämmung', 'Sockeldämmung',
+              'Sockeldämmung Einfamilienhaus komplett',
+              'Kellerdeckendämmung von oben mit Bodenbelag',
+              'Kellerdecke per Einblasdämmung', 'Kellerdecke per Sprühdämmung',
+              'Zellulosedämmung eingeblasen 140 mm',
+              'Blauarbeit - Fassadendämmung Kosten 2026',
+              'Blauarbeit - Sockeldämmung Kosten 2026',
+              'Blauarbeit - Zellulosedämmung Kosten 2026',
+              'co2online - Kellerdeckendämmung Kosten',
+          )
+          for needle in expected_main:
+              if needle not in main: raise SystemExit(f'Missing Dämmung signal: {needle}')
+
+          for needle in ('Dämmung Kosten in München 2026', 'Kerndämmung Einblasdämmung Fassade', 'WDVS mit Mineralwolle', 'Sockeldämmung', 'Kellerdecke per Einblasdämmung'):
+              if needle not in city: raise SystemExit(f'Missing München Dämmung signal: {needle}')
+
+          for needle in ('Blauarbeit - Fassadendämmung Kosten 2026', 'Blauarbeit - Sockeldämmung Kosten 2026', 'Blauarbeit - Zellulosedämmung Kosten 2026', 'co2online - Kellerdeckendämmung Kosten'):
+              if needle not in quellen: raise SystemExit(f'Missing Dämmung source: {needle}')
+
+          for needle in ('/kosten/daemmung/leistung/kerndaemmung-einblasdaemmung-fassade', '/kosten/daemmung/leistung/wdvs-mit-mineralwolle', '/kosten/daemmung/leistung/sockeldaemmung', '/kosten/daemmung/leistung/zellulosedaemmung-eingeblasen-140-mm'):
+              if needle not in sitemap: raise SystemExit(f'Missing Dämmung URL: {needle}')
+          PY
