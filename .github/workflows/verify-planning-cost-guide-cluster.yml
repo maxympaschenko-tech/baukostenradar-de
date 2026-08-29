@@ -1,0 +1,59 @@
+name: Verify planning and cost guide cluster
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-planning-cost-guide-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify planning and cost guides
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+
+          guides=(
+            sanierung-reihenfolge
+            arbeitskosten-materialkosten
+            handwerker-stundensaetze
+          )
+
+          for source in "${guides[@]}"; do
+            guide_url="https://baukostenradar.de/ratgeber/${source}"
+            guide_html="/tmp/${source}.html"
+
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Planning guide missing in sitemap: ${source}"; exit 1; }
+            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Planning guide missing from hub: ${source}"; exit 1; }
+
+            fetch "$guide_url" "$guide_html"
+            grep -q "$guide_url" "$guide_html"
+            grep -q '"@type":"Article"' "$guide_html"
+            grep -q '/staedte/berlin' "$guide_html"
+            ! grep -qi 'noindex' "$guide_html"
+
+            if [ "$source" = 'sanierung-reihenfolge' ]; then
+              grep -q '/rechner/renovierungskosten' "$guide_html"
+              grep -q '/kosten/badsanierung/berlin' "$guide_html"
+            else
+              grep -q '/rechner/handwerkerkosten' "$guide_html"
+              grep -q '/kosten/elektriker/berlin' "$guide_html"
+            fi
+
+            for target in "${guides[@]}"; do
+              [ "$source" = "$target" ] && continue
+              grep -q "/ratgeber/${target}" "$guide_html" || { echo "${source} missing planning peer ${target}"; exit 1; }
+            done
+          done
+
+          echo 'Verified planning and cost hub visibility, calculators, regional links and full three-guide peer silo'
