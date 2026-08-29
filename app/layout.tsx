@@ -34,6 +34,11 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     url: "/",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "BauKostenRadar",
+    description: siteConfig.description,
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
