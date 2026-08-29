@@ -44,6 +44,16 @@ export const priceSources = {
     url: "https://handwerker-kontakte.de/de/ratgeber/kueche-renovieren-kosten",
     checkedAt: "20.03.2026",
   },
+  co2Fenster: {
+    name: "co2online - Fenster tauschen 2026",
+    url: "https://www.co2online.de/energie-sparen/heizenergie-sparen/lueften-lueftungsanlagen-fenster/fenster-tauschen/",
+    checkedAt: "29.08.2026",
+  },
+  aroundhomeFenster: {
+    name: "Aroundhome - Fenster Preise 2026",
+    url: "https://www.aroundhome.de/fenster/preise-preisvergleich/",
+    checkedAt: "29.08.2026",
+  },
 } as const;
 
 type CatalogSourceKey = keyof typeof priceSources;
@@ -134,11 +144,65 @@ export const extraServices: Service[] = [
   },
 ];
 
-const baseServiceSlugs = new Set(baseServices.map((service) => service.slug));
+const enrichedBaseServices: Service[] = baseServices.map((service) => {
+  const catalogService = service as unknown as Service;
+
+  if (service.slug !== "fenster") return catalogService;
+
+  return {
+    ...catalogService,
+    description: "Aktuelle Richtwerte für neue Fenster, Zwei- und Dreifachverglasung, Rahmenmaterialien und professionelle Montage in Deutschland.",
+    priceItems: [
+      ...catalogService.priceItems,
+      {
+        name: "Standardfenster inkl. Einbau",
+        low: 500,
+        high: 1500,
+        unit: "pro Fenster",
+        note: "Grobe Orientierung für ein Standardfenster inklusive fachgerechtem Einbau",
+        sourceKey: "co2Fenster",
+      },
+      {
+        name: "Kunststofffenster",
+        low: 200,
+        high: 390,
+        unit: "pro m² Fensterfläche",
+        note: "Material- und Flächenorientierung; Montage separat kalkulieren",
+        sourceKey: "aroundhomeFenster",
+      },
+      {
+        name: "Holzfenster",
+        low: 300,
+        high: 500,
+        unit: "pro m² Fensterfläche",
+        note: "Material- und Flächenorientierung; Montage separat kalkulieren",
+        sourceKey: "aroundhomeFenster",
+      },
+      {
+        name: "Aluminiumfenster",
+        low: 300,
+        high: 600,
+        unit: "pro m² Fensterfläche",
+        note: "Material- und Flächenorientierung; Montage separat kalkulieren",
+        sourceKey: "aroundhomeFenster",
+      },
+      {
+        name: "Holz-Alu-Fenster",
+        low: 700,
+        high: 1200,
+        unit: "pro m² Fensterfläche",
+        note: "Material- und Flächenorientierung; Montage separat kalkulieren",
+        sourceKey: "aroundhomeFenster",
+      },
+    ],
+  };
+});
+
+const baseServiceSlugs = new Set(enrichedBaseServices.map((service) => service.slug));
 const uniqueExtraServices = extraServices.filter((service) => !baseServiceSlugs.has(service.slug));
 
 export const services: Service[] = [
-  ...(baseServices as unknown as Service[]),
+  ...enrichedBaseServices,
   ...uniqueExtraServices,
 ];
 

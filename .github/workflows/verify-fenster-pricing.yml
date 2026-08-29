@@ -1,0 +1,96 @@
+name: Verify Fenster pricing expansion
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-fenster-pricing:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Fenster pages and source catalog
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch_with_retry() {
+            local url="$1"
+            local output="$2"
+            for i in 1 2 3 4 5; do
+              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then
+                return 0
+              fi
+              if [[ "$i" == "5" ]]; then
+                return 1
+              fi
+              sleep 4
+            done
+          }
+
+          fetch_with_retry 'https://baukostenradar.de/kosten/fenster' /tmp/fenster.html
+          fetch_with_retry 'https://baukostenradar.de/kosten/fenster/muenchen' /tmp/fenster-muenchen.html
+          fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
+
+      - name: Verify expanded source-backed Fenster data
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python - <<'PY'
+          import re
+          from html.parser import HTMLParser
+
+          class TextParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.parts = []
+
+              def handle_data(self, data):
+                  value = data.strip()
+                  if value:
+                      self.parts.append(value)
+
+          def text(path):
+              parser = TextParser()
+              with open(path, encoding='utf-8') as handle:
+                  parser.feed(handle.read())
+              return re.sub(r'\s+', ' ', ' '.join(parser.parts))
+
+          fenster = text('/tmp/fenster.html')
+          muenchen = text('/tmp/fenster-muenchen.html')
+          quellen = text('/tmp/quellen.html')
+
+          expected_main = (
+              '8 Preispositionen',
+              '3 geprüfte Quellen',
+              'Standardfenster inkl. Einbau',
+              'Kunststofffenster',
+              'Holzfenster',
+              'Aluminiumfenster',
+              'Holz-Alu-Fenster',
+              'co2online - Fenster tauschen 2026',
+              'Aroundhome - Fenster Preise 2026',
+          )
+          for needle in expected_main:
+              if needle not in fenster:
+                  raise SystemExit(f'Missing Fenster production signal: {needle}')
+
+          expected_city = (
+              'Fenster Kosten in München 2026',
+              'Standardfenster inkl. Einbau',
+              'Kunststofffenster',
+              'Holzfenster',
+              'Aluminiumfenster',
+              'Holz-Alu-Fenster',
+          )
+          for needle in expected_city:
+              if needle not in muenchen:
+                  raise SystemExit(f'Missing München Fenster production signal: {needle}')
+
+          for source_name in ('co2online - Fenster tauschen 2026', 'Aroundhome - Fenster Preise 2026'):
+              if source_name not in quellen:
+                  raise SystemExit(f'Missing Fenster source in central source catalog: {source_name}')
+          PY
