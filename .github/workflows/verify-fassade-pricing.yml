@@ -15,23 +15,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
           fetch_with_retry() {
-            local url="$1"
-            local output="$2"
+            local url="$1" output="$2"
             for i in 1 2 3 4 5; do
-              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then
-                return 0
-              fi
-              if [[ "$i" == "5" ]]; then
-                return 1
-              fi
+              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then return 0; fi
+              [[ "$i" == "5" ]] && return 1
               sleep 4
             done
           }
-
-          fetch_with_retry 'https://baukostenradar.de/kosten/fassade' /tmp/fassade.html
-          fetch_with_retry 'https://baukostenradar.de/kosten/fassade/muenchen' /tmp/fassade-muenchen.html
+          fetch_with_retry 'https://baukostenradar.de/kosten/fassade' /tmp/main.html
+          fetch_with_retry 'https://baukostenradar.de/kosten/fassade/muenchen' /tmp/city.html
           fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
           fetch_with_retry 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
 
@@ -39,77 +32,53 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
           python - <<'PY'
           import re
           from html.parser import HTMLParser
 
           class TextParser(HTMLParser):
-              def __init__(self):
-                  super().__init__()
-                  self.parts = []
-
+              def __init__(self): super().__init__(); self.parts = []
               def handle_data(self, data):
                   value = data.strip()
-                  if value:
-                      self.parts.append(value)
+                  if value: self.parts.append(value)
 
           def text(path):
               parser = TextParser()
-              with open(path, encoding='utf-8') as handle:
-                  parser.feed(handle.read())
+              with open(path, encoding='utf-8') as handle: parser.feed(handle.read())
               return re.sub(r'\s+', ' ', ' '.join(parser.parts))
 
-          fassade = text('/tmp/fassade.html')
-          muenchen = text('/tmp/fassade-muenchen.html')
+          main = text('/tmp/main.html')
+          city = text('/tmp/city.html')
           quellen = text('/tmp/quellen.html')
-          with open('/tmp/sitemap.xml', encoding='utf-8') as handle:
-              sitemap = handle.read()
+          sitemap = open('/tmp/sitemap.xml', encoding='utf-8').read()
 
           expected_main = (
-              '14 Preispositionen',
-              '5 geprüfte Quellen',
-              'Fassadengerüst aufstellen & mieten',
-              'Fassadenreinigung mit Hochdruck',
-              'Algen- und Pilzbehandlung Fassade',
-              'Fassade grundieren',
-              'Zweifacher Fassadenanstrich',
-              'Putzabplatzungen ausbessern',
-              'Kerndämmung / Einblasdämmung Fassade',
-              'WDVS Fassadendämmung',
-              'Aroundhome - Fassadenanstrich Kosten 2026',
-              'co2online - Fassadendämmung Kosten',
+              '26 Preispositionen', '9 geprüfte Quellen',
+              'Außenfassade Standardputz inkl. Arbeit',
+              'Mineralischer Fassadenputz',
+              'Edelputz für Außenfassade',
+              'Einfamilienhaus Fassade neu verputzen ohne Dämmung',
+              'Einfamilienhaus Fassade verputzen mit Dämmung',
+              'Fassade streichen komplett inkl. Material und Arbeit',
+              'Fassade 100 m² komplett streichen',
+              'Sichtmauerwerk Fugen auskratzen und neu verfugen',
+              'Risse im Fassadenmauerwerk verpressen',
+              'Klinkerriemchen als Fassadenverblendung',
+              'Verblendmauerwerk aus Klinker',
+              'MyHammer - Außenfassade verputzen Kosten 2026',
+              'MyHammer - Fassade streichen Kosten 2026',
+              'Blauarbeit - Mauerwerk sanieren Kosten 2026',
+              'Blauarbeit - Verblendmauerwerk Kosten 2026',
           )
           for needle in expected_main:
-              if needle not in fassade:
-                  raise SystemExit(f'Missing Fassade production signal: {needle}')
+              if needle not in main: raise SystemExit(f'Missing Fassade signal: {needle}')
 
-          expected_city = (
-              'Fassade Kosten in München 2026',
-              'Fassadenreinigung mit Hochdruck',
-              'Fassade grundieren',
-              'Zweifacher Fassadenanstrich',
-              'Kerndämmung / Einblasdämmung Fassade',
-              'WDVS Fassadendämmung',
-          )
-          for needle in expected_city:
-              if needle not in muenchen:
-                  raise SystemExit(f'Missing München Fassade production signal: {needle}')
+          for needle in ('Fassade Kosten in München 2026', 'Außenfassade Standardputz inkl. Arbeit', 'Fassade streichen komplett inkl. Material und Arbeit', 'Risse im Fassadenmauerwerk verpressen', 'Klinkerriemchen als Fassadenverblendung'):
+              if needle not in city: raise SystemExit(f'Missing München Fassade signal: {needle}')
 
-          for source_name in (
-              'Aroundhome - Fassadenanstrich Kosten 2026',
-              'co2online - Fassadendämmung Kosten',
-          ):
-              if source_name not in quellen:
-                  raise SystemExit(f'Missing Fassade source in central source catalog: {source_name}')
+          for needle in ('MyHammer - Außenfassade verputzen Kosten 2026', 'MyHammer - Fassade streichen Kosten 2026', 'Blauarbeit - Mauerwerk sanieren Kosten 2026', 'Blauarbeit - Verblendmauerwerk Kosten 2026'):
+              if needle not in quellen: raise SystemExit(f'Missing Fassade source: {needle}')
 
-          sitemap_needles = (
-              '/kosten/fassade/leistung/fassadengeruest-aufstellen-mieten',
-              '/kosten/fassade/leistung/fassadenreinigung-mit-hochdruck',
-              '/kosten/fassade/leistung/kerndaemmung-einblasdaemmung-fassade',
-              '/kosten/fassade/leistung/wdvs-fassadendaemmung',
-          )
-          for needle in sitemap_needles:
-              if needle not in sitemap:
-                  raise SystemExit(f'Missing Fassade detail URL in sitemap: {needle}')
+          for needle in ('/kosten/fassade/leistung/aussenfassade-standardputz-inkl-arbeit', '/kosten/fassade/leistung/fassade-streichen-komplett-inkl-material-und-arbeit', '/kosten/fassade/leistung/risse-im-fassadenmauerwerk-verpressen', '/kosten/fassade/leistung/klinkerriemchen-als-fassadenverblendung', '/kosten/fassade/leistung/verblendmauerwerk-aus-klinker'):
+              if needle not in sitemap: raise SystemExit(f'Missing Fassade URL: {needle}')
           PY
