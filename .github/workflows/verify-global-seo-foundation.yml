@@ -1,0 +1,72 @@
+name: Verify global SEO foundation
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-global-seo:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch robots and sitemap
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch_with_retry() {
+            local url="$1"
+            local output="$2"
+            for i in 1 2 3 4 5; do
+              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then
+                return 0
+              fi
+              if [[ "$i" == "5" ]]; then
+                return 1
+              fi
+              sleep 4
+            done
+          }
+
+          fetch_with_retry 'https://baukostenradar.de/robots.txt' /tmp/robots.txt
+          fetch_with_retry 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+
+      - name: Verify robots points to canonical sitemap
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'User-agent: \*' /tmp/robots.txt
+          grep -q 'Allow: /' /tmp/robots.txt
+          grep -q 'Disallow: /api/' /tmp/robots.txt
+          grep -q 'Sitemap: https://baukostenradar.de/sitemap.xml' /tmp/robots.txt
+
+      - name: Verify sitemap contains canonical indexable URLs only
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q '<loc>https://baukostenradar.de</loc>' /tmp/sitemap.xml
+          grep -q '<loc>https://baukostenradar.de/kosten</loc>' /tmp/sitemap.xml
+          grep -q '<loc>https://baukostenradar.de/rechner</loc>' /tmp/sitemap.xml
+          grep -q '<loc>https://baukostenradar.de/ratgeber</loc>' /tmp/sitemap.xml
+          grep -q '<loc>https://baukostenradar.de/staedte</loc>' /tmp/sitemap.xml
+          grep -q '<loc>https://baukostenradar.de/kosten/maler/berlin</loc>' /tmp/sitemap.xml
+          grep -q '<loc>https://baukostenradar.de/kosten/maler/leistung/waende-streichen</loc>' /tmp/sitemap.xml
+          grep -q '<loc>https://baukostenradar.de/ratgeber/sanierungskosten-pro-qm</loc>' /tmp/sitemap.xml
+
+          for forbidden in '/impressum' '/datenschutz' '/angebot' '/api/'; do
+            if grep -q "$forbidden" /tmp/sitemap.xml; then
+              echo "Non-indexable path found in sitemap: $forbidden" >&2
+              exit 1
+            fi
+          done
+
+          if grep -Eq '<lastmod>|<priority>|<changefreq>' /tmp/sitemap.xml; then
+            echo 'Sitemap contains freshness or priority signals that are not backed by per-URL modification data.' >&2
+            exit 1
+          fi
+
+          duplicate_count=$(grep -o '<loc>[^<]*</loc>' /tmp/sitemap.xml | sort | uniq -d | wc -l | tr -d ' ')
+          echo "Duplicate sitemap URLs: $duplicate_count"
+          test "$duplicate_count" = '0'
