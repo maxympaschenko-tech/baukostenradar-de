@@ -5,7 +5,7 @@ import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Ratgeber zu Sanierung, Renovierung & Handwerkerkosten 2026",
-  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Wärmepumpen, Photovoltaik, Dämmung, Fassaden, Garten und Außenanlagen, Sanitär, Malerarbeiten, Fliesen, Bodenbelägen, Trockenbau, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
+  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Wärmepumpen, Photovoltaik, Dämmung, Kellerabdichtung, Fassaden, Garten und Außenanlagen, Sanitär, Malerarbeiten, Fliesen, Bodenbelägen, Trockenbau, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
   alternates: { canonical: "/ratgeber" },
 };
 
@@ -84,6 +84,12 @@ const guideGroups = [
     title: "Dämmkosten, Fassade und Dachaufbau kalkulieren",
     description: "Dämmkosten pro Quadratmeter sowie WDVS, Innendämmung, Zwischen- und Aufsparrendämmung mit aktuellen Richtwerten, regionalen Modellwerten und exakten Rechner-Presets vergleichen.",
     slugs: ["daemmung-kosten-pro-qm", "fassadendaemmung-kosten-pro-qm", "innendaemmung-kosten-pro-qm", "zwischensparrendaemmung-kosten-pro-qm", "aufsparrendaemmung-kosten-pro-qm"],
+  },
+  {
+    eyebrow: "Keller & Feuchteschutz",
+    title: "Kellerabdichtung außen und innen kalkulieren",
+    description: "Außenabdichtung inklusive Aushub und Innenabdichtung pro Quadratmeter direkt vergleichen, Kostenunterschiede verstehen und mit exakten Rechner-Presets weiterrechnen.",
+    slugs: ["kellerabdichtung-aussen-oder-innen-kosten", "kellerabdichtung-aussen-kosten-pro-qm", "kellerabdichtung-innen-kosten-pro-qm"],
   },
   {
     eyebrow: "Fassade & Außenhaut",
