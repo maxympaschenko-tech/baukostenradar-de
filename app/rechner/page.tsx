@@ -36,6 +36,40 @@ const calculators = [
   },
 ] as const;
 
+const quickStartGroups = [
+  {
+    eyebrow: "Renovierung",
+    title: "Gesamtbudget nach Wohnfläche starten",
+    description: "Wohnfläche oder Sanierungsumfang direkt vorausfüllen und anschließend Standard und Region anpassen.",
+    links: [
+      { label: "100 m² Renovierung", href: "/rechner/renovierungskosten?flaeche=100" },
+      { label: "150 m² Renovierung", href: "/rechner/renovierungskosten?flaeche=150" },
+      { label: "200 m² Renovierung", href: "/rechner/renovierungskosten?flaeche=200" },
+      { label: "120 m² Kernsanierung", href: "/rechner/renovierungskosten?flaeche=120&umfang=core" },
+    ],
+  },
+  {
+    eyebrow: "Badsanierung",
+    title: "Typische Badgrößen vorausfüllen",
+    description: "Mit einer typischen Fläche starten und danach den Regionalfaktor im Bad-Rechner auswählen.",
+    links: [
+      { label: "Bad 6 m²", href: "/rechner/badsanierungskosten?flaeche=6" },
+      { label: "Bad 8 m²", href: "/rechner/badsanierungskosten?flaeche=8" },
+      { label: "Bad 10 m²", href: "/rechner/badsanierungskosten?flaeche=10" },
+    ],
+  },
+  {
+    eyebrow: "Einzelarbeiten",
+    title: "Häufige Handwerkerleistungen direkt rechnen",
+    description: "Gewerk, Preisposition und typische Menge sind bereits gesetzt und können im Rechner geändert werden.",
+    links: [
+      { label: "100 m² Wände streichen", href: "/rechner/handwerkerkosten?gewerk=maler&leistung=waende-streichen&menge=100" },
+      { label: "Sicherungskasten erneuern", href: "/rechner/handwerkerkosten?gewerk=elektriker&leistung=sicherungskasten-erneuern&menge=1" },
+      { label: "Luft-Wasser-Wärmepumpe", href: "/rechner/handwerkerkosten?gewerk=waermepumpe&leistung=luft-wasser-waermepumpe-komplett&menge=1" },
+    ],
+  },
+] as const;
+
 export default function CalculatorDirectoryPage() {
   const base = siteConfig.url.replace(/\/$/, "");
   const priceCount = services.reduce((sum, service) => sum + service.priceItems.length, 0);
@@ -129,6 +163,35 @@ export default function CalculatorDirectoryPage() {
       </section>
 
       <section className="section sectionAlt">
+        <div className="shell">
+          <div className="premiumSectionHeading">
+            <div>
+              <span className="eyebrow">Schnellstart</span>
+              <h2>Mit einem typischen Szenario direkt losrechnen</h2>
+              <p>Die folgenden Links öffnen den passenden Rechner bereits mit sinnvollen Startwerten. Alle Werte lassen sich anschließend frei ändern.</p>
+            </div>
+          </div>
+          <div className="directoryGrid">
+            {quickStartGroups.map((group) => (
+              <article className="directoryCard" key={group.title}>
+                <span className="eyebrow">{group.eyebrow}</span>
+                <h3>{group.title}</h3>
+                <p>{group.description}</p>
+                <div className="sourceList">
+                  {group.links.map((link) => (
+                    <Link href={link.href} key={link.href}>
+                      <strong>{link.label}</strong>
+                      <span>Im Rechner öffnen →</span>
+                    </Link>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
         <div className="shell twoColumn">
           <div>
             <span className="eyebrow">Ergebnis richtig nutzen</span>
