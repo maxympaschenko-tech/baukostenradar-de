@@ -81,7 +81,7 @@ jobs:
                   raise SystemExit(f'Missing Elektriker production signal: {needle}')
 
           expected_city = (
-              'Elektriker Kosten in München 2026',
+              'Elektrik Kosten in München 2026',
               'FI-Schutzschalter nachrüsten',
               'Elektroinstallation Neubau',
               'Smart Home Einrichtung',
