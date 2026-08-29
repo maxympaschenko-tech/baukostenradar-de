@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CostDirectory, type CostDirectoryService } from "@/components/cost-directory";
 import { priceItemSlug } from "@/lib/price-slug";
 import { regions, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
@@ -26,6 +27,19 @@ export default function CostsPage() {
   const priceCount = services.reduce((sum, service) => sum + service.priceItems.length, 0);
   const cityCount = regions.filter((region) => region.value !== "de").length;
   const baseUrl = siteConfig.url.replace(/\/$/, "");
+  const directoryServices: CostDirectoryService[] = services.map((service) => ({
+    slug: service.slug,
+    shortTitle: service.shortTitle,
+    description: service.description,
+    icon: service.icon,
+    href: `/kosten/${service.slug}`,
+    items: service.priceItems.map((item) => ({
+      name: item.name,
+      href: `/kosten/${service.slug}/leistung/${priceItemSlug(item.name)}`,
+      price: priceRange(item.low, item.high),
+      unit: item.unit,
+    })),
+  }));
 
   const structuredData = [
     {
@@ -117,44 +131,7 @@ export default function CostsPage() {
         </div>
       </section>
 
-      <section className="section sectionAlt">
-        <div className="shell">
-          <div className="sectionHeading">
-            <span className="eyebrow">Alle Gewerke</span>
-            <h2>Handwerkerpreise nach Bereich</h2>
-            <p>
-              Jede Gewerkseite enthält die vollständige Preistabelle, Quellen, regionale Modellwerte,
-              weiterführende Ratgeber und passende Rechner.
-            </p>
-          </div>
-
-          <div className="directoryGrid">
-            {services.map((service) => (
-              <article className="directoryCard" key={service.slug}>
-                <div className="directoryCardTop">
-                  <span className="serviceIcon" aria-hidden="true">{service.icon}</span>
-                  <div>
-                    <h2>{service.shortTitle}</h2>
-                    <p>{service.description}</p>
-                  </div>
-                </div>
-                <div className="directoryPrices">
-                  {service.priceItems.slice(0, 3).map((item) => (
-                    <div key={item.name}>
-                      <Link className="priceItemLink" href={`/kosten/${service.slug}/leistung/${priceItemSlug(item.name)}`}>
-                        {item.name}
-                      </Link>
-                      <strong>{priceRange(item.low, item.high)}</strong>
-                      <small>{item.unit}</small>
-                    </div>
-                  ))}
-                </div>
-                <Link className="primaryButton" href={`/kosten/${service.slug}`}>Alle {service.shortTitle}-Preise</Link>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+      <CostDirectory services={directoryServices} />
 
       <section className="section">
         <div className="shell">

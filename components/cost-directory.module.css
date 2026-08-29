@@ -1,0 +1,111 @@
+.section {
+  background: #edf2f5;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(190px, 0.28fr);
+  gap: 16px;
+  align-items: end;
+  margin: 24px 0 28px;
+  padding: 18px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.searchField > span {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.searchField input {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #c9d4dc;
+  border-radius: 11px;
+  background: white;
+  padding: 0 13px;
+  color: var(--text);
+}
+
+.searchField input:focus {
+  outline: 2px solid rgba(31, 88, 127, 0.16);
+  border-color: var(--primary-2);
+}
+
+.status {
+  min-height: 48px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.status strong {
+  font-size: 22px;
+  color: var(--primary);
+}
+
+.status span {
+  font-weight: 800;
+}
+
+.status small {
+  width: 100%;
+  color: var(--muted);
+}
+
+.status button {
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: white;
+  color: var(--primary-2);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.status button:hover,
+.status button:focus-visible {
+  border-color: #b7c9d5;
+  background: #f7fafc;
+}
+
+.matchNote {
+  display: block;
+  margin: -2px 0 10px;
+  color: var(--primary-2);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.emptyState {
+  text-align: center;
+}
+
+.emptyState h3 {
+  margin: 12px 0 8px;
+  font-size: 28px;
+}
+
+.resetButton {
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: white;
+  color: var(--primary-2);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+@media (max-width: 720px) {
+  .controls {
+    grid-template-columns: 1fr;
+  }
+}
