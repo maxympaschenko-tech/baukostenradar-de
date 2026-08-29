@@ -282,6 +282,36 @@ const bodenGuideSilos: Record<string, GuideSilo> = {
   },
 };
 
+const trockenbauGuideSilos: Record<string, GuideSilo> = {
+  "trockenbau-kosten-pro-qm": {
+    serviceSlugs: ["trockenbau", "maler"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "trockenbau",
+      itemSlug: "trockenbauwand-beidseitig-beplankt",
+    }),
+    calculatorLabel: "Trockenbaukosten berechnen",
+    regionalMode: "service",
+  },
+  "trockenbauwand-kosten-pro-qm": {
+    serviceSlugs: ["trockenbau", "maler"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "trockenbau",
+      itemSlug: "trockenbauwand-beidseitig-beplankt",
+    }),
+    calculatorLabel: "Trockenbauwand berechnen",
+    regionalMode: "service",
+  },
+  "verspachtelung-q4-kosten-pro-qm": {
+    serviceSlugs: ["trockenbau", "maler"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "trockenbau",
+      itemSlug: "verspachtelung-q4",
+    }),
+    calculatorLabel: "Verspachtelung Q4 berechnen",
+    regionalMode: "service",
+  },
+};
+
 const serviceAugments: Record<string, string[]> = {
   "klinkerfassade-kosten-pro-qm": ["maurer"],
 };
@@ -294,7 +324,8 @@ export function getGuideSilo(slug: string): GuideSilo {
     bathGuideSilos[slug] ??
     malerGuideSilos[slug] ??
     fliesenGuideSilos[slug] ??
-    bodenGuideSilos[slug];
+    bodenGuideSilos[slug] ??
+    trockenbauGuideSilos[slug];
   if (explicit) return explicit;
 
   const base = getBaseGuideSilo(slug);

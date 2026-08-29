@@ -5,7 +5,7 @@ import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Ratgeber zu Sanierung, Renovierung & Handwerkerkosten 2026",
-  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Malerarbeiten, Fliesen, Bodenbelägen, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
+  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Malerarbeiten, Fliesen, Bodenbelägen, Trockenbau, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
   alternates: { canonical: "/ratgeber" },
 };
 
@@ -78,6 +78,12 @@ const guideGroups = [
     title: "Vinyl, Parkett, Laminat und Bodensanierung kalkulieren",
     description: "Bodenlegerkosten, Vinyl, Parkett und Laminat sowie komplette Bodensanierung und Parkett-Aufarbeitung mit aktuellen Preisen pro Quadratmeter und exakten Rechner-Presets vergleichen.",
     slugs: ["bodenleger-kosten-pro-qm", "vinylboden-verlegen-kosten-pro-qm", "parkett-verlegen-kosten-pro-qm", "laminat-verlegen-kosten-pro-qm", "boden-sanieren-kosten-pro-qm", "parkett-abschleifen-kosten"],
+  },
+  {
+    eyebrow: "Trockenbau & Oberflächen",
+    title: "Trockenbauwand und Q4-Verspachtelung kalkulieren",
+    description: "Trockenbaukosten pro Quadratmeter, beidseitig beplankte Wände und hochwertige Q4-Verspachtelung mit aktuellen Richtwerten und exakten Rechner-Presets vergleichen.",
+    slugs: ["trockenbau-kosten-pro-qm", "trockenbauwand-kosten-pro-qm", "verspachtelung-q4-kosten-pro-qm"],
   },
   {
     eyebrow: "Innenausbau & Modernisierung",
