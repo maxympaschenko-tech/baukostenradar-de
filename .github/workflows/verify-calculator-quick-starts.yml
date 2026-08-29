@@ -64,11 +64,17 @@ jobs:
 
           fetch 'https://baukostenradar.de/rechner/badsanierungskosten?flaeche=6' /tmp/bad-6.html
           assert_contains /tmp/bad-6.html 'value="6"' 'Bad 6 m² SSR preset'
-          assert_contains /tmp/bad-6.html 'Badsanierung anfragen' 'Bad 6 m² calculator result rendered'
+          assert_contains /tmp/bad-6.html 'Badsanierung-Preise ansehen' 'Bad price CTA'
+          assert_contains /tmp/bad-6.html '/ratgeber/bad-komplett-sanieren-kosten' 'Bad guide CTA'
+          assert_contains /tmp/bad-6.html '/rechner/handwerkerkosten?gewerk=badsanierung' 'Bad individual-work calculator CTA'
+          if grep -Fq '/angebot' /tmp/bad-6.html || grep -Fq 'Badsanierung anfragen' /tmp/bad-6.html; then
+            echo 'Verification failed: Bad calculator still exposes the retired offer CTA'
+            exit 1
+          fi
 
           fetch 'https://baukostenradar.de/rechner/badsanierungskosten?flaeche=10' /tmp/bad-10.html
           assert_contains /tmp/bad-10.html 'value="10"' 'Bad 10 m² SSR preset'
-          assert_contains /tmp/bad-10.html 'Badsanierung anfragen' 'Bad 10 m² calculator result rendered'
+          assert_contains /tmp/bad-10.html 'Badsanierung-Preise ansehen' 'Bad 10 m² price CTA'
 
           fetch 'https://baukostenradar.de/rechner/badsanierungskosten?flaeche=100' /tmp/bad-max.html
           assert_contains /tmp/bad-max.html 'value="40"' 'Bad area upper safety clamp'
@@ -81,4 +87,4 @@ jobs:
             exit 1
           fi
 
-          echo 'Verified calculator quick starts, SSR Bad presets, safety bounds and exact scenario routing in production'
+          echo 'Verified calculator quick starts, SSR Bad presets, live CTAs, safety bounds and exact scenario routing in production'
