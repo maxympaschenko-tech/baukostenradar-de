@@ -1,0 +1,114 @@
+name: Verify Dach pricing expansion
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-dach-pricing:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Dach pages and source catalog
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch_with_retry() {
+            local url="$1"
+            local output="$2"
+            for i in 1 2 3 4 5; do
+              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then
+                return 0
+              fi
+              if [[ "$i" == "5" ]]; then
+                return 1
+              fi
+              sleep 4
+            done
+          }
+
+          fetch_with_retry 'https://baukostenradar.de/kosten/dachsanierung' /tmp/dach.html
+          fetch_with_retry 'https://baukostenradar.de/kosten/dachsanierung/muenchen' /tmp/dach-muenchen.html
+          fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
+          fetch_with_retry 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+
+      - name: Verify expanded source-backed Dach data
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python - <<'PY'
+          import re
+          from html.parser import HTMLParser
+
+          class TextParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.parts = []
+
+              def handle_data(self, data):
+                  value = data.strip()
+                  if value:
+                      self.parts.append(value)
+
+          def text(path):
+              parser = TextParser()
+              with open(path, encoding='utf-8') as handle:
+                  parser.feed(handle.read())
+              return re.sub(r'\s+', ' ', ' '.join(parser.parts))
+
+          dach = text('/tmp/dach.html')
+          muenchen = text('/tmp/dach-muenchen.html')
+          quellen = text('/tmp/quellen.html')
+          with open('/tmp/sitemap.xml', encoding='utf-8') as handle:
+              sitemap = handle.read()
+
+          expected_main = (
+              '14 Preispositionen',
+              '5 geprüfte Quellen',
+              'Zwischensparrendämmung',
+              'Untersparrendämmung',
+              'Aufsparrendämmung inkl. Wiedereindecken',
+              'Flachdachdämmung',
+              'Dach neu eindecken',
+              'Dachdecker Stundensatz',
+              'Dachsanierung komplett',
+              'Dachgaube bauen',
+              'co2online - Dachdämmung Methoden und Kosten',
+              'Aroundhome - Dach neu decken & Dachsanierung',
+          )
+          for needle in expected_main:
+              if needle not in dach:
+                  raise SystemExit(f'Missing Dach production signal: {needle}')
+
+          expected_city = (
+              'Dachsanierung Kosten in München 2026',
+              'Zwischensparrendämmung',
+              'Untersparrendämmung',
+              'Flachdachdämmung',
+              'Dach neu eindecken',
+              'Dachgaube bauen',
+          )
+          for needle in expected_city:
+              if needle not in muenchen:
+                  raise SystemExit(f'Missing München Dach production signal: {needle}')
+
+          for source_name in (
+              'co2online - Dachdämmung Methoden und Kosten',
+              'Aroundhome - Dach neu decken & Dachsanierung',
+          ):
+              if source_name not in quellen:
+                  raise SystemExit(f'Missing Dach source in central source catalog: {source_name}')
+
+          sitemap_needles = (
+              '/kosten/dachsanierung/leistung/zwischensparrendaemmung',
+              '/kosten/dachsanierung/leistung/dach-neu-eindecken',
+              '/kosten/dachsanierung/leistung/dachgaube-bauen',
+          )
+          for needle in sitemap_needles:
+              if needle not in sitemap:
+                  raise SystemExit(f'Missing Dach detail URL in sitemap: {needle}')
+          PY

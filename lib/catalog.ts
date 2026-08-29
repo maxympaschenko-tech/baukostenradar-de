@@ -54,6 +54,11 @@ export const priceSources = {
     url: "https://www.aroundhome.de/fenster/preise-preisvergleich/",
     checkedAt: "29.08.2026",
   },
+  aroundhomeDach: {
+    name: "Aroundhome - Dach neu decken & Dachsanierung",
+    url: "https://www.aroundhome.de/dachdecker/preise-kosten/",
+    checkedAt: "29.08.2026",
+  },
 } as const;
 
 type CatalogSourceKey = keyof typeof priceSources;
@@ -147,55 +152,128 @@ export const extraServices: Service[] = [
 const enrichedBaseServices: Service[] = baseServices.map((service) => {
   const catalogService = service as unknown as Service;
 
-  if (service.slug !== "fenster") return catalogService;
+  if (service.slug === "fenster") {
+    return {
+      ...catalogService,
+      description: "Aktuelle Richtwerte für neue Fenster, Zwei- und Dreifachverglasung, Rahmenmaterialien und professionelle Montage in Deutschland.",
+      priceItems: [
+        ...catalogService.priceItems,
+        {
+          name: "Standardfenster inkl. Einbau",
+          low: 500,
+          high: 1500,
+          unit: "pro Fenster",
+          note: "Grobe Orientierung für ein Standardfenster inklusive fachgerechtem Einbau",
+          sourceKey: "co2Fenster",
+        },
+        {
+          name: "Kunststofffenster",
+          low: 200,
+          high: 390,
+          unit: "pro m² Fensterfläche",
+          note: "Material- und Flächenorientierung; Montage separat kalkulieren",
+          sourceKey: "aroundhomeFenster",
+        },
+        {
+          name: "Holzfenster",
+          low: 300,
+          high: 500,
+          unit: "pro m² Fensterfläche",
+          note: "Material- und Flächenorientierung; Montage separat kalkulieren",
+          sourceKey: "aroundhomeFenster",
+        },
+        {
+          name: "Aluminiumfenster",
+          low: 300,
+          high: 600,
+          unit: "pro m² Fensterfläche",
+          note: "Material- und Flächenorientierung; Montage separat kalkulieren",
+          sourceKey: "aroundhomeFenster",
+        },
+        {
+          name: "Holz-Alu-Fenster",
+          low: 700,
+          high: 1200,
+          unit: "pro m² Fensterfläche",
+          note: "Material- und Flächenorientierung; Montage separat kalkulieren",
+          sourceKey: "aroundhomeFenster",
+        },
+      ],
+    };
+  }
 
-  return {
-    ...catalogService,
-    description: "Aktuelle Richtwerte für neue Fenster, Zwei- und Dreifachverglasung, Rahmenmaterialien und professionelle Montage in Deutschland.",
-    priceItems: [
-      ...catalogService.priceItems,
-      {
-        name: "Standardfenster inkl. Einbau",
-        low: 500,
-        high: 1500,
-        unit: "pro Fenster",
-        note: "Grobe Orientierung für ein Standardfenster inklusive fachgerechtem Einbau",
-        sourceKey: "co2Fenster",
-      },
-      {
-        name: "Kunststofffenster",
-        low: 200,
-        high: 390,
-        unit: "pro m² Fensterfläche",
-        note: "Material- und Flächenorientierung; Montage separat kalkulieren",
-        sourceKey: "aroundhomeFenster",
-      },
-      {
-        name: "Holzfenster",
-        low: 300,
-        high: 500,
-        unit: "pro m² Fensterfläche",
-        note: "Material- und Flächenorientierung; Montage separat kalkulieren",
-        sourceKey: "aroundhomeFenster",
-      },
-      {
-        name: "Aluminiumfenster",
-        low: 300,
-        high: 600,
-        unit: "pro m² Fensterfläche",
-        note: "Material- und Flächenorientierung; Montage separat kalkulieren",
-        sourceKey: "aroundhomeFenster",
-      },
-      {
-        name: "Holz-Alu-Fenster",
-        low: 700,
-        high: 1200,
-        unit: "pro m² Fensterfläche",
-        note: "Material- und Flächenorientierung; Montage separat kalkulieren",
-        sourceKey: "aroundhomeFenster",
-      },
-    ],
-  };
+  if (service.slug === "dachsanierung") {
+    return {
+      ...catalogService,
+      description: "Aktuelle Richtwerte für Dacheindeckung, komplette Dachsanierung, Dämmverfahren, Dachfenster, Dachgauben und typische Dachdeckerarbeiten in Deutschland.",
+      priceItems: [
+        ...catalogService.priceItems,
+        {
+          name: "Zwischensparrendämmung",
+          low: 70,
+          high: 120,
+          unit: "pro m² Dachfläche",
+          note: "Dämmmaterial und Einbau durch einen Handwerksbetrieb",
+          sourceKey: "co2Dachdaemmung",
+        },
+        {
+          name: "Untersparrendämmung",
+          low: 30,
+          high: 80,
+          unit: "pro m² Dachfläche",
+          note: "Dämmmaterial und Einbau durch einen Handwerksbetrieb",
+          sourceKey: "co2Dachdaemmung",
+        },
+        {
+          name: "Aufsparrendämmung inkl. Wiedereindecken",
+          low: 130,
+          high: 200,
+          unit: "pro m² Dachfläche",
+          note: "Dämmmaterial, Montage und Wiedereindecken laut Quellenorientierung",
+          sourceKey: "co2Dachdaemmung",
+        },
+        {
+          name: "Flachdachdämmung",
+          low: 100,
+          high: 180,
+          unit: "pro m² Dachfläche",
+          sourceKey: "co2Dachdaemmung",
+        },
+        {
+          name: "Dach neu eindecken",
+          low: 90,
+          high: 180,
+          unit: "pro m² Dachfläche",
+          note: "Richtwert abhängig von Material, Aufwand und regionalem Lohnniveau",
+          sourceKey: "aroundhomeDach",
+        },
+        {
+          name: "Dachdecker Stundensatz",
+          low: 50,
+          high: 80,
+          unit: "pro Stunde",
+          sourceKey: "aroundhomeDach",
+        },
+        {
+          name: "Dachsanierung komplett",
+          low: 170,
+          high: 500,
+          unit: "pro m² Dachfläche",
+          note: "Breiter Richtwert inklusive möglichem Dachstuhl, Dämmung und Dacheindeckung",
+          sourceKey: "aroundhomeDach",
+        },
+        {
+          name: "Dachgaube bauen",
+          low: 5000,
+          high: 15000,
+          unit: "pro Gaube",
+          sourceKey: "aroundhomeDach",
+        },
+      ],
+    };
+  }
+
+  return catalogService;
 });
 
 const baseServiceSlugs = new Set(enrichedBaseServices.map((service) => service.slug));
