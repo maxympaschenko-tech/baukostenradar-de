@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { allGuides, getAnyGuide } from "@/lib/all-guides";
 import { getGuideRegionalServices, getGuideRegions, getGuideSilo, getGuideSiloServices } from "@/lib/guide-silo";
+import { withSupplementalGuideLinks } from "@/lib/guide-supplemental-links";
 import { priceItemSlug } from "@/lib/price-slug";
 import { siteConfig } from "@/lib/site";
 
@@ -78,6 +79,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
   const primaryService = siloServices[0];
   const guideRegions = getGuideRegions();
   const regionalServices = getGuideRegionalServices(guide.slug);
+  const relatedItems = withSupplementalGuideLinks(guide.slug, guide.related);
 
   const structuredData = [
     {
@@ -318,7 +320,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
           <h2>Passende Preise, Rechner und Ratgeber</h2>
           <p>Vertiefen Sie die Kostenfrage mit den nächsten passenden Seiten, statt wieder bei der allgemeinen Suche zu beginnen.</p>
           <div className="sourceList relatedGuideList">
-            {guide.related.map((item) => (
+            {relatedItems.map((item) => (
               <Link href={item.href} key={item.href}>
                 <span className="relatedType">{relatedType(item.href)}</span>
                 <strong>{item.label}</strong>
