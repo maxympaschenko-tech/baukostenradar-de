@@ -11,19 +11,28 @@ export type { GuideSilo } from "./guide-silo";
 const doorGuideSilos: Record<string, GuideSilo> = {
   "innentuer-einbauen-kosten": {
     serviceSlugs: ["tueren"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "tueren", itemSlug: "innentuer-mit-zarge-inkl-montage" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "tueren",
+      itemSlug: "innentuer-mit-zarge-inkl-montage",
+    }),
     calculatorLabel: "Innentür berechnen",
     regionalMode: "service",
   },
   "haustuer-kunststoff-kosten": {
     serviceSlugs: ["tueren", "fenster", "fassade"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "tueren", itemSlug: "haustuer-kunststoff-inkl-montage" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "tueren",
+      itemSlug: "haustuer-kunststoff-inkl-montage",
+    }),
     calculatorLabel: "Kunststoff-Haustür berechnen",
     regionalMode: "service",
   },
   "haustuer-rc2-kosten": {
     serviceSlugs: ["tueren", "fenster", "fassade"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "tueren", itemSlug: "haustuer-holz-alu-rc2-inkl-montage" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "tueren",
+      itemSlug: "haustuer-holz-alu-rc2-inkl-montage",
+    }),
     calculatorLabel: "RC2-Haustür berechnen",
     regionalMode: "service",
   },
@@ -32,13 +41,19 @@ const doorGuideSilos: Record<string, GuideSilo> = {
 const roofGuideSilos: Record<string, GuideSilo> = {
   "dachfenster-nachtraeglich-einbauen-kosten": {
     serviceSlugs: ["dachsanierung", "fenster", "daemmung"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "dachsanierung", itemSlug: "dachfenster-nachtraeglich-einbauen" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "dachsanierung",
+      itemSlug: "dachfenster-nachtraeglich-einbauen",
+    }),
     calculatorLabel: "Dachfenster nachträglich einbauen berechnen",
     regionalMode: "service",
   },
   "dachfenster-austauschen-kosten": {
     serviceSlugs: ["dachsanierung", "fenster", "daemmung"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "dachsanierung", itemSlug: "dachfenster-1-1-austauschen" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "dachsanierung",
+      itemSlug: "dachfenster-1-1-austauschen",
+    }),
     calculatorLabel: "Dachfenster austauschen berechnen",
     regionalMode: "service",
   },
@@ -47,13 +62,19 @@ const roofGuideSilos: Record<string, GuideSilo> = {
 const electricalGuideSilos: Record<string, GuideSilo> = {
   "elektrik-erneuern-altbau": {
     serviceSlugs: ["elektriker"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "elektriker", itemSlug: "komplett-neuinstallation" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "elektriker",
+      itemSlug: "komplett-neuinstallation",
+    }),
     calculatorLabel: "Elektro-Neuinstallation berechnen",
     regionalMode: "service",
   },
   "elektrik-erneuern-100-qm-kosten": {
     serviceSlugs: ["elektriker"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "elektriker", itemSlug: "komplett-neuinstallation" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "elektriker",
+      itemSlug: "komplett-neuinstallation",
+    }),
     calculatorLabel: "Elektrik für 100 m² berechnen",
     regionalMode: "service",
   },
@@ -62,37 +83,56 @@ const electricalGuideSilos: Record<string, GuideSilo> = {
 const bathGuideSilos: Record<string, GuideSilo> = {
   "bad-komplett-sanieren-kosten": {
     serviceSlugs: ["badsanierung", "sanitaer", "fliesenleger"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "badsanierung", itemSlug: "bad-neubau-sanierung" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "badsanierung",
+      itemSlug: "bad-neubau-sanierung",
+    }),
     calculatorLabel: "Badkosten berechnen",
     regionalMode: "service",
   },
   "bad-10-qm-sanieren-kosten": {
     serviceSlugs: ["badsanierung", "sanitaer", "fliesenleger"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "badsanierung", itemSlug: "bad-neubau-sanierung", quantity: 10 }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "badsanierung",
+      itemSlug: "bad-neubau-sanierung",
+      quantity: 10,
+    }),
     calculatorLabel: "10 m² Bad berechnen",
     regionalMode: "service",
   },
   "bad-entkernen-kosten": {
     serviceSlugs: ["badsanierung", "sanitaer", "fliesenleger"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "sanitaer", itemSlug: "demontage-entsorgung-altbad" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "sanitaer",
+      itemSlug: "demontage-entsorgung-altbad",
+    }),
     calculatorLabel: "Bad-Rückbau berechnen",
     regionalMode: "service",
   },
   "bad-komplett-verfliesen-kosten": {
     serviceSlugs: ["badsanierung", "sanitaer", "fliesenleger"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "badsanierung", itemSlug: "komplettverfliesung-bad" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "badsanierung",
+      itemSlug: "komplettverfliesung-bad",
+    }),
     calculatorLabel: "Badverfliesung berechnen",
     regionalMode: "service",
   },
   "bad-abdichten-kosten-pro-qm": {
     serviceSlugs: ["badsanierung", "sanitaer", "fliesenleger"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "badsanierung", itemSlug: "verbundabdichtung-nassbereich" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "badsanierung",
+      itemSlug: "verbundabdichtung-nassbereich",
+    }),
     calculatorLabel: "Badabdichtung berechnen",
     regionalMode: "service",
   },
   "sanitaerobjekte-bad-kosten": {
     serviceSlugs: ["badsanierung", "sanitaer", "fliesenleger"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "sanitaer", itemSlug: "sanitaerobjekte-armaturen-fuer-8-m2-bad" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "sanitaer",
+      itemSlug: "sanitaerobjekte-armaturen-fuer-8-m2-bad",
+    }),
     calculatorLabel: "Sanitärobjekte berechnen",
     regionalMode: "service",
   },
@@ -101,25 +141,37 @@ const bathGuideSilos: Record<string, GuideSilo> = {
 const malerGuideSilos: Record<string, GuideSilo> = {
   "maler-kosten-pro-qm": {
     serviceSlugs: ["maler", "trockenbau", "fassade"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "maler", itemSlug: "waende-streichen" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "maler",
+      itemSlug: "waende-streichen",
+    }),
     calculatorLabel: "Malerarbeiten berechnen",
     regionalMode: "service",
   },
   "waende-streichen-kosten-pro-qm": {
     serviceSlugs: ["maler", "trockenbau"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "maler", itemSlug: "waende-streichen" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "maler",
+      itemSlug: "waende-streichen",
+    }),
     calculatorLabel: "Wände streichen berechnen",
     regionalMode: "service",
   },
   "tapezieren-kosten-pro-qm": {
     serviceSlugs: ["maler", "trockenbau"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "maler", itemSlug: "tapezieren-inkl-tapete" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "maler",
+      itemSlug: "tapezieren-inkl-tapete",
+    }),
     calculatorLabel: "Tapezieren berechnen",
     regionalMode: "service",
   },
   "innenputz-q3-kosten-pro-qm": {
     serviceSlugs: ["maler", "trockenbau"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "maler", itemSlug: "innenputz-glaetten-q3" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "maler",
+      itemSlug: "innenputz-glaetten-q3",
+    }),
     calculatorLabel: "Innenputz Q3 berechnen",
     regionalMode: "service",
   },
@@ -128,31 +180,46 @@ const malerGuideSilos: Record<string, GuideSilo> = {
 const fliesenGuideSilos: Record<string, GuideSilo> = {
   "fliesenleger-kosten-pro-qm": {
     serviceSlugs: ["fliesenleger", "badsanierung", "sanitaer"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "fliesenleger", itemSlug: "standard-fliesen-verlegen" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "fliesenleger",
+      itemSlug: "standard-fliesen-verlegen",
+    }),
     calculatorLabel: "Fliesenlegerkosten berechnen",
     regionalMode: "service",
   },
   "fliesen-verlegen-kosten-pro-qm": {
     serviceSlugs: ["fliesenleger", "badsanierung"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "fliesenleger", itemSlug: "standard-fliesen-verlegen" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "fliesenleger",
+      itemSlug: "standard-fliesen-verlegen",
+    }),
     calculatorLabel: "Standardfliesen berechnen",
     regionalMode: "service",
   },
   "grossformat-fliesen-verlegen-kosten": {
     serviceSlugs: ["fliesenleger", "badsanierung"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "fliesenleger", itemSlug: "grossformat-ab-80-x-80-cm" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "fliesenleger",
+      itemSlug: "grossformat-ab-80-x-80-cm",
+    }),
     calculatorLabel: "Großformat-Fliesen berechnen",
     regionalMode: "service",
   },
   "mosaik-fliesen-verlegen-kosten-pro-qm": {
     serviceSlugs: ["fliesenleger", "badsanierung"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "fliesenleger", itemSlug: "mosaik-fliesen-verlegen" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "fliesenleger",
+      itemSlug: "mosaik-fliesen-verlegen",
+    }),
     calculatorLabel: "Mosaikfliesen berechnen",
     regionalMode: "service",
   },
   "naturstein-verlegen-kosten-pro-qm": {
     serviceSlugs: ["fliesenleger", "badsanierung"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "fliesenleger", itemSlug: "naturstein-verlegen" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "fliesenleger",
+      itemSlug: "naturstein-verlegen",
+    }),
     calculatorLabel: "Naturstein berechnen",
     regionalMode: "service",
   },
@@ -161,37 +228,55 @@ const fliesenGuideSilos: Record<string, GuideSilo> = {
 const bodenGuideSilos: Record<string, GuideSilo> = {
   "bodenleger-kosten-pro-qm": {
     serviceSlugs: ["bodenleger", "estrich"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "bodenleger", itemSlug: "vinylboden-klick-inkl-material" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "bodenleger",
+      itemSlug: "vinylboden-klick-inkl-material",
+    }),
     calculatorLabel: "Bodenlegerkosten berechnen",
     regionalMode: "service",
   },
   "vinylboden-verlegen-kosten-pro-qm": {
     serviceSlugs: ["bodenleger", "estrich"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "bodenleger", itemSlug: "vinylboden-klick-inkl-material" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "bodenleger",
+      itemSlug: "vinylboden-klick-inkl-material",
+    }),
     calculatorLabel: "Vinylboden berechnen",
     regionalMode: "service",
   },
   "parkett-verlegen-kosten-pro-qm": {
     serviceSlugs: ["bodenleger", "estrich"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "bodenleger", itemSlug: "parkett-verlegen-inkl-material" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "bodenleger",
+      itemSlug: "parkett-verlegen-inkl-material",
+    }),
     calculatorLabel: "Parkett verlegen berechnen",
     regionalMode: "service",
   },
   "laminat-verlegen-kosten-pro-qm": {
     serviceSlugs: ["bodenleger", "estrich"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "bodenleger", itemSlug: "laminat-verlegen" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "bodenleger",
+      itemSlug: "laminat-verlegen",
+    }),
     calculatorLabel: "Laminat verlegen berechnen",
     regionalMode: "service",
   },
   "boden-sanieren-kosten-pro-qm": {
     serviceSlugs: ["bodenleger", "estrich"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "bodenleger", itemSlug: "boden-sanierung-alt-raus-neu-rein" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "bodenleger",
+      itemSlug: "boden-sanierung-alt-raus-neu-rein",
+    }),
     calculatorLabel: "Bodensanierung berechnen",
     regionalMode: "service",
   },
   "parkett-abschleifen-kosten": {
     serviceSlugs: ["bodenleger"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "bodenleger", itemSlug: "parkett-abschleifen-und-oelen" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "bodenleger",
+      itemSlug: "parkett-abschleifen-und-oelen",
+    }),
     calculatorLabel: "Parkett abschleifen berechnen",
     regionalMode: "service",
   },
@@ -200,19 +285,28 @@ const bodenGuideSilos: Record<string, GuideSilo> = {
 const trockenbauGuideSilos: Record<string, GuideSilo> = {
   "trockenbau-kosten-pro-qm": {
     serviceSlugs: ["trockenbau", "maler"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "trockenbau", itemSlug: "trockenbauwand-beidseitig-beplankt" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "trockenbau",
+      itemSlug: "trockenbauwand-beidseitig-beplankt",
+    }),
     calculatorLabel: "Trockenbaukosten berechnen",
     regionalMode: "service",
   },
   "trockenbauwand-kosten-pro-qm": {
     serviceSlugs: ["trockenbau", "maler"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "trockenbau", itemSlug: "trockenbauwand-beidseitig-beplankt" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "trockenbau",
+      itemSlug: "trockenbauwand-beidseitig-beplankt",
+    }),
     calculatorLabel: "Trockenbauwand berechnen",
     regionalMode: "service",
   },
   "verspachtelung-q4-kosten-pro-qm": {
     serviceSlugs: ["trockenbau", "maler"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "trockenbau", itemSlug: "verspachtelung-q4" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "trockenbau",
+      itemSlug: "verspachtelung-q4",
+    }),
     calculatorLabel: "Verspachtelung Q4 berechnen",
     regionalMode: "service",
   },
@@ -221,37 +315,55 @@ const trockenbauGuideSilos: Record<string, GuideSilo> = {
 const photovoltaikGuideSilos: Record<string, GuideSilo> = {
   "photovoltaik-kosten-2026": {
     serviceSlugs: ["photovoltaik", "dachsanierung", "elektriker"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "photovoltaik", itemSlug: "pv-anlage-10-kwp-inkl-installation" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "photovoltaik",
+      itemSlug: "pv-anlage-10-kwp-inkl-installation",
+    }),
     calculatorLabel: "Photovoltaik 10 kWp berechnen",
     regionalMode: "service",
   },
   "photovoltaik-5-kwp-kosten": {
     serviceSlugs: ["photovoltaik", "dachsanierung", "elektriker"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "photovoltaik", itemSlug: "pv-anlage-5-kwp-inkl-installation" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "photovoltaik",
+      itemSlug: "pv-anlage-5-kwp-inkl-installation",
+    }),
     calculatorLabel: "Photovoltaik 5 kWp berechnen",
     regionalMode: "service",
   },
   "photovoltaik-10-kwp-kosten": {
     serviceSlugs: ["photovoltaik", "dachsanierung", "elektriker"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "photovoltaik", itemSlug: "pv-anlage-10-kwp-inkl-installation" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "photovoltaik",
+      itemSlug: "pv-anlage-10-kwp-inkl-installation",
+    }),
     calculatorLabel: "Photovoltaik 10 kWp berechnen",
     regionalMode: "service",
   },
   "photovoltaik-15-kwp-kosten": {
     serviceSlugs: ["photovoltaik", "dachsanierung", "elektriker"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "photovoltaik", itemSlug: "pv-anlage-15-kwp-inkl-installation" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "photovoltaik",
+      itemSlug: "pv-anlage-15-kwp-inkl-installation",
+    }),
     calculatorLabel: "Photovoltaik 15 kWp berechnen",
     regionalMode: "service",
   },
   "photovoltaik-mit-speicher-kosten": {
     serviceSlugs: ["photovoltaik", "elektriker"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "photovoltaik", itemSlug: "10-kwp-pv-ca-10-kwh-speicher" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "photovoltaik",
+      itemSlug: "10-kwp-pv-ca-10-kwh-speicher",
+    }),
     calculatorLabel: "PV-Anlage mit Speicher berechnen",
     regionalMode: "service",
   },
   "stromspeicher-kosten-pro-kwh": {
     serviceSlugs: ["photovoltaik", "elektriker"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "photovoltaik", itemSlug: "stromspeicher-lfp" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "photovoltaik",
+      itemSlug: "stromspeicher-lfp",
+    }),
     calculatorLabel: "Stromspeicher berechnen",
     regionalMode: "service",
   },
@@ -260,19 +372,28 @@ const photovoltaikGuideSilos: Record<string, GuideSilo> = {
 const waermepumpeGuideSilos: Record<string, GuideSilo> = {
   "waermepumpe-kosten-2026": {
     serviceSlugs: ["waermepumpe", "heizung", "elektriker"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "waermepumpe", itemSlug: "luft-wasser-waermepumpe-komplett" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "waermepumpe",
+      itemSlug: "luft-wasser-waermepumpe-komplett",
+    }),
     calculatorLabel: "Wärmepumpe berechnen",
     regionalMode: "service",
   },
   "luft-wasser-waermepumpe-kosten": {
     serviceSlugs: ["waermepumpe", "heizung", "elektriker"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "waermepumpe", itemSlug: "luft-wasser-waermepumpe-komplett" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "waermepumpe",
+      itemSlug: "luft-wasser-waermepumpe-komplett",
+    }),
     calculatorLabel: "Luft-Wasser-Wärmepumpe berechnen",
     regionalMode: "service",
   },
   "waermepumpe-wartung-kosten": {
     serviceSlugs: ["waermepumpe", "heizung"],
-    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "waermepumpe", itemSlug: "wartung-waermepumpe" }),
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "waermepumpe",
+      itemSlug: "wartung-waermepumpe",
+    }),
     calculatorLabel: "Wärmepumpen-Wartung berechnen",
     regionalMode: "service",
   },
