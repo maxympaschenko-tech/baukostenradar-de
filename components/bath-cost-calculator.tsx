@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { getService, regions } from "@/lib/pricing";
 
 function euro(value: number) {
@@ -16,21 +16,13 @@ function safeArea(value: number) {
   return Math.min(40, Math.max(2, Number.isFinite(value) ? value : 8));
 }
 
-export function BathCostCalculator() {
+export function BathCostCalculator({ initialArea = 8 }: { initialArea?: number }) {
   const service = getService("badsanierung");
   const squareMeterItem = service?.priceItems.find((item) => item.name === "Bad-Neubau / Sanierung");
   const wholeBathItem = service?.priceItems.find((item) => item.name === "Bad-Sanierung komplett");
 
-  const [area, setArea] = useState(8);
+  const [area, setArea] = useState(() => safeArea(initialArea));
   const [regionValue, setRegionValue] = useState("de");
-
-  useEffect(() => {
-    const rawArea = new URLSearchParams(window.location.search).get("flaeche");
-    if (!rawArea) return;
-    const parsedArea = Number(rawArea.replace(",", "."));
-    if (!Number.isFinite(parsedArea)) return;
-    setArea(safeArea(parsedArea));
-  }, []);
 
   const result = useMemo(() => {
     const normalizedArea = safeArea(area);
