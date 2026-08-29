@@ -1,0 +1,119 @@
+name: Verify Trockenbau pricing expansion
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-trockenbau-pricing:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Trockenbau pages and source catalog
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch_with_retry() {
+            local url="$1"
+            local output="$2"
+            for i in 1 2 3 4 5; do
+              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then
+                return 0
+              fi
+              if [[ "$i" == "5" ]]; then
+                return 1
+              fi
+              sleep 4
+            done
+          }
+
+          fetch_with_retry 'https://baukostenradar.de/kosten/trockenbau' /tmp/trockenbau.html
+          fetch_with_retry 'https://baukostenradar.de/kosten/trockenbau/muenchen' /tmp/trockenbau-muenchen.html
+          fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
+          fetch_with_retry 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+
+      - name: Verify expanded source-backed Trockenbau data
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python - <<'PY'
+          import re
+          from html.parser import HTMLParser
+
+          class TextParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.parts = []
+
+              def handle_data(self, data):
+                  value = data.strip()
+                  if value:
+                      self.parts.append(value)
+
+          def text(path):
+              parser = TextParser()
+              with open(path, encoding='utf-8') as handle:
+                  parser.feed(handle.read())
+              return re.sub(r'\s+', ' ', ' '.join(parser.parts))
+
+          trockenbau = text('/tmp/trockenbau.html')
+          muenchen = text('/tmp/trockenbau-muenchen.html')
+          quellen = text('/tmp/quellen.html')
+          with open('/tmp/sitemap.xml', encoding='utf-8') as handle:
+              sitemap = handle.read()
+
+          expected_main = (
+              '12 Preispositionen',
+              '4 geprüfte Quellen',
+              'Trockenbauwand einfach inkl. Material',
+              'Trennwand aus Holz',
+              'Vorsatzschale',
+              'Decke abhängen',
+              'Dachschräge verkleiden',
+              'Verspachtelung Q3',
+              'Verspachtelung Q4',
+              'Trockenbauer Stundensatz',
+              'Spanndecke',
+              'Blauarbeit - Trockenbau Preise 2026',
+              'Aroundhome - Trockenbau Kosten 2026',
+          )
+          for needle in expected_main:
+              if needle not in trockenbau:
+                  raise SystemExit(f'Missing Trockenbau production signal: {needle}')
+
+          expected_city = (
+              'Trockenbau Kosten in München 2026',
+              'Trockenbauwand einfach inkl. Material',
+              'Decke abhängen',
+              'Dachschräge verkleiden',
+              'Verspachtelung Q3',
+              'Trockenbauer Stundensatz',
+          )
+          for needle in expected_city:
+              if needle not in muenchen:
+                  raise SystemExit(f'Missing München Trockenbau production signal: {needle}')
+
+          for needle in (
+              'Blauarbeit - Trockenbau Preise 2026',
+              'Aroundhome - Trockenbau Kosten 2026',
+          ):
+              if needle not in quellen:
+                  raise SystemExit(f'Missing Trockenbau source in central source catalog: {needle}')
+
+          sitemap_needles = (
+              '/kosten/trockenbau/leistung/trockenbauwand-einfach-inkl-material',
+              '/kosten/trockenbau/leistung/trennwand-aus-holz',
+              '/kosten/trockenbau/leistung/vorsatzschale',
+              '/kosten/trockenbau/leistung/decke-abhaengen',
+              '/kosten/trockenbau/leistung/dachschraege-verkleiden',
+              '/kosten/trockenbau/leistung/verspachtelung-q3',
+              '/kosten/trockenbau/leistung/spanndecke',
+          )
+          for needle in sitemap_needles:
+              if needle not in sitemap:
+                  raise SystemExit(f'Missing Trockenbau detail URL in sitemap: {needle}')
+          PY

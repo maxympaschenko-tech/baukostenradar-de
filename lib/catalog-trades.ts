@@ -39,6 +39,16 @@ export const priceSources = {
     url: "https://www.aroundhome.de/bodenverlegung/vinyl-verlegen-kosten/",
     checkedAt: "29.08.2026",
   },
+  blauarbeitTrockenbau: {
+    name: "Blauarbeit - Trockenbau Preise 2026",
+    url: "https://ratgeber.blauarbeit.de/kosten-preise/trockenbau-preise",
+    checkedAt: "29.08.2026",
+  },
+  aroundhomeTrockenbau: {
+    name: "Aroundhome - Trockenbau Kosten 2026",
+    url: "https://www.aroundhome.de/trockenbau-innenausbau/preise-kosten/",
+    checkedAt: "29.08.2026",
+  },
 } as const;
 
 type TradeSourceKey = keyof typeof priceSources;
@@ -264,6 +274,98 @@ export const services: Service[] = commercialServices.map((service) => {
           unit: "pro m²",
           note: "Spachteln und Ausgleichen vor der Verlegung; Schäden und Unebenheiten können den Aufwand erhöhen",
           sourceKey: "aroundhomeVinyl",
+        },
+      ],
+    };
+  }
+
+  if (service.slug === "trockenbau") {
+    const refreshedPriceItems: PriceItem[] = commercialService.priceItems.map((item) => {
+      if (item.name === "Verspachtelung Q4") {
+        return {
+          ...item,
+          low: 10,
+          high: 20,
+          unit: "pro m²",
+          note: "Aktualisierter Richtwert 2026 für hochwertige Q4-Spachtelung",
+          sourceKey: "blauarbeitTrockenbau",
+        };
+      }
+
+      if (item.name === "Trockenbauer Stundensatz") {
+        return {
+          ...item,
+          low: 45,
+          high: 70,
+          unit: "pro Stunde",
+          note: "Aktueller 2026-Richtwert; Region, Spezialisierung und Auftragsgröße beeinflussen den Verrechnungssatz",
+          sourceKey: "blauarbeitTrockenbau",
+        };
+      }
+
+      return item;
+    });
+
+    return {
+      ...commercialService,
+      description: "Aktuelle Richtwerte für Trockenbauwände, Ständerwände, abgehängte Decken, Vorsatzschalen, Dachschrägen, Spachtelarbeiten und Trockenbauer-Stundensätze in Deutschland.",
+      priceItems: [
+        ...refreshedPriceItems,
+        {
+          name: "Trockenbauwand einfach inkl. Material",
+          low: 35,
+          high: 75,
+          unit: "pro m²",
+          note: "Einfache Gipskarton-Trennwand; Türen, Sonderanforderungen und Malerarbeiten können zusätzlich anfallen",
+          sourceKey: "aroundhomeTrockenbau",
+        },
+        {
+          name: "Trennwand aus Holz",
+          low: 50,
+          high: 90,
+          unit: "pro m² inkl. Material",
+          note: "Richtwert für eine Trockenbau-Trennwand mit Holzkonstruktion",
+          sourceKey: "blauarbeitTrockenbau",
+        },
+        {
+          name: "Vorsatzschale",
+          low: 30,
+          high: 60,
+          unit: "pro m² inkl. Material",
+          note: "Für das Verkleiden unebener Wände, Leitungsführung sowie zusätzlichen Schall- oder Wärmeschutz",
+          sourceKey: "blauarbeitTrockenbau",
+        },
+        {
+          name: "Decke abhängen",
+          low: 40,
+          high: 90,
+          unit: "pro m² inkl. Material",
+          note: "Standard-Trockenbaudecke; Dämmung, Spots und Sonderkonstruktionen können den Preis erhöhen",
+          sourceKey: "blauarbeitTrockenbau",
+        },
+        {
+          name: "Dachschräge verkleiden",
+          low: 40,
+          high: 80,
+          unit: "pro m² inkl. Material",
+          note: "Trockenbau-Verkleidung von Dachschrägen inklusive üblicher Montage",
+          sourceKey: "blauarbeitTrockenbau",
+        },
+        {
+          name: "Verspachtelung Q3",
+          low: 8,
+          high: 15,
+          unit: "pro m²",
+          note: "Qualitätsstufe Q3 für erhöhte optische Anforderungen",
+          sourceKey: "blauarbeitTrockenbau",
+        },
+        {
+          name: "Spanndecke",
+          low: 120,
+          high: 130,
+          unit: "pro m² inkl. Montage",
+          note: "Orientierungswert für eine typische Spanndecke; Design-, Licht- und Akustikvarianten können höher liegen",
+          sourceKey: "blauarbeitTrockenbau",
         },
       ],
     };
