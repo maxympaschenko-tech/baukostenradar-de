@@ -1,0 +1,115 @@
+name: Verify Fassade pricing expansion
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-fassade-pricing:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Fassade pages and source catalog
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch_with_retry() {
+            local url="$1"
+            local output="$2"
+            for i in 1 2 3 4 5; do
+              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then
+                return 0
+              fi
+              if [[ "$i" == "5" ]]; then
+                return 1
+              fi
+              sleep 4
+            done
+          }
+
+          fetch_with_retry 'https://baukostenradar.de/kosten/fassade' /tmp/fassade.html
+          fetch_with_retry 'https://baukostenradar.de/kosten/fassade/muenchen' /tmp/fassade-muenchen.html
+          fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
+          fetch_with_retry 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+
+      - name: Verify expanded source-backed Fassade data
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python - <<'PY'
+          import re
+          from html.parser import HTMLParser
+
+          class TextParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.parts = []
+
+              def handle_data(self, data):
+                  value = data.strip()
+                  if value:
+                      self.parts.append(value)
+
+          def text(path):
+              parser = TextParser()
+              with open(path, encoding='utf-8') as handle:
+                  parser.feed(handle.read())
+              return re.sub(r'\s+', ' ', ' '.join(parser.parts))
+
+          fassade = text('/tmp/fassade.html')
+          muenchen = text('/tmp/fassade-muenchen.html')
+          quellen = text('/tmp/quellen.html')
+          with open('/tmp/sitemap.xml', encoding='utf-8') as handle:
+              sitemap = handle.read()
+
+          expected_main = (
+              '14 Preispositionen',
+              '5 geprüfte Quellen',
+              'Fassadengerüst aufstellen & mieten',
+              'Fassadenreinigung mit Hochdruck',
+              'Algen- und Pilzbehandlung Fassade',
+              'Fassade grundieren',
+              'Zweifacher Fassadenanstrich',
+              'Putzabplatzungen ausbessern',
+              'Kerndämmung / Einblasdämmung Fassade',
+              'WDVS Fassadendämmung',
+              'Aroundhome - Fassadenanstrich Kosten 2026',
+              'co2online - Fassadendämmung Kosten',
+          )
+          for needle in expected_main:
+              if needle not in fassade:
+                  raise SystemExit(f'Missing Fassade production signal: {needle}')
+
+          expected_city = (
+              'Fassade Kosten in München 2026',
+              'Fassadenreinigung mit Hochdruck',
+              'Fassade grundieren',
+              'Zweifacher Fassadenanstrich',
+              'Kerndämmung / Einblasdämmung Fassade',
+              'WDVS Fassadendämmung',
+          )
+          for needle in expected_city:
+              if needle not in muenchen:
+                  raise SystemExit(f'Missing München Fassade production signal: {needle}')
+
+          for source_name in (
+              'Aroundhome - Fassadenanstrich Kosten 2026',
+              'co2online - Fassadendämmung Kosten',
+          ):
+              if source_name not in quellen:
+                  raise SystemExit(f'Missing Fassade source in central source catalog: {source_name}')
+
+          sitemap_needles = (
+              '/kosten/fassade/leistung/fassadengeruest-aufstellen-mieten',
+              '/kosten/fassade/leistung/fassadenreinigung-mit-hochdruck',
+              '/kosten/fassade/leistung/kerndaemmung-einblasdaemmung-fassade',
+              '/kosten/fassade/leistung/wdvs-fassadendaemmung',
+          )
+          for needle in sitemap_needles:
+              if needle not in sitemap:
+                  raise SystemExit(f'Missing Fassade detail URL in sitemap: {needle}')
+          PY
