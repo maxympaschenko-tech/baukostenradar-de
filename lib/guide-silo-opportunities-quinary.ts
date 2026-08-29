@@ -61,6 +61,24 @@ export const quinaryOpportunitySilos: Record<string, OpportunitySiloConfig> = {
     itemSlug: "sanitaerobjekte-armaturen-fuer-8-m2-bad",
     calculatorLabel: "Sanitärkosten berechnen",
   },
+  "kellerabdichtung-aussen-oder-innen-kosten": {
+    serviceSlugs: ["kellerabdichtung", "daemmung"],
+    serviceSlug: "kellerabdichtung",
+    itemSlug: "kellerabdichtung-aussen-inkl-aushub",
+    calculatorLabel: "Kellerabdichtung berechnen",
+  },
+  "kellerabdichtung-aussen-kosten-pro-qm": {
+    serviceSlugs: ["kellerabdichtung", "daemmung"],
+    serviceSlug: "kellerabdichtung",
+    itemSlug: "kellerabdichtung-aussen-inkl-aushub",
+    calculatorLabel: "Außenabdichtung berechnen",
+  },
+  "kellerabdichtung-innen-kosten-pro-qm": {
+    serviceSlugs: ["kellerabdichtung"],
+    serviceSlug: "kellerabdichtung",
+    itemSlug: "kellerabdichtung-innen",
+    calculatorLabel: "Innenabdichtung berechnen",
+  },
   "zementestrich-kosten-pro-qm": {
     serviceSlugs: ["estrich", "bodenleger"],
     serviceSlug: "estrich",
