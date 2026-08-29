@@ -1,0 +1,95 @@
+name: Verify renovation area guide cluster
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-renovation-area-guide-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify renovation area guides and full peer silo
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+
+          guides=(
+            wohnung-renovieren-kosten
+            renovierungskosten-haus
+            renovierungskosten-100-qm
+            haus-renovieren-150-qm-kosten
+            haus-renovieren-200-qm-kosten
+          )
+
+          for source in "${guides[@]}"; do
+            guide_url="https://baukostenradar.de/ratgeber/${source}"
+            guide_html="/tmp/${source}.html"
+
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Renovation guide missing in sitemap: ${source}"; exit 1; }
+            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Renovation guide missing from hub: ${source}"; exit 1; }
+
+            fetch "$guide_url" "$guide_html"
+            grep -q "$guide_url" "$guide_html"
+            grep -q '"@type":"Article"' "$guide_html"
+            grep -q '/rechner/renovierungskosten' "$guide_html"
+            grep -q '/staedte/berlin' "$guide_html"
+            grep -q '/kosten/badsanierung/berlin' "$guide_html"
+            ! grep -qi 'noindex' "$guide_html"
+
+            for target in "${guides[@]}"; do
+              [ "$source" = "$target" ] && continue
+              grep -q "/ratgeber/${target}" "$guide_html" || { echo "${source} missing renovation peer ${target}"; exit 1; }
+            done
+          done
+
+          echo 'Verified renovation area hub visibility and full five-guide peer silo'
+
+      - name: Verify 100, 150 and 200 m² calculator scenario links
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          scenarios=$(cat <<'EOF'
+          renovierungskosten-100-qm|100
+          haus-renovieren-150-qm-kosten|150
+          haus-renovieren-200-qm-kosten|200
+          EOF
+          )
+
+          checked=0
+          while IFS='|' read -r guide area; do
+            guide="${guide#${guide%%[![:space:]]*}}"
+            [ -n "$guide" ] || continue
+
+            guide_html="/tmp/renovation-${guide}.html"
+            calculator_html="/tmp/renovation-calculator-${area}.html"
+            calculator_url="https://baukostenradar.de/rechner/renovierungskosten?flaeche=${area}"
+
+            fetch "https://baukostenradar.de/ratgeber/${guide}" "$guide_html"
+            grep -q "/rechner/renovierungskosten?flaeche=${area}" "$guide_html" || { echo "Missing ${area} m² calculator link on ${guide}"; exit 1; }
+
+            fetch "$calculator_url" "$calculator_html"
+            grep -q 'Renovierungskosten Rechner 2026' "$calculator_html"
+            grep -Eq "value=.?${area}.?" "$calculator_html" || { echo "Calculator did not preload ${area} m²"; exit 1; }
+            grep -q 'href="/rechner/renovierungskosten"' "$calculator_html" || grep -q 'https://baukostenradar.de/rechner/renovierungskosten' "$calculator_html"
+            ! grep -qi 'noindex' "$calculator_html"
+
+            checked=$((checked + 1))
+          done <<< "$scenarios"
+
+          test "$checked" -eq 3
+          echo "Verified ${checked} renovation area calculator presets"
