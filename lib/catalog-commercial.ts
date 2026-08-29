@@ -24,6 +24,16 @@ export const priceSources = {
     url: "https://www.co2online.de/modernisieren-und-bauen/daemmung/uebersicht-fassadendaemmung/",
     checkedAt: "29.08.2026",
   },
+  blauarbeitBad: {
+    name: "Blauarbeit - Badsanierung Kosten 2026",
+    url: "https://ratgeber.blauarbeit.de/kosten-preise/badsanierung-kosten",
+    checkedAt: "29.08.2026",
+  },
+  aroundhomeBadCommercial: {
+    name: "Aroundhome - Badsanierung Preise & Kosten 2026",
+    url: "https://www.aroundhome.de/badezimmer/preise-kosten/",
+    checkedAt: "29.08.2026",
+  },
 } as const;
 
 type CommercialSourceKey = keyof typeof priceSources;
@@ -174,6 +184,86 @@ export const services: Service[] = catalogServices.map((service) => {
           unit: "pro m²",
           note: "Wärmedämmverbundsystem inklusive Dämmstoff und Montage laut Quellenorientierung",
           sourceKey: "co2Fassadendaemmung",
+        },
+      ],
+    };
+  }
+
+  if (service.slug === "badsanierung") {
+    const refreshedPriceItems: PriceItem[] = catalogService.priceItems.map((item) => {
+      if (item.name === "Bad-Teilsanierung") {
+        return {
+          ...item,
+          low: 3000,
+          high: 8000,
+          unit: "pro Bad",
+          note: "Teilsanierung mit Austausch typischer Sanitärobjekte bei erhaltenen Fliesen und Leitungen",
+          sourceKey: "blauarbeitBad",
+        };
+      }
+      return item;
+    });
+
+    return {
+      ...catalogService,
+      description: "Aktuelle Richtwerte 2026 für komplette und teilweise Badsanierung, Kosten pro Quadratmeter, 6-, 8- und 10-m²-Bäder sowie barrierefreie Modernisierung in Deutschland.",
+      priceItems: [
+        ...refreshedPriceItems,
+        {
+          name: "Badsanierung komplett Standard",
+          low: 3000,
+          high: 4000,
+          unit: "pro m² Badfläche",
+          note: "Komplettsanierung inklusive üblicher Gewerke; Standardausstattung laut Blauarbeit 2026",
+          sourceKey: "blauarbeitBad",
+        },
+        {
+          name: "Badsanierung komplett gehoben",
+          low: 4000,
+          high: 5000,
+          unit: "pro m² Badfläche",
+          note: "Komplettsanierung mit gehobener Ausstattung laut Blauarbeit 2026",
+          sourceKey: "blauarbeitBad",
+        },
+        {
+          name: "Badsanierung barrierefrei",
+          low: 3500,
+          high: 5500,
+          unit: "pro m² Badfläche",
+          note: "Orientierung für barrierefreie Komplettsanierung mit bodengleicher Dusche und angepasster Ausstattung",
+          sourceKey: "blauarbeitBad",
+        },
+        {
+          name: "Bad 6 m² komplett sanieren",
+          low: 18000,
+          high: 30000,
+          unit: "pro Bad",
+          note: "Gesamtrichtwert aus 3.000–5.000 € pro m² für ein typisches 6-m²-Bad",
+          sourceKey: "blauarbeitBad",
+        },
+        {
+          name: "Bad 8 m² komplett sanieren",
+          low: 9600,
+          high: 28000,
+          unit: "pro Bad",
+          note: "Breiter Markt-Richtwert nach Ausstattungsniveau; Aroundhome nennt für 8 m² etwa 9.600–28.000 €",
+          sourceKey: "aroundhomeBadCommercial",
+        },
+        {
+          name: "Bad 10 m² komplett sanieren",
+          low: 12000,
+          high: 35000,
+          unit: "pro Bad",
+          note: "Breiter Markt-Richtwert nach Ausstattungsniveau; Aroundhome nennt für 10 m² etwa 12.000–35.000 €",
+          sourceKey: "aroundhomeBadCommercial",
+        },
+        {
+          name: "Bodengleiche Dusche komplett",
+          low: 1500,
+          high: 3500,
+          unit: "pro Dusche",
+          note: "Material und Einbau; gehobene Ausführung kann laut Quelle bis etwa 6.000 € reichen",
+          sourceKey: "blauarbeitBad",
         },
       ],
     };
