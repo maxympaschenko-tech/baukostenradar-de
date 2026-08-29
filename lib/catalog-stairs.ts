@@ -19,6 +19,21 @@ export const priceSources = {
     url: "https://www.my-hammer.de/bauen-renovieren/preisradar/was-kostet-holztreppe-sanieren",
     checkedAt: "29.08.2026",
   },
+  blauarbeitKuechenmontage: {
+    name: "Blauarbeit - Küchenmontage Kosten 2026",
+    url: "https://ratgeber.blauarbeit.de/kosten-preise/kueche-montieren-kosten",
+    checkedAt: "29.08.2026",
+  },
+  blauarbeitKuechensanierung: {
+    name: "Blauarbeit - Küchensanierung Kosten 2026",
+    url: "https://ratgeber.blauarbeit.de/kueche/was-kostet-eine-kuechensanierung-kosten-beispiele-und-einflussfaktoren",
+    checkedAt: "29.08.2026",
+  },
+  myhammerKuechenmontage: {
+    name: "MyHammer - Küche einbauen Kosten 2026",
+    url: "https://www.my-hammer.de/kueche/preisradar/was-kostet-kueche-einbauen",
+    checkedAt: "29.08.2026",
+  },
 } as const;
 
 type StairsSourceKey = keyof typeof priceSources;
@@ -145,6 +160,106 @@ export const services: Service[] = demolitionServices.map((service) => {
           unit: "pro Treppe",
           note: "Material und Arbeitskosten für einen typischen Handlauf",
           sourceKey: "myhammerHolztreppe",
+        },
+      ],
+    };
+  }
+
+  if (service.slug === "kueche") {
+    return {
+      ...demolitionService,
+      description: "Aktuelle Richtwerte 2026 für Küchensanierung, Küchenmontage, Demontage der Altküche, Küchenzeilen, L-Küchen, Kochinseln sowie kleine, mittlere und große Küchen in Deutschland.",
+      priceItems: [
+        ...demolitionService.priceItems,
+        {
+          name: "Küchensanierung Teilsanierung",
+          low: 5000,
+          high: 10000,
+          unit: "pro Küche",
+          note: "Typisch bei Erneuerung einzelner Elemente wie Fronten, Arbeitsplatte, Spüle oder Armaturen",
+          sourceKey: "blauarbeitKuechensanierung",
+        },
+        {
+          name: "Küchensanierung komplett",
+          low: 10000,
+          high: 25000,
+          unit: "pro Küche",
+          note: "Komplette Modernisierung mit neuen Möbeln, Geräten, Anschlüssen und Montage; hochwertige Ausstattung kann darüber liegen",
+          sourceKey: "blauarbeitKuechensanierung",
+        },
+        {
+          name: "Kleine Küche bis 8 m² sanieren",
+          low: 5000,
+          high: 12000,
+          unit: "pro Küche",
+          sourceKey: "blauarbeitKuechensanierung",
+        },
+        {
+          name: "Mittlere Küche 8 bis 15 m² sanieren",
+          low: 10000,
+          high: 20000,
+          unit: "pro Küche",
+          sourceKey: "blauarbeitKuechensanierung",
+        },
+        {
+          name: "Große Küche ab 15 m² sanieren",
+          low: 15000,
+          high: 25000,
+          unit: "pro Küche",
+          sourceKey: "blauarbeitKuechensanierung",
+        },
+        {
+          name: "Küchenmontage je laufendem Meter",
+          low: 150,
+          high: 250,
+          unit: "pro lfd. Meter",
+          note: "Richtwert für reine Montage; MyHammer nennt je nach Auftrag auch bis etwa 300 € pro laufendem Meter",
+          sourceKey: "blauarbeitKuechenmontage",
+        },
+        {
+          name: "Küchenzeile bis 3 m montieren",
+          low: 400,
+          high: 700,
+          unit: "pro Küche",
+          sourceKey: "blauarbeitKuechenmontage",
+        },
+        {
+          name: "Standardküche 3 bis 5 m oder L-Form montieren",
+          low: 500,
+          high: 1100,
+          unit: "pro Küche",
+          sourceKey: "blauarbeitKuechenmontage",
+        },
+        {
+          name: "Große Küche mit Kochinsel montieren",
+          low: 1000,
+          high: 1500,
+          unit: "pro Küche",
+          sourceKey: "blauarbeitKuechenmontage",
+        },
+        {
+          name: "Altküche demontieren und entsorgen",
+          low: 150,
+          high: 400,
+          unit: "pro Küche",
+          note: "Richtwert für Demontage und Entsorgung vor der neuen Küchenmontage",
+          sourceKey: "blauarbeitKuechenmontage",
+        },
+        {
+          name: "Herd und Kochfeld elektrisch anschließen",
+          low: 100,
+          high: 200,
+          unit: "pro Anschluss",
+          note: "Starkstromanschluss durch eine Elektrofachkraft; nicht automatisch in der Küchenmontage enthalten",
+          sourceKey: "blauarbeitKuechenmontage",
+        },
+        {
+          name: "Küchenmontage MyHammer Richtwert",
+          low: 150,
+          high: 300,
+          unit: "pro lfd. Meter",
+          note: "Zusätzlicher Marktvergleich für reine professionelle Montage",
+          sourceKey: "myhammerKuechenmontage",
         },
       ],
     };
