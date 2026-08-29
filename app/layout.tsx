@@ -48,7 +48,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     "@type": "Organization",
     "@id": `${siteUrl}/#organization`,
     name: siteConfig.name,
+    description: siteConfig.description,
     url: `${siteUrl}/`,
+    logo: {
+      "@type": "ImageObject",
+      url: `${siteUrl}/baukostenradar-logo.svg`,
+      contentUrl: `${siteUrl}/baukostenradar-logo.svg`,
+      width: 512,
+      height: 512,
+    },
     email: siteConfig.email,
     contactPoint: {
       "@type": "ContactPoint",
