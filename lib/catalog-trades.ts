@@ -24,6 +24,11 @@ export const priceSources = {
     url: "https://ratgeber.blauarbeit.de/kosten-preise/maler-stundenlohn",
     checkedAt: "29.08.2026",
   },
+  blauarbeitFliesen: {
+    name: "Blauarbeit - Fliesen verlegen Kosten 2026",
+    url: "https://ratgeber.blauarbeit.de/kosten-preise/fliesenlegen",
+    checkedAt: "29.08.2026",
+  },
 } as const;
 
 type TradeSourceKey = keyof typeof priceSources;
@@ -126,6 +131,56 @@ export const services: Service[] = commercialServices.map((service) => {
           unit: "pro Fensterrahmen",
           note: "Faustwert für Schleifen, Vorbereiten und Lackieren; alte Lackschichten oder Schäden erhöhen den Aufwand",
           sourceKey: "blauarbeitMaler",
+        },
+      ],
+    };
+  }
+
+  if (service.slug === "fliesenleger") {
+    return {
+      ...commercialService,
+      description: "Aktuelle Richtwerte für Fliesenleger-Stundensätze, Überfliesen, Untergrundvorbereitung, Silikonfugen, Sockelleisten und typische Fliesenarbeiten in Deutschland.",
+      priceItems: [
+        ...commercialService.priceItems,
+        {
+          name: "Fliese auf Fliese verlegen",
+          low: 50,
+          high: 80,
+          unit: "pro m²",
+          note: "Überfliesen auf tragfähigem Altbelag; Aufbauhöhe und Zustand des vorhandenen Belags beeinflussen den Aufwand",
+          sourceKey: "blauarbeitFliesen",
+        },
+        {
+          name: "Untergrund ausgleichen",
+          low: 10,
+          high: 30,
+          unit: "pro m²",
+          note: "Zusätzliche Vorarbeit bei unebenen Böden oder Wänden vor der Verlegung",
+          sourceKey: "blauarbeitFliesen",
+        },
+        {
+          name: "Silikonfugen ziehen",
+          low: 3,
+          high: 8,
+          unit: "pro lfd. Meter",
+          note: "Richtwert für Dehnungsfugen an Wandanschlüssen und Ecken",
+          sourceKey: "blauarbeitFliesen",
+        },
+        {
+          name: "Fliesen-Sockelleisten anbringen",
+          low: 5,
+          high: 10,
+          unit: "pro lfd. Meter",
+          note: "Arbeitsrichtwert je nach Material, Zuschnitt und Raumgeometrie",
+          sourceKey: "blauarbeitFliesen",
+        },
+        {
+          name: "Fliesenleger Stundensatz",
+          low: 45,
+          high: 70,
+          unit: "pro Stunde",
+          note: "Typischer Richtwert 2026; viele Fliesenarbeiten werden dennoch nach Quadratmetern kalkuliert",
+          sourceKey: "blauarbeitFliesen",
         },
       ],
     };

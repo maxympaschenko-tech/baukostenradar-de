@@ -1,0 +1,108 @@
+name: Verify Fliesenleger pricing expansion
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-fliesenleger-pricing:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Fliesenleger pages and source catalog
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch_with_retry() {
+            local url="$1"
+            local output="$2"
+            for i in 1 2 3 4 5; do
+              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then
+                return 0
+              fi
+              if [[ "$i" == "5" ]]; then
+                return 1
+              fi
+              sleep 4
+            done
+          }
+
+          fetch_with_retry 'https://baukostenradar.de/kosten/fliesenleger' /tmp/fliesenleger.html
+          fetch_with_retry 'https://baukostenradar.de/kosten/fliesenleger/muenchen' /tmp/fliesenleger-muenchen.html
+          fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
+          fetch_with_retry 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+
+      - name: Verify expanded source-backed Fliesenleger data
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python - <<'PY'
+          import re
+          from html.parser import HTMLParser
+
+          class TextParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.parts = []
+
+              def handle_data(self, data):
+                  value = data.strip()
+                  if value:
+                      self.parts.append(value)
+
+          def text(path):
+              parser = TextParser()
+              with open(path, encoding='utf-8') as handle:
+                  parser.feed(handle.read())
+              return re.sub(r'\s+', ' ', ' '.join(parser.parts))
+
+          fliesenleger = text('/tmp/fliesenleger.html')
+          muenchen = text('/tmp/fliesenleger-muenchen.html')
+          quellen = text('/tmp/quellen.html')
+          with open('/tmp/sitemap.xml', encoding='utf-8') as handle:
+              sitemap = handle.read()
+
+          expected_main = (
+              '10 Preispositionen',
+              '2 geprüfte Quellen',
+              'Fliese auf Fliese verlegen',
+              'Untergrund ausgleichen',
+              'Silikonfugen ziehen',
+              'Fliesen-Sockelleisten anbringen',
+              'Fliesenleger Stundensatz',
+              'Blauarbeit - Fliesen verlegen Kosten 2026',
+          )
+          for needle in expected_main:
+              if needle not in fliesenleger:
+                  raise SystemExit(f'Missing Fliesenleger production signal: {needle}')
+
+          expected_city = (
+              'Fliesenleger Kosten in München 2026',
+              'Fliese auf Fliese verlegen',
+              'Untergrund ausgleichen',
+              'Silikonfugen ziehen',
+              'Fliesen-Sockelleisten anbringen',
+              'Fliesenleger Stundensatz',
+          )
+          for needle in expected_city:
+              if needle not in muenchen:
+                  raise SystemExit(f'Missing München Fliesenleger production signal: {needle}')
+
+          if 'Blauarbeit - Fliesen verlegen Kosten 2026' not in quellen:
+              raise SystemExit('Missing Fliesenleger source in central source catalog')
+
+          sitemap_needles = (
+              '/kosten/fliesenleger/leistung/fliese-auf-fliese-verlegen',
+              '/kosten/fliesenleger/leistung/untergrund-ausgleichen',
+              '/kosten/fliesenleger/leistung/silikonfugen-ziehen',
+              '/kosten/fliesenleger/leistung/fliesen-sockelleisten-anbringen',
+              '/kosten/fliesenleger/leistung/fliesenleger-stundensatz',
+          )
+          for needle in sitemap_needles:
+              if needle not in sitemap:
+                  raise SystemExit(f'Missing Fliesenleger detail URL in sitemap: {needle}')
+          PY
