@@ -51,6 +51,18 @@ const renovationAreaGuideLinks: SupplementalGuide[] = [
   { slug: "haus-renovieren-200-qm-kosten", label: "Haus renovieren 200 m²", href: "/ratgeber/haus-renovieren-200-qm-kosten" },
 ];
 
+const renovationScenarioLinks: Record<string, GuideSupplementalLink[]> = {
+  "renovierungskosten-100-qm": [
+    { label: "100 m² im Renovierungskosten-Rechner", href: "/rechner/renovierungskosten?flaeche=100" },
+  ],
+  "haus-renovieren-150-qm-kosten": [
+    { label: "150 m² im Renovierungskosten-Rechner", href: "/rechner/renovierungskosten?flaeche=150" },
+  ],
+  "haus-renovieren-200-qm-kosten": [
+    { label: "200 m² im Renovierungskosten-Rechner", href: "/rechner/renovierungskosten?flaeche=200" },
+  ],
+};
+
 const supplementalClusters = [
   sanitaerGuideLinks,
   kellerabdichtungGuideLinks,
@@ -75,7 +87,11 @@ export function withSupplementalGuideLinks(
   slug: string,
   related: GuideSupplementalLink[],
 ): GuideSupplementalLink[] {
-  const combined = [...related, ...(supplementalByGuide[slug] ?? [])];
+  const combined = [
+    ...related,
+    ...(supplementalByGuide[slug] ?? []),
+    ...(renovationScenarioLinks[slug] ?? []),
+  ];
 
   return combined.filter(
     (link, index) => combined.findIndex((candidate) => candidate.href === link.href) === index,
