@@ -34,6 +34,16 @@ export const priceSources = {
     url: "https://www.aroundhome.de/badezimmer/preise-kosten/",
     checkedAt: "29.08.2026",
   },
+  blauarbeitMauerarbeiten: {
+    name: "Blauarbeit - Mauerarbeiten Kosten 2026",
+    url: "https://ratgeber.blauarbeit.de/kosten-preise/mauerarbeiten-kosten",
+    checkedAt: "29.08.2026",
+  },
+  myhammerMauerfugen: {
+    name: "MyHammer - Mauerfugen erneuern Kosten 2026",
+    url: "https://www.my-hammer.de/bauen-renovieren/preisradar/was-kostet-fugensanierung",
+    checkedAt: "29.08.2026",
+  },
 } as const;
 
 type CommercialSourceKey = keyof typeof priceSources;
@@ -264,6 +274,80 @@ export const services: Service[] = catalogServices.map((service) => {
           unit: "pro Dusche",
           note: "Material und Einbau; gehobene Ausführung kann laut Quelle bis etwa 6.000 € reichen",
           sourceKey: "blauarbeitBad",
+        },
+      ],
+    };
+  }
+
+  if (service.slug === "maurer") {
+    const refreshedPriceItems: PriceItem[] = catalogService.priceItems.map((item) => {
+      if (item.name === "Porenbeton-Mauerwerk") {
+        return { ...item, low: 60, high: 90, sourceKey: "blauarbeitMauerarbeiten" };
+      }
+      if (item.name === "Kalksandstein-Mauerwerk") {
+        return { ...item, low: 70, high: 110, sourceKey: "blauarbeitMauerarbeiten" };
+      }
+      if (item.name === "Poroton-Mauerwerk") {
+        return { ...item, low: 80, high: 130, sourceKey: "blauarbeitMauerarbeiten" };
+      }
+      if (item.name === "Klinker-Verblendmauerwerk") {
+        return { ...item, low: 100, high: 150, sourceKey: "blauarbeitMauerarbeiten" };
+      }
+      return item;
+    });
+
+    return {
+      ...catalogService,
+      description: "Aktuelle Richtwerte 2026 für Maurer-Stundensätze, Porenbeton, Kalksandstein, Ziegel, Klinker, Fundamente, Bodenplatten, Mauerabbruch und Fugensanierung in Deutschland.",
+      priceItems: [
+        ...refreshedPriceItems,
+        {
+          name: "Bauhelfer bei Maurerarbeiten",
+          low: 30,
+          high: 45,
+          unit: "pro Stunde",
+          note: "Richtwert für Hilfsarbeiten; Einsatz und Region beeinflussen den Verrechnungssatz",
+          sourceKey: "blauarbeitMaurer",
+        },
+        {
+          name: "Streifenfundament herstellen",
+          low: 150,
+          high: 300,
+          unit: "pro m³",
+          note: "Orientierung für typische Streifenfundamente; Erdarbeiten und schwierige Bodenverhältnisse können zusätzlich anfallen",
+          sourceKey: "cleanInvoiceMaurer",
+        },
+        {
+          name: "Energetische Bodenplatte mit Dämmung",
+          low: 130,
+          high: 180,
+          unit: "pro m²",
+          note: "Richtwert für gedämmte Bodenplatte mit Frostschutz/Frostschürze gemäß Quellenorientierung",
+          sourceKey: "cleanInvoiceMaurer",
+        },
+        {
+          name: "Mauer abreißen & Bauschutt abfahren",
+          low: 20,
+          high: 50,
+          unit: "pro m²",
+          note: "Standard-Wandabbruch; tragende Wände benötigen Statik und können deutlich teurer werden",
+          sourceKey: "cleanInvoiceMaurer",
+        },
+        {
+          name: "Mauerwerksfugen erneuern Standard",
+          low: 35,
+          high: 50,
+          unit: "pro m²",
+          note: "Richtwert für Standardfugen; Gerüst und umfangreiche Materialarbeiten können separat anfallen",
+          sourceKey: "myhammerMauerfugen",
+        },
+        {
+          name: "Klinkerfugen erneuern",
+          low: 45,
+          high: 80,
+          unit: "pro m²",
+          note: "Richtwert für die Fugensanierung an Klinkermauerwerk",
+          sourceKey: "myhammerMauerfugen",
         },
       ],
     };
