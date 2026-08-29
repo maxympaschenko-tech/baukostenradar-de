@@ -51,6 +51,14 @@ const renovationAreaGuideLinks: SupplementalGuide[] = [
   { slug: "haus-renovieren-200-qm-kosten", label: "Haus renovieren 200 m²", href: "/ratgeber/haus-renovieren-200-qm-kosten" },
 ];
 
+const houseRenovationGuideLinks: SupplementalGuide[] = [
+  { slug: "sanierungskosten-pro-qm", label: "Sanierungskosten pro m²", href: "/ratgeber/sanierungskosten-pro-qm" },
+  { slug: "haus-sanieren-kosten", label: "Haus sanieren Kosten", href: "/ratgeber/haus-sanieren-kosten" },
+  { slug: "kernsanierung-kosten", label: "Kernsanierung Kosten", href: "/ratgeber/kernsanierung-kosten" },
+  { slug: "sanierungskosten-einfamilienhaus", label: "Sanierungskosten Einfamilienhaus", href: "/ratgeber/sanierungskosten-einfamilienhaus" },
+  { slug: "altbausanierung-kosten", label: "Altbausanierung Kosten", href: "/ratgeber/altbausanierung-kosten" },
+];
+
 const renovationScenarioLinks: Record<string, GuideSupplementalLink[]> = {
   "renovierungskosten-100-qm": [
     { label: "100 m² im Renovierungskosten-Rechner", href: "/rechner/renovierungskosten?flaeche=100" },
@@ -61,6 +69,9 @@ const renovationScenarioLinks: Record<string, GuideSupplementalLink[]> = {
   "haus-renovieren-200-qm-kosten": [
     { label: "200 m² im Renovierungskosten-Rechner", href: "/rechner/renovierungskosten?flaeche=200" },
   ],
+  "kernsanierung-kosten": [
+    { label: "Kernsanierung im Renovierungskosten-Rechner", href: "/rechner/renovierungskosten?umfang=core" },
+  ],
 };
 
 const supplementalClusters = [
@@ -70,6 +81,7 @@ const supplementalClusters = [
   estrichGuideLinks,
   abrissGuideLinks,
   renovationAreaGuideLinks,
+  houseRenovationGuideLinks,
 ];
 
 const supplementalByGuide: Record<string, GuideSupplementalLink[]> = Object.fromEntries(
