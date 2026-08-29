@@ -11,11 +11,42 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   const priceCount = services.reduce((sum, service) => sum + service.priceItems.length, 0);
+  const base = siteConfig.url.replace(/\/$/, "");
+  const canonicalUrl = `${base}/ueber-uns`;
+  const organizationId = `${base}/#organization`;
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Startseite", item: base },
+        { "@type": "ListItem", position: 2, name: "Über BauKostenRadar", item: canonicalUrl },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      "@id": `${canonicalUrl}#about`,
+      url: canonicalUrl,
+      name: "Über BauKostenRadar",
+      description: metadata.description,
+      isPartOf: { "@id": `${base}/#website` },
+      about: { "@id": organizationId },
+      mainEntity: { "@id": organizationId },
+    },
+  ];
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+
       <section className="contentHero">
         <div className="shell">
+          <nav className="visibleBreadcrumbs" aria-label="Breadcrumb">
+            <Link href="/">Startseite</Link>
+            <span aria-hidden="true">›</span>
+            <span aria-current="page">Über BauKostenRadar</span>
+          </nav>
           <span className="eyebrow">Über das Projekt</span>
           <h1>Über BauKostenRadar</h1>
           <p>
