@@ -1,0 +1,112 @@
+name: Verify Maler pricing expansion
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-maler-pricing:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Maler pages and source catalog
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch_with_retry() {
+            local url="$1"
+            local output="$2"
+            for i in 1 2 3 4 5; do
+              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then
+                return 0
+              fi
+              if [[ "$i" == "5" ]]; then
+                return 1
+              fi
+              sleep 4
+            done
+          }
+
+          fetch_with_retry 'https://baukostenradar.de/kosten/maler' /tmp/maler.html
+          fetch_with_retry 'https://baukostenradar.de/kosten/maler/muenchen' /tmp/maler-muenchen.html
+          fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
+          fetch_with_retry 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+
+      - name: Verify expanded source-backed Maler data
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python - <<'PY'
+          import re
+          from html.parser import HTMLParser
+
+          class TextParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.parts = []
+
+              def handle_data(self, data):
+                  value = data.strip()
+                  if value:
+                      self.parts.append(value)
+
+          def text(path):
+              parser = TextParser()
+              with open(path, encoding='utf-8') as handle:
+                  parser.feed(handle.read())
+              return re.sub(r'\s+', ' ', ' '.join(parser.parts))
+
+          maler = text('/tmp/maler.html')
+          muenchen = text('/tmp/maler-muenchen.html')
+          quellen = text('/tmp/quellen.html')
+          with open('/tmp/sitemap.xml', encoding='utf-8') as handle:
+              sitemap = handle.read()
+
+          expected_main = (
+              '9 Preispositionen',
+              '3 geprüfte Quellen',
+              'Maler Stundensatz',
+              'Alte Tapeten entfernen',
+              'Vlies- oder Mustertapete tapezieren',
+              'Innentür inkl. Zarge lackieren',
+              'Fensterrahmen lackieren',
+              'Aroundhome - Maler Preise & Kosten 2026',
+              'Blauarbeit - Maler Stundenlohn 2026',
+          )
+          for needle in expected_main:
+              if needle not in maler:
+                  raise SystemExit(f'Missing Maler production signal: {needle}')
+
+          expected_city = (
+              'Malerarbeiten Kosten in München 2026',
+              'Maler Stundensatz',
+              'Vlies- oder Mustertapete tapezieren',
+              'Innentür inkl. Zarge lackieren',
+              'Fensterrahmen lackieren',
+          )
+          for needle in expected_city:
+              if needle not in muenchen:
+                  raise SystemExit(f'Missing München Maler production signal: {needle}')
+
+          for source_name in (
+              'Aroundhome - Maler Preise & Kosten 2026',
+              'Blauarbeit - Maler Stundenlohn 2026',
+          ):
+              if source_name not in quellen:
+                  raise SystemExit(f'Missing Maler source in central source catalog: {source_name}')
+
+          sitemap_needles = (
+              '/kosten/maler/leistung/maler-stundensatz',
+              '/kosten/maler/leistung/alte-tapeten-entfernen',
+              '/kosten/maler/leistung/vlies-oder-mustertapete-tapezieren',
+              '/kosten/maler/leistung/innentuer-inkl-zarge-lackieren',
+              '/kosten/maler/leistung/fensterrahmen-lackieren',
+          )
+          for needle in sitemap_needles:
+              if needle not in sitemap:
+                  raise SystemExit(f'Missing Maler detail URL in sitemap: {needle}')
+          PY
