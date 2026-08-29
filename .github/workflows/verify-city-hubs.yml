@@ -11,10 +11,72 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Verify city directory and direct trade navigation
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          cities=(berlin hamburg muenchen koeln frankfurt stuttgart duesseldorf leipzig)
+          services=(badsanierung dachsanierung elektriker fenster heizung kueche)
+
+          fetch 'https://baukostenradar.de/staedte' /tmp/cities.html
+
+          grep -q '"@type":"CollectionPage"' /tmp/cities.html
+          grep -q 'Beliebte Handwerkerkosten nach Stadt' /tmp/cities.html
+          ! grep -qi 'noindex' /tmp/cities.html
+
+          for city in "${cities[@]}"; do
+            grep -q "/staedte/${city}" /tmp/cities.html
+            for service in "${services[@]}"; do
+              grep -q "/kosten/${service}/${city}" /tmp/cities.html
+            done
+          done
+
+          python3 - /tmp/cities.html <<'PY'
+          import json
+          import re
+          import sys
+
+          html = open(sys.argv[1], encoding="utf-8").read()
+          scripts = re.findall(r'<script[^>]*type="application/ld\+json"[^>]*>(.*?)</script>', html, flags=re.S)
+          collections = []
+          for script in scripts:
+              try:
+                  data = json.loads(script)
+              except json.JSONDecodeError:
+                  continue
+              stack = list(data) if isinstance(data, list) else [data]
+              while stack:
+                  value = stack.pop()
+                  if isinstance(value, dict):
+                      if value.get("@type") == "CollectionPage" and value.get("url", "").endswith("/staedte"):
+                          collections.append(value)
+                      stack.extend(value.values())
+                  elif isinstance(value, list):
+                      stack.extend(value)
+
+          if len(collections) != 1:
+              raise SystemExit(f"Expected one city CollectionPage, found {len(collections)}")
+          item_list = collections[0].get("mainEntity", {})
+          if item_list.get("@type") != "ItemList":
+              raise SystemExit("City CollectionPage mainEntity is not ItemList")
+          if item_list.get("numberOfItems") != 8 or len(item_list.get("itemListElement", [])) != 8:
+              raise SystemExit("City ItemList must contain exactly 8 city pages")
+          print("City directory CollectionPage verified: 8 cities")
+          PY
+
       - name: Verify all eight city hubs
         shell: bash
         run: |
           set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
 
           cities=(berlin hamburg muenchen koeln frankfurt stuttgart duesseldorf leipzig)
           guides=(
@@ -30,7 +92,7 @@ jobs:
           for city in "${cities[@]}"; do
             output="/tmp/city-${city}.html"
             url="https://baukostenradar.de/staedte/${city}"
-            curl -sS --fail "$url" -o "$output"
+            fetch "$url" "$output"
 
             grep -q "https://baukostenradar.de/staedte/${city}" "$output"
             ! grep -qi 'noindex' "$output"
@@ -93,7 +155,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
           cities='berlin|hamburg|muenchen|koeln|frankfurt|stuttgart|duesseldorf|leipzig'
           count=$(grep -oE "https://baukostenradar.de/staedte/(${cities})</loc>" /tmp/sitemap.xml | wc -l | tr -d ' ')
           test "$count" -eq 8
@@ -105,7 +167,7 @@ jobs:
 
           for city in berlin hamburg muenchen koeln frankfurt stuttgart duesseldorf leipzig; do
             output="/tmp/calculator-${city}.html"
-            curl -sS --fail "https://baukostenradar.de/rechner/handwerkerkosten?region=${city}" -o "$output"
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "https://baukostenradar.de/rechner/handwerkerkosten?region=${city}" -o "$output"
             grep -q 'Vorauswahl aus der vorherigen Kostenseite übernommen' "$output"
             grep -q "/kosten/badsanierung/${city}" "$output"
             ! grep -qi 'noindex' "$output"
