@@ -49,6 +49,12 @@ export const quinaryOpportunitySilos: Record<string, OpportunitySiloConfig> = {
     itemSlug: "klinker-verblendung",
     calculatorLabel: "Klinkerfassade berechnen",
   },
+  "garten-anlegen-kosten": {
+    serviceSlugs: ["garten"],
+    serviceSlug: "garten",
+    itemSlug: "einfahrt-pflastern",
+    calculatorLabel: "Außenanlagen berechnen",
+  },
   "zementestrich-kosten-pro-qm": {
     serviceSlugs: ["estrich", "bodenleger"],
     serviceSlug: "estrich",
