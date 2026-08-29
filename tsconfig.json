@@ -15,7 +15,7 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/lib/pricing": ["./lib/catalog-doors.ts"],
+      "@/lib/pricing": ["./lib/catalog-sanitaer.ts"],
       "@/lib/price-guide-links": ["./lib/price-guide-links-catalog.ts"],
       "@/lib/all-guides": ["./lib/all-guides-catalog.ts"],
       "@/lib/guide-silo": ["./lib/guide-silo-catalog.ts"],
