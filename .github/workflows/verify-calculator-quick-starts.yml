@@ -51,9 +51,20 @@ jobs:
           grep -q 'value="120"' /tmp/core.html
           grep -q 'value="core" selected' /tmp/core.html
 
+          fetch 'https://baukostenradar.de/rechner/badsanierungskosten?flaeche=6' /tmp/bad-6.html
+          grep -q 'value="6"' /tmp/bad-6.html
+          grep -q 'Geschätzte Kostenspanne für ca. 6 m²' /tmp/bad-6.html
+
+          fetch 'https://baukostenradar.de/rechner/badsanierungskosten?flaeche=10' /tmp/bad-10.html
+          grep -q 'value="10"' /tmp/bad-10.html
+          grep -q 'Geschätzte Kostenspanne für ca. 10 m²' /tmp/bad-10.html
+
+          fetch 'https://baukostenradar.de/rechner/badsanierungskosten?flaeche=100' /tmp/bad-max.html
+          grep -q 'value="40"' /tmp/bad-max.html
+
           fetch 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=elektriker&leistung=sicherungskasten-erneuern&menge=1' /tmp/electric.html
           grep -q 'Sicherungskasten erneuern' /tmp/electric.html
 
           ! grep -qi 'noindex' /tmp/rechner.html
 
-          echo 'Verified calculator quick starts, exact Renovierung presets and Handwerker scenario routing in production'
+          echo 'Verified calculator quick starts, SSR Bad presets, safety bounds and exact scenario routing in production'
