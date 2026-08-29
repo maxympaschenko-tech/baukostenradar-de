@@ -67,18 +67,31 @@ jobs:
               sitemap = handle.read()
 
           expected_main = (
-              '14 Preispositionen',
-              '5 geprüfte Quellen',
+              '27 Preispositionen',
+              '9 geprüfte Quellen',
               'Zwischensparrendämmung',
-              'Untersparrendämmung',
               'Aufsparrendämmung inkl. Wiedereindecken',
-              'Flachdachdämmung',
               'Dach neu eindecken',
               'Dachdecker Stundensatz',
               'Dachsanierung komplett',
               'Dachgaube bauen',
-              'co2online - Dachdämmung Methoden und Kosten',
-              'Aroundhome - Dach neu decken & Dachsanierung',
+              'Tonziegel neu decken inkl. Material und Arbeit',
+              'Betondachsteine neu decken inkl. Material und Arbeit',
+              'Schieferdach neu decken',
+              'Metalldach Aluminium oder Zink neu decken',
+              'Bitumen- oder Kunststoffbahnen eindecken',
+              'Alte Dacheindeckung abtragen',
+              'Dachentwässerung mit Rinnen und Fallrohren erneuern',
+              'Dachstuhl neu bauen',
+              'Dachstuhl sanieren',
+              'Dach komplett sanieren inkl. Dachstuhl',
+              'Flachdach komplett sanieren',
+              'Dach 150 m² neu decken und dämmen',
+              'Reetdach neu decken',
+              'MyHammer - Dach neu decken Kosten 2026',
+              'MyHammer - Dachsanierung Kosten 2026',
+              'MyHammer - Dachstuhl Kosten 2026',
+              'Blauarbeit - Dach neu decken Kosten 2026',
           )
           for needle in expected_main:
               if needle not in dach:
@@ -86,11 +99,13 @@ jobs:
 
           expected_city = (
               'Dachsanierung Kosten in München 2026',
-              'Zwischensparrendämmung',
-              'Untersparrendämmung',
-              'Flachdachdämmung',
-              'Dach neu eindecken',
-              'Dachgaube bauen',
+              'Tonziegel neu decken inkl. Material und Arbeit',
+              'Schieferdach neu decken',
+              'Alte Dacheindeckung abtragen',
+              'Dachstuhl neu bauen',
+              'Dach komplett sanieren inkl. Dachstuhl',
+              'Flachdach komplett sanieren',
+              'Reetdach neu decken',
           )
           for needle in expected_city:
               if needle not in muenchen:
@@ -99,14 +114,20 @@ jobs:
           for source_name in (
               'co2online - Dachdämmung Methoden und Kosten',
               'Aroundhome - Dach neu decken & Dachsanierung',
+              'MyHammer - Dach neu decken Kosten 2026',
+              'MyHammer - Dachsanierung Kosten 2026',
+              'MyHammer - Dachstuhl Kosten 2026',
+              'Blauarbeit - Dach neu decken Kosten 2026',
           ):
               if source_name not in quellen:
                   raise SystemExit(f'Missing Dach source in central source catalog: {source_name}')
 
           sitemap_needles = (
-              '/kosten/dachsanierung/leistung/zwischensparrendaemmung',
-              '/kosten/dachsanierung/leistung/dach-neu-eindecken',
-              '/kosten/dachsanierung/leistung/dachgaube-bauen',
+              '/kosten/dachsanierung/leistung/tonziegel-neu-decken-inkl-material-und-arbeit',
+              '/kosten/dachsanierung/leistung/alte-dacheindeckung-abtragen',
+              '/kosten/dachsanierung/leistung/dachstuhl-neu-bauen',
+              '/kosten/dachsanierung/leistung/dach-komplett-sanieren-inkl-dachstuhl',
+              '/kosten/dachsanierung/leistung/reetdach-neu-decken',
           )
           for needle in sitemap_needles:
               if needle not in sitemap:
