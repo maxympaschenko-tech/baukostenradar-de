@@ -11,7 +11,26 @@ export const metadata: Metadata = {
   alternates: { canonical: "/rechner/badsanierungskosten" },
 };
 
-export default function BathCostCalculatorPage() {
+type BathCalculatorSearchParams = Record<string, string | string[] | undefined>;
+
+function firstParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function validArea(value: string | undefined) {
+  if (!value) return undefined;
+  const parsed = Number(value.replace(",", "."));
+  if (!Number.isFinite(parsed)) return undefined;
+  return Math.min(40, Math.max(2, parsed));
+}
+
+export default async function BathCostCalculatorPage({
+  searchParams,
+}: {
+  searchParams: Promise<BathCalculatorSearchParams>;
+}) {
+  const query = await searchParams;
+  const initialArea = validArea(firstParam(query.flaeche));
   const service = getService("badsanierung");
   const squareMeterItem = service?.priceItems.find((item) => item.name === "Bad-Neubau / Sanierung");
   const wholeBathItem = service?.priceItems.find((item) => item.name === "Bad-Sanierung komplett");
@@ -93,7 +112,7 @@ export default function BathCostCalculatorPage() {
       </section>
 
       <div className="shell articleShell">
-        <BathCostCalculator />
+        <BathCostCalculator initialArea={initialArea} />
 
         <section className="contentCard proseCard">
           <span className="eyebrow">Methodik</span>
