@@ -1,0 +1,165 @@
+name: Verify About and Organization entity
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-about-organization-entity:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch homepage and About page
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch_with_retry() {
+            local url="$1"
+            local output="$2"
+            for i in 1 2 3 4 5; do
+              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then
+                return 0
+              fi
+              if [[ "$i" == "5" ]]; then
+                return 1
+              fi
+              sleep 4
+            done
+          }
+
+          fetch_with_retry 'https://baukostenradar.de/' /tmp/home.html
+          fetch_with_retry 'https://baukostenradar.de/ueber-uns' /tmp/about.html
+
+      - name: Verify Organization administrative details
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python - <<'PY'
+          import json
+          from html.parser import HTMLParser
+
+          class JsonLdParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.capture = False
+                  self.current = []
+                  self.blocks = []
+
+              def handle_starttag(self, tag, attrs):
+                  data = dict(attrs)
+                  if tag == 'script' and data.get('type') == 'application/ld+json':
+                      self.capture = True
+                      self.current = []
+
+              def handle_data(self, data):
+                  if self.capture:
+                      self.current.append(data)
+
+              def handle_endtag(self, tag):
+                  if tag == 'script' and self.capture:
+                      self.capture = False
+                      raw = ''.join(self.current).strip()
+                      if raw:
+                          self.blocks.append(json.loads(raw))
+
+          def flatten(value):
+              if isinstance(value, list):
+                  for item in value:
+                      yield from flatten(item)
+              else:
+                  yield value
+
+          parser = JsonLdParser()
+          with open('/tmp/home.html', encoding='utf-8') as handle:
+              parser.feed(handle.read())
+
+          objects = [obj for block in parser.blocks for obj in flatten(block) if isinstance(obj, dict)]
+          org = next((obj for obj in objects if obj.get('@type') == 'Organization' and obj.get('@id') == 'https://baukostenradar.de/#organization'), None)
+          if not org:
+              raise SystemExit('Canonical Organization entity missing on homepage')
+
+          if not str(org.get('telephone', '')).startswith('+'):
+              raise SystemExit('Organization top-level telephone is missing or not international format')
+          if not org.get('email'):
+              raise SystemExit('Organization email is missing')
+
+          address = org.get('address')
+          if not isinstance(address, dict) or address.get('@type') != 'PostalAddress':
+              raise SystemExit('Organization PostalAddress is missing')
+          for field in ('streetAddress', 'postalCode', 'addressLocality', 'addressCountry'):
+              if not address.get(field):
+                  raise SystemExit(f'Organization address field missing: {field}')
+          PY
+
+      - name: Verify AboutPage and breadcrumb entity links
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python - <<'PY'
+          import json
+          from html.parser import HTMLParser
+
+          class JsonLdParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.capture = False
+                  self.current = []
+                  self.blocks = []
+
+              def handle_starttag(self, tag, attrs):
+                  data = dict(attrs)
+                  if tag == 'script' and data.get('type') == 'application/ld+json':
+                      self.capture = True
+                      self.current = []
+
+              def handle_data(self, data):
+                  if self.capture:
+                      self.current.append(data)
+
+              def handle_endtag(self, tag):
+                  if tag == 'script' and self.capture:
+                      self.capture = False
+                      raw = ''.join(self.current).strip()
+                      if raw:
+                          self.blocks.append(json.loads(raw))
+
+          def flatten(value):
+              if isinstance(value, list):
+                  for item in value:
+                      yield from flatten(item)
+              else:
+                  yield value
+
+          parser = JsonLdParser()
+          with open('/tmp/about.html', encoding='utf-8') as handle:
+              html = handle.read()
+              parser.feed(html)
+
+          objects = [obj for block in parser.blocks for obj in flatten(block) if isinstance(obj, dict)]
+          about = next((obj for obj in objects if obj.get('@type') == 'AboutPage'), None)
+          if not about:
+              raise SystemExit('AboutPage structured data missing')
+          if about.get('@id') != 'https://baukostenradar.de/ueber-uns#about':
+              raise SystemExit('Unexpected AboutPage @id')
+          if about.get('url') != 'https://baukostenradar.de/ueber-uns':
+              raise SystemExit('Unexpected AboutPage URL')
+          if about.get('about', {}).get('@id') != 'https://baukostenradar.de/#organization':
+              raise SystemExit('AboutPage.about does not link canonical Organization')
+          if about.get('mainEntity', {}).get('@id') != 'https://baukostenradar.de/#organization':
+              raise SystemExit('AboutPage.mainEntity does not link canonical Organization')
+
+          breadcrumb = next((obj for obj in objects if obj.get('@type') == 'BreadcrumbList'), None)
+          if not breadcrumb:
+              raise SystemExit('About page BreadcrumbList missing')
+          items = breadcrumb.get('itemListElement', [])
+          if len(items) != 2 or items[-1].get('item') != 'https://baukostenradar.de/ueber-uns':
+              raise SystemExit('Unexpected About page breadcrumb trail')
+
+          if 'class="visibleBreadcrumbs"' not in html or 'Über BauKostenRadar' not in html:
+              raise SystemExit('Visible About page breadcrumb missing')
+          PY

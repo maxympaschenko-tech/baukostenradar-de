@@ -58,6 +58,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       height: 512,
     },
     email: siteConfig.email,
+    telephone: siteConfig.phone,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: siteConfig.operator.addressLine,
+      postalCode: siteConfig.operator.postalCode,
+      addressLocality: siteConfig.operator.city,
+      addressCountry: siteConfig.operator.country,
+    },
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer support",
