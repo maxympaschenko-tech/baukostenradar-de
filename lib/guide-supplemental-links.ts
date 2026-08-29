@@ -59,6 +59,12 @@ const houseRenovationGuideLinks: SupplementalGuide[] = [
   { slug: "altbausanierung-kosten", label: "Altbausanierung Kosten", href: "/ratgeber/altbausanierung-kosten" },
 ];
 
+const planningCostGuideLinks: SupplementalGuide[] = [
+  { slug: "sanierung-reihenfolge", label: "Sanierung richtig planen", href: "/ratgeber/sanierung-reihenfolge" },
+  { slug: "arbeitskosten-materialkosten", label: "Arbeitskosten und Materialkosten", href: "/ratgeber/arbeitskosten-materialkosten" },
+  { slug: "handwerker-stundensaetze", label: "Handwerker-Stundensätze", href: "/ratgeber/handwerker-stundensaetze" },
+];
+
 const renovationScenarioLinks: Record<string, GuideSupplementalLink[]> = {
   "renovierungskosten-100-qm": [
     { label: "100 m² im Renovierungskosten-Rechner", href: "/rechner/renovierungskosten?flaeche=100" },
@@ -82,6 +88,7 @@ const supplementalClusters = [
   abrissGuideLinks,
   renovationAreaGuideLinks,
   houseRenovationGuideLinks,
+  planningCostGuideLinks,
 ];
 
 const supplementalByGuide: Record<string, GuideSupplementalLink[]> = Object.fromEntries(
