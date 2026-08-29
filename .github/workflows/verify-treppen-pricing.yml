@@ -1,0 +1,132 @@
+name: Verify Treppen pricing expansion
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-treppen-pricing:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Treppen pages and source catalog
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch_with_retry() {
+            local url="$1"
+            local output="$2"
+            for i in 1 2 3 4 5; do
+              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then
+                return 0
+              fi
+              if [[ "$i" == "5" ]]; then
+                return 1
+              fi
+              sleep 4
+            done
+          }
+
+          fetch_with_retry 'https://baukostenradar.de/kosten/treppen' /tmp/treppen.html
+          fetch_with_retry 'https://baukostenradar.de/kosten/treppen/muenchen' /tmp/treppen-muenchen.html
+          fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
+          fetch_with_retry 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+
+      - name: Verify expanded source-backed Treppen data
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python - <<'PY'
+          import re
+          from html.parser import HTMLParser
+
+          class TextParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.parts = []
+
+              def handle_data(self, data):
+                  value = data.strip()
+                  if value:
+                      self.parts.append(value)
+
+          def text(path):
+              parser = TextParser()
+              with open(path, encoding='utf-8') as handle:
+                  parser.feed(handle.read())
+              return re.sub(r'\s+', ' ', ' '.join(parser.parts))
+
+          treppen = text('/tmp/treppen.html')
+          muenchen = text('/tmp/treppen-muenchen.html')
+          quellen = text('/tmp/quellen.html')
+          with open('/tmp/sitemap.xml', encoding='utf-8') as handle:
+              sitemap = handle.read()
+
+          expected_main = (
+              '21 Preispositionen',
+              '4 geprüfte Quellen',
+              'Treppenbauer Stundensatz',
+              'Raumspartreppe komplett',
+              'Bolzentreppe komplett',
+              'Wangentreppe komplett',
+              'Faltwerktreppe komplett',
+              'Kragarmtreppe komplett',
+              'Stahlwangentreppe komplett',
+              'Wendeltreppe komplett',
+              'Gerade Betontreppe komplett',
+              'Gerade Holztreppe komplett',
+              'Maßgefertigte Holztreppe komplett',
+              'Einfache Außentreppe Stahl oder Holz',
+              'Holztreppe Stufen verkleiden',
+              'Treppenwangen verkleiden',
+              'Handlauf erneuern',
+              'MyHammer - Treppenbau Kosten 2026',
+              'MyHammer - Holztreppe sanieren Kosten 2026',
+          )
+          for needle in expected_main:
+              if needle not in treppen:
+                  raise SystemExit(f'Missing Treppen production signal: {needle}')
+
+          expected_city = (
+              'Treppen Kosten in München 2026',
+              'Raumspartreppe komplett',
+              'Gerade Betontreppe komplett',
+              'Gerade Holztreppe komplett',
+              'Holztreppe Stufen verkleiden',
+          )
+          for needle in expected_city:
+              if needle not in muenchen:
+                  raise SystemExit(f'Missing München Treppen production signal: {needle}')
+
+          for needle in (
+              'MyHammer - Treppenbau Kosten 2026',
+              'MyHammer - Holztreppe sanieren Kosten 2026',
+          ):
+              if needle not in quellen:
+                  raise SystemExit(f'Missing Treppen source in central source catalog: {needle}')
+
+          sitemap_needles = (
+              '/kosten/treppen/leistung/treppenbauer-stundensatz',
+              '/kosten/treppen/leistung/raumspartreppe-komplett',
+              '/kosten/treppen/leistung/bolzentreppe-komplett',
+              '/kosten/treppen/leistung/wangentreppe-komplett',
+              '/kosten/treppen/leistung/faltwerktreppe-komplett',
+              '/kosten/treppen/leistung/kragarmtreppe-komplett',
+              '/kosten/treppen/leistung/stahlwangentreppe-komplett',
+              '/kosten/treppen/leistung/wendeltreppe-komplett',
+              '/kosten/treppen/leistung/gerade-betontreppe-komplett',
+              '/kosten/treppen/leistung/gerade-holztreppe-komplett',
+              '/kosten/treppen/leistung/massgefertigte-holztreppe-komplett',
+              '/kosten/treppen/leistung/einfache-aussentreppe-stahl-oder-holz',
+              '/kosten/treppen/leistung/holztreppe-stufen-verkleiden',
+              '/kosten/treppen/leistung/treppenwangen-verkleiden',
+              '/kosten/treppen/leistung/handlauf-erneuern',
+          )
+          for needle in sitemap_needles:
+              if needle not in sitemap:
+                  raise SystemExit(f'Missing Treppen detail URL in sitemap: {needle}')
+          PY
