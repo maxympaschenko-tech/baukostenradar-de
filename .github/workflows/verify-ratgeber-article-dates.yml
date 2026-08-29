@@ -31,7 +31,7 @@ jobs:
           }
 
           fetch_with_retry 'https://baukostenradar.de/ratgeber/sanierungskosten-pro-qm' /tmp/guide-1.html
-          fetch_with_retry 'https://baukostenradar.de/ratgeber/badsanierung-kosten' /tmp/guide-2.html
+          fetch_with_retry 'https://baukostenradar.de/ratgeber/bad-komplett-sanieren-kosten' /tmp/guide-2.html
           fetch_with_retry 'https://baukostenradar.de/ratgeber/sanitaer-kosten' /tmp/guide-3.html
           fetch_with_retry 'https://baukostenradar.de/ratgeber/kernsanierung-kosten' /tmp/guide-4.html
 
