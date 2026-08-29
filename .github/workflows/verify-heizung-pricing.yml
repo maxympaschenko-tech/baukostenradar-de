@@ -67,17 +67,24 @@ jobs:
               sitemap = handle.read()
 
           expected_main = (
-              '14 Preispositionen',
-              '2 geprüfte Quellen',
-              'Elektroheizung komplett',
-              'Gasheizung komplett inkl. Einbau',
-              'Ölheizung komplett inkl. Einbau',
-              'Pelletheizung komplett inkl. Einbau',
-              'Wärmepumpe komplett inkl. Einbau',
-              'Fernwärmeanschluss',
-              'Solarthermieanlage',
-              'Brennstoffzellenheizung',
-              'Aroundhome - Heizung Kosten 2026',
+              '28 Preispositionen',
+              '6 geprüfte Quellen',
+              'Standardflachheizkörper austauschen inkl. Montage',
+              'Badheizkörper austauschen inkl. Montage',
+              'Niedertemperaturheizkörper austauschen inkl. Montage',
+              'Fußbodenheizung Nasssystem verlegen',
+              'Fußbodenheizung Dünnschichtsystem verlegen',
+              'Fußbodenheizung Trockenbausystem verlegen',
+              'Fußbodenheizung im Altbau nachrüsten',
+              'Heizkreisverteiler für Fußbodenheizung',
+              'Hydraulischer Abgleich Einfamilienhaus',
+              'Heizungspumpe gegen Hocheffizienzpumpe tauschen',
+              'Heizungspumpe plus hydraulischer Abgleich',
+              'Schlamm- oder Magnetabscheider inkl. Installation',
+              'Blauarbeit - Heizkörper austauschen Kosten 2026',
+              'MyHammer - Fußbodenheizung verlegen Kosten 2026',
+              'co2online - Hydraulischer Abgleich Kosten 2026',
+              'co2online - Heizungspumpe tauschen Kosten',
           )
           for needle in expected_main:
               if needle not in heizung:
@@ -85,24 +92,32 @@ jobs:
 
           expected_city = (
               'Heizung Kosten in München 2026',
-              'Gasheizung komplett inkl. Einbau',
-              'Pelletheizung komplett inkl. Einbau',
-              'Fernwärmeanschluss',
-              'Solarthermieanlage',
-              'Brennstoffzellenheizung',
+              'Standardflachheizkörper austauschen inkl. Montage',
+              'Fußbodenheizung Nasssystem verlegen',
+              'Fußbodenheizung im Altbau nachrüsten',
+              'Hydraulischer Abgleich Einfamilienhaus',
+              'Heizungspumpe gegen Hocheffizienzpumpe tauschen',
           )
           for needle in expected_city:
               if needle not in muenchen:
                   raise SystemExit(f'Missing München Heizung production signal: {needle}')
 
-          if 'Aroundhome - Heizung Kosten 2026' not in quellen:
-              raise SystemExit('Missing Heizung source in central source catalog')
+          for needle in (
+              'Blauarbeit - Heizkörper austauschen Kosten 2026',
+              'MyHammer - Fußbodenheizung verlegen Kosten 2026',
+              'co2online - Hydraulischer Abgleich Kosten 2026',
+              'co2online - Heizungspumpe tauschen Kosten',
+          ):
+              if needle not in quellen:
+                  raise SystemExit(f'Missing Heizung source in central source catalog: {needle}')
 
           sitemap_needles = (
-              '/kosten/heizung/leistung/elektroheizung-komplett',
-              '/kosten/heizung/leistung/pelletheizung-komplett-inkl-einbau',
-              '/kosten/heizung/leistung/fernwaermeanschluss',
-              '/kosten/heizung/leistung/brennstoffzellenheizung',
+              '/kosten/heizung/leistung/standardflachheizkoerper-austauschen-inkl-montage',
+              '/kosten/heizung/leistung/fussbodenheizung-nasssystem-verlegen',
+              '/kosten/heizung/leistung/fussbodenheizung-im-altbau-nachruesten',
+              '/kosten/heizung/leistung/hydraulischer-abgleich-einfamilienhaus',
+              '/kosten/heizung/leistung/heizungspumpe-gegen-hocheffizienzpumpe-tauschen',
+              '/kosten/heizung/leistung/heizungspumpe-plus-hydraulischer-abgleich',
           )
           for needle in sitemap_needles:
               if needle not in sitemap:
