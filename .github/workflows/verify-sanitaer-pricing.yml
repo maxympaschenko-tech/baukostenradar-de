@@ -1,0 +1,123 @@
+name: Verify Sanitaer pricing expansion
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-sanitaer-pricing:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Sanitaer pages and source catalog
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch_with_retry() {
+            local url="$1"
+            local output="$2"
+            for i in 1 2 3 4 5; do
+              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then
+                return 0
+              fi
+              if [[ "$i" == "5" ]]; then
+                return 1
+              fi
+              sleep 4
+            done
+          }
+
+          fetch_with_retry 'https://baukostenradar.de/kosten/sanitaer' /tmp/sanitaer.html
+          fetch_with_retry 'https://baukostenradar.de/kosten/sanitaer/muenchen' /tmp/sanitaer-muenchen.html
+          fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
+          fetch_with_retry 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+
+      - name: Verify expanded source-backed Sanitaer data
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python - <<'PY'
+          import re
+          from html.parser import HTMLParser
+
+          class TextParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.parts = []
+
+              def handle_data(self, data):
+                  value = data.strip()
+                  if value:
+                      self.parts.append(value)
+
+          def text(path):
+              parser = TextParser()
+              with open(path, encoding='utf-8') as handle:
+                  parser.feed(handle.read())
+              return re.sub(r'\s+', ' ', ' '.join(parser.parts))
+
+          sanitaer = text('/tmp/sanitaer.html')
+          muenchen = text('/tmp/sanitaer-muenchen.html')
+          quellen = text('/tmp/quellen.html')
+          with open('/tmp/sitemap.xml', encoding='utf-8') as handle:
+              sitemap = handle.read()
+
+          expected_main = (
+              '16 Preispositionen',
+              '4 geprüfte Quellen',
+              'Sanitär Anfahrt',
+              'Wasserhahn montieren',
+              'WC montieren',
+              'Spülkasten reparieren',
+              'Waschbecken montieren',
+              'Dusche einbauen',
+              'Badewanne einbauen',
+              'Rohrverstopfung beseitigen',
+              'Hänge-WC modern inkl. Montage',
+              'Waschtisch-Armatur inkl. Montage',
+              'AuftragsGlück - Sanitärinstallateur Kosten 2026',
+              'Aroundhome - Badsanierung Preise & Kosten 2026',
+          )
+          for needle in expected_main:
+              if needle not in sanitaer:
+                  raise SystemExit(f'Missing Sanitaer production signal: {needle}')
+
+          expected_city = (
+              'Sanitär Kosten in München 2026',
+              'Wasserhahn montieren',
+              'WC montieren',
+              'Spülkasten reparieren',
+              'Rohrverstopfung beseitigen',
+              'Hänge-WC modern inkl. Montage',
+          )
+          for needle in expected_city:
+              if needle not in muenchen:
+                  raise SystemExit(f'Missing München Sanitaer production signal: {needle}')
+
+          for needle in (
+              'AuftragsGlück - Sanitärinstallateur Kosten 2026',
+              'Aroundhome - Badsanierung Preise & Kosten 2026',
+          ):
+              if needle not in quellen:
+                  raise SystemExit(f'Missing Sanitaer source in central source catalog: {needle}')
+
+          sitemap_needles = (
+              '/kosten/sanitaer/leistung/sanitaer-anfahrt',
+              '/kosten/sanitaer/leistung/wasserhahn-montieren',
+              '/kosten/sanitaer/leistung/wc-montieren',
+              '/kosten/sanitaer/leistung/spuelkasten-reparieren',
+              '/kosten/sanitaer/leistung/waschbecken-montieren',
+              '/kosten/sanitaer/leistung/dusche-einbauen',
+              '/kosten/sanitaer/leistung/badewanne-einbauen',
+              '/kosten/sanitaer/leistung/rohrverstopfung-beseitigen',
+              '/kosten/sanitaer/leistung/haenge-wc-modern-inkl-montage',
+              '/kosten/sanitaer/leistung/waschtisch-armatur-inkl-montage',
+          )
+          for needle in sitemap_needles:
+              if needle not in sitemap:
+                  raise SystemExit(f'Missing Sanitaer detail URL in sitemap: {needle}')
+          PY

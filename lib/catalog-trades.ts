@@ -49,6 +49,16 @@ export const priceSources = {
     url: "https://www.aroundhome.de/trockenbau-innenausbau/preise-kosten/",
     checkedAt: "29.08.2026",
   },
+  auftragsglueckSanitaer: {
+    name: "AuftragsGlück - Sanitärinstallateur Kosten 2026",
+    url: "https://auftragsglueck.de/ratgeber/sanitaer-kosten/",
+    checkedAt: "29.08.2026",
+  },
+  aroundhomeSanitaer: {
+    name: "Aroundhome - Badsanierung Preise & Kosten 2026",
+    url: "https://www.aroundhome.de/badezimmer/preise-kosten/",
+    checkedAt: "29.08.2026",
+  },
 } as const;
 
 type TradeSourceKey = keyof typeof priceSources;
@@ -366,6 +376,96 @@ export const services: Service[] = commercialServices.map((service) => {
           unit: "pro m² inkl. Montage",
           note: "Orientierungswert für eine typische Spanndecke; Design-, Licht- und Akustikvarianten können höher liegen",
           sourceKey: "blauarbeitTrockenbau",
+        },
+      ],
+    };
+  }
+
+  if (service.slug === "sanitaer") {
+    return {
+      ...commercialService,
+      description: "Aktuelle Richtwerte für Sanitärinstallateur-Stundensätze, Anfahrt, Armaturen, WC, Waschbecken, Dusche, Badewanne, Rohrreinigung und typische Sanitärarbeiten in Deutschland.",
+      priceItems: [
+        ...commercialService.priceItems,
+        {
+          name: "Sanitär Anfahrt",
+          low: 20,
+          high: 50,
+          unit: "pro Einsatz",
+          note: "Typische Anfahrtskosten je nach Entfernung; Kleinaufträge können zusätzlich mit einer Mindestpauschale berechnet werden",
+          sourceKey: "auftragsglueckSanitaer",
+        },
+        {
+          name: "Wasserhahn montieren",
+          low: 60,
+          high: 100,
+          unit: "pro Stück Arbeit",
+          note: "Reine Arbeitskosten ohne Armatur; bei schwierigen Anschlüssen kann der Aufwand höher liegen",
+          sourceKey: "auftragsglueckSanitaer",
+        },
+        {
+          name: "WC montieren",
+          low: 150,
+          high: 300,
+          unit: "pro Stück Arbeit",
+          note: "Reine Montagekosten ohne WC und zusätzliches Vorwandelement",
+          sourceKey: "auftragsglueckSanitaer",
+        },
+        {
+          name: "Spülkasten reparieren",
+          low: 80,
+          high: 150,
+          unit: "pro Reparatur Arbeit",
+          note: "Arbeitskosten ohne Material; Ersatzteile können zusätzlich anfallen",
+          sourceKey: "auftragsglueckSanitaer",
+        },
+        {
+          name: "Waschbecken montieren",
+          low: 100,
+          high: 200,
+          unit: "pro Stück Arbeit",
+          note: "Reine Montagekosten ohne Waschbecken, Armatur und Sonderanschlüsse",
+          sourceKey: "auftragsglueckSanitaer",
+        },
+        {
+          name: "Dusche einbauen",
+          low: 300,
+          high: 600,
+          unit: "pro Stück Arbeit",
+          note: "Arbeitsrichtwert ohne Material für eine typische Duschmontage; Umbauten und Abdichtung können zusätzlich anfallen",
+          sourceKey: "auftragsglueckSanitaer",
+        },
+        {
+          name: "Badewanne einbauen",
+          low: 400,
+          high: 800,
+          unit: "pro Stück Arbeit",
+          note: "Reine Einbaukosten ohne Wanne, Armatur und aufwendige Verkleidung",
+          sourceKey: "auftragsglueckSanitaer",
+        },
+        {
+          name: "Rohrverstopfung beseitigen",
+          low: 80,
+          high: 250,
+          unit: "pro Einsatz",
+          note: "Richtwert für reguläre Einsätze; Notdienst, Spezialgeräte oder schwer zugängliche Leitungen können teurer sein",
+          sourceKey: "auftragsglueckSanitaer",
+        },
+        {
+          name: "Hänge-WC modern inkl. Montage",
+          low: 800,
+          high: 1800,
+          unit: "pro Stück",
+          note: "Komplettpreis-Richtwert 2026; ein neu zu setzendes Vorwandelement oder ein neuer Spülkasten kann den Preis erhöhen",
+          sourceKey: "aroundhomeSanitaer",
+        },
+        {
+          name: "Waschtisch-Armatur inkl. Montage",
+          low: 250,
+          high: 600,
+          unit: "pro Stück",
+          note: "Inklusive Montage und typischer Kleinteile wie Eckventilen",
+          sourceKey: "aroundhomeSanitaer",
         },
       ],
     };
