@@ -7,7 +7,7 @@ import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Handwerkerkosten Rechner 2026",
-  description: "Handwerkerkosten online berechnen: Gewerk, Leistung, Menge und Region auswählen. Mit 101 Preispositionen, Einzelpreisen, Stadtvergleich und Quellen.",
+  description: `Handwerkerkosten online berechnen: Gewerk, Leistung, Menge und Region auswählen. Mit ${services.reduce((sum, service) => sum + service.priceItems.length, 0)} Preispositionen, Einzelpreisen, Stadtvergleich und Quellen.`,
   alternates: { canonical: "/rechner/handwerkerkosten" },
 };
 
