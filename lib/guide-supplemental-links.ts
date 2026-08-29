@@ -25,7 +25,17 @@ const tuerenGuideLinks: SupplementalGuide[] = [
   { slug: "haustuer-rc2-kosten", label: "Haustür Holz/Alu RC2 Kosten", href: "/ratgeber/haustuer-rc2-kosten" },
 ];
 
-const supplementalClusters = [sanitaerGuideLinks, kellerabdichtungGuideLinks, tuerenGuideLinks];
+const estrichGuideLinks: SupplementalGuide[] = [
+  { slug: "estrich-100-qm-kosten", label: "Estrich 100 m² Kosten", href: "/ratgeber/estrich-100-qm-kosten" },
+  { slug: "zementestrich-kosten-pro-qm", label: "Zementestrich Kosten pro m²", href: "/ratgeber/zementestrich-kosten-pro-qm" },
+  { slug: "fliessestrich-kosten-pro-qm", label: "Fließestrich Kosten pro m²", href: "/ratgeber/fliessestrich-kosten-pro-qm" },
+  { slug: "trockenestrich-kosten-pro-qm", label: "Trockenestrich Kosten pro m²", href: "/ratgeber/trockenestrich-kosten-pro-qm" },
+  { slug: "schnellestrich-kosten-pro-qm", label: "Schnellestrich Kosten pro m²", href: "/ratgeber/schnellestrich-kosten-pro-qm" },
+  { slug: "bodenausgleich-kosten-pro-qm", label: "Bodenausgleich Kosten pro m²", href: "/ratgeber/bodenausgleich-kosten-pro-qm" },
+  { slug: "estrich-rissreparatur-kosten", label: "Estrich-Rissreparatur Kosten", href: "/ratgeber/estrich-rissreparatur-kosten" },
+];
+
+const supplementalClusters = [sanitaerGuideLinks, kellerabdichtungGuideLinks, tuerenGuideLinks, estrichGuideLinks];
 
 const supplementalByGuide: Record<string, GuideSupplementalLink[]> = Object.fromEntries(
   supplementalClusters.flatMap((cluster) =>
