@@ -29,6 +29,16 @@ export const priceSources = {
     url: "https://ratgeber.blauarbeit.de/kosten-preise/fliesenlegen",
     checkedAt: "29.08.2026",
   },
+  aroundhomeBoden: {
+    name: "Aroundhome - Boden verlegen Preise & Kosten",
+    url: "https://www.aroundhome.de/bodenverlegung/preise-kosten/",
+    checkedAt: "29.08.2026",
+  },
+  aroundhomeVinyl: {
+    name: "Aroundhome - Vinylboden verlegen Kosten",
+    url: "https://www.aroundhome.de/bodenverlegung/vinyl-verlegen-kosten/",
+    checkedAt: "29.08.2026",
+  },
 } as const;
 
 type TradeSourceKey = keyof typeof priceSources;
@@ -181,6 +191,79 @@ export const services: Service[] = commercialServices.map((service) => {
           unit: "pro Stunde",
           note: "Typischer Richtwert 2026; viele Fliesenarbeiten werden dennoch nach Quadratmetern kalkuliert",
           sourceKey: "blauarbeitFliesen",
+        },
+      ],
+    };
+  }
+
+  if (service.slug === "bodenleger") {
+    return {
+      ...commercialService,
+      description: "Aktuelle Richtwerte für Bodenleger-Stundensätze, Vinyl, Laminat, Parkett, Untergrundvorbereitung und das Entfernen alter Bodenbeläge in Deutschland.",
+      priceItems: [
+        ...commercialService.priceItems,
+        {
+          name: "Bodenleger Stundensatz",
+          low: 40,
+          high: 60,
+          unit: "pro Stunde",
+          note: "Typischer Handwerker-Richtwert; Region, Auftragsgröße und Spezialisierung beeinflussen den Verrechnungssatz",
+          sourceKey: "aroundhomeBoden",
+        },
+        {
+          name: "Klick-Vinyl verlegen",
+          low: 12,
+          high: 20,
+          unit: "pro m² Arbeit",
+          note: "Reine Verlegearbeit ohne Material; Untergrundvorbereitung und Sockelleisten separat",
+          sourceKey: "aroundhomeVinyl",
+        },
+        {
+          name: "Klebe-Vinyl verlegen",
+          low: 10,
+          high: 30,
+          unit: "pro m² Arbeit",
+          note: "Reine Verlegearbeit; Muster, Untergrund und Zuschnitte können den Aufwand erhöhen",
+          sourceKey: "aroundhomeVinyl",
+        },
+        {
+          name: "PVC / Laminat verlegen",
+          low: 10,
+          high: 30,
+          unit: "pro m² Arbeit",
+          sourceKey: "aroundhomeBoden",
+        },
+        {
+          name: "Mehrschichtparkett schwimmend verlegen",
+          low: 10,
+          high: 20,
+          unit: "pro m² Arbeit",
+          note: "Richtwert für schwimmende Verlegung; Material und zusätzliche Vorarbeiten separat",
+          sourceKey: "aroundhomeBoden",
+        },
+        {
+          name: "Mehrschichtparkett vollflächig verklebt",
+          low: 15,
+          high: 35,
+          unit: "pro m² Arbeit",
+          note: "Richtwert für vollflächige Verklebung; Untergrundzustand und Muster beeinflussen den Endpreis",
+          sourceKey: "aroundhomeBoden",
+        },
+        {
+          name: "Alten Bodenbelag entfernen & entsorgen",
+          low: 5,
+          high: 20,
+          unit: "pro m²",
+          note: "Zusatzleistung vor der Neuverlegung; Aufwand hängt von Belagsart und Verklebung ab",
+          sourceKey: "aroundhomeVinyl",
+        },
+        {
+          name: "Untergrund vorbereiten & ausgleichen",
+          low: 12,
+          high: 50,
+          unit: "pro m²",
+          note: "Spachteln und Ausgleichen vor der Verlegung; Schäden und Unebenheiten können den Aufwand erhöhen",
+          sourceKey: "aroundhomeVinyl",
         },
       ],
     };
