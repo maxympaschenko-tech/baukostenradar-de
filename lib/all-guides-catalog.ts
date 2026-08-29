@@ -129,6 +129,15 @@ const trockenbauGuideLinks = [
   { slug: "verspachtelung-q4-kosten-pro-qm", label: "Verspachtelung Q4 Kosten pro m²", href: "/ratgeber/verspachtelung-q4-kosten-pro-qm" },
 ] as const;
 
+const photovoltaikGuideLinks = [
+  { slug: "photovoltaik-kosten-2026", label: "Photovoltaik Kosten 2026", href: "/ratgeber/photovoltaik-kosten-2026" },
+  { slug: "photovoltaik-5-kwp-kosten", label: "Photovoltaik 5 kWp Kosten", href: "/ratgeber/photovoltaik-5-kwp-kosten" },
+  { slug: "photovoltaik-10-kwp-kosten", label: "Photovoltaik 10 kWp Kosten", href: "/ratgeber/photovoltaik-10-kwp-kosten" },
+  { slug: "photovoltaik-15-kwp-kosten", label: "Photovoltaik 15 kWp Kosten", href: "/ratgeber/photovoltaik-15-kwp-kosten" },
+  { slug: "photovoltaik-mit-speicher-kosten", label: "Photovoltaik mit Speicher Kosten", href: "/ratgeber/photovoltaik-mit-speicher-kosten" },
+  { slug: "stromspeicher-kosten-pro-kwh", label: "Stromspeicher Kosten pro kWh", href: "/ratgeber/stromspeicher-kosten-pro-kwh" },
+] as const;
+
 function peers<T extends readonly { slug: string; label: string; href: string }[]>(links: T, slug: string) {
   return links
     .filter((link) => link.slug !== slug)
@@ -207,6 +216,12 @@ const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
   "trockenbau-kosten-pro-qm": peers(trockenbauGuideLinks, "trockenbau-kosten-pro-qm"),
   "trockenbauwand-kosten-pro-qm": peers(trockenbauGuideLinks, "trockenbauwand-kosten-pro-qm"),
   "verspachtelung-q4-kosten-pro-qm": peers(trockenbauGuideLinks, "verspachtelung-q4-kosten-pro-qm"),
+  "photovoltaik-kosten-2026": peers(photovoltaikGuideLinks, "photovoltaik-kosten-2026"),
+  "photovoltaik-5-kwp-kosten": peers(photovoltaikGuideLinks, "photovoltaik-5-kwp-kosten"),
+  "photovoltaik-10-kwp-kosten": peers(photovoltaikGuideLinks, "photovoltaik-10-kwp-kosten"),
+  "photovoltaik-15-kwp-kosten": peers(photovoltaikGuideLinks, "photovoltaik-15-kwp-kosten"),
+  "photovoltaik-mit-speicher-kosten": peers(photovoltaikGuideLinks, "photovoltaik-mit-speicher-kosten"),
+  "stromspeicher-kosten-pro-kwh": peers(photovoltaikGuideLinks, "stromspeicher-kosten-pro-kwh"),
 };
 
 const enrichedBaseGuides = baseAllGuides.map((guide) => {
