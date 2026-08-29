@@ -5,7 +5,7 @@ import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Ratgeber zu Sanierung, Renovierung & Handwerkerkosten 2026",
-  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Malerarbeiten, Fliesen, Bodenbelägen, Trockenbau, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
+  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Photovoltaik, Malerarbeiten, Fliesen, Bodenbelägen, Trockenbau, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
   alternates: { canonical: "/ratgeber" },
 };
 
@@ -60,6 +60,12 @@ const guideGroups = [
     title: "Heizung erneuern, Fußbodenheizung und Wartung kalkulieren",
     description: "Gesamterneuerung, Gasheizung, 100-m²-Fußbodenheizung, Heizkörper, Thermostate und Wartung als zusammenhängendes Heizungsbudget vergleichen.",
     slugs: ["heizung-erneuern-kosten", "fussbodenheizung-100-qm-kosten", "gasheizung-austauschen-kosten", "heizkoerper-montieren-kosten", "thermostat-installieren-kosten", "heizungswartung-kosten"],
+  },
+  {
+    eyebrow: "Photovoltaik & Stromspeicher",
+    title: "PV-Anlagen nach Leistung und Speicher kalkulieren",
+    description: "Photovoltaik-Gesamtkosten sowie 5-, 10- und 15-kWp-Anlagen, PV mit Speicher und Stromspeicherpreise pro kWh anhand aktueller Richtwerte und exakter Rechner-Presets vergleichen.",
+    slugs: ["photovoltaik-kosten-2026", "photovoltaik-5-kwp-kosten", "photovoltaik-10-kwp-kosten", "photovoltaik-15-kwp-kosten", "photovoltaik-mit-speicher-kosten", "stromspeicher-kosten-pro-kwh"],
   },
   {
     eyebrow: "Maler & Oberflächen",
