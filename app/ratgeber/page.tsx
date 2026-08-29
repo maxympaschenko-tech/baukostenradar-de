@@ -5,7 +5,7 @@ import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Ratgeber zu Sanierung, Renovierung & Handwerkerkosten 2026",
-  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Photovoltaik, Malerarbeiten, Fliesen, Bodenbelägen, Trockenbau, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
+  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Wärmepumpen, Photovoltaik, Malerarbeiten, Fliesen, Bodenbelägen, Trockenbau, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
   alternates: { canonical: "/ratgeber" },
 };
 
@@ -60,6 +60,12 @@ const guideGroups = [
     title: "Heizung erneuern, Fußbodenheizung und Wartung kalkulieren",
     description: "Gesamterneuerung, Gasheizung, 100-m²-Fußbodenheizung, Heizkörper, Thermostate und Wartung als zusammenhängendes Heizungsbudget vergleichen.",
     slugs: ["heizung-erneuern-kosten", "fussbodenheizung-100-qm-kosten", "gasheizung-austauschen-kosten", "heizkoerper-montieren-kosten", "thermostat-installieren-kosten", "heizungswartung-kosten"],
+  },
+  {
+    eyebrow: "Wärmepumpe & Wartung",
+    title: "Wärmepumpenkosten, Luft-Wasser-System und Wartung kalkulieren",
+    description: "Gesamtkosten einer Wärmepumpe, Luft-Wasser-Komplettsysteme und laufende Wartung mit aktuellen Richtwerten, regionalen Modellwerten und exakten Rechner-Presets vergleichen.",
+    slugs: ["waermepumpe-kosten-2026", "luft-wasser-waermepumpe-kosten", "waermepumpe-wartung-kosten"],
   },
   {
     eyebrow: "Photovoltaik & Stromspeicher",
