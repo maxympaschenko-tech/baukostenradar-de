@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">BauKostenRadar</title>
+  <desc id="desc">BauKostenRadar Logo mit Hausdach und drei Kostenbalken</desc>
+  <rect width="512" height="512" rx="96" fill="#ffffff"/>
+  <path d="M76 221 256 88l180 133" fill="none" stroke="#0b467d" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="112" y="310" width="70" height="120" rx="14" fill="#f2b400"/>
+  <rect x="221" y="256" width="70" height="174" rx="14" fill="#0b467d"/>
+  <rect x="330" y="202" width="70" height="228" rx="14" fill="#0b467d"/>
+  <rect x="221" y="151" width="30" height="30" rx="7" fill="#0b467d"/>
+  <rect x="264" y="151" width="30" height="30" rx="7" fill="#0b467d"/>
+</svg>
