@@ -1,0 +1,44 @@
+name: Verify service guide links
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-service-guide-links:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify direct guide links on key cost pages
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          check_link() {
+            local page="$1"
+            local expected="$2"
+            local label="$3"
+            local tmp="/tmp/${label}.html"
+
+            for i in 1 2 3 4 5; do
+              if curl -sS --fail --connect-timeout 10 --max-time 25 "https://baukostenradar.de${page}" -o "$tmp"; then
+                break
+              fi
+              [[ "$i" == "5" ]] && exit 1
+              sleep 4
+            done
+
+            if ! grep -Fq "href=\"${expected}\"" "$tmp"; then
+              echo "Missing expected guide link ${expected} on ${page}"
+              exit 1
+            fi
+          }
+
+          check_link '/kosten/waermepumpe' '/ratgeber/luft-wasser-waermepumpe-kosten' 'waermepumpe'
+          check_link '/kosten/photovoltaik' '/ratgeber/photovoltaik-10-kwp-kosten' 'photovoltaik'
+          check_link '/kosten/daemmung' '/ratgeber/fassadendaemmung-kosten-pro-qm' 'daemmung'
+          check_link '/kosten/kellerabdichtung' '/ratgeber/kellerabdichtung-aussen-kosten-pro-qm' 'kellerabdichtung'
+          check_link '/kosten/fenster' '/ratgeber/20-fenster-austauschen-kosten' 'fenster'
+          check_link '/kosten/dachsanierung' '/ratgeber/dach-150-qm-kosten' 'dachsanierung'
