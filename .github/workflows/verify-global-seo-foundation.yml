@@ -11,7 +11,7 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch robots and sitemap
+      - name: Fetch global SEO resources
         shell: bash
         run: |
           set -euo pipefail
@@ -30,8 +30,34 @@ jobs:
             done
           }
 
+          fetch_with_retry 'https://baukostenradar.de/' /tmp/home.html
+          fetch_with_retry 'https://baukostenradar.de/kosten' /tmp/costs.html
           fetch_with_retry 'https://baukostenradar.de/robots.txt' /tmp/robots.txt
           fetch_with_retry 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+
+      - name: Verify homepage site-name structured data
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          grep -q '"@type":"WebSite"' /tmp/home.html
+          grep -q '"@id":"https://baukostenradar.de/#website"' /tmp/home.html
+          grep -q '"url":"https://baukostenradar.de/"' /tmp/home.html
+          grep -q '"name":"BauKostenRadar"' /tmp/home.html
+          grep -q '"inLanguage":"de-DE"' /tmp/home.html
+          grep -q '"publisher":{"@id":"https://baukostenradar.de/#organization"}' /tmp/home.html
+          grep -q '"@type":"Organization"' /tmp/home.html
+          grep -q '"@id":"https://baukostenradar.de/#organization"' /tmp/home.html
+
+          if grep -q '"@type":"WebSite"' /tmp/costs.html; then
+            echo 'WebSite site-name structured data must remain homepage-only.' >&2
+            exit 1
+          fi
+
+          if grep -q 'SearchAction' /tmp/home.html; then
+            echo 'Homepage must not emit obsolete/unneeded WebSite SearchAction markup.' >&2
+            exit 1
+          fi
 
       - name: Verify robots points to canonical sitemap
         shell: bash

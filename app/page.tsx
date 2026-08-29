@@ -2,6 +2,7 @@ import Link from "next/link";
 import { RenovationCalculator } from "@/components/renovation-calculator";
 import { allGuides } from "@/lib/all-guides";
 import { regions, services } from "@/lib/pricing";
+import { siteConfig } from "@/lib/site";
 
 function euro(value: number) {
   return new Intl.NumberFormat("de-DE", {
@@ -43,6 +44,19 @@ const featuredGuideSlugs = [
 ];
 
 export default function HomePage() {
+  const siteUrl = siteConfig.url.replace(/\/$/, "");
+  const websiteData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${siteUrl}/#website`,
+    url: `${siteUrl}/`,
+    name: siteConfig.name,
+    description: siteConfig.description,
+    inLanguage: "de-DE",
+    publisher: {
+      "@id": `${siteUrl}/#organization`,
+    },
+  };
   const priceCount = services.reduce((sum, service) => sum + service.priceItems.length, 0);
   const featuredServices = featuredServiceSlugs
     .map((slug) => services.find((service) => service.slug === slug))
@@ -53,6 +67,11 @@ export default function HomePage() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteData) }}
+      />
+
       <section className="premiumHero">
         <div className="premiumHeroBackdrop" aria-hidden="true" />
         <div className="shell premiumHeroGrid">
