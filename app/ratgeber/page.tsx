@@ -5,7 +5,7 @@ import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Ratgeber zu Sanierung, Renovierung & Handwerkerkosten 2026",
-  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Wärmepumpen, Photovoltaik, Malerarbeiten, Fliesen, Bodenbelägen, Trockenbau, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
+  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Wärmepumpen, Photovoltaik, Dämmung, Malerarbeiten, Fliesen, Bodenbelägen, Trockenbau, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
   alternates: { canonical: "/ratgeber" },
 };
 
@@ -72,6 +72,12 @@ const guideGroups = [
     title: "PV-Anlagen nach Leistung und Speicher kalkulieren",
     description: "Photovoltaik-Gesamtkosten sowie 5-, 10- und 15-kWp-Anlagen, PV mit Speicher und Stromspeicherpreise pro kWh anhand aktueller Richtwerte und exakter Rechner-Presets vergleichen.",
     slugs: ["photovoltaik-kosten-2026", "photovoltaik-5-kwp-kosten", "photovoltaik-10-kwp-kosten", "photovoltaik-15-kwp-kosten", "photovoltaik-mit-speicher-kosten", "stromspeicher-kosten-pro-kwh"],
+  },
+  {
+    eyebrow: "Dämmung & Gebäudehülle",
+    title: "Dämmkosten, Fassade und Dachaufbau kalkulieren",
+    description: "Dämmkosten pro Quadratmeter sowie WDVS, Innendämmung, Zwischen- und Aufsparrendämmung mit aktuellen Richtwerten, regionalen Modellwerten und exakten Rechner-Presets vergleichen.",
+    slugs: ["daemmung-kosten-pro-qm", "fassadendaemmung-kosten-pro-qm", "innendaemmung-kosten-pro-qm", "zwischensparrendaemmung-kosten-pro-qm", "aufsparrendaemmung-kosten-pro-qm"],
   },
   {
     eyebrow: "Maler & Oberflächen",

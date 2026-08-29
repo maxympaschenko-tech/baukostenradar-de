@@ -399,6 +399,54 @@ const waermepumpeGuideSilos: Record<string, GuideSilo> = {
   },
 };
 
+const daemmungGuideSilos: Record<string, GuideSilo> = {
+  "daemmung-kosten-pro-qm": {
+    serviceSlugs: ["daemmung", "fassade", "dachsanierung"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "daemmung",
+      itemSlug: "fassadendaemmung-wdvs",
+    }),
+    calculatorLabel: "Dämmkosten berechnen",
+    regionalMode: "service",
+  },
+  "fassadendaemmung-kosten-pro-qm": {
+    serviceSlugs: ["daemmung", "fassade"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "daemmung",
+      itemSlug: "fassadendaemmung-wdvs",
+    }),
+    calculatorLabel: "Fassadendämmung berechnen",
+    regionalMode: "service",
+  },
+  "innendaemmung-kosten-pro-qm": {
+    serviceSlugs: ["daemmung", "trockenbau", "fassade"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "daemmung",
+      itemSlug: "innendaemmung",
+    }),
+    calculatorLabel: "Innendämmung berechnen",
+    regionalMode: "service",
+  },
+  "zwischensparrendaemmung-kosten-pro-qm": {
+    serviceSlugs: ["daemmung", "dachsanierung"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "daemmung",
+      itemSlug: "dachdaemmung-zwischensparren",
+    }),
+    calculatorLabel: "Zwischensparrendämmung berechnen",
+    regionalMode: "service",
+  },
+  "aufsparrendaemmung-kosten-pro-qm": {
+    serviceSlugs: ["daemmung", "dachsanierung"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "daemmung",
+      itemSlug: "dachdaemmung-aufsparren",
+    }),
+    calculatorLabel: "Aufsparrendämmung berechnen",
+    regionalMode: "service",
+  },
+};
+
 const serviceAugments: Record<string, string[]> = {
   "klinkerfassade-kosten-pro-qm": ["maurer"],
 };
@@ -414,7 +462,8 @@ export function getGuideSilo(slug: string): GuideSilo {
     bodenGuideSilos[slug] ??
     trockenbauGuideSilos[slug] ??
     photovoltaikGuideSilos[slug] ??
-    waermepumpeGuideSilos[slug];
+    waermepumpeGuideSilos[slug] ??
+    daemmungGuideSilos[slug];
   if (explicit) return explicit;
 
   const base = getBaseGuideSilo(slug);

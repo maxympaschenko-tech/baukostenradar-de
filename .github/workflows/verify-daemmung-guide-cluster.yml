@@ -1,0 +1,136 @@
+name: Verify Dämmung guide cluster
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-daemmung-guide-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify exact Dämmung price-item guide mappings
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/kosten/daemmung' /tmp/daemmung.html
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+
+          grep -q 'https://baukostenradar.de/kosten/daemmung' /tmp/daemmung.html
+          ! grep -qi 'noindex' /tmp/daemmung.html
+
+          mappings=$(cat <<'EOF'
+          fassadendaemmung-wdvs|fassadendaemmung-kosten-pro-qm
+          innendaemmung|innendaemmung-kosten-pro-qm
+          dachdaemmung-zwischensparren|zwischensparrendaemmung-kosten-pro-qm
+          dachdaemmung-aufsparren|aufsparrendaemmung-kosten-pro-qm
+          EOF
+          )
+
+          checked=0
+          while IFS='|' read -r item guide; do
+            item="${item#${item%%[![:space:]]*}}"
+            [ -n "$item" ] || continue
+
+            item_url="https://baukostenradar.de/kosten/daemmung/leistung/${item}"
+            guide_url="https://baukostenradar.de/ratgeber/${guide}"
+            item_output="/tmp/daemmung-item-${item}.html"
+            guide_output="/tmp/daemmung-guide-${guide}.html"
+
+            grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Dämmung item missing in sitemap: ${item}"; exit 1; }
+            grep -q "/kosten/daemmung/leistung/${item}" /tmp/daemmung.html || { echo "Dämmung item missing on category: ${item}"; exit 1; }
+
+            fetch "$item_url" "$item_output"
+            grep -q 'Passender Ratgeber' "$item_output"
+            grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong Dämmung guide mapping: ${item} -> ${guide}"; exit 1; }
+            ! grep -qi 'noindex' "$item_output"
+
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+
+            fetch "$guide_url" "$guide_output"
+            grep -q "$guide_url" "$guide_output"
+            grep -q '"@type":"Article"' "$guide_output"
+            grep -q '/kosten/daemmung' "$guide_output"
+            grep -q '/kosten/daemmung/berlin' "$guide_output"
+            grep -q 'gewerk=daemmung' "$guide_output"
+            grep -q "leistung=${item}" "$guide_output"
+            ! grep -qi 'noindex' "$guide_output"
+
+            checked=$((checked + 1))
+          done <<< "$mappings"
+
+          test "$checked" -eq 4
+          echo "Verified ${checked} exact Dämmung price-item guide mappings"
+
+      - name: Verify Dämmung parent guide and calculator
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          guide='daemmung-kosten-pro-qm'
+          guide_url="https://baukostenradar.de/ratgeber/${guide}"
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          fetch "$guide_url" /tmp/daemmung-parent.html
+
+          grep -q "${guide_url}</loc>" /tmp/sitemap.xml
+          grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+          grep -q "$guide_url" /tmp/daemmung-parent.html
+          grep -q '"@type":"Article"' /tmp/daemmung-parent.html
+          grep -q '/kosten/daemmung' /tmp/daemmung-parent.html
+          grep -q '/kosten/daemmung/berlin' /tmp/daemmung-parent.html
+          grep -q 'gewerk=daemmung' /tmp/daemmung-parent.html
+          grep -q 'leistung=fassadendaemmung-wdvs' /tmp/daemmung-parent.html
+          ! grep -qi 'noindex' /tmp/daemmung-parent.html
+
+      - name: Verify Dämmung guide hub and internal-link silo
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+
+          guides=(
+            daemmung-kosten-pro-qm
+            fassadendaemmung-kosten-pro-qm
+            innendaemmung-kosten-pro-qm
+            zwischensparrendaemmung-kosten-pro-qm
+            aufsparrendaemmung-kosten-pro-qm
+          )
+
+          for source in "${guides[@]}"; do
+            guide_url="https://baukostenradar.de/ratgeber/${source}"
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Dämmung cluster guide missing in sitemap: ${source}"; exit 1; }
+            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Dämmung cluster guide missing from hub: ${source}"; exit 1; }
+
+            fetch "$guide_url" "/tmp/${source}.html"
+            grep -q "$guide_url" "/tmp/${source}.html"
+            grep -q '"@type":"Article"' "/tmp/${source}.html"
+            ! grep -qi 'noindex' "/tmp/${source}.html"
+
+            for target in "${guides[@]}"; do
+              [ "$source" = "$target" ] && continue
+              grep -q "/ratgeber/${target}" "/tmp/${source}.html" || { echo "${source} missing Dämmung peer ${target}"; exit 1; }
+            done
+          done
+
+          echo "Verified Dämmung hub visibility and full peer-link silo"

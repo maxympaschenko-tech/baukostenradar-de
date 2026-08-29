@@ -144,6 +144,14 @@ const waermepumpeGuideLinks = [
   { slug: "waermepumpe-wartung-kosten", label: "Wärmepumpe Wartung Kosten", href: "/ratgeber/waermepumpe-wartung-kosten" },
 ] as const;
 
+const daemmungGuideLinks = [
+  { slug: "daemmung-kosten-pro-qm", label: "Dämmung Kosten pro m²", href: "/ratgeber/daemmung-kosten-pro-qm" },
+  { slug: "fassadendaemmung-kosten-pro-qm", label: "Fassadendämmung Kosten pro m²", href: "/ratgeber/fassadendaemmung-kosten-pro-qm" },
+  { slug: "innendaemmung-kosten-pro-qm", label: "Innendämmung Kosten pro m²", href: "/ratgeber/innendaemmung-kosten-pro-qm" },
+  { slug: "zwischensparrendaemmung-kosten-pro-qm", label: "Zwischensparrendämmung Kosten pro m²", href: "/ratgeber/zwischensparrendaemmung-kosten-pro-qm" },
+  { slug: "aufsparrendaemmung-kosten-pro-qm", label: "Aufsparrendämmung Kosten pro m²", href: "/ratgeber/aufsparrendaemmung-kosten-pro-qm" },
+] as const;
+
 function peers<T extends readonly { slug: string; label: string; href: string }[]>(links: T, slug: string) {
   return links
     .filter((link) => link.slug !== slug)
@@ -231,6 +239,11 @@ const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
   "waermepumpe-kosten-2026": peers(waermepumpeGuideLinks, "waermepumpe-kosten-2026"),
   "luft-wasser-waermepumpe-kosten": peers(waermepumpeGuideLinks, "luft-wasser-waermepumpe-kosten"),
   "waermepumpe-wartung-kosten": peers(waermepumpeGuideLinks, "waermepumpe-wartung-kosten"),
+  "daemmung-kosten-pro-qm": peers(daemmungGuideLinks, "daemmung-kosten-pro-qm"),
+  "fassadendaemmung-kosten-pro-qm": peers(daemmungGuideLinks, "fassadendaemmung-kosten-pro-qm"),
+  "innendaemmung-kosten-pro-qm": peers(daemmungGuideLinks, "innendaemmung-kosten-pro-qm"),
+  "zwischensparrendaemmung-kosten-pro-qm": peers(daemmungGuideLinks, "zwischensparrendaemmung-kosten-pro-qm"),
+  "aufsparrendaemmung-kosten-pro-qm": peers(daemmungGuideLinks, "aufsparrendaemmung-kosten-pro-qm"),
 };
 
 const enrichedBaseGuides = baseAllGuides.map((guide) => {
