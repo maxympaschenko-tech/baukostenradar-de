@@ -19,8 +19,18 @@ const heroCategories = [
   ["Badsanierung", "/kosten/badsanierung"],
   ["Dacharbeiten", "/kosten/dachsanierung"],
   ["Fenster", "/kosten/fenster"],
-  ["Heizung & Sanitär", "/kosten/heizung"],
+  ["Heizung", "/kosten/heizung"],
+  ["Sanitär", "/kosten/sanitaer"],
   ["Elektroarbeiten", "/kosten/elektriker"],
+] as const;
+
+const featuredServiceSlugs = [
+  "badsanierung",
+  "maler",
+  "elektriker",
+  "dachsanierung",
+  "fenster",
+  "heizung",
 ] as const;
 
 const featuredGuideSlugs = [
@@ -34,7 +44,9 @@ const featuredGuideSlugs = [
 
 export default function HomePage() {
   const priceCount = services.reduce((sum, service) => sum + service.priceItems.length, 0);
-  const featuredServices = services.slice(0, 6);
+  const featuredServices = featuredServiceSlugs
+    .map((slug) => services.find((service) => service.slug === slug))
+    .filter((service): service is NonNullable<typeof service> => Boolean(service));
   const featuredGuides = featuredGuideSlugs
     .map((slug) => allGuides.find((guide) => guide.slug === slug))
     .filter((guide): guide is (typeof allGuides)[number] => Boolean(guide));
