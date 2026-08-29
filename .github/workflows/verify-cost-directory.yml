@@ -1,0 +1,47 @@
+name: Verify cost directory
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-cost-directory:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify searchable Handwerker cost directory
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/api/version' /tmp/version.json
+          fetch 'https://baukostenradar.de/kosten' /tmp/kosten.html
+
+          grep -q '"@type":"ItemList"' /tmp/kosten.html
+          grep -q 'Handwerkerpreise nach Bereich' /tmp/kosten.html
+          grep -q 'Handwerkerpreise durchsuchen' /tmp/kosten.html
+          grep -q 'Gewerk oder Leistung suchen' /tmp/kosten.html
+          grep -q 'Sicherungskasten' /tmp/kosten.html
+          grep -q 'Wärmepumpe' /tmp/kosten.html
+
+          representative_services=(
+            elektriker
+            bodenleger
+            waermepumpe
+            tueren
+            abriss-entsorgung
+          )
+
+          for slug in "${representative_services[@]}"; do
+            grep -q "/kosten/${slug}" /tmp/kosten.html || { echo "Cost directory missing ${slug}"; exit 1; }
+          done
+
+          ! grep -qi 'noindex' /tmp/kosten.html
+
+          echo 'Verified searchable cost controls, price-item search payload, ItemList metadata and representative service links in production HTML'
