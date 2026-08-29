@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getService, regions } from "@/lib/pricing";
 
 function euro(value: number) {
@@ -12,6 +12,10 @@ function euro(value: number) {
   }).format(value);
 }
 
+function safeArea(value: number) {
+  return Math.min(40, Math.max(2, Number.isFinite(value) ? value : 8));
+}
+
 export function BathCostCalculator() {
   const service = getService("badsanierung");
   const squareMeterItem = service?.priceItems.find((item) => item.name === "Bad-Neubau / Sanierung");
@@ -20,17 +24,25 @@ export function BathCostCalculator() {
   const [area, setArea] = useState(8);
   const [regionValue, setRegionValue] = useState("de");
 
+  useEffect(() => {
+    const rawArea = new URLSearchParams(window.location.search).get("flaeche");
+    if (!rawArea) return;
+    const parsedArea = Number(rawArea.replace(",", "."));
+    if (!Number.isFinite(parsedArea)) return;
+    setArea(safeArea(parsedArea));
+  }, []);
+
   const result = useMemo(() => {
-    const safeArea = Math.min(40, Math.max(2, Number.isFinite(area) ? area : 8));
+    const normalizedArea = safeArea(area);
     const region = regions.find((item) => item.value === regionValue) ?? regions[0];
     const lowPerSquareMeter = squareMeterItem?.low ?? 1000;
     const highPerSquareMeter = squareMeterItem?.high ?? 2500;
 
     return {
-      area: safeArea,
+      area: normalizedArea,
       region,
-      low: safeArea * lowPerSquareMeter * region.factor,
-      high: safeArea * highPerSquareMeter * region.factor,
+      low: normalizedArea * lowPerSquareMeter * region.factor,
+      high: normalizedArea * highPerSquareMeter * region.factor,
       lowPerSquareMeter,
       highPerSquareMeter,
     };
