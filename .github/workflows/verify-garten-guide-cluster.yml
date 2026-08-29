@@ -1,0 +1,140 @@
+name: Verify Garten guide cluster
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-garten-guide-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify exact Garten price-item guide mappings
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/kosten/garten' /tmp/garten.html
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+
+          grep -q 'https://baukostenradar.de/kosten/garten' /tmp/garten.html
+          ! grep -qi 'noindex' /tmp/garten.html
+
+          mappings=$(cat <<'EOF'
+          einfahrt-pflastern|einfahrt-pflastern-kosten
+          terrasse-pflastern-inkl-unterbau|terrasse-pflastern-kosten
+          doppelstabmattenzaun-inkl-montage|doppelstabmattenzaun-kosten-pro-meter
+          rollrasen-inkl-vorbereitung|rollrasen-kosten-pro-qm
+          heckenschnitt|heckenschnitt-kosten-pro-meter
+          baumfaellung-mittelgross-inkl-entsorgung|baum-faellen-kosten
+          EOF
+          )
+
+          checked=0
+          while IFS='|' read -r item guide; do
+            item="${item#${item%%[![:space:]]*}}"
+            [ -n "$item" ] || continue
+
+            item_url="https://baukostenradar.de/kosten/garten/leistung/${item}"
+            guide_url="https://baukostenradar.de/ratgeber/${guide}"
+            item_output="/tmp/garten-item-${item}.html"
+            guide_output="/tmp/garten-guide-${guide}.html"
+
+            grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Garten item missing in sitemap: ${item}"; exit 1; }
+            grep -q "/kosten/garten/leistung/${item}" /tmp/garten.html || { echo "Garten item missing on category: ${item}"; exit 1; }
+
+            fetch "$item_url" "$item_output"
+            grep -q 'Passender Ratgeber' "$item_output"
+            grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong Garten guide mapping: ${item} -> ${guide}"; exit 1; }
+            ! grep -qi 'noindex' "$item_output"
+
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+
+            fetch "$guide_url" "$guide_output"
+            grep -q "$guide_url" "$guide_output"
+            grep -q '"@type":"Article"' "$guide_output"
+            grep -q '/kosten/garten' "$guide_output"
+            grep -q '/kosten/garten/berlin' "$guide_output"
+            grep -q 'gewerk=garten' "$guide_output"
+            grep -q "leistung=${item}" "$guide_output"
+            ! grep -qi 'noindex' "$guide_output"
+
+            checked=$((checked + 1))
+          done <<< "$mappings"
+
+          test "$checked" -eq 6
+          echo "Verified ${checked} exact Garten price-item guide mappings"
+
+      - name: Verify Garten parent guide and calculator
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          guide='garten-anlegen-kosten'
+          guide_url="https://baukostenradar.de/ratgeber/${guide}"
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          fetch "$guide_url" /tmp/garten-parent.html
+
+          grep -q "${guide_url}</loc>" /tmp/sitemap.xml
+          grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+          grep -q "$guide_url" /tmp/garten-parent.html
+          grep -q '"@type":"Article"' /tmp/garten-parent.html
+          grep -q '/kosten/garten' /tmp/garten-parent.html
+          grep -q '/kosten/garten/berlin' /tmp/garten-parent.html
+          grep -q 'gewerk=garten' /tmp/garten-parent.html
+          grep -q 'leistung=einfahrt-pflastern' /tmp/garten-parent.html
+          ! grep -qi 'noindex' /tmp/garten-parent.html
+
+      - name: Verify Garten guide hub and internal-link silo
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+
+          guides=(
+            garten-anlegen-kosten
+            einfahrt-pflastern-kosten
+            terrasse-pflastern-kosten
+            doppelstabmattenzaun-kosten-pro-meter
+            rollrasen-kosten-pro-qm
+            heckenschnitt-kosten-pro-meter
+            baum-faellen-kosten
+          )
+
+          for source in "${guides[@]}"; do
+            guide_url="https://baukostenradar.de/ratgeber/${source}"
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Garten cluster guide missing in sitemap: ${source}"; exit 1; }
+            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Garten cluster guide missing from hub: ${source}"; exit 1; }
+
+            fetch "$guide_url" "/tmp/${source}.html"
+            grep -q "$guide_url" "/tmp/${source}.html"
+            grep -q '"@type":"Article"' "/tmp/${source}.html"
+            ! grep -qi 'noindex' "/tmp/${source}.html"
+
+            for target in "${guides[@]}"; do
+              [ "$source" = "$target" ] && continue
+              grep -q "/ratgeber/${target}" "/tmp/${source}.html" || { echo "${source} missing Garten peer ${target}"; exit 1; }
+            done
+          done
+
+          echo "Verified Garten hub visibility and full peer-link silo"
