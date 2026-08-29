@@ -1,0 +1,125 @@
+name: Verify internal social metadata
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-social-metadata:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch representative indexable pages
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          urls=(
+            'https://baukostenradar.de/kosten'
+            'https://baukostenradar.de/kosten/maler'
+            'https://baukostenradar.de/kosten/maler/berlin'
+            'https://baukostenradar.de/kosten/maler/leistung/waende-streichen'
+            'https://baukostenradar.de/staedte'
+            'https://baukostenradar.de/staedte/berlin'
+            'https://baukostenradar.de/ratgeber'
+            'https://baukostenradar.de/ratgeber/sanierungskosten-pro-qm'
+            'https://baukostenradar.de/rechner'
+            'https://baukostenradar.de/rechner/renovierungskosten'
+            'https://baukostenradar.de/rechner/handwerkerkosten'
+            'https://baukostenradar.de/rechner/badsanierungskosten'
+          )
+
+          mkdir -p /tmp/social-meta
+          printf '%s\n' "${urls[@]}" > /tmp/social-meta/urls.txt
+
+          for index in "${!urls[@]}"; do
+            url="${urls[$index]}"
+            output="/tmp/social-meta/${index}.html"
+            for attempt in 1 2 3 4 5; do
+              if curl -sS --fail --connect-timeout 10 --max-time 30 "$url" -o "$output"; then
+                break
+              fi
+              if [[ "$attempt" == "5" ]]; then
+                echo "Failed to fetch $url" >&2
+                exit 1
+              fi
+              sleep 4
+            done
+          done
+
+      - name: Verify page-specific Open Graph and Twitter metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import urlsplit
+
+          class HeadParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.in_title = False
+                  self.title_parts = []
+                  self.meta = {}
+                  self.canonical = None
+
+              def handle_starttag(self, tag, attrs):
+                  data = dict(attrs)
+                  if tag == "title":
+                      self.in_title = True
+                  elif tag == "meta":
+                      key = data.get("property") or data.get("name")
+                      content = data.get("content")
+                      if key and content is not None:
+                          self.meta[key] = content
+                  elif tag == "link" and data.get("rel") == "canonical":
+                      self.canonical = data.get("href")
+
+              def handle_endtag(self, tag):
+                  if tag == "title":
+                      self.in_title = False
+
+              def handle_data(self, data):
+                  if self.in_title:
+                      self.title_parts.append(data)
+
+              @property
+              def title(self):
+                  return "".join(self.title_parts).strip()
+
+          urls = Path("/tmp/social-meta/urls.txt").read_text().splitlines()
+          suffix = " | BauKostenRadar"
+
+          for index, url in enumerate(urls):
+              parser = HeadParser()
+              parser.feed(Path(f"/tmp/social-meta/{index}.html").read_text())
+
+              page_title = parser.title[:-len(suffix)] if parser.title.endswith(suffix) else parser.title
+              description = parser.meta.get("description")
+              og_title = parser.meta.get("og:title")
+              twitter_title = parser.meta.get("twitter:title")
+              og_description = parser.meta.get("og:description")
+              twitter_description = parser.meta.get("twitter:description")
+              og_url = parser.meta.get("og:url")
+
+              assert page_title and page_title != "BauKostenRadar", f"Generic/missing title on {url}: {page_title!r}"
+              assert og_title == page_title, f"og:title mismatch on {url}: {og_title!r} != {page_title!r}"
+              assert twitter_title == page_title, f"twitter:title mismatch on {url}: {twitter_title!r} != {page_title!r}"
+              assert description, f"Missing meta description on {url}"
+              assert og_description == description, f"og:description mismatch on {url}"
+              assert twitter_description == description, f"twitter:description mismatch on {url}"
+              assert parser.canonical, f"Missing canonical on {url}"
+              assert og_url and og_url.rstrip("/") == parser.canonical.rstrip("/"), f"og:url mismatch on {url}: {og_url!r} vs {parser.canonical!r}"
+              assert parser.meta.get("twitter:card") == "summary_large_image", f"Wrong Twitter card on {url}"
+              assert parser.meta.get("og:image", "").startswith("https://baukostenradar.de/"), f"Missing inherited og:image on {url}"
+              assert parser.meta.get("twitter:image", "").startswith("https://baukostenradar.de/"), f"Missing inherited twitter:image on {url}"
+
+              path = urlsplit(url).path
+              if path.startswith("/ratgeber/"):
+                  assert parser.meta.get("og:type") == "article", f"Ratgeber must retain article Open Graph type on {url}"
+
+              print(f"OK: {url} -> {page_title}")
+          PY
