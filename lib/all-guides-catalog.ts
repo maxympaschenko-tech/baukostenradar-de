@@ -2,18 +2,45 @@ import { allGuides as baseAllGuides } from "./all-guides";
 import { doorGuides } from "./guides-doors";
 
 const doorRelatedLinks = {
-  kunststoff: { label: "Haustür Kunststoff Kosten", href: "/ratgeber/haustuer-kunststoff-kosten" },
-  rc2: { label: "Haustür Holz/Alu RC2 Kosten", href: "/ratgeber/haustuer-rc2-kosten" },
+  kunststoff: {
+    label: "Haustür Kunststoff Kosten",
+    href: "/ratgeber/haustuer-kunststoff-kosten",
+  },
+  rc2: {
+    label: "Haustür Holz/Alu RC2 Kosten",
+    href: "/ratgeber/haustuer-rc2-kosten",
+  },
 } as const;
 
 const masonryRelatedLinks = {
-  innenwand: { label: "Innenwand mauern Kosten", href: "/ratgeber/innenwand-mauern-kosten" },
-  kalksandstein: { label: "Kalksandstein-Mauerwerk Kosten", href: "/ratgeber/kalksandstein-mauerwerk-kosten-pro-qm" },
-  poroton: { label: "Poroton-Mauerwerk Kosten", href: "/ratgeber/poroton-mauerwerk-kosten-pro-qm" },
-  porenbeton: { label: "Porenbeton-Mauerwerk Kosten", href: "/ratgeber/porenbeton-mauerwerk-kosten-pro-qm" },
-  klinker: { label: "Klinkerfassade und Verblendmauerwerk Kosten", href: "/ratgeber/klinkerfassade-kosten-pro-qm" },
-  bodenplatte: { label: "Bodenplatte Kosten", href: "/ratgeber/bodenplatte-kosten-pro-qm" },
-  klinkerCalculator: { label: "Klinker-Verblendmauerwerk berechnen", href: "/rechner/handwerkerkosten?gewerk=maurer&leistung=klinker-verblendmauerwerk" },
+  innenwand: {
+    label: "Innenwand mauern Kosten",
+    href: "/ratgeber/innenwand-mauern-kosten",
+  },
+  kalksandstein: {
+    label: "Kalksandstein-Mauerwerk Kosten",
+    href: "/ratgeber/kalksandstein-mauerwerk-kosten-pro-qm",
+  },
+  poroton: {
+    label: "Poroton-Mauerwerk Kosten",
+    href: "/ratgeber/poroton-mauerwerk-kosten-pro-qm",
+  },
+  porenbeton: {
+    label: "Porenbeton-Mauerwerk Kosten",
+    href: "/ratgeber/porenbeton-mauerwerk-kosten-pro-qm",
+  },
+  klinker: {
+    label: "Klinkerfassade und Verblendmauerwerk Kosten",
+    href: "/ratgeber/klinkerfassade-kosten-pro-qm",
+  },
+  bodenplatte: {
+    label: "Bodenplatte Kosten",
+    href: "/ratgeber/bodenplatte-kosten-pro-qm",
+  },
+  klinkerCalculator: {
+    label: "Klinker-Verblendmauerwerk berechnen",
+    href: "/rechner/handwerkerkosten?gewerk=maurer&leistung=klinker-verblendmauerwerk",
+  },
 } as const;
 
 const treppenGuideLinks = [
@@ -118,7 +145,9 @@ const waermepumpeGuideLinks = [
 ] as const;
 
 function peers<T extends readonly { slug: string; label: string; href: string }[]>(links: T, slug: string) {
-  return links.filter((link) => link.slug !== slug).map(({ label, href }) => ({ label, href }));
+  return links
+    .filter((link) => link.slug !== slug)
+    .map(({ label, href }) => ({ label, href }));
 }
 
 const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
@@ -129,7 +158,14 @@ const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
   "poroton-mauerwerk-kosten-pro-qm": [masonryRelatedLinks.klinker],
   "porenbeton-mauerwerk-kosten-pro-qm": [masonryRelatedLinks.klinker],
   "bodenplatte-kosten-pro-qm": [masonryRelatedLinks.klinker],
-  "klinkerfassade-kosten-pro-qm": [masonryRelatedLinks.innenwand, masonryRelatedLinks.kalksandstein, masonryRelatedLinks.poroton, masonryRelatedLinks.porenbeton, masonryRelatedLinks.bodenplatte, masonryRelatedLinks.klinkerCalculator],
+  "klinkerfassade-kosten-pro-qm": [
+    masonryRelatedLinks.innenwand,
+    masonryRelatedLinks.kalksandstein,
+    masonryRelatedLinks.poroton,
+    masonryRelatedLinks.porenbeton,
+    masonryRelatedLinks.bodenplatte,
+    masonryRelatedLinks.klinkerCalculator,
+  ],
   "14-treppenstufen-renovieren-kosten": peers(treppenGuideLinks, "14-treppenstufen-renovieren-kosten"),
   "treppenrenovierung-holzstufen-system-kosten": peers(treppenGuideLinks, "treppenrenovierung-holzstufen-system-kosten"),
   "holztreppe-schleifen-kosten": peers(treppenGuideLinks, "holztreppe-schleifen-kosten"),
