@@ -34,6 +34,16 @@ export const priceSources = {
     url: "https://www.my-hammer.de/kueche/preisradar/was-kostet-kueche-einbauen",
     checkedAt: "29.08.2026",
   },
+  co2WaermepumpeGesamt: {
+    name: "co2online - Wärmepumpe Kosten 2026",
+    url: "https://www.co2online.de/modernisieren-und-bauen/waermepumpe/",
+    checkedAt: "29.08.2026",
+  },
+  co2WasserWaermepumpe: {
+    name: "co2online - Wasser-Wasser-Wärmepumpe Kosten 2026",
+    url: "https://www.co2online.de/modernisieren-und-bauen/waermepumpe/wasser-wasser-waermepumpe/",
+    checkedAt: "29.08.2026",
+  },
 } as const;
 
 type StairsSourceKey = keyof typeof priceSources;
@@ -160,6 +170,87 @@ export const services: Service[] = demolitionServices.map((service) => {
           unit: "pro Treppe",
           note: "Material und Arbeitskosten für einen typischen Handlauf",
           sourceKey: "myhammerHolztreppe",
+        },
+      ],
+    };
+  }
+
+  if (service.slug === "waermepumpe") {
+    return {
+      ...demolitionService,
+      description: "Aktuelle Richtwerte 2026 für Luft-Wasser-, Erd- und Grundwasser-Wärmepumpen, Erschließung mit Kollektor oder Erdsonde, Brunnenbohrungen, Installation, Wartung und Betriebsstrom in Deutschland.",
+      priceItems: [
+        ...demolitionService.priceItems,
+        {
+          name: "Luftwärmepumpe Anschaffung inkl. Speicher und Komponenten",
+          low: 22500,
+          high: 22500,
+          unit: "pro Anlage vor Förderung",
+          note: "Orientierungswert für ein Einfamilienhaus; Installation und individuelle Zusatzarbeiten separat prüfen",
+          sourceKey: "co2WaermepumpeGesamt",
+        },
+        {
+          name: "Erdwärmepumpe mit Flächenkollektor komplett",
+          low: 30500,
+          high: 33500,
+          unit: "pro Anlage vor Förderung",
+          note: "Aus 28.500 € Anlagenkosten plus etwa 2.000–5.000 € Erschließung mit Kollektoren abgeleiteter Richtwert",
+          sourceKey: "co2WaermepumpeGesamt",
+        },
+        {
+          name: "Erdwärmepumpe mit Erdsonde komplett",
+          low: 34500,
+          high: 41500,
+          unit: "pro Anlage vor Förderung",
+          note: "Aus 28.500 € Anlagenkosten plus etwa 6.000–13.000 € Erschließung mit Erdsonde abgeleiteter Richtwert",
+          sourceKey: "co2WaermepumpeGesamt",
+        },
+        {
+          name: "Flächenkollektor für Erdwärmepumpe erschließen",
+          low: 2000,
+          high: 5000,
+          unit: "pro Projekt",
+          sourceKey: "co2WaermepumpeGesamt",
+        },
+        {
+          name: "Erdsonde für Erdwärmepumpe erschließen",
+          low: 6000,
+          high: 13000,
+          unit: "pro Projekt",
+          note: "Bohrtiefe, Untergrund und Genehmigungen beeinflussen die tatsächlichen Kosten",
+          sourceKey: "co2WaermepumpeGesamt",
+        },
+        {
+          name: "Wasser-Wasser-Wärmepumpe komplett",
+          low: 27000,
+          high: 50000,
+          unit: "pro Anlage inkl. typischer Erschließung",
+          note: "Aktueller Gesamtbereich für ein Einfamilienhaus; Förderung noch nicht abgezogen",
+          sourceKey: "co2WasserWaermepumpe",
+        },
+        {
+          name: "Brunnenbohrungen für Wasser-Wasser-Wärmepumpe",
+          low: 8000,
+          high: 16000,
+          unit: "pro Projekt",
+          note: "Förder- und Schluckbrunnen; Tiefe, Boden und Nebenkosten bestimmen den Endpreis",
+          sourceKey: "co2WasserWaermepumpe",
+        },
+        {
+          name: "Brunnenbohrung für Wärmepumpe je Meter",
+          low: 100,
+          high: 250,
+          unit: "pro Bohrmeter",
+          note: "Zusätzliche Kosten für Genehmigungen, Baustelleneinrichtung, Aushub und Entsorgung können hinzukommen",
+          sourceKey: "co2WasserWaermepumpe",
+        },
+        {
+          name: "Wärmepumpenstrom laufende Kosten",
+          low: 230,
+          high: 1400,
+          unit: "pro Jahr",
+          note: "Breiter Orientierungsbereich abhängig von Gebäude, Dämmstandard, Wärmepumpentyp und Jahresarbeitszahl",
+          sourceKey: "co2WaermepumpeGesamt",
         },
       ],
     };
