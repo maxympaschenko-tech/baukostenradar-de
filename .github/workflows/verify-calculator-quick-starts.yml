@@ -1,0 +1,59 @@
+name: Verify calculator quick starts
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-calculator-quick-starts:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify calculator directory quick-start links
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/api/version' /tmp/version.json
+          fetch 'https://baukostenradar.de/rechner' /tmp/rechner.html
+
+          grep -q '"@type":"CollectionPage"' /tmp/rechner.html
+          grep -q 'Mit einem typischen Szenario direkt losrechnen' /tmp/rechner.html
+
+          expected_links=(
+            '/rechner/renovierungskosten?flaeche=100'
+            '/rechner/renovierungskosten?flaeche=150'
+            '/rechner/renovierungskosten?flaeche=200'
+            '/rechner/renovierungskosten?flaeche=120&umfang=core'
+            '/rechner/badsanierungskosten?flaeche=6'
+            '/rechner/badsanierungskosten?flaeche=8'
+            '/rechner/badsanierungskosten?flaeche=10'
+            '/rechner/handwerkerkosten?gewerk=maler&leistung=waende-streichen&menge=100'
+            '/rechner/handwerkerkosten?gewerk=elektriker&leistung=sicherungskasten-erneuern&menge=1'
+            '/rechner/handwerkerkosten?gewerk=waermepumpe&leistung=luft-wasser-waermepumpe-komplett&menge=1'
+          )
+
+          for href in "${expected_links[@]}"; do
+            encoded_href="${href//&/&amp;}"
+            if ! grep -Fq "$href" /tmp/rechner.html && ! grep -Fq "$encoded_href" /tmp/rechner.html; then
+              echo "Missing calculator quick-start link: $href"
+              exit 1
+            fi
+          done
+
+          fetch 'https://baukostenradar.de/rechner/renovierungskosten?flaeche=120&umfang=core' /tmp/core.html
+          grep -q 'value="120"' /tmp/core.html
+          grep -q 'value="core" selected' /tmp/core.html
+
+          fetch 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=elektriker&leistung=sicherungskasten-erneuern&menge=1' /tmp/electric.html
+          grep -q 'Sicherungskasten erneuern' /tmp/electric.html
+
+          ! grep -qi 'noindex' /tmp/rechner.html
+
+          echo 'Verified calculator quick starts, exact Renovierung presets and Handwerker scenario routing in production'
