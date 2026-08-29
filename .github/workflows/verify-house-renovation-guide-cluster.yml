@@ -1,0 +1,80 @@
+name: Verify house renovation guide cluster
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-house-renovation-guide-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify house renovation guides and full peer silo
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+
+          guides=(
+            sanierungskosten-pro-qm
+            haus-sanieren-kosten
+            kernsanierung-kosten
+            sanierungskosten-einfamilienhaus
+            altbausanierung-kosten
+          )
+
+          for source in "${guides[@]}"; do
+            guide_url="https://baukostenradar.de/ratgeber/${source}"
+            guide_html="/tmp/${source}.html"
+
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "House renovation guide missing in sitemap: ${source}"; exit 1; }
+            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "House renovation guide missing from hub: ${source}"; exit 1; }
+
+            fetch "$guide_url" "$guide_html"
+            grep -q "$guide_url" "$guide_html"
+            grep -q '"@type":"Article"' "$guide_html"
+            grep -q '/rechner/renovierungskosten' "$guide_html"
+            grep -q '/staedte/berlin' "$guide_html"
+            grep -q '/kosten/badsanierung/berlin' "$guide_html"
+            ! grep -qi 'noindex' "$guide_html"
+
+            for target in "${guides[@]}"; do
+              [ "$source" = "$target" ] && continue
+              grep -q "/ratgeber/${target}" "$guide_html" || { echo "${source} missing house renovation peer ${target}"; exit 1; }
+            done
+          done
+
+          echo 'Verified house renovation hub visibility and full five-guide peer silo'
+
+      - name: Verify Kernsanierung calculator scope preset
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          guide='kernsanierung-kosten'
+          calculator_url='https://baukostenradar.de/rechner/renovierungskosten?umfang=core'
+
+          fetch "https://baukostenradar.de/ratgeber/${guide}" /tmp/kernsanierung.html
+          grep -q '/rechner/renovierungskosten?umfang=core' /tmp/kernsanierung.html
+
+          fetch "$calculator_url" /tmp/kernsanierung-calculator.html
+          grep -q 'Renovierungskosten Rechner 2026' /tmp/kernsanierung-calculator.html
+          grep -Eq 'value="core"[^>]*selected|selected[^>]*value="core"' /tmp/kernsanierung-calculator.html || { echo 'Calculator did not preload Kernsanierung scope'; exit 1; }
+          grep -q 'Kernsanierung' /tmp/kernsanierung-calculator.html
+          grep -q '1.500' /tmp/kernsanierung-calculator.html
+          grep -q '3.500' /tmp/kernsanierung-calculator.html
+          ! grep -qi 'noindex' /tmp/kernsanierung-calculator.html
+
+          echo 'Verified Kernsanierung calculator scope preset'
