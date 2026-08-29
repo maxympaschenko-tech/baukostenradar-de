@@ -1,0 +1,154 @@
+.intro {
+  padding-bottom: 34px;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(240px, 0.8fr) minmax(190px, 0.55fr);
+  gap: 14px;
+  align-items: end;
+  margin-top: 24px;
+  padding: 18px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.searchField > span,
+.topicField > span {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.searchField input,
+.topicField select {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #c9d4dc;
+  border-radius: 11px;
+  background: white;
+  padding: 0 13px;
+  color: var(--text);
+}
+
+.searchField input:focus,
+.topicField select:focus {
+  outline: 2px solid rgba(31, 88, 127, 0.16);
+  border-color: var(--primary-2);
+}
+
+.status {
+  min-height: 48px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.status strong {
+  font-size: 22px;
+  color: var(--primary);
+}
+
+.status span {
+  font-weight: 800;
+}
+
+.status small {
+  width: 100%;
+  color: var(--muted);
+}
+
+.status button,
+.topicLinks button {
+  border: 1px solid var(--line);
+  background: white;
+  color: var(--primary-2);
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.status button {
+  padding: 7px 10px;
+}
+
+.topicLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.topicLinks button {
+  padding: 8px 11px;
+}
+
+.topicLinks button:hover,
+.topicLinks button:focus-visible,
+.status button:hover,
+.status button:focus-visible {
+  border-color: #b7c9d5;
+  background: #f7fafc;
+}
+
+.directorySection {
+  scroll-margin-top: 82px;
+}
+
+.emptySection {
+  background: #edf2f5;
+}
+
+.emptyState {
+  text-align: center;
+}
+
+.emptyState h2 {
+  margin: 12px 0 8px;
+}
+
+.resetButton {
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: white;
+  color: var(--primary-2);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+@media (max-width: 920px) {
+  .controls {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .status {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 620px) {
+  .controls {
+    grid-template-columns: 1fr;
+  }
+
+  .status {
+    grid-column: auto;
+  }
+
+  .topicLinks {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .topicLinks button {
+    flex: 0 0 auto;
+  }
+}
