@@ -11,86 +11,141 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Verify Türen guide silo
+      - name: Verify exact Türen price-item guide mappings
         shell: bash
         run: |
           set -euo pipefail
 
-          sitemap='/tmp/sitemap.xml'
-          parent='/tmp/haustuer-parent.html'
-          hub='/tmp/hub.html'
-          category='/tmp/tueren.html'
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
 
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o "$sitemap"
-          curl -sS --fail 'https://baukostenradar.de/ratgeber/haustuer-einbauen-kosten' -o "$parent"
-          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o "$hub"
-          curl -sS --fail 'https://baukostenradar.de/kosten/tueren' -o "$category"
+          assert_ratgeber_href() {
+            local html="$1"
+            local href="$2"
+            python - "$html" "$href" <<'PY'
+          import re
+          import sys
 
-          verify_guide() {
-            local guide="$1"
-            local item="$2"
-            local low="$3"
-            local high="$4"
-            local title="$5"
-            local peer="$6"
-            local guide_html="/tmp/${guide}.html"
-            local item_html="/tmp/${item}.html"
+          path, href = sys.argv[1:]
+          html = open(path, encoding="utf-8").read()
+          section = re.search(r'id="ratgeber".*?id="quelle"', html, flags=re.S)
+          if not section:
+              raise SystemExit(f"Ratgeber section missing in {path}")
+          if f'href="{href}"' not in section.group(0):
+              raise SystemExit(f"Expected exact Ratgeber href {href} in {path}")
+          PY
+          }
 
-            grep -q "https://baukostenradar.de/ratgeber/${guide}</loc>" "$sitemap"
-            grep -q "https://baukostenradar.de/kosten/tueren/leistung/${item}</loc>" "$sitemap"
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/kosten/tueren' /tmp/tueren.html
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/hub.html
 
-            curl -sS --fail "https://baukostenradar.de/ratgeber/${guide}" -o "$guide_html"
-            grep -q "https://baukostenradar.de/ratgeber/${guide}" "$guide_html"
+          ! grep -qi 'noindex' /tmp/tueren.html
+
+          mappings=$(cat <<'EOF'
+          innentuer-mit-zarge-inkl-montage|innentuer-einbauen-kosten
+          haustuer-kunststoff-inkl-montage|haustuer-kunststoff-kosten
+          haustuer-holz-alu-rc2-inkl-montage|haustuer-rc2-kosten
+          EOF
+          )
+
+          checked=0
+          while IFS='|' read -r item guide; do
+            item="${item#${item%%[![:space:]]*}}"
+            [ -n "$item" ] || continue
+
+            item_url="https://baukostenradar.de/kosten/tueren/leistung/${item}"
+            guide_url="https://baukostenradar.de/ratgeber/${guide}"
+            item_html="/tmp/door-item-${item}.html"
+            guide_html="/tmp/door-guide-${guide}.html"
+
+            grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Türen item missing in sitemap: ${item}"; exit 1; }
+            grep -q "/kosten/tueren/leistung/${item}" /tmp/tueren.html || { echo "Türen item missing on category: ${item}"; exit 1; }
+
+            fetch "$item_url" "$item_html"
+            grep -q 'Passender Ratgeber' "$item_html"
+            assert_ratgeber_href "$item_html" "/ratgeber/${guide}"
+            ! grep -qi 'noindex' "$item_html"
+
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml
+            grep -q "/ratgeber/${guide}" /tmp/hub.html
+
+            fetch "$guide_url" "$guide_html"
+            grep -q "$guide_url" "$guide_html"
             grep -q '"@type":"Article"' "$guide_html"
-            grep -q "$low" "$guide_html"
-            grep -q "$high" "$guide_html"
+            grep -q '/kosten/tueren' "$guide_html"
             grep -q '/kosten/tueren/berlin' "$guide_html"
             grep -q 'gewerk=tueren' "$guide_html"
             grep -q "leistung=${item}" "$guide_html"
-            grep -q "/ratgeber/${peer}" "$guide_html"
             ! grep -qi 'noindex' "$guide_html"
 
-            curl -sS --fail "https://baukostenradar.de/kosten/tueren/leistung/${item}" -o "$item_html"
-            grep -q 'Passender Ratgeber' "$item_html"
-            grep -q "/ratgeber/${guide}" "$item_html"
-            ! grep -qi 'noindex' "$item_html"
+            checked=$((checked + 1))
+          done <<< "$mappings"
 
-            grep -q "/kosten/tueren/leistung/${item}" "$category"
-            grep -q "/ratgeber/${guide}" "$hub"
-            grep -q "$title" "$hub"
+          test "$checked" -eq 3
+          echo "Verified ${checked} exact Türen price-item guide mappings"
+
+      - name: Verify Türen parent and scenario calculator presets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
           }
 
-          verify_guide \
-            'innentuer-einbauen-kosten' \
-            'innentuer-mit-zarge-inkl-montage' \
-            '320' \
-            '950' \
-            'Innentür einbauen Kosten 2026' \
-            'haustuer-kunststoff-kosten'
+          fetch 'https://baukostenradar.de/ratgeber/haustuer-einbauen-kosten' /tmp/haustuer-parent.html
+          fetch 'https://baukostenradar.de/ratgeber/6-innentueren-austauschen-kosten' /tmp/innentueren-six.html
 
-          verify_guide \
-            'haustuer-kunststoff-kosten' \
-            'haustuer-kunststoff-inkl-montage' \
-            '1.500' \
-            '3.500' \
-            'Haustür Kunststoff Kosten 2026' \
-            'haustuer-rc2-kosten'
+          grep -q '"@type":"Article"' /tmp/haustuer-parent.html
+          grep -q '/kosten/tueren/berlin' /tmp/haustuer-parent.html
+          grep -q 'gewerk=tueren' /tmp/haustuer-parent.html
+          grep -q 'leistung=haustuer-kunststoff-inkl-montage' /tmp/haustuer-parent.html
+          ! grep -qi 'noindex' /tmp/haustuer-parent.html
 
-          verify_guide \
-            'haustuer-rc2-kosten' \
-            'haustuer-holz-alu-rc2-inkl-montage' \
-            '3.500' \
-            '8.500' \
-            'Haustür Holz/Alu RC2 Kosten 2026' \
-            'haustuer-kunststoff-kosten'
+          grep -q '"@type":"Article"' /tmp/innentueren-six.html
+          grep -q '/kosten/tueren/berlin' /tmp/innentueren-six.html
+          grep -q 'gewerk=tueren' /tmp/innentueren-six.html
+          grep -q 'leistung=innentuer-mit-zarge-inkl-montage' /tmp/innentueren-six.html
+          ! grep -qi 'noindex' /tmp/innentueren-six.html
 
-          grep -q '/ratgeber/haustuer-kunststoff-kosten' "$parent"
-          grep -q '/ratgeber/haustuer-rc2-kosten' "$parent"
-          grep -q '/ratgeber/haustuer-rc2-kosten' '/tmp/innentuer-einbauen-kosten.html'
-          grep -q '/ratgeber/6-innentueren-austauschen-kosten' '/tmp/innentuer-einbauen-kosten.html'
+      - name: Verify full Türen guide hub and peer-link silo
+        shell: bash
+        run: |
+          set -euo pipefail
 
-          ! grep -qi 'noindex' "$parent"
-          ! grep -qi 'noindex' "$hub"
-          ! grep -qi 'noindex' "$category"
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
 
-          echo 'All 3 Türen price items, dedicated guides, calculator presets, internal links, price backlinks and hub visibility verified'
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/hub.html
+
+          guides=(
+            6-innentueren-austauschen-kosten
+            innentuer-einbauen-kosten
+            haustuer-einbauen-kosten
+            haustuer-kunststoff-kosten
+            haustuer-rc2-kosten
+          )
+
+          for source in "${guides[@]}"; do
+            guide_url="https://baukostenradar.de/ratgeber/${source}"
+            guide_html="/tmp/door-peer-${source}.html"
+
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Door guide missing in sitemap: ${source}"; exit 1; }
+            grep -q "/ratgeber/${source}" /tmp/hub.html || { echo "Door guide missing from hub: ${source}"; exit 1; }
+
+            fetch "$guide_url" "$guide_html"
+            grep -q "$guide_url" "$guide_html"
+            grep -q '"@type":"Article"' "$guide_html"
+            ! grep -qi 'noindex' "$guide_html"
+
+            for target in "${guides[@]}"; do
+              [ "$source" = "$target" ] && continue
+              grep -q "/ratgeber/${target}" "$guide_html" || { echo "${source} missing Türen peer ${target}"; exit 1; }
+            done
+          done
+
+          echo 'Verified all 5 Türen guides, exact price backlinks, calculator presets, hub visibility and full peer-link silo'
