@@ -31,6 +31,12 @@ export const quinaryOpportunitySilos: Record<string, OpportunitySiloConfig> = {
     itemSlug: "pv-anlage-5-kwp-inkl-installation",
     calculatorLabel: "PV 5 kWp berechnen",
   },
+  "fassade-sanieren-kosten": {
+    serviceSlugs: ["fassade", "daemmung", "maler"],
+    serviceSlug: "fassade",
+    itemSlug: "putz-fassade-neu",
+    calculatorLabel: "Fassadensanierung berechnen",
+  },
   "fassade-streichen-kosten-pro-qm": {
     serviceSlugs: ["fassade", "maler"],
     serviceSlug: "fassade",

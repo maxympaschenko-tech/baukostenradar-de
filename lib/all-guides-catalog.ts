@@ -152,6 +152,15 @@ const daemmungGuideLinks = [
   { slug: "aufsparrendaemmung-kosten-pro-qm", label: "Aufsparrendämmung Kosten pro m²", href: "/ratgeber/aufsparrendaemmung-kosten-pro-qm" },
 ] as const;
 
+const fassadeGuideLinks = [
+  { slug: "fassade-sanieren-kosten", label: "Fassade sanieren Kosten", href: "/ratgeber/fassade-sanieren-kosten" },
+  { slug: "putzfassade-kosten-pro-qm", label: "Putzfassade Kosten pro m²", href: "/ratgeber/putzfassade-kosten-pro-qm" },
+  { slug: "fassadenrisse-sanieren-kosten-pro-qm", label: "Fassadenrisse sanieren Kosten pro m²", href: "/ratgeber/fassadenrisse-sanieren-kosten-pro-qm" },
+  { slug: "vorgehaengte-hinterlueftete-fassade-kosten-pro-qm", label: "Vorgehängte hinterlüftete Fassade Kosten", href: "/ratgeber/vorgehaengte-hinterlueftete-fassade-kosten-pro-qm" },
+  { slug: "fassade-streichen-kosten-pro-qm", label: "Fassade streichen Kosten pro m²", href: "/ratgeber/fassade-streichen-kosten-pro-qm" },
+  { slug: "klinkerfassade-kosten-pro-qm", label: "Klinkerfassade Kosten pro m²", href: "/ratgeber/klinkerfassade-kosten-pro-qm" },
+] as const;
+
 function peers<T extends readonly { slug: string; label: string; href: string }[]>(links: T, slug: string) {
   return links
     .filter((link) => link.slug !== slug)
@@ -166,14 +175,6 @@ const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
   "poroton-mauerwerk-kosten-pro-qm": [masonryRelatedLinks.klinker],
   "porenbeton-mauerwerk-kosten-pro-qm": [masonryRelatedLinks.klinker],
   "bodenplatte-kosten-pro-qm": [masonryRelatedLinks.klinker],
-  "klinkerfassade-kosten-pro-qm": [
-    masonryRelatedLinks.innenwand,
-    masonryRelatedLinks.kalksandstein,
-    masonryRelatedLinks.poroton,
-    masonryRelatedLinks.porenbeton,
-    masonryRelatedLinks.bodenplatte,
-    masonryRelatedLinks.klinkerCalculator,
-  ],
   "14-treppenstufen-renovieren-kosten": peers(treppenGuideLinks, "14-treppenstufen-renovieren-kosten"),
   "treppenrenovierung-holzstufen-system-kosten": peers(treppenGuideLinks, "treppenrenovierung-holzstufen-system-kosten"),
   "holztreppe-schleifen-kosten": peers(treppenGuideLinks, "holztreppe-schleifen-kosten"),
@@ -244,6 +245,20 @@ const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
   "innendaemmung-kosten-pro-qm": peers(daemmungGuideLinks, "innendaemmung-kosten-pro-qm"),
   "zwischensparrendaemmung-kosten-pro-qm": peers(daemmungGuideLinks, "zwischensparrendaemmung-kosten-pro-qm"),
   "aufsparrendaemmung-kosten-pro-qm": peers(daemmungGuideLinks, "aufsparrendaemmung-kosten-pro-qm"),
+  "fassade-sanieren-kosten": peers(fassadeGuideLinks, "fassade-sanieren-kosten"),
+  "putzfassade-kosten-pro-qm": peers(fassadeGuideLinks, "putzfassade-kosten-pro-qm"),
+  "fassadenrisse-sanieren-kosten-pro-qm": peers(fassadeGuideLinks, "fassadenrisse-sanieren-kosten-pro-qm"),
+  "vorgehaengte-hinterlueftete-fassade-kosten-pro-qm": peers(fassadeGuideLinks, "vorgehaengte-hinterlueftete-fassade-kosten-pro-qm"),
+  "fassade-streichen-kosten-pro-qm": peers(fassadeGuideLinks, "fassade-streichen-kosten-pro-qm"),
+  "klinkerfassade-kosten-pro-qm": [
+    ...peers(fassadeGuideLinks, "klinkerfassade-kosten-pro-qm"),
+    masonryRelatedLinks.innenwand,
+    masonryRelatedLinks.kalksandstein,
+    masonryRelatedLinks.poroton,
+    masonryRelatedLinks.porenbeton,
+    masonryRelatedLinks.bodenplatte,
+    masonryRelatedLinks.klinkerCalculator,
+  ],
 };
 
 const enrichedBaseGuides = baseAllGuides.map((guide) => {
