@@ -20,11 +20,22 @@ jobs:
             curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
           }
 
+          assert_contains() {
+            local file="$1"
+            local needle="$2"
+            local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "Verification failed: $label"
+              echo "Expected to find: $needle"
+              exit 1
+            fi
+          }
+
           fetch 'https://baukostenradar.de/api/version' /tmp/version.json
           fetch 'https://baukostenradar.de/rechner' /tmp/rechner.html
 
-          grep -q '"@type":"CollectionPage"' /tmp/rechner.html
-          grep -q 'Mit einem typischen Szenario direkt losrechnen' /tmp/rechner.html
+          assert_contains /tmp/rechner.html '"@type":"CollectionPage"' 'calculator directory CollectionPage schema'
+          assert_contains /tmp/rechner.html 'Mit einem typischen Szenario direkt losrechnen' 'calculator quick-start section'
 
           expected_links=(
             '/rechner/renovierungskosten?flaeche=100'
@@ -48,23 +59,26 @@ jobs:
           done
 
           fetch 'https://baukostenradar.de/rechner/renovierungskosten?flaeche=120&umfang=core' /tmp/core.html
-          grep -q 'value="120"' /tmp/core.html
-          grep -q 'value="core" selected' /tmp/core.html
+          assert_contains /tmp/core.html 'value="120"' 'Renovierung 120 m² SSR preset'
+          assert_contains /tmp/core.html 'value="core" selected' 'Renovierung Kernsanierung SSR preset'
 
           fetch 'https://baukostenradar.de/rechner/badsanierungskosten?flaeche=6' /tmp/bad-6.html
-          grep -q 'value="6"' /tmp/bad-6.html
-          grep -q 'Geschätzte Kostenspanne für ca. 6 m²' /tmp/bad-6.html
+          assert_contains /tmp/bad-6.html 'value="6"' 'Bad 6 m² SSR preset'
+          assert_contains /tmp/bad-6.html 'Badsanierung anfragen' 'Bad 6 m² calculator result rendered'
 
           fetch 'https://baukostenradar.de/rechner/badsanierungskosten?flaeche=10' /tmp/bad-10.html
-          grep -q 'value="10"' /tmp/bad-10.html
-          grep -q 'Geschätzte Kostenspanne für ca. 10 m²' /tmp/bad-10.html
+          assert_contains /tmp/bad-10.html 'value="10"' 'Bad 10 m² SSR preset'
+          assert_contains /tmp/bad-10.html 'Badsanierung anfragen' 'Bad 10 m² calculator result rendered'
 
           fetch 'https://baukostenradar.de/rechner/badsanierungskosten?flaeche=100' /tmp/bad-max.html
-          grep -q 'value="40"' /tmp/bad-max.html
+          assert_contains /tmp/bad-max.html 'value="40"' 'Bad area upper safety clamp'
 
           fetch 'https://baukostenradar.de/rechner/handwerkerkosten?gewerk=elektriker&leistung=sicherungskasten-erneuern&menge=1' /tmp/electric.html
-          grep -q 'Sicherungskasten erneuern' /tmp/electric.html
+          assert_contains /tmp/electric.html 'Sicherungskasten erneuern' 'Handwerker exact Sicherungskasten scenario'
 
-          ! grep -qi 'noindex' /tmp/rechner.html
+          if grep -qi 'noindex' /tmp/rechner.html; then
+            echo 'Verification failed: calculator directory unexpectedly contains noindex'
+            exit 1
+          fi
 
           echo 'Verified calculator quick starts, SSR Bad presets, safety bounds and exact scenario routing in production'
