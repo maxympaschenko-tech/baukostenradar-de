@@ -7,10 +7,35 @@ import {
 export type { PriceGuideLink } from "./price-guide-links";
 
 const serviceGuideOverrides: Record<string, PriceGuideLink> = {
+  waermepumpe: {
+    href: "/ratgeber/luft-wasser-waermepumpe-kosten",
+    title: "Luft-Wasser-Wärmepumpe: Kosten 2026 im Detail",
+    cta: "Wärmepumpen-Ratgeber öffnen",
+  },
+  photovoltaik: {
+    href: "/ratgeber/photovoltaik-10-kwp-kosten",
+    title: "Photovoltaik 10 kWp: Kosten 2026 im Detail",
+    cta: "10-kWp-PV-Ratgeber öffnen",
+  },
+  daemmung: {
+    href: "/ratgeber/fassadendaemmung-kosten-pro-qm",
+    title: "Fassadendämmung: Kosten pro m² 2026",
+    cta: "Dämmungs-Ratgeber öffnen",
+  },
   kellerabdichtung: {
-    href: "/ratgeber/kellerabdichtung-aussen-oder-innen-kosten",
-    title: "Keller abdichten: Außen- und Innenabdichtung vergleichen",
+    href: "/ratgeber/kellerabdichtung-aussen-kosten-pro-qm",
+    title: "Kellerabdichtung außen: Kosten pro m² 2026",
     cta: "Kellerabdichtungs-Ratgeber öffnen",
+  },
+  fenster: {
+    href: "/ratgeber/20-fenster-austauschen-kosten",
+    title: "20 Fenster austauschen: Projektkosten 2026",
+    cta: "Fenster-Ratgeber öffnen",
+  },
+  dachsanierung: {
+    href: "/ratgeber/dach-150-qm-kosten",
+    title: "Dach 150 m² sanieren: Projektkosten 2026",
+    cta: "Dach-Ratgeber öffnen",
   },
   "abriss-entsorgung": {
     href: "/ratgeber/haus-abreissen-kosten",
