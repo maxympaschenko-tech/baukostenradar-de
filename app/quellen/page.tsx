@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { priceSources } from "@/lib/pricing";
+import { getActivePriceSources } from "@/lib/active-price-sources";
 import { siteConfig } from "@/lib/site";
 
 const sourcesDescription =
@@ -12,11 +12,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/quellen" },
 };
 
-const sources = Array.from(
-  new Map(
-    Object.values(priceSources).map((source) => [source.url, source]),
-  ).values(),
-).sort((a, b) => a.name.localeCompare(b.name, "de"));
+const sources = getActivePriceSources();
 
 export default function SourcesPage() {
   const base = siteConfig.url.replace(/\/$/, "");
@@ -103,8 +99,8 @@ export default function SourcesPage() {
           <span className="eyebrow">Quellenverzeichnis</span>
           <h2>Aktuell verwendete Quellen</h2>
           <p>
-            Die Liste wird aus derselben Datenbasis erzeugt, die auch unsere Kosten- und Detailseiten verwenden.
-            Dadurch bleibt nachvollziehbar, welche externen Quellen tatsächlich im Portal hinterlegt sind.
+            Die Liste wird direkt aus den veröffentlichten Preispositionen erzeugt. Angezeigt werden ausschließlich
+            Quellen, die aktuell mindestens einer Preisposition auf BauKostenRadar zugeordnet sind.
           </p>
           <div className="sourceList">
             {sources.map((source) => (

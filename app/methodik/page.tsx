@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { priceSources } from "@/lib/pricing";
+import { getActivePriceSources } from "@/lib/active-price-sources";
 import { siteConfig } from "@/lib/site";
 
 const methodologyDescription =
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default function MethodologyPage() {
-  const sourceCount = new Set(Object.values(priceSources).map((source) => source.url)).size;
+  const sourceCount = getActivePriceSources().length;
   const base = siteConfig.url.replace(/\/$/, "");
   const canonicalUrl = `${base}/methodik`;
   const structuredData = [
@@ -84,8 +84,8 @@ export default function MethodologyPage() {
           <h2>3. Quellen im aktuellen Datenstand</h2>
           <p>
             Das zentrale Quellenverzeichnis wird direkt aus derselben Preis-Datenbank erzeugt, die auch
-            unsere Kosten- und Detailseiten verwenden. Dort finden Sie die aktuell hinterlegten Originalquellen
-            mit Prüfdatum und direktem Link.
+            unsere Kosten- und Detailseiten verwenden. Aufgeführt werden nur Quellen, die aktuell mindestens
+            einer veröffentlichten Preisposition zugeordnet sind.
           </p>
           <div className="heroActions">
             <Link className="primaryButton" href="/quellen">Alle {sourceCount} Quellen ansehen</Link>
