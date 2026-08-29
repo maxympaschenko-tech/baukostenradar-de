@@ -12,8 +12,18 @@ function euro(value: number) {
   }).format(value);
 }
 
-export function RenovationCalculator({ compact = false }: { compact?: boolean }) {
-  const [area, setArea] = useState(80);
+function safeArea(value: number) {
+  return Math.min(1000, Math.max(10, Number.isFinite(value) ? value : 80));
+}
+
+export function RenovationCalculator({
+  compact = false,
+  initialArea = 80,
+}: {
+  compact?: boolean;
+  initialArea?: number;
+}) {
+  const [area, setArea] = useState(() => safeArea(initialArea));
   const [condition, setCondition] = useState("normal");
   const [standard, setStandard] = useState("standard");
   const [region, setRegion] = useState("de");
@@ -22,12 +32,12 @@ export function RenovationCalculator({ compact = false }: { compact?: boolean })
   const selectedCondition = renovationModel.conditions.find((item) => item.value === condition) ?? renovationModel.conditions[1];
 
   const result = useMemo(() => {
-    const safeArea = Math.min(1000, Math.max(10, area || 80));
+    const normalizedArea = safeArea(area || 80);
     const standardFactor = renovationModel.standards.find((item) => item.value === standard)?.factor ?? 1;
     const regionFactor = selectedRegion.factor;
 
-    const low = safeArea * selectedCondition.lowPerSquareMeter * standardFactor * regionFactor;
-    const high = safeArea * selectedCondition.highPerSquareMeter * standardFactor * regionFactor;
+    const low = normalizedArea * selectedCondition.lowPerSquareMeter * standardFactor * regionFactor;
+    const high = normalizedArea * selectedCondition.highPerSquareMeter * standardFactor * regionFactor;
 
     return {
       low,

@@ -13,7 +13,20 @@ export const metadata: Metadata = {
 
 const featuredServiceSlugs = ["badsanierung", "elektriker", "dachsanierung", "fenster", "heizung", "bodenleger"];
 
-export default function RenovationCalculatorPage() {
+function parseInitialArea(value: string | string[] | undefined) {
+  const rawValue = Array.isArray(value) ? value[0] : value;
+  const parsed = Number(rawValue);
+  if (!Number.isFinite(parsed)) return 80;
+  return Math.min(1000, Math.max(10, parsed));
+}
+
+export default async function RenovationCalculatorPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ flaeche?: string | string[] }>;
+}) {
+  const resolvedSearchParams = await searchParams;
+  const initialArea = parseInitialArea(resolvedSearchParams.flaeche);
   const base = siteConfig.url.replace(/\/$/, "");
   const cityRegions = regions.filter((region) => region.value !== "de").slice(0, 4);
   const featuredServices = featuredServiceSlugs
@@ -70,7 +83,7 @@ export default function RenovationCalculatorPage() {
       </section>
 
       <div className="shell articleShell">
-        <RenovationCalculator />
+        <RenovationCalculator initialArea={initialArea} />
 
         <section className="contentCard proseCard">
           <span className="eyebrow">Richtwerte verstehen</span>

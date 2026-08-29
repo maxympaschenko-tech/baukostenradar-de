@@ -43,12 +43,33 @@ const abrissGuideLinks: SupplementalGuide[] = [
   { slug: "bauschuttcontainer-30-m3-kosten", label: "Bauschuttcontainer 30 m³ Kosten", href: "/ratgeber/bauschuttcontainer-30-m3-kosten" },
 ];
 
+const renovationAreaGuideLinks: SupplementalGuide[] = [
+  { slug: "wohnung-renovieren-kosten", label: "Wohnung renovieren Kosten", href: "/ratgeber/wohnung-renovieren-kosten" },
+  { slug: "renovierungskosten-haus", label: "Renovierungskosten Haus", href: "/ratgeber/renovierungskosten-haus" },
+  { slug: "renovierungskosten-100-qm", label: "Renovierungskosten 100 m²", href: "/ratgeber/renovierungskosten-100-qm" },
+  { slug: "haus-renovieren-150-qm-kosten", label: "Haus renovieren 150 m²", href: "/ratgeber/haus-renovieren-150-qm-kosten" },
+  { slug: "haus-renovieren-200-qm-kosten", label: "Haus renovieren 200 m²", href: "/ratgeber/haus-renovieren-200-qm-kosten" },
+];
+
+const renovationScenarioLinks: Record<string, GuideSupplementalLink[]> = {
+  "renovierungskosten-100-qm": [
+    { label: "100 m² im Renovierungskosten-Rechner", href: "/rechner/renovierungskosten?flaeche=100" },
+  ],
+  "haus-renovieren-150-qm-kosten": [
+    { label: "150 m² im Renovierungskosten-Rechner", href: "/rechner/renovierungskosten?flaeche=150" },
+  ],
+  "haus-renovieren-200-qm-kosten": [
+    { label: "200 m² im Renovierungskosten-Rechner", href: "/rechner/renovierungskosten?flaeche=200" },
+  ],
+};
+
 const supplementalClusters = [
   sanitaerGuideLinks,
   kellerabdichtungGuideLinks,
   tuerenGuideLinks,
   estrichGuideLinks,
   abrissGuideLinks,
+  renovationAreaGuideLinks,
 ];
 
 const supplementalByGuide: Record<string, GuideSupplementalLink[]> = Object.fromEntries(
@@ -66,7 +87,11 @@ export function withSupplementalGuideLinks(
   slug: string,
   related: GuideSupplementalLink[],
 ): GuideSupplementalLink[] {
-  const combined = [...related, ...(supplementalByGuide[slug] ?? [])];
+  const combined = [
+    ...related,
+    ...(supplementalByGuide[slug] ?? []),
+    ...(renovationScenarioLinks[slug] ?? []),
+  ];
 
   return combined.filter(
     (link, index) => combined.findIndex((candidate) => candidate.href === link.href) === index,
