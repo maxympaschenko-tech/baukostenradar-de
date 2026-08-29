@@ -16,15 +16,21 @@ function safeArea(value: number) {
   return Math.min(1000, Math.max(10, Number.isFinite(value) ? value : 80));
 }
 
+function safeCondition(value: string) {
+  return renovationModel.conditions.some((item) => item.value === value) ? value : "normal";
+}
+
 export function RenovationCalculator({
   compact = false,
   initialArea = 80,
+  initialCondition = "normal",
 }: {
   compact?: boolean;
   initialArea?: number;
+  initialCondition?: string;
 }) {
   const [area, setArea] = useState(() => safeArea(initialArea));
-  const [condition, setCondition] = useState("normal");
+  const [condition, setCondition] = useState(() => safeCondition(initialCondition));
   const [standard, setStandard] = useState("standard");
   const [region, setRegion] = useState("de");
 
