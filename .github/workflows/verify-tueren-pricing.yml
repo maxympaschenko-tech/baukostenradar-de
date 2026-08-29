@@ -1,0 +1,84 @@
+name: Verify Türen pricing expansion
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-tueren-pricing:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Türen production pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          fetch_with_retry() {
+            local url="$1" output="$2"
+            for i in 1 2 3 4 5; do
+              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then return 0; fi
+              [[ "$i" == "5" ]] && return 1
+              sleep 4
+            done
+          }
+          fetch_with_retry 'https://baukostenradar.de/kosten/tueren' /tmp/main.html
+          fetch_with_retry 'https://baukostenradar.de/kosten/tueren/muenchen' /tmp/city.html
+          fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
+          fetch_with_retry 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+
+      - name: Verify source-backed Türen data
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import re
+          from html.parser import HTMLParser
+
+          class TextParser(HTMLParser):
+              def __init__(self): super().__init__(); self.parts = []
+              def handle_data(self, data):
+                  value = data.strip()
+                  if value: self.parts.append(value)
+
+          def text(path):
+              parser = TextParser()
+              with open(path, encoding='utf-8') as handle: parser.feed(handle.read())
+              return re.sub(r'\s+', ' ', ' '.join(parser.parts))
+
+          main = text('/tmp/main.html')
+          city = text('/tmp/city.html')
+          quellen = text('/tmp/quellen.html')
+          sitemap = open('/tmp/sitemap.xml', encoding='utf-8').read()
+
+          expected_main = (
+              '23 Preispositionen', '5 geprüfte Quellen',
+              'Glashaustür ohne Montage',
+              'Kunststoff-Haustür RC2 inkl. Einbau',
+              'Aluminium-Haustür RC2 mit zwei Seitenteilen inkl. Einbau',
+              'Premium-Haustür Massivholz RC2 mit Seitenteil und Oberlicht inkl. Einbau',
+              'Elektronisches Schloss oder Türöffner für Haustür',
+              'Fingerprint oder Motorschloss für Haustür',
+              'Alte Haustür ausbauen und entsorgen',
+              'Sondermaß oder Überhöhe bei Zimmertür',
+              'Eingemauerte alte Stahlzarge ausbauen',
+              'Schiebetür aus Glas Standard komplett einbauen',
+              'Blauarbeit - Schiebetür einbauen Kosten 2026',
+          )
+          for needle in expected_main:
+              if needle not in main: raise SystemExit(f'Missing Türen signal: {needle}')
+
+          for needle in ('Türen Kosten in München 2026', 'Kunststoff-Haustür RC2 inkl. Einbau', 'Alte Haustür ausbauen und entsorgen', 'Schiebetür aus Glas Standard komplett einbauen'):
+              if needle not in city: raise SystemExit(f'Missing München Türen signal: {needle}')
+
+          for needle in ('Aroundhome - Haustür Preise & Kosten 2026', 'Blauarbeit - Tür einbauen Kosten 2026', 'Blauarbeit - Schiebetür einbauen Kosten 2026'):
+              if needle not in quellen: raise SystemExit(f'Missing Türen source: {needle}')
+
+          for needle in (
+              '/kosten/tueren/leistung/kunststoff-haustuer-rc2-inkl-einbau',
+              '/kosten/tueren/leistung/fingerprint-oder-motorschloss-fuer-haustuer',
+              '/kosten/tueren/leistung/schiebetuer-aus-glas-standard-komplett-einbauen',
+          ):
+              if needle not in sitemap: raise SystemExit(f'Missing Türen URL: {needle}')
+          PY
