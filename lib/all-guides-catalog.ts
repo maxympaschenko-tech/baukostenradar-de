@@ -123,6 +123,12 @@ const bodenGuideLinks = [
   { slug: "parkett-abschleifen-kosten", label: "Parkett abschleifen Kosten pro m²", href: "/ratgeber/parkett-abschleifen-kosten" },
 ] as const;
 
+const trockenbauGuideLinks = [
+  { slug: "trockenbau-kosten-pro-qm", label: "Trockenbau Kosten pro m²", href: "/ratgeber/trockenbau-kosten-pro-qm" },
+  { slug: "trockenbauwand-kosten-pro-qm", label: "Trockenbauwand Kosten pro m²", href: "/ratgeber/trockenbauwand-kosten-pro-qm" },
+  { slug: "verspachtelung-q4-kosten-pro-qm", label: "Verspachtelung Q4 Kosten pro m²", href: "/ratgeber/verspachtelung-q4-kosten-pro-qm" },
+] as const;
+
 function peers<T extends readonly { slug: string; label: string; href: string }[]>(links: T, slug: string) {
   return links
     .filter((link) => link.slug !== slug)
@@ -198,6 +204,9 @@ const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
   "laminat-verlegen-kosten-pro-qm": peers(bodenGuideLinks, "laminat-verlegen-kosten-pro-qm"),
   "boden-sanieren-kosten-pro-qm": peers(bodenGuideLinks, "boden-sanieren-kosten-pro-qm"),
   "parkett-abschleifen-kosten": peers(bodenGuideLinks, "parkett-abschleifen-kosten"),
+  "trockenbau-kosten-pro-qm": peers(trockenbauGuideLinks, "trockenbau-kosten-pro-qm"),
+  "trockenbauwand-kosten-pro-qm": peers(trockenbauGuideLinks, "trockenbauwand-kosten-pro-qm"),
+  "verspachtelung-q4-kosten-pro-qm": peers(trockenbauGuideLinks, "verspachtelung-q4-kosten-pro-qm"),
 };
 
 const enrichedBaseGuides = baseAllGuides.map((guide) => {
