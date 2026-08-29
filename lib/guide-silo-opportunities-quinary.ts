@@ -55,6 +55,12 @@ export const quinaryOpportunitySilos: Record<string, OpportunitySiloConfig> = {
     itemSlug: "einfahrt-pflastern",
     calculatorLabel: "Außenanlagen berechnen",
   },
+  "sanitaer-kosten": {
+    serviceSlugs: ["sanitaer", "badsanierung"],
+    serviceSlug: "sanitaer",
+    itemSlug: "sanitaerobjekte-armaturen-fuer-8-m2-bad",
+    calculatorLabel: "Sanitärkosten berechnen",
+  },
   "zementestrich-kosten-pro-qm": {
     serviceSlugs: ["estrich", "bodenleger"],
     serviceSlug: "estrich",

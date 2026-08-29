@@ -5,7 +5,7 @@ import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Ratgeber zu Sanierung, Renovierung & Handwerkerkosten 2026",
-  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Wärmepumpen, Photovoltaik, Dämmung, Fassaden, Garten und Außenanlagen, Malerarbeiten, Fliesen, Bodenbelägen, Trockenbau, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
+  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Wärmepumpen, Photovoltaik, Dämmung, Fassaden, Garten und Außenanlagen, Sanitär, Malerarbeiten, Fliesen, Bodenbelägen, Trockenbau, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
   alternates: { canonical: "/ratgeber" },
 };
 
@@ -21,6 +21,12 @@ const guideGroups = [
     title: "Badsanierung realistisch kalkulieren",
     description: "Komplette Badsanierung mit konkreten 2026-Richtwerten und nachvollziehbaren Kostenblöcken einordnen.",
     slugs: ["bad-komplett-sanieren-kosten"],
+  },
+  {
+    eyebrow: "Sanitär & Badausstattung",
+    title: "Sanitärkosten, Badausstattung und Rückbau kalkulieren",
+    description: "Sanitärkosten als eigenes Gewerk einordnen, Sanitärobjekte und Armaturen für ein typisches Bad kalkulieren und Demontage samt Entsorgung des Altbads separat vergleichen.",
+    slugs: ["sanitaer-kosten", "sanitaerobjekte-bad-kosten", "bad-entkernen-kosten"],
   },
   {
     eyebrow: "Konkrete Projektgrößen",
