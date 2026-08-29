@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { RenovationCalculator } from "@/components/renovation-calculator";
 import { allGuides } from "@/lib/all-guides";
-import { regions, services } from "@/lib/pricing";
+import { regions, services } from "@/lib/catalog-stairs";
 import { siteConfig } from "@/lib/site";
 
 function euro(value: number) {
