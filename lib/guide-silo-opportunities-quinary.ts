@@ -79,6 +79,18 @@ export const quinaryOpportunitySilos: Record<string, OpportunitySiloConfig> = {
     itemSlug: "kellerabdichtung-innen",
     calculatorLabel: "Innenabdichtung berechnen",
   },
+  "haustuer-kunststoff-kosten": {
+    serviceSlugs: ["tueren", "fenster", "fassade"],
+    serviceSlug: "tueren",
+    itemSlug: "haustuer-kunststoff-inkl-montage",
+    calculatorLabel: "Kunststoff-Haustür berechnen",
+  },
+  "haustuer-rc2-kosten": {
+    serviceSlugs: ["tueren", "fenster", "fassade"],
+    serviceSlug: "tueren",
+    itemSlug: "haustuer-holz-alu-rc2-inkl-montage",
+    calculatorLabel: "RC2-Haustür berechnen",
+  },
   "zementestrich-kosten-pro-qm": {
     serviceSlugs: ["estrich", "bodenleger"],
     serviceSlug: "estrich",
