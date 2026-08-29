@@ -1,0 +1,40 @@
+name: Verify organization logo
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-organization-logo:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch homepage and logo
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sS --fail --connect-timeout 10 --max-time 30 'https://baukostenradar.de/' -o /tmp/home.html
+          curl -sS --fail --connect-timeout 10 --max-time 30 -D /tmp/logo.headers 'https://baukostenradar.de/baukostenradar-logo.svg' -o /tmp/logo.svg
+
+      - name: Verify Organization logo markup
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q '"@type":"Organization"' /tmp/home.html
+          grep -q '"@id":"https://baukostenradar.de/#organization"' /tmp/home.html
+          grep -q '"logo":{"@type":"ImageObject"' /tmp/home.html
+          grep -q '"url":"https://baukostenradar.de/baukostenradar-logo.svg"' /tmp/home.html
+          grep -q '"contentUrl":"https://baukostenradar.de/baukostenradar-logo.svg"' /tmp/home.html
+          grep -q '"width":512' /tmp/home.html
+          grep -q '"height":512' /tmp/home.html
+
+      - name: Verify crawlable 512px logo asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -qi '^content-type: image/svg+xml' /tmp/logo.headers
+          grep -q 'width="512" height="512"' /tmp/logo.svg
+          grep -q '<title id="title">BauKostenRadar</title>' /tmp/logo.svg
+          test "$(wc -c < /tmp/logo.svg)" -gt 500
