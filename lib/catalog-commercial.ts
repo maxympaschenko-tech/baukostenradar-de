@@ -59,6 +59,26 @@ export const priceSources = {
     url: "https://www.aroundhome.de/haustuer/preise-kosten/",
     checkedAt: "29.08.2026",
   },
+  blauarbeitEstrichCommercial: {
+    name: "Blauarbeit - Estrich Kosten 2026",
+    url: "https://ratgeber.blauarbeit.de/kosten-preise/estrich-verlegen-kosten",
+    checkedAt: "29.08.2026",
+  },
+  blauarbeitEstrichEntfernen: {
+    name: "Blauarbeit - Estrich entfernen Kosten 2026",
+    url: "https://ratgeber.blauarbeit.de/kosten-preise/estrich-entfernen-kosten",
+    checkedAt: "29.08.2026",
+  },
+  blauarbeitEstrichSchleifen: {
+    name: "Blauarbeit - Estrich schleifen Kosten 2026",
+    url: "https://ratgeber.blauarbeit.de/kosten-preise/estrich-schleifen-kosten",
+    checkedAt: "29.08.2026",
+  },
+  myhammerEstrichCommercial: {
+    name: "MyHammer - Estrich verlegen Kosten 2026",
+    url: "https://www.my-hammer.de/boden-fliesen/preisradar/was-kostet-estrich-verlegen",
+    checkedAt: "29.08.2026",
+  },
 } as const;
 
 type CommercialSourceKey = keyof typeof priceSources;
@@ -169,6 +189,29 @@ export const services: Service[] = catalogServices.map((service) => {
         { name: "Haustür Holz ohne Montage", low: 2500, high: 6000, unit: "pro Tür", sourceKey: "aroundhomeHaustuer" },
         { name: "Haustür Holz-Alu ohne Montage", low: 3000, high: 7000, unit: "pro Tür", sourceKey: "aroundhomeHaustuer" },
         { name: "Haustür montieren", low: 300, high: 700, unit: "pro Tür Montage", note: "Element separat; Ausbau der alten Haustür und zusätzliche Anschlussarbeiten können Mehrkosten verursachen", sourceKey: "blauarbeitTueren" },
+      ],
+    };
+  }
+
+  if (service.slug === "estrich") {
+    return {
+      ...catalogService,
+      description: "Aktuelle Richtwerte 2026 für Zement-, Anhydrit-, Trocken-, Gussasphalt- und Sichtestrich sowie Ausbau, Schleifen, Ausgleichen, Reparatur, Versiegelung und Estrich mit Fußbodenheizung.",
+      priceItems: [
+        ...catalogService.priceItems,
+        { name: "Alten Estrich entfernen inkl. Entsorgung", low: 25, high: 60, unit: "pro m²", note: "Komplett-Richtwert inklusive Abtransport und Entsorgung; Estrichart und Dicke bestimmen den Aufwand", sourceKey: "blauarbeitEstrichEntfernen" },
+        { name: "Zementestrich aufstemmen", low: 18, high: 40, unit: "pro m²", note: "Reiner Ausbau; Entsorgung kann je nach Auftrag separat ausgewiesen werden", sourceKey: "blauarbeitEstrichEntfernen" },
+        { name: "Anhydritestrich aufnehmen", low: 15, high: 32, unit: "pro m²", sourceKey: "blauarbeitEstrichEntfernen" },
+        { name: "Trockenestrich demontieren", low: 8, high: 18, unit: "pro m²", sourceKey: "blauarbeitEstrichEntfernen" },
+        { name: "Boden vor Estrich ausgleichen", low: 8, high: 25, unit: "pro m²", note: "Nebenarbeit bei unebenem Untergrund", sourceKey: "blauarbeitEstrichCommercial" },
+        { name: "Estrich anschleifen", low: 12, high: 20, unit: "pro m²", note: "Ein Schleifdurchgang, z. B. zum Entfernen der Sinterschicht", sourceKey: "blauarbeitEstrichSchleifen" },
+        { name: "Estrich schleifen 2 bis 3 Durchgänge", low: 20, high: 40, unit: "pro m²", note: "Zum Abtragen von Unebenheiten und Rückständen", sourceKey: "blauarbeitEstrichSchleifen" },
+        { name: "Sichtestrich Feinschliff", low: 35, high: 60, unit: "pro m²", note: "Mehrstufiger Feinschliff für eine sichtbare, glatte Oberfläche; Versiegelung separat", sourceKey: "blauarbeitEstrichSchleifen" },
+        { name: "Estrich versiegeln", low: 15, high: 35, unit: "pro m²", note: "Schutz gegen Wasser und Abrieb nach der Oberflächenbearbeitung", sourceKey: "blauarbeitEstrichSchleifen" },
+        { name: "Estrichrisse verharzen", low: 25, high: 60, unit: "pro lfd. Meter", note: "Richtwert für fachgerechte Rissreparatur", sourceKey: "blauarbeitEstrichCommercial" },
+        { name: "Estrich mit Fußbodenheizung", low: 40, high: 120, unit: "pro m²", note: "Breiter Gesamtrichtwert je nach Estrichart und Heizsystem; zusätzliche Dämm- und Systemkosten können enthalten sein", sourceKey: "myhammerEstrichCommercial" },
+        { name: "Zementestrich 100 m² Neubau", low: 2500, high: 5000, unit: "pro 100 m²", note: "Beispielwert für Neubau ohne Fußbodenheizung", sourceKey: "blauarbeitEstrichCommercial" },
+        { name: "Estrichsanierung 100 m² mit Rückbau", low: 5000, high: 11000, unit: "pro 100 m²", note: "Beispielwert für Rückbau des Altaufbaus plus neuen Zementestrich", sourceKey: "blauarbeitEstrichCommercial" },
       ],
     };
   }
