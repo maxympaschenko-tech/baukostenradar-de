@@ -369,6 +369,36 @@ const photovoltaikGuideSilos: Record<string, GuideSilo> = {
   },
 };
 
+const waermepumpeGuideSilos: Record<string, GuideSilo> = {
+  "waermepumpe-kosten-2026": {
+    serviceSlugs: ["waermepumpe", "heizung", "elektriker"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "waermepumpe",
+      itemSlug: "luft-wasser-waermepumpe-komplett",
+    }),
+    calculatorLabel: "Wärmepumpe berechnen",
+    regionalMode: "service",
+  },
+  "luft-wasser-waermepumpe-kosten": {
+    serviceSlugs: ["waermepumpe", "heizung", "elektriker"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "waermepumpe",
+      itemSlug: "luft-wasser-waermepumpe-komplett",
+    }),
+    calculatorLabel: "Luft-Wasser-Wärmepumpe berechnen",
+    regionalMode: "service",
+  },
+  "waermepumpe-wartung-kosten": {
+    serviceSlugs: ["waermepumpe", "heizung"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "waermepumpe",
+      itemSlug: "wartung-waermepumpe",
+    }),
+    calculatorLabel: "Wärmepumpen-Wartung berechnen",
+    regionalMode: "service",
+  },
+};
+
 const serviceAugments: Record<string, string[]> = {
   "klinkerfassade-kosten-pro-qm": ["maurer"],
 };
@@ -383,7 +413,8 @@ export function getGuideSilo(slug: string): GuideSilo {
     fliesenGuideSilos[slug] ??
     bodenGuideSilos[slug] ??
     trockenbauGuideSilos[slug] ??
-    photovoltaikGuideSilos[slug];
+    photovoltaikGuideSilos[slug] ??
+    waermepumpeGuideSilos[slug];
   if (explicit) return explicit;
 
   const base = getBaseGuideSilo(slug);

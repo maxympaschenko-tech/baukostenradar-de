@@ -1,0 +1,120 @@
+name: Verify Wärmepumpe guide cluster
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-waermepumpe-guide-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify exact Wärmepumpe price-item guide mappings
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'https://baukostenradar.de/kosten/waermepumpe' -o /tmp/waermepumpe.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+
+          grep -q 'https://baukostenradar.de/kosten/waermepumpe' /tmp/waermepumpe.html
+          ! grep -qi 'noindex' /tmp/waermepumpe.html
+
+          mappings=$(cat <<'EOF'
+          luft-wasser-waermepumpe-komplett|luft-wasser-waermepumpe-kosten
+          wartung-waermepumpe|waermepumpe-wartung-kosten
+          EOF
+          )
+
+          checked=0
+          while IFS='|' read -r item guide; do
+            item="${item#${item%%[![:space:]]*}}"
+            [ -n "$item" ] || continue
+
+            item_url="https://baukostenradar.de/kosten/waermepumpe/leistung/${item}"
+            guide_url="https://baukostenradar.de/ratgeber/${guide}"
+            item_output="/tmp/waermepumpe-item-${item}.html"
+            guide_output="/tmp/waermepumpe-guide-${guide}.html"
+
+            grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Wärmepumpe item missing in sitemap: ${item}"; exit 1; }
+            grep -q "/kosten/waermepumpe/leistung/${item}" /tmp/waermepumpe.html || { echo "Wärmepumpe item missing on category: ${item}"; exit 1; }
+
+            curl -sS --fail "$item_url" -o "$item_output"
+            grep -q 'Passender Ratgeber' "$item_output"
+            grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong Wärmepumpe guide mapping: ${item} -> ${guide}"; exit 1; }
+            ! grep -qi 'noindex' "$item_output"
+
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+
+            curl -sS --fail "$guide_url" -o "$guide_output"
+            grep -q "$guide_url" "$guide_output"
+            grep -q '"@type":"Article"' "$guide_output"
+            grep -q '/kosten/waermepumpe' "$guide_output"
+            grep -q '/kosten/waermepumpe/berlin' "$guide_output"
+            grep -q 'gewerk=waermepumpe' "$guide_output"
+            grep -q "leistung=${item}" "$guide_output"
+            ! grep -qi 'noindex' "$guide_output"
+
+            checked=$((checked + 1))
+          done <<< "$mappings"
+
+          test "$checked" -eq 2
+          echo "Verified ${checked} exact Wärmepumpe price-item guide mappings"
+
+      - name: Verify Wärmepumpe parent guide and calculator
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          guide='waermepumpe-kosten-2026'
+          guide_url="https://baukostenradar.de/ratgeber/${guide}"
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+          curl -sS --fail "$guide_url" -o /tmp/waermepumpe-parent.html
+
+          grep -q "${guide_url}</loc>" /tmp/sitemap.xml
+          grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+          grep -q "$guide_url" /tmp/waermepumpe-parent.html
+          grep -q '"@type":"Article"' /tmp/waermepumpe-parent.html
+          grep -q '/kosten/waermepumpe' /tmp/waermepumpe-parent.html
+          grep -q '/kosten/waermepumpe/berlin' /tmp/waermepumpe-parent.html
+          grep -q 'gewerk=waermepumpe' /tmp/waermepumpe-parent.html
+          grep -q 'leistung=luft-wasser-waermepumpe-komplett' /tmp/waermepumpe-parent.html
+          ! grep -qi 'noindex' /tmp/waermepumpe-parent.html
+
+      - name: Verify Wärmepumpe guide hub and internal-link silo
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+
+          guides=(
+            waermepumpe-kosten-2026
+            luft-wasser-waermepumpe-kosten
+            waermepumpe-wartung-kosten
+          )
+
+          for source in "${guides[@]}"; do
+            guide_url="https://baukostenradar.de/ratgeber/${source}"
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Wärmepumpe cluster guide missing in sitemap: ${source}"; exit 1; }
+            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Wärmepumpe cluster guide missing from hub: ${source}"; exit 1; }
+
+            curl -sS --fail "$guide_url" -o "/tmp/${source}.html"
+            grep -q "$guide_url" "/tmp/${source}.html"
+            grep -q '"@type":"Article"' "/tmp/${source}.html"
+            ! grep -qi 'noindex' "/tmp/${source}.html"
+
+            for target in "${guides[@]}"; do
+              [ "$source" = "$target" ] && continue
+              grep -q "/ratgeber/${target}" "/tmp/${source}.html" || { echo "${source} missing Wärmepumpe peer ${target}"; exit 1; }
+            done
+          done
+
+          echo "Verified Wärmepumpe hub visibility and full peer-link silo"

@@ -138,6 +138,12 @@ const photovoltaikGuideLinks = [
   { slug: "stromspeicher-kosten-pro-kwh", label: "Stromspeicher Kosten pro kWh", href: "/ratgeber/stromspeicher-kosten-pro-kwh" },
 ] as const;
 
+const waermepumpeGuideLinks = [
+  { slug: "waermepumpe-kosten-2026", label: "Wärmepumpe Kosten 2026", href: "/ratgeber/waermepumpe-kosten-2026" },
+  { slug: "luft-wasser-waermepumpe-kosten", label: "Luft-Wasser-Wärmepumpe Kosten", href: "/ratgeber/luft-wasser-waermepumpe-kosten" },
+  { slug: "waermepumpe-wartung-kosten", label: "Wärmepumpe Wartung Kosten", href: "/ratgeber/waermepumpe-wartung-kosten" },
+] as const;
+
 function peers<T extends readonly { slug: string; label: string; href: string }[]>(links: T, slug: string) {
   return links
     .filter((link) => link.slug !== slug)
@@ -222,6 +228,9 @@ const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
   "photovoltaik-15-kwp-kosten": peers(photovoltaikGuideLinks, "photovoltaik-15-kwp-kosten"),
   "photovoltaik-mit-speicher-kosten": peers(photovoltaikGuideLinks, "photovoltaik-mit-speicher-kosten"),
   "stromspeicher-kosten-pro-kwh": peers(photovoltaikGuideLinks, "stromspeicher-kosten-pro-kwh"),
+  "waermepumpe-kosten-2026": peers(waermepumpeGuideLinks, "waermepumpe-kosten-2026"),
+  "luft-wasser-waermepumpe-kosten": peers(waermepumpeGuideLinks, "luft-wasser-waermepumpe-kosten"),
+  "waermepumpe-wartung-kosten": peers(waermepumpeGuideLinks, "waermepumpe-wartung-kosten"),
 };
 
 const enrichedBaseGuides = baseAllGuides.map((guide) => {
