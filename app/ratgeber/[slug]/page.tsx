@@ -57,8 +57,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: guide.title,
       description: guide.description,
       url: `/ratgeber/${guide.slug}`,
-      publishedTime: "2026-08-26T08:00:00+02:00",
-      modifiedTime: "2026-08-27T10:00:00+02:00",
     },
   };
 }
@@ -70,6 +68,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 
   const base = siteConfig.url.replace(/\/$/, "");
   const canonicalUrl = `${base}/ratgeber/${guide.slug}`;
+  const organizationId = `${base}/#organization`;
   const tocItems = guide.sections.map((section) => ({
     label: section.heading,
     id: headingId(section.heading),
@@ -96,17 +95,17 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
       "@type": "Article",
       headline: guide.h1,
       description: guide.description,
-      datePublished: "2026-08-26",
-      dateModified: "2026-08-27",
       mainEntityOfPage: canonicalUrl,
       articleSection: guide.sections.map((section) => section.heading),
       author: {
         "@type": "Organization",
+        "@id": organizationId,
         name: siteConfig.name,
         url: base,
       },
       publisher: {
         "@type": "Organization",
+        "@id": organizationId,
         name: siteConfig.name,
         url: base,
       },
@@ -153,7 +152,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
           <p>{guide.intro}</p>
           <div className="guideMeta" aria-label="Redaktionelle Angaben">
             <span><strong>Redaktion:</strong> <Link href="/ueber-uns">BauKostenRadar</Link></span>
-            <span><strong>Aktualisiert:</strong> 27. August 2026</span>
+            <span><strong>Datenstand:</strong> 2026</span>
             <span><strong>Datenbasis:</strong> Quellen + transparentes Kostenmodell</span>
           </div>
           <div className="heroFacts">

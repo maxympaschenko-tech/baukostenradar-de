@@ -1,0 +1,69 @@
+name: Verify Ratgeber article dates
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-ratgeber-article-dates:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch representative Ratgeber pages
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch_with_retry() {
+            local url="$1"
+            local output="$2"
+            for i in 1 2 3 4 5; do
+              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then
+                return 0
+              fi
+              if [[ "$i" == "5" ]]; then
+                return 1
+              fi
+              sleep 4
+            done
+          }
+
+          fetch_with_retry 'https://baukostenradar.de/ratgeber/sanierungskosten-pro-qm' /tmp/guide-1.html
+          fetch_with_retry 'https://baukostenradar.de/ratgeber/badsanierung-kosten' /tmp/guide-2.html
+          fetch_with_retry 'https://baukostenradar.de/ratgeber/sanitaer-kosten' /tmp/guide-3.html
+          fetch_with_retry 'https://baukostenradar.de/ratgeber/kernsanierung-kosten' /tmp/guide-4.html
+
+      - name: Verify Article markup without invented dates
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for file in /tmp/guide-*.html; do
+            grep -q '"@type":"Article"' "$file"
+            grep -q '"author":{"@type":"Organization","@id":"https://baukostenradar.de/#organization"' "$file"
+            grep -q '"publisher":{"@type":"Organization","@id":"https://baukostenradar.de/#organization"' "$file"
+            grep -q 'Datenstand:</strong> 2026' "$file"
+
+            if grep -q '"datePublished"' "$file"; then
+              echo "Unexpected datePublished in $file" >&2
+              exit 1
+            fi
+            if grep -q '"dateModified"' "$file"; then
+              echo "Unexpected dateModified in $file" >&2
+              exit 1
+            fi
+            if grep -q 'article:published_time' "$file"; then
+              echo "Unexpected Open Graph published time in $file" >&2
+              exit 1
+            fi
+            if grep -q 'article:modified_time' "$file"; then
+              echo "Unexpected Open Graph modified time in $file" >&2
+              exit 1
+            fi
+            if grep -q 'Aktualisiert:</strong> 27. August 2026' "$file"; then
+              echo "Stale visible update date in $file" >&2
+              exit 1
+            fi
+          done
