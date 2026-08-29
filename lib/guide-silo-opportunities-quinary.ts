@@ -94,7 +94,7 @@ export const quinaryOpportunitySilos: Record<string, OpportunitySiloConfig> = {
   "zementestrich-kosten-pro-qm": {
     serviceSlugs: ["estrich", "bodenleger"],
     serviceSlug: "estrich",
-    itemSlug: "zementestrich-komplett",
+    itemSlug: "zementestrich-verlegen",
     calculatorLabel: "Zementestrich berechnen",
   },
   "kalksandstein-mauerwerk-kosten-pro-qm": {
