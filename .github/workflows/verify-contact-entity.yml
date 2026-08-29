@@ -1,0 +1,105 @@
+name: Verify Contact entity
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-contact-entity:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Contact page
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for i in 1 2 3 4 5; do
+            if curl -sS --fail --connect-timeout 10 --max-time 25 'https://baukostenradar.de/kontakt' -o /tmp/contact.html; then
+              exit 0
+            fi
+            if [[ "$i" == "5" ]]; then
+              exit 1
+            fi
+            sleep 4
+          done
+
+      - name: Verify ContactPage, Organization link and breadcrumb
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python - <<'PY'
+          import json
+          from html.parser import HTMLParser
+
+          class JsonLdParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.capture = False
+                  self.current = []
+                  self.blocks = []
+
+              def handle_starttag(self, tag, attrs):
+                  data = dict(attrs)
+                  if tag == 'script' and data.get('type') == 'application/ld+json':
+                      self.capture = True
+                      self.current = []
+
+              def handle_data(self, data):
+                  if self.capture:
+                      self.current.append(data)
+
+              def handle_endtag(self, tag):
+                  if tag == 'script' and self.capture:
+                      self.capture = False
+                      raw = ''.join(self.current).strip()
+                      if raw:
+                          self.blocks.append(json.loads(raw))
+
+          def flatten(value):
+              if isinstance(value, list):
+                  for item in value:
+                      yield from flatten(item)
+              else:
+                  yield value
+
+          parser = JsonLdParser()
+          with open('/tmp/contact.html', encoding='utf-8') as handle:
+              html = handle.read()
+              parser.feed(html)
+
+          objects = [obj for block in parser.blocks for obj in flatten(block) if isinstance(obj, dict)]
+          contact = next((obj for obj in objects if obj.get('@type') == 'ContactPage'), None)
+          if not contact:
+              raise SystemExit('ContactPage structured data missing')
+          if contact.get('@id') != 'https://baukostenradar.de/kontakt#contact':
+              raise SystemExit('Unexpected ContactPage @id')
+          if contact.get('url') != 'https://baukostenradar.de/kontakt':
+              raise SystemExit('Unexpected ContactPage URL')
+          if contact.get('about', {}).get('@id') != 'https://baukostenradar.de/#organization':
+              raise SystemExit('ContactPage.about does not link canonical Organization')
+          if contact.get('mainEntity', {}).get('@id') != 'https://baukostenradar.de/#organization':
+              raise SystemExit('ContactPage.mainEntity does not link canonical Organization')
+          if contact.get('isPartOf', {}).get('@id') != 'https://baukostenradar.de/#website':
+              raise SystemExit('ContactPage.isPartOf does not link canonical WebSite')
+
+          breadcrumb = next((obj for obj in objects if obj.get('@type') == 'BreadcrumbList'), None)
+          if not breadcrumb:
+              raise SystemExit('Contact page BreadcrumbList missing')
+          items = breadcrumb.get('itemListElement', [])
+          if len(items) != 2 or items[-1].get('item') != 'https://baukostenradar.de/kontakt':
+              raise SystemExit('Unexpected Contact page breadcrumb trail')
+
+          required_visible = (
+              'class="visibleBreadcrumbs"',
+              'BauKostenRadar kontaktieren',
+              'Maksym Pashchenko',
+              'href="/impressum"',
+          )
+          for needle in required_visible:
+              if needle not in html:
+                  raise SystemExit(f'Missing visible Contact page trust signal: {needle}')
+          PY
