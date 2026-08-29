@@ -37,11 +37,13 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const siteUrl = siteConfig.url.replace(/\/$/, "");
   const organizationData = {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": `${siteUrl}/#organization`,
     name: siteConfig.name,
-    url: siteConfig.url,
+    url: `${siteUrl}/`,
     email: siteConfig.email,
     contactPoint: {
       "@type": "ContactPoint",
