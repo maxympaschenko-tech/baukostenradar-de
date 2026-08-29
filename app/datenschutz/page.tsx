@@ -46,8 +46,8 @@ export default function DatenschutzPage() {
           <p>
             Wir verarbeiten personenbezogene Daten nur, soweit dies für den Betrieb dieser Website, die technische
             Sicherheit, die Bearbeitung von Anfragen sowie - nach entsprechender Einwilligung - für Reichweitenmessung
-            und eine spätere Werbefinanzierung erforderlich ist. Personenbezogene Daten sind alle Informationen, die
-            sich auf eine identifizierte oder identifizierbare natürliche Person beziehen.
+            erforderlich ist. Personenbezogene Daten sind alle Informationen, die sich auf eine identifizierte oder
+            identifizierbare natürliche Person beziehen.
           </p>
 
           <h2>3. Hosting und Server-Logfiles</h2>
@@ -148,22 +148,25 @@ export default function DatenschutzPage() {
           <h2>8. Einwilligungsverwaltung und Google Consent Mode</h2>
           <p>
             Beim ersten Besuch zeigt BauKostenRadar eine Einwilligungsabfrage. Notwendige Funktionen bleiben aktiv;
-            Statistik und Marketing können getrennt erlaubt oder abgelehnt werden. Die Google-Consent-Signale
-            <code> analytics_storage</code>, <code>ad_storage</code>, <code>ad_user_data</code> und
-            <code> ad_personalization</code> sind zunächst auf <code>denied</code> gesetzt und werden entsprechend
-            Ihrer Auswahl aktualisiert.
+            aktuell kann zusätzlich die Nutzung von Google Analytics für Statistik erlaubt oder abgelehnt werden.
+            Das Google-Consent-Signal <code>analytics_storage</code> ist zunächst auf <code>denied</code> gesetzt und
+            wird entsprechend Ihrer Auswahl aktualisiert.
           </p>
           <p>
-            Ihre Auswahl wird ausschließlich im lokalen Speicher Ihres Browsers unter dem Schlüssel
-            <code> baukostenradar-consent-v1</code> gespeichert, damit wir die Abfrage nicht bei jedem Seitenaufruf
-            erneut anzeigen müssen. Diese Speicherung ist für die Verwaltung Ihrer Datenschutzeinstellungen
-            erforderlich.
+            Die Werbesignale <code>ad_storage</code>, <code>ad_user_data</code> und <code>ad_personalization</code>
+            bleiben derzeit auf <code>denied</code>. Der aktuelle eigene Einwilligungsdialog erteilt keine Zustimmung
+            für personalisierte Werbung. Vor einer späteren AdSense-Aktivierung in den dafür relevanten Regionen wird
+            eine von Google zertifizierte CMP mit IAB-TCF-Unterstützung eingesetzt.
+          </p>
+          <p>
+            Ihre aktuelle Statistik-Auswahl wird ausschließlich im lokalen Speicher Ihres Browsers unter dem Schlüssel
+            <code> baukostenradar-consent-v2</code> gespeichert, damit wir die Abfrage nicht bei jedem Seitenaufruf
+            erneut anzeigen müssen. Eine frühere Auswahl aus <code>baukostenradar-consent-v1</code> wird einmalig nur
+            hinsichtlich der Statistik-Einstellung übernommen; eine frühere Marketing-Auswahl wird nicht weiterverwendet.
           </p>
           <p>
             Sie können Ihre Einwilligung jederzeit mit Wirkung für die Zukunft ändern oder widerrufen. Verwenden Sie
-            dazu den dauerhaft im Seitenfuß erreichbaren Link „Datenschutz-Einstellungen“. Die derzeitige
-            Einwilligungsverwaltung dient insbesondere der Analytics-Konfiguration. Vor dem späteren Einsatz von
-            Google AdSense wird zusätzlich eine Google-zertifizierte CMP für die erforderlichen Regionen eingebunden.
+            dazu den dauerhaft im Seitenfuß erreichbaren Link „Datenschutz-Einstellungen“.
           </p>
 
           <h2>9. Externe Links</h2>

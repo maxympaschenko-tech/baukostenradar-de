@@ -25,6 +25,21 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Verify custom consent stays analytics-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          consent_file='components/consent-manager.tsx'
+
+          grep -q 'analytics_storage' "$consent_file"
+          grep -q 'baukostenradar-consent-v2' "$consent_file"
+          grep -q 'baukostenradar-consent-v1' "$consent_file"
+
+          if grep -Eq 'ad_storage|ad_user_data|ad_personalization|consent_marketing' "$consent_file"; then
+            echo 'Custom consent must not grant or manage advertising consent signals before certified CMP integration.' >&2
+            exit 1
+          fi
+
       - name: Typecheck
         run: npm run typecheck
 

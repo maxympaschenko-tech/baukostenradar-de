@@ -1,0 +1,56 @@
+name: Verify consent readiness
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-consent:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify restrictive Google consent defaults
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for i in 1 2 3 4 5; do
+            if curl -sS --fail --connect-timeout 10 --max-time 20 'https://baukostenradar.de/' -o /tmp/home.html; then
+              break
+            fi
+            if [[ "$i" == "5" ]]; then
+              exit 1
+            fi
+            sleep 4
+          done
+
+          grep -q "analytics_storage:'denied'" /tmp/home.html
+          grep -q "ad_storage:'denied'" /tmp/home.html
+          grep -q "ad_user_data:'denied'" /tmp/home.html
+          grep -q "ad_personalization:'denied'" /tmp/home.html
+
+      - name: Verify privacy text matches analytics-only custom consent
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for i in 1 2 3 4 5; do
+            if curl -sS --fail --connect-timeout 10 --max-time 20 'https://baukostenradar.de/datenschutz' -o /tmp/privacy.html; then
+              break
+            fi
+            if [[ "$i" == "5" ]]; then
+              exit 1
+            fi
+            sleep 4
+          done
+
+          grep -q 'baukostenradar-consent-v2' /tmp/privacy.html
+          grep -q 'erteilt keine Zustimmung' /tmp/privacy.html
+          grep -q 'ad_storage' /tmp/privacy.html
+          grep -q 'ad_user_data' /tmp/privacy.html
+          grep -q 'ad_personalization' /tmp/privacy.html
+          grep -q 'Google zertifizierte Consent Management Platform' /tmp/privacy.html
+          grep -q 'IAB-TCF' /tmp/privacy.html
+          grep -qi 'noindex' /tmp/privacy.html
