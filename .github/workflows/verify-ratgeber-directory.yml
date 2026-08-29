@@ -1,0 +1,49 @@
+name: Verify Ratgeber directory
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-ratgeber-directory:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify searchable Ratgeber directory and SSR coverage
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/api/version' /tmp/version.json
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+
+          grep -q '"@type":"CollectionPage"' /tmp/ratgeber.html
+          grep -q 'rel="canonical" href="https://baukostenradar.de/ratgeber"' /tmp/ratgeber.html || grep -q 'href="/ratgeber"' /tmp/ratgeber.html
+
+          grep -q 'Ratgeber finden' /tmp/ratgeber.html
+          grep -q 'Schnell zum passenden Kostenthema' /tmp/ratgeber.html
+          grep -q 'Ratgeber durchsuchen' /tmp/ratgeber.html
+          grep -q 'Alle Themenbereiche' /tmp/ratgeber.html
+          grep -q 'Dachfenster' /tmp/ratgeber.html
+          grep -q 'Wärmepumpe' /tmp/ratgeber.html
+
+          representative_guides=(
+            sanierungskosten-pro-qm
+            photovoltaik-10-kwp-kosten
+            estrich-100-qm-kosten
+            handwerker-stundensaetze
+          )
+
+          for slug in "${representative_guides[@]}"; do
+            grep -q "/ratgeber/${slug}" /tmp/ratgeber.html || { echo "SSR Ratgeber directory missing ${slug}"; exit 1; }
+          done
+
+          ! grep -qi 'noindex' /tmp/ratgeber.html
+
+          echo 'Verified searchable Ratgeber controls, CollectionPage metadata and representative guide links in server-rendered production HTML'
