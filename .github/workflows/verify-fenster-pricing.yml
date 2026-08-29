@@ -64,15 +64,23 @@ jobs:
           quellen = text('/tmp/quellen.html')
 
           expected_main = (
-              '8 Preispositionen',
-              '3 geprüfte Quellen',
+              '15 Preispositionen',
+              '4 geprüfte Quellen',
               'Standardfenster inkl. Einbau',
               'Kunststofffenster',
               'Holzfenster',
               'Aluminiumfenster',
               'Holz-Alu-Fenster',
+              'Fenstermontage durch Fachbetrieb',
+              'Fensterbauer Stundensatz',
+              '10 neue Fenster inkl. Einbau',
+              'Neues Fenster mit Mauerdurchbruch',
+              'Kunststofffenster Standardgröße inkl. Einbau',
+              'Altfenster ausbauen',
+              'Altfenster entsorgen',
               'co2online - Fenster tauschen 2026',
               'Aroundhome - Fenster Preise 2026',
+              'MyHammer - Fenstereinbau Kosten 2026',
           )
           for needle in expected_main:
               if needle not in fenster:
@@ -81,16 +89,21 @@ jobs:
           expected_city = (
               'Fenster Kosten in München 2026',
               'Standardfenster inkl. Einbau',
-              'Kunststofffenster',
-              'Holzfenster',
-              'Aluminiumfenster',
-              'Holz-Alu-Fenster',
+              'Fenstermontage durch Fachbetrieb',
+              '10 neue Fenster inkl. Einbau',
+              'Neues Fenster mit Mauerdurchbruch',
+              'Altfenster ausbauen',
+              'Altfenster entsorgen',
           )
           for needle in expected_city:
               if needle not in muenchen:
                   raise SystemExit(f'Missing München Fenster production signal: {needle}')
 
-          for source_name in ('co2online - Fenster tauschen 2026', 'Aroundhome - Fenster Preise 2026'):
+          for source_name in (
+              'co2online - Fenster tauschen 2026',
+              'Aroundhome - Fenster Preise 2026',
+              'MyHammer - Fenstereinbau Kosten 2026',
+          ):
               if source_name not in quellen:
                   raise SystemExit(f'Missing Fenster source in central source catalog: {source_name}')
           PY
