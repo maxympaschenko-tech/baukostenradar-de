@@ -312,6 +312,63 @@ const trockenbauGuideSilos: Record<string, GuideSilo> = {
   },
 };
 
+const photovoltaikGuideSilos: Record<string, GuideSilo> = {
+  "photovoltaik-kosten-2026": {
+    serviceSlugs: ["photovoltaik", "dachsanierung", "elektriker"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "photovoltaik",
+      itemSlug: "pv-anlage-10-kwp-inkl-installation",
+    }),
+    calculatorLabel: "Photovoltaik 10 kWp berechnen",
+    regionalMode: "service",
+  },
+  "photovoltaik-5-kwp-kosten": {
+    serviceSlugs: ["photovoltaik", "dachsanierung", "elektriker"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "photovoltaik",
+      itemSlug: "pv-anlage-5-kwp-inkl-installation",
+    }),
+    calculatorLabel: "Photovoltaik 5 kWp berechnen",
+    regionalMode: "service",
+  },
+  "photovoltaik-10-kwp-kosten": {
+    serviceSlugs: ["photovoltaik", "dachsanierung", "elektriker"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "photovoltaik",
+      itemSlug: "pv-anlage-10-kwp-inkl-installation",
+    }),
+    calculatorLabel: "Photovoltaik 10 kWp berechnen",
+    regionalMode: "service",
+  },
+  "photovoltaik-15-kwp-kosten": {
+    serviceSlugs: ["photovoltaik", "dachsanierung", "elektriker"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "photovoltaik",
+      itemSlug: "pv-anlage-15-kwp-inkl-installation",
+    }),
+    calculatorLabel: "Photovoltaik 15 kWp berechnen",
+    regionalMode: "service",
+  },
+  "photovoltaik-mit-speicher-kosten": {
+    serviceSlugs: ["photovoltaik", "elektriker"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "photovoltaik",
+      itemSlug: "10-kwp-pv-ca-10-kwh-speicher",
+    }),
+    calculatorLabel: "PV-Anlage mit Speicher berechnen",
+    regionalMode: "service",
+  },
+  "stromspeicher-kosten-pro-kwh": {
+    serviceSlugs: ["photovoltaik", "elektriker"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "photovoltaik",
+      itemSlug: "stromspeicher-lfp",
+    }),
+    calculatorLabel: "Stromspeicher berechnen",
+    regionalMode: "service",
+  },
+};
+
 const serviceAugments: Record<string, string[]> = {
   "klinkerfassade-kosten-pro-qm": ["maurer"],
 };
@@ -325,7 +382,8 @@ export function getGuideSilo(slug: string): GuideSilo {
     malerGuideSilos[slug] ??
     fliesenGuideSilos[slug] ??
     bodenGuideSilos[slug] ??
-    trockenbauGuideSilos[slug];
+    trockenbauGuideSilos[slug] ??
+    photovoltaikGuideSilos[slug];
   if (explicit) return explicit;
 
   const base = getBaseGuideSilo(slug);
