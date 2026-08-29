@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { regions } from "@/lib/pricing";
+import { regions, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
+
+const cities = regions.filter((region) => region.value !== "de");
+const featuredServiceSlugs = ["badsanierung", "dachsanierung", "elektriker", "fenster", "heizung", "kueche"];
+const featuredServices = featuredServiceSlugs
+  .map((slug) => services.find((service) => service.slug === slug))
+  .filter((service): service is NonNullable<typeof service> => Boolean(service));
 
 export const metadata: Metadata = {
   title: "Handwerkerpreise nach Stadt 2026",
-  description: "Handwerker- und Renovierungskosten 2026 nach Stadt vergleichen: Regionalfaktoren, Beispielbudgets und Detailseiten für acht deutsche Großstädte.",
+  description: `Handwerker- und Renovierungskosten 2026 nach Stadt vergleichen: Regionalfaktoren, Beispielbudgets und Detailseiten für ${cities.length} deutsche Großstädte.`,
   alternates: { canonical: "/staedte" },
 };
 
@@ -18,16 +24,33 @@ function euro(value: number) {
 }
 
 export default function CitiesPage() {
-  const cities = regions.filter((region) => region.value !== "de");
   const baseUrl = siteConfig.url.replace(/\/$/, "");
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Startseite", item: baseUrl },
-      { "@type": "ListItem", position: 2, name: "Städte", item: `${baseUrl}/staedte` },
-    ],
-  };
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Startseite", item: baseUrl },
+        { "@type": "ListItem", position: 2, name: "Städte", item: `${baseUrl}/staedte` },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: "Handwerkerpreise nach Stadt 2026",
+      url: `${baseUrl}/staedte`,
+      mainEntity: {
+        "@type": "ItemList",
+        numberOfItems: cities.length,
+        itemListElement: cities.map((region, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: `Handwerkerpreise ${region.label}`,
+          url: `${baseUrl}/staedte/${region.slug}`,
+        })),
+      },
+    },
+  ];
 
   return (
     <>
@@ -46,11 +69,12 @@ export default function CitiesPage() {
           <span className="eyebrow">Regionale Kosten 2026</span>
           <h1>Handwerkerpreise nach Stadt vergleichen</h1>
           <p>
-            BauKostenRadar ordnet bundesweite Preisbänder mit transparenten Regionalfaktoren für acht deutsche
+            BauKostenRadar ordnet bundesweite Preisbänder mit transparenten Regionalfaktoren für {cities.length} deutsche
             Großstädte ein. So lässt sich ein Renovierungs- oder Handwerkerbudget vor der Angebotssuche grob regional anpassen.
           </p>
           <div className="heroFacts">
             <span><strong>{cities.length}</strong> Städte</span>
+            <span><strong>{services.length}</strong> Gewerke je Stadt</span>
             <span><strong>2026</strong> Preisbasis</span>
             <span><strong>transparent</strong> modellierte Faktoren</span>
           </div>
@@ -81,6 +105,43 @@ export default function CitiesPage() {
       </section>
 
       <section className="section sectionAlt">
+        <div className="shell">
+          <div className="sectionHeading">
+            <span className="eyebrow">Direkt zum Gewerk</span>
+            <h2>Beliebte Handwerkerkosten nach Stadt</h2>
+            <p>
+              Wenn das Gewerk bereits feststeht, führt diese Übersicht ohne Umweg direkt zur regionalen Preisseite.
+              Dort stehen alle Preispositionen, Quellen, Rechner und passende Ratgeber für die gewählte Stadt bereit.
+            </p>
+          </div>
+
+          <div className="directoryGrid">
+            {featuredServices.map((service) => (
+              <article className="directoryCard" key={service.slug}>
+                <span className="eyebrow">{service.shortTitle}</span>
+                <h3>{service.shortTitle}-Kosten regional vergleichen</h3>
+                <p>{service.description}</p>
+                <div className="regionChips">
+                  {cities.map((region) => (
+                    <Link
+                      className="regionChip"
+                      key={region.slug}
+                      href={`/kosten/${service.slug}/${region.slug}`}
+                    >
+                      {service.shortTitle} {region.label}
+                    </Link>
+                  ))}
+                </div>
+                <Link className="textLink" href={`/kosten/${service.slug}`}>
+                  Alle {service.shortTitle}-Preise Deutschland →
+                </Link>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
         <div className="shell">
           <div className="sectionHeading">
             <span className="eyebrow">Direkter Vergleich</span>
@@ -128,7 +189,7 @@ export default function CitiesPage() {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section sectionAlt">
         <div className="shell twoColumn">
           <div>
             <span className="eyebrow">So funktioniert es</span>
