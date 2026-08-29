@@ -17,7 +17,15 @@ const kellerabdichtungGuideLinks: SupplementalGuide[] = [
   { slug: "kellerabdichtung-innen-kosten-pro-qm", label: "Kellerabdichtung innen Kosten pro m²", href: "/ratgeber/kellerabdichtung-innen-kosten-pro-qm" },
 ];
 
-const supplementalClusters = [sanitaerGuideLinks, kellerabdichtungGuideLinks];
+const tuerenGuideLinks: SupplementalGuide[] = [
+  { slug: "6-innentueren-austauschen-kosten", label: "6 Innentüren austauschen Kosten", href: "/ratgeber/6-innentueren-austauschen-kosten" },
+  { slug: "innentuer-einbauen-kosten", label: "Innentür einbauen Kosten", href: "/ratgeber/innentuer-einbauen-kosten" },
+  { slug: "haustuer-einbauen-kosten", label: "Haustür einbauen Kosten", href: "/ratgeber/haustuer-einbauen-kosten" },
+  { slug: "haustuer-kunststoff-kosten", label: "Haustür Kunststoff Kosten", href: "/ratgeber/haustuer-kunststoff-kosten" },
+  { slug: "haustuer-rc2-kosten", label: "Haustür Holz/Alu RC2 Kosten", href: "/ratgeber/haustuer-rc2-kosten" },
+];
+
+const supplementalClusters = [sanitaerGuideLinks, kellerabdichtungGuideLinks, tuerenGuideLinks];
 
 const supplementalByGuide: Record<string, GuideSupplementalLink[]> = Object.fromEntries(
   supplementalClusters.flatMap((cluster) =>

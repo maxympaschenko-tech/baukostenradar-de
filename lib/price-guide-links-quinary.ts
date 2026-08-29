@@ -115,6 +115,16 @@ export const quinaryItemGuideOverrides: Record<string, QuinaryPriceGuideLink> = 
     title: "Innentür mit Zarge einbauen: Kosten inklusive Montage",
     cta: "Innentür-Ratgeber öffnen",
   },
+  "tueren:haustuer-kunststoff-inkl-montage": {
+    href: "/ratgeber/haustuer-kunststoff-kosten",
+    title: "Haustür Kunststoff: Kosten inklusive Montage",
+    cta: "Kunststoff-Haustür-Ratgeber öffnen",
+  },
+  "tueren:haustuer-holz-alu-rc2-inkl-montage": {
+    href: "/ratgeber/haustuer-rc2-kosten",
+    title: "Haustür Holz/Alu RC2: Kosten inklusive Montage",
+    cta: "RC2-Haustür-Ratgeber öffnen",
+  },
   "estrich:zementestrich-verlegen": {
     href: "/ratgeber/zementestrich-kosten-pro-qm",
     title: "Zementestrich verlegen: Kosten pro m²",
