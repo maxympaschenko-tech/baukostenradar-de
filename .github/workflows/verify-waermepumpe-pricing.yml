@@ -53,27 +53,38 @@ jobs:
           sitemap = open('/tmp/sitemap.xml', encoding='utf-8').read()
 
           expected_main = (
-              '13 Preispositionen', '5 geprüfte Quellen',
+              '21 Preispositionen', '6 geprüfte Quellen',
               'Erdwärmepumpe mit Flächenkollektor komplett',
               'Erdwärmepumpe mit Erdsonde komplett',
-              'Flächenkollektor für Erdwärmepumpe erschließen',
-              'Erdsonde für Erdwärmepumpe erschließen',
               'Wasser-Wasser-Wärmepumpe komplett',
-              'Brunnenbohrungen für Wasser-Wasser-Wärmepumpe',
-              'Brunnenbohrung für Wärmepumpe je Meter',
-              'Wärmepumpenstrom laufende Kosten',
-              'co2online - Wärmepumpe Kosten 2026',
-              'co2online - Wasser-Wasser-Wärmepumpe Kosten 2026',
+              'Wärmepumpe im Neubau inkl. Einbau',
+              'Wärmepumpe im Altbau inkl. Einbau und Anpassungen',
+              'Luft-Wasser-Wärmepumpe Gerät 10 kW',
+              'Wärmepumpe installieren und hydraulisch einbinden',
+              'Altheizung demontieren mit Pufferspeicher und Zubehör',
+              'Elektrik für Wärmepumpe mit Zählerschrank und Anschluss',
+              'Niedertemperatur-Heizkörper für Wärmepumpe nachrüsten',
+              'Hydraulischer Abgleich für Wärmepumpe im Einfamilienhaus',
+              'Blauarbeit - Wärmepumpe Kosten & Einbau 2026',
           )
           for needle in expected_main:
               if needle not in main: raise SystemExit(f'Missing Wärmepumpe signal: {needle}')
 
-          for needle in ('Wärmepumpe Kosten in München 2026', 'Erdwärmepumpe mit Erdsonde komplett', 'Wasser-Wasser-Wärmepumpe komplett', 'Brunnenbohrungen für Wasser-Wasser-Wärmepumpe'):
+          for needle in (
+              'Wärmepumpe Kosten in München 2026',
+              'Wärmepumpe im Altbau inkl. Einbau und Anpassungen',
+              'Elektrik für Wärmepumpe mit Zählerschrank und Anschluss',
+              'Hydraulischer Abgleich für Wärmepumpe im Einfamilienhaus',
+          ):
               if needle not in city: raise SystemExit(f'Missing München Wärmepumpe signal: {needle}')
 
-          for needle in ('co2online - Wärmepumpe Kosten 2026', 'co2online - Wasser-Wasser-Wärmepumpe Kosten 2026'):
-              if needle not in quellen: raise SystemExit(f'Missing Wärmepumpe source: {needle}')
+          if 'Blauarbeit - Wärmepumpe Kosten & Einbau 2026' not in quellen:
+              raise SystemExit('Missing Wärmepumpe source in central source catalog')
 
-          for needle in ('/kosten/waermepumpe/leistung/erdwaermepumpe-mit-erdsonde-komplett', '/kosten/waermepumpe/leistung/wasser-wasser-waermepumpe-komplett', '/kosten/waermepumpe/leistung/brunnenbohrung-fuer-waermepumpe-je-meter'):
+          for needle in (
+              '/kosten/waermepumpe/leistung/waermepumpe-im-altbau-inkl-einbau-und-anpassungen',
+              '/kosten/waermepumpe/leistung/elektrik-fuer-waermepumpe-mit-zaehlerschrank-und-anschluss',
+              '/kosten/waermepumpe/leistung/hydraulischer-abgleich-fuer-waermepumpe-im-einfamilienhaus',
+          ):
               if needle not in sitemap: raise SystemExit(f'Missing Wärmepumpe URL: {needle}')
           PY
