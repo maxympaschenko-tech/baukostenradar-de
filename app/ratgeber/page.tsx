@@ -5,7 +5,7 @@ import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Ratgeber zu Sanierung, Renovierung & Handwerkerkosten 2026",
-  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Wärmepumpen, Photovoltaik, Dämmung, Malerarbeiten, Fliesen, Bodenbelägen, Trockenbau, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
+  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Wärmepumpen, Photovoltaik, Dämmung, Fassaden, Malerarbeiten, Fliesen, Bodenbelägen, Trockenbau, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
   alternates: { canonical: "/ratgeber" },
 };
 
@@ -78,6 +78,12 @@ const guideGroups = [
     title: "Dämmkosten, Fassade und Dachaufbau kalkulieren",
     description: "Dämmkosten pro Quadratmeter sowie WDVS, Innendämmung, Zwischen- und Aufsparrendämmung mit aktuellen Richtwerten, regionalen Modellwerten und exakten Rechner-Presets vergleichen.",
     slugs: ["daemmung-kosten-pro-qm", "fassadendaemmung-kosten-pro-qm", "innendaemmung-kosten-pro-qm", "zwischensparrendaemmung-kosten-pro-qm", "aufsparrendaemmung-kosten-pro-qm"],
+  },
+  {
+    eyebrow: "Fassade & Außenhaut",
+    title: "Fassadensanierung, Putz, Risse und Verkleidung kalkulieren",
+    description: "Fassadensanierung, neue Putzfassade, Risssanierung, hinterlüftete Fassade, Fassadenanstrich und Klinker mit aktuellen Richtwerten und exakten Rechner-Presets vergleichen.",
+    slugs: ["fassade-sanieren-kosten", "putzfassade-kosten-pro-qm", "fassadenrisse-sanieren-kosten-pro-qm", "vorgehaengte-hinterlueftete-fassade-kosten-pro-qm", "fassade-streichen-kosten-pro-qm", "klinkerfassade-kosten-pro-qm"],
   },
   {
     eyebrow: "Maler & Oberflächen",
