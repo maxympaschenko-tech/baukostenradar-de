@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import styles from "./guide-directory.module.css";
 
 export type GuideDirectoryGuide = {
   slug: string;
@@ -61,7 +62,7 @@ export function GuideDirectory({ groups }: { groups: GuideDirectoryGroup[] }) {
 
   return (
     <>
-      <section className="section guideDirectoryIntro" aria-labelledby="ratgeber-finden">
+      <section className={`section ${styles.intro}`} aria-labelledby="ratgeber-finden">
         <div className="shell">
           <div className="premiumSectionHeading">
             <div>
@@ -73,8 +74,8 @@ export function GuideDirectory({ groups }: { groups: GuideDirectoryGroup[] }) {
             </div>
           </div>
 
-          <div className="guideDirectoryControls" role="search" aria-label="Ratgeber durchsuchen">
-            <label className="guideSearchField">
+          <div className={styles.controls} role="search" aria-label="Ratgeber durchsuchen">
+            <label className={styles.searchField}>
               <span>Suchbegriff</span>
               <input
                 type="search"
@@ -85,7 +86,7 @@ export function GuideDirectory({ groups }: { groups: GuideDirectoryGroup[] }) {
               />
             </label>
 
-            <label className="guideTopicField">
+            <label className={styles.topicField}>
               <span>Themenbereich</span>
               <select value={topic} onChange={(event) => setTopic(event.target.value)}>
                 <option value="all">Alle Themenbereiche</option>
@@ -95,9 +96,9 @@ export function GuideDirectory({ groups }: { groups: GuideDirectoryGroup[] }) {
               </select>
             </label>
 
-            <div className="guideDirectoryStatus" aria-live="polite">
+            <div className={styles.status} aria-live="polite">
               <strong>{visibleGuideCount}</strong>
-              <span>{visibleGuideCount === 1 ? "Ratgeber gefunden" : "Ratgeber gefunden"}</span>
+              <span>Ratgeber gefunden</span>
               {hasFilters ? (
                 <button
                   type="button"
@@ -114,7 +115,7 @@ export function GuideDirectory({ groups }: { groups: GuideDirectoryGroup[] }) {
             </div>
           </div>
 
-          <nav className="guideTopicLinks" aria-label="Schnellnavigation Themenbereiche">
+          <nav className={styles.topicLinks} aria-label="Schnellnavigation Themenbereiche">
             {groups.map((group) => (
               <button type="button" key={group.id} onClick={() => setTopic(group.id)}>
                 {group.eyebrow}
@@ -126,7 +127,7 @@ export function GuideDirectory({ groups }: { groups: GuideDirectoryGroup[] }) {
 
       {filteredGroups.length > 0 ? filteredGroups.map((group, index) => (
         <section
-          className={`section guideDirectorySection${index % 2 === 0 ? "" : " sectionAlt"}`}
+          className={`section ${styles.directorySection}${index % 2 === 0 ? "" : " sectionAlt"}`}
           id={`thema-${group.id}`}
           key={group.id}
         >
@@ -156,15 +157,15 @@ export function GuideDirectory({ groups }: { groups: GuideDirectoryGroup[] }) {
           </div>
         </section>
       )) : (
-        <section className="section guideEmptySection">
+        <section className={`section ${styles.emptySection}`}>
           <div className="shell">
-            <div className="contentCard guideEmptyState">
+            <div className={`contentCard ${styles.emptyState}`}>
               <span className="eyebrow">Keine Treffer</span>
               <h2>Kein Ratgeber passt zu dieser Suche</h2>
               <p>Versuchen Sie einen allgemeineren Begriff oder setzen Sie den Themenfilter zurück.</p>
               <button
                 type="button"
-                className="ghostButton guideResetButton"
+                className={styles.resetButton}
                 onClick={() => {
                   setQuery("");
                   setTopic("all");
