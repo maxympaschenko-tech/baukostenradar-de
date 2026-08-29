@@ -59,6 +59,11 @@ export const priceSources = {
     url: "https://www.aroundhome.de/dachdecker/preise-kosten/",
     checkedAt: "29.08.2026",
   },
+  aroundhomeBad: {
+    name: "Aroundhome - Badsanierung Preise 2026",
+    url: "https://www.aroundhome.de/badezimmer/preise-kosten/",
+    checkedAt: "29.08.2026",
+  },
 } as const;
 
 type CatalogSourceKey = keyof typeof priceSources;
@@ -268,6 +273,92 @@ const enrichedBaseServices: Service[] = baseServices.map((service) => {
           high: 15000,
           unit: "pro Gaube",
           sourceKey: "aroundhomeDach",
+        },
+      ],
+    };
+  }
+
+  if (service.slug === "badsanierung") {
+    return {
+      ...catalogService,
+      description: "Aktuelle Richtwerte für komplette und teilweise Badsanierung, Demontage, Rohinstallation, Trockenbau, Abdichtung und einzelne Sanitärobjekte in Deutschland.",
+      priceItems: [
+        ...catalogService.priceItems,
+        {
+          name: "Bad-Teilsanierung",
+          low: 5000,
+          high: 18000,
+          unit: "pro Bad",
+          note: "Je nach Umfang von Oberflächen bis zu einzelnen Sanitärobjekten",
+          sourceKey: "aroundhomeBad",
+        },
+        {
+          name: "Demontage & Entsorgung altes Bad",
+          low: 800,
+          high: 1500,
+          unit: "pro 6-m²-Bad",
+          sourceKey: "aroundhomeBad",
+        },
+        {
+          name: "Rohinstallation Wasser & Elektro",
+          low: 1000,
+          high: 2500,
+          unit: "pro 6-m²-Bad",
+          sourceKey: "aroundhomeBad",
+        },
+        {
+          name: "Trockenbau & Vorwandelemente",
+          low: 800,
+          high: 2500,
+          unit: "pro 6-m²-Bad",
+          sourceKey: "aroundhomeBad",
+        },
+        {
+          name: "Sanitärobjekte WC, Dusche & Waschtisch",
+          low: 1500,
+          high: 5000,
+          unit: "pro 6-m²-Bad",
+          sourceKey: "aroundhomeBad",
+        },
+        {
+          name: "Badezimmer abdichten",
+          low: 800,
+          high: 1500,
+          unit: "pro Bad",
+          note: "Abhängig von Fläche und Abdichtungsverfahren",
+          sourceKey: "aroundhomeBad",
+        },
+        {
+          name: "Waschtisch inkl. Anschluss",
+          low: 1200,
+          high: 3500,
+          unit: "pro Stück",
+          note: "Becken mit Unterschrank und fachgerechtem Anschluss an vorhandene Leitungen",
+          sourceKey: "aroundhomeBad",
+        },
+        {
+          name: "Hänge-WC modern inkl. Montage",
+          low: 800,
+          high: 1800,
+          unit: "pro Stück",
+          note: "Bei neuem Vorwandelement oder Spülkasten kann der Preis höher liegen",
+          sourceKey: "aroundhomeBad",
+        },
+        {
+          name: "Ebenerdige Dusche / Walk-in",
+          low: 4500,
+          high: 8500,
+          unit: "pro Dusche",
+          note: "Mit Gefälleestrich, Bodenablauf, Abdichtung und Glaswand",
+          sourceKey: "aroundhomeBad",
+        },
+        {
+          name: "Badewanne austauschen",
+          low: 2000,
+          high: 4500,
+          unit: "pro Wanne",
+          note: "Mit Entsorgung, neuer Abmauerung oder Schürze und Armatur",
+          sourceKey: "aroundhomeBad",
         },
       ],
     };
