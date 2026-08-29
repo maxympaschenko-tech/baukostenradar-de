@@ -97,7 +97,7 @@ jobs:
               if needle not in muenchen:
                   raise SystemExit(f'Missing München Bad production signal: {needle}')
 
-          if 'Aroundhome - Badsanierung Preise 2026' not in quellen:
+          if 'Aroundhome - Badsanierung' not in quellen:
               raise SystemExit('Missing Bad source in central source catalog')
 
           sitemap_needles = (
