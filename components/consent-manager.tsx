@@ -12,19 +12,22 @@ declare global {
 
 type ConsentState = {
   analytics: boolean;
-  marketing: boolean;
-  version: 1;
+  version: 2;
   updatedAt: string;
 };
 
-const STORAGE_KEY = "baukostenradar-consent-v1";
+type LegacyConsentState = {
+  analytics?: boolean;
+  marketing?: boolean;
+  version?: number;
+};
 
-function applyGoogleConsent(consent: Pick<ConsentState, "analytics" | "marketing">) {
+const STORAGE_KEY = "baukostenradar-consent-v2";
+const LEGACY_STORAGE_KEY = "baukostenradar-consent-v1";
+
+function applyAnalyticsConsent(analytics: boolean) {
   const values = {
-    analytics_storage: consent.analytics ? "granted" : "denied",
-    ad_storage: consent.marketing ? "granted" : "denied",
-    ad_user_data: consent.marketing ? "granted" : "denied",
-    ad_personalization: consent.marketing ? "granted" : "denied",
+    analytics_storage: analytics ? "granted" : "denied",
   };
 
   if (typeof window.gtag === "function") {
@@ -37,8 +40,7 @@ function applyGoogleConsent(consent: Pick<ConsentState, "analytics" | "marketing
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({
     event: "consent_update",
-    consent_analytics: consent.analytics,
-    consent_marketing: consent.marketing,
+    consent_analytics: analytics,
   });
 }
 
@@ -46,29 +48,38 @@ export function ConsentManager() {
   const [visible, setVisible] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [analytics, setAnalytics] = useState(false);
-  const [marketing, setMarketing] = useState(false);
 
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem(STORAGE_KEY);
-      if (!saved) {
-        setVisible(true);
-        return;
+      if (saved) {
+        const parsed = JSON.parse(saved) as Partial<ConsentState>;
+        if (parsed.version === 2) {
+          const nextAnalytics = Boolean(parsed.analytics);
+          setAnalytics(nextAnalytics);
+          applyAnalyticsConsent(nextAnalytics);
+          return;
+        }
       }
 
-      const parsed = JSON.parse(saved) as Partial<ConsentState>;
-      if (parsed.version !== 1) {
-        setVisible(true);
-        return;
+      const legacySaved = window.localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (legacySaved) {
+        const legacy = JSON.parse(legacySaved) as LegacyConsentState;
+        if (legacy.version === 1) {
+          const migrated: ConsentState = {
+            analytics: Boolean(legacy.analytics),
+            version: 2,
+            updatedAt: new Date().toISOString(),
+          };
+          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+          window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+          setAnalytics(migrated.analytics);
+          applyAnalyticsConsent(migrated.analytics);
+          return;
+        }
       }
 
-      const next = {
-        analytics: Boolean(parsed.analytics),
-        marketing: Boolean(parsed.marketing),
-      };
-      setAnalytics(next.analytics);
-      setMarketing(next.marketing);
-      applyGoogleConsent(next);
+      setVisible(true);
     } catch {
       setVisible(true);
     }
@@ -84,18 +95,16 @@ export function ConsentManager() {
     return () => window.removeEventListener("baukostenradar:open-consent", openSettings);
   }, []);
 
-  function save(nextAnalytics: boolean, nextMarketing: boolean) {
+  function save(nextAnalytics: boolean) {
     const consent: ConsentState = {
       analytics: nextAnalytics,
-      marketing: nextMarketing,
-      version: 1,
+      version: 2,
       updatedAt: new Date().toISOString(),
     };
 
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(consent));
     setAnalytics(nextAnalytics);
-    setMarketing(nextMarketing);
-    applyGoogleConsent(consent);
+    applyAnalyticsConsent(nextAnalytics);
     setVisible(false);
     setSettingsOpen(false);
   }
@@ -116,8 +125,9 @@ export function ConsentManager() {
           <h2 id="consent-title">Ihre Privatsphäre-Einstellungen</h2>
           <p id="consent-description">
             Wir verwenden notwendige Funktionen für den Betrieb der Website. Mit Ihrer Einwilligung nutzen wir
-            zusätzlich Google Analytics zur Reichweitenmessung. Marketing- und Werbesignale sind für eine spätere
-            Werbeeinbindung vorbereitet. Sie können Ihre Auswahl jederzeit ändern.
+            zusätzlich Google Analytics zur Reichweitenmessung. Werbe- und Personalisierungssignale bleiben derzeit
+            deaktiviert und werden erst vor einer späteren Werbeeinbindung über eine dafür geeignete Consent-Lösung
+            verwaltet.
           </p>
           <p className="consentLegal">
             Details finden Sie in unserer <Link href="/datenschutz">Datenschutzerklärung</Link>.
@@ -146,28 +156,15 @@ export function ConsentManager() {
                 aria-label="Statistik erlauben"
               />
             </label>
-
-            <label className="consentOption">
-              <span>
-                <strong>Marketing</strong>
-                <small>Werbe- und Personalisierungssignale für zukünftige Google-Werbedienste.</small>
-              </span>
-              <input
-                type="checkbox"
-                checked={marketing}
-                onChange={(event) => setMarketing(event.target.checked)}
-                aria-label="Marketing erlauben"
-              />
-            </label>
           </div>
         )}
 
         <div className="consentActions">
-          <button className="consentButton consentButtonSecondary" type="button" onClick={() => save(false, false)}>
-            Alle ablehnen
+          <button className="consentButton consentButtonSecondary" type="button" onClick={() => save(false)}>
+            Nur notwendige
           </button>
           {settingsOpen ? (
-            <button className="consentButton consentButtonSecondary" type="button" onClick={() => save(analytics, marketing)}>
+            <button className="consentButton consentButtonSecondary" type="button" onClick={() => save(analytics)}>
               Auswahl speichern
             </button>
           ) : (
@@ -175,8 +172,8 @@ export function ConsentManager() {
               Einstellungen
             </button>
           )}
-          <button className="consentButton consentButtonPrimary" type="button" onClick={() => save(true, true)}>
-            Alle akzeptieren
+          <button className="consentButton consentButtonPrimary" type="button" onClick={() => save(true)}>
+            Statistik akzeptieren
           </button>
         </div>
       </section>
