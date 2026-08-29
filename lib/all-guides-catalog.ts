@@ -161,6 +161,16 @@ const fassadeGuideLinks = [
   { slug: "klinkerfassade-kosten-pro-qm", label: "Klinkerfassade Kosten pro m²", href: "/ratgeber/klinkerfassade-kosten-pro-qm" },
 ] as const;
 
+const gartenGuideLinks = [
+  { slug: "garten-anlegen-kosten", label: "Garten und Außenanlagen Kosten", href: "/ratgeber/garten-anlegen-kosten" },
+  { slug: "einfahrt-pflastern-kosten", label: "Einfahrt pflastern Kosten", href: "/ratgeber/einfahrt-pflastern-kosten" },
+  { slug: "terrasse-pflastern-kosten", label: "Terrasse pflastern Kosten", href: "/ratgeber/terrasse-pflastern-kosten" },
+  { slug: "doppelstabmattenzaun-kosten-pro-meter", label: "Doppelstabmattenzaun Kosten pro Meter", href: "/ratgeber/doppelstabmattenzaun-kosten-pro-meter" },
+  { slug: "rollrasen-kosten-pro-qm", label: "Rollrasen Kosten pro m²", href: "/ratgeber/rollrasen-kosten-pro-qm" },
+  { slug: "heckenschnitt-kosten-pro-meter", label: "Heckenschnitt Kosten pro Meter", href: "/ratgeber/heckenschnitt-kosten-pro-meter" },
+  { slug: "baum-faellen-kosten", label: "Baum fällen Kosten", href: "/ratgeber/baum-faellen-kosten" },
+] as const;
+
 function peers<T extends readonly { slug: string; label: string; href: string }[]>(links: T, slug: string) {
   return links
     .filter((link) => link.slug !== slug)
@@ -259,6 +269,13 @@ const relatedByGuide: Record<string, Array<{ label: string; href: string }>> = {
     masonryRelatedLinks.bodenplatte,
     masonryRelatedLinks.klinkerCalculator,
   ],
+  "garten-anlegen-kosten": peers(gartenGuideLinks, "garten-anlegen-kosten"),
+  "einfahrt-pflastern-kosten": peers(gartenGuideLinks, "einfahrt-pflastern-kosten"),
+  "terrasse-pflastern-kosten": peers(gartenGuideLinks, "terrasse-pflastern-kosten"),
+  "doppelstabmattenzaun-kosten-pro-meter": peers(gartenGuideLinks, "doppelstabmattenzaun-kosten-pro-meter"),
+  "rollrasen-kosten-pro-qm": peers(gartenGuideLinks, "rollrasen-kosten-pro-qm"),
+  "heckenschnitt-kosten-pro-meter": peers(gartenGuideLinks, "heckenschnitt-kosten-pro-meter"),
+  "baum-faellen-kosten": peers(gartenGuideLinks, "baum-faellen-kosten"),
 };
 
 const enrichedBaseGuides = baseAllGuides.map((guide) => {
