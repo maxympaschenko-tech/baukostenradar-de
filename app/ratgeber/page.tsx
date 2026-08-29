@@ -5,7 +5,7 @@ import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Ratgeber zu Sanierung, Renovierung & Handwerkerkosten 2026",
-  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Wärmepumpen, Photovoltaik, Dämmung, Fassaden, Malerarbeiten, Fliesen, Bodenbelägen, Trockenbau, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
+  description: "Ratgeber zu Sanierungskosten, Dach, Fenster, Elektrik, Heizung, Wärmepumpen, Photovoltaik, Dämmung, Fassaden, Garten und Außenanlagen, Malerarbeiten, Fliesen, Bodenbelägen, Trockenbau, Türen, Estrich, Abriss, Entsorgung, Maurerarbeiten, Treppen, Küchenrenovierung und konkreten Projektgrößen mit Richtwerten und Beispielbudgets.",
   alternates: { canonical: "/ratgeber" },
 };
 
@@ -84,6 +84,12 @@ const guideGroups = [
     title: "Fassadensanierung, Putz, Risse und Verkleidung kalkulieren",
     description: "Fassadensanierung, neue Putzfassade, Risssanierung, hinterlüftete Fassade, Fassadenanstrich und Klinker mit aktuellen Richtwerten und exakten Rechner-Presets vergleichen.",
     slugs: ["fassade-sanieren-kosten", "putzfassade-kosten-pro-qm", "fassadenrisse-sanieren-kosten-pro-qm", "vorgehaengte-hinterlueftete-fassade-kosten-pro-qm", "fassade-streichen-kosten-pro-qm", "klinkerfassade-kosten-pro-qm"],
+  },
+  {
+    eyebrow: "Garten & Außenanlagen",
+    title: "Einfahrt, Terrasse, Zaun und Gartenarbeiten kalkulieren",
+    description: "Außenanlagen als zusammenhängendes Budget planen: Einfahrt und Terrasse pflastern, Doppelstabmattenzaun, Rollrasen, Heckenschnitt und Baumfällung mit exakten Rechner-Presets vergleichen.",
+    slugs: ["garten-anlegen-kosten", "einfahrt-pflastern-kosten", "terrasse-pflastern-kosten", "doppelstabmattenzaun-kosten-pro-meter", "rollrasen-kosten-pro-qm", "heckenschnitt-kosten-pro-meter", "baum-faellen-kosten"],
   },
   {
     eyebrow: "Maler & Oberflächen",
