@@ -35,7 +35,21 @@ const estrichGuideLinks: SupplementalGuide[] = [
   { slug: "estrich-rissreparatur-kosten", label: "Estrich-Rissreparatur Kosten", href: "/ratgeber/estrich-rissreparatur-kosten" },
 ];
 
-const supplementalClusters = [sanitaerGuideLinks, kellerabdichtungGuideLinks, tuerenGuideLinks, estrichGuideLinks];
+const abrissGuideLinks: SupplementalGuide[] = [
+  { slug: "haus-abreissen-kosten", label: "Haus abreißen Kosten", href: "/ratgeber/haus-abreissen-kosten" },
+  { slug: "abbruch-kosten-pro-m3", label: "Abbruch Kosten pro m³", href: "/ratgeber/abbruch-kosten-pro-m3" },
+  { slug: "innenabbruch-einfamilienhaus-kosten", label: "Innenabbruch Einfamilienhaus Kosten", href: "/ratgeber/innenabbruch-einfamilienhaus-kosten" },
+  { slug: "industriehalle-abbrechen-kosten-pro-qm", label: "Industriehalle abbrechen Kosten pro m²", href: "/ratgeber/industriehalle-abbrechen-kosten-pro-qm" },
+  { slug: "bauschuttcontainer-30-m3-kosten", label: "Bauschuttcontainer 30 m³ Kosten", href: "/ratgeber/bauschuttcontainer-30-m3-kosten" },
+];
+
+const supplementalClusters = [
+  sanitaerGuideLinks,
+  kellerabdichtungGuideLinks,
+  tuerenGuideLinks,
+  estrichGuideLinks,
+  abrissGuideLinks,
+];
 
 const supplementalByGuide: Record<string, GuideSupplementalLink[]> = Object.fromEntries(
   supplementalClusters.flatMap((cluster) =>
