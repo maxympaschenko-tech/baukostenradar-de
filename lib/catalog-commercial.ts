@@ -79,21 +79,6 @@ export const priceSources = {
     url: "https://www.my-hammer.de/boden-fliesen/preisradar/was-kostet-estrich-verlegen",
     checkedAt: "29.08.2026",
   },
-  blauarbeitHausAbriss: {
-    name: "Blauarbeit - Haus abreißen Kosten 2026",
-    url: "https://ratgeber.blauarbeit.de/auftraggeber/haus-abreissen",
-    checkedAt: "29.08.2026",
-  },
-  myhammerHausAbriss: {
-    name: "MyHammer - Hausabriss Kosten 2026",
-    url: "https://www.my-hammer.de/abriss-entsorgung/preisradar/was-kosten-abbrucharbeiten",
-    checkedAt: "29.08.2026",
-  },
-  blauarbeitWanddurchbruch: {
-    name: "Blauarbeit - Wanddurchbruch Kosten 2026",
-    url: "https://ratgeber.blauarbeit.de/kosten-preise/wanddurchbruch-kosten",
-    checkedAt: "29.08.2026",
-  },
 } as const;
 
 type CommercialSourceKey = keyof typeof priceSources;
@@ -227,30 +212,6 @@ export const services: Service[] = catalogServices.map((service) => {
         { name: "Estrich mit Fußbodenheizung", low: 40, high: 120, unit: "pro m²", note: "Breiter Gesamtrichtwert je nach Estrichart und Heizsystem; zusätzliche Dämm- und Systemkosten können enthalten sein", sourceKey: "myhammerEstrichCommercial" },
         { name: "Zementestrich 100 m² Neubau", low: 2500, high: 5000, unit: "pro 100 m²", note: "Beispielwert für Neubau ohne Fußbodenheizung", sourceKey: "blauarbeitEstrichCommercial" },
         { name: "Estrichsanierung 100 m² mit Rückbau", low: 5000, high: 11000, unit: "pro 100 m²", note: "Beispielwert für Rückbau des Altaufbaus plus neuen Zementestrich", sourceKey: "blauarbeitEstrichCommercial" },
-      ],
-    };
-  }
-
-  if (service.slug === "abriss-entsorgung") {
-    const refreshedPriceItems: PriceItem[] = catalogService.priceItems.map((item) =>
-      item.name === "Einfamilienhaus komplett abreißen"
-        ? { ...item, low: 10000, high: 30000, unit: "pro Einfamilienhaus", note: "Typischer Gesamtbereich 2026; Keller, Schadstoffe und schwierige Zufahrt erhöhen die Kosten", sourceKey: "myhammerHausAbriss" }
-        : item,
-    );
-    return {
-      ...catalogService,
-      description: "Aktuelle Richtwerte 2026 für Hausabriss, Abriss mit Keller, Entkernung, Abrissplanung, Bauschuttentsorgung, Wanddurchbrüche und typische Abbrucharbeiten in Deutschland.",
-      priceItems: [
-        ...refreshedPriceItems,
-        { name: "Hausabriss ohne Keller", low: 50, high: 150, unit: "pro m² Gebäudefläche", note: "Durchschnittlicher Richtwert; bei schwieriger Logistik oder Schadstoffen können bis zu etwa 200 €/m² entstehen", sourceKey: "myhammerHausAbriss" },
-        { name: "Hausabriss mit Keller", low: 150, high: 250, unit: "pro m² Gebäudefläche", note: "Zusätzlicher Aushub und höhere Entsorgungskosten machen Kellergebäude deutlich teurer", sourceKey: "myhammerHausAbriss" },
-        { name: "Abrissplanung", low: 10, high: 10, unit: "pro m² Gebäudefläche", note: "Beispiel-Richtwert für Planung und Vorbereitung eines typischen Hausabbruchs", sourceKey: "blauarbeitHausAbriss" },
-        { name: "Haus entkernen vor Abriss", low: 20, high: 25, unit: "pro m² Gebäudefläche", note: "Entfernung beweglicher Teile und vorbereitende Entkernung vor dem eigentlichen Abbruch", sourceKey: "blauarbeitHausAbriss" },
-        { name: "Reine Abrissarbeiten Haus", low: 50, high: 120, unit: "pro m² Gebäudefläche", note: "Eigentliche Abbrucharbeiten ohne separat ausgewiesene Planung und Entsorgung", sourceKey: "blauarbeitHausAbriss" },
-        { name: "Keller ausbaggern & Fundament herstellen", low: 30, high: 45, unit: "pro m² Gebäudefläche", note: "Zusatzposten beim Abriss eines Hauses mit Keller", sourceKey: "blauarbeitHausAbriss" },
-        { name: "Bauschutt & Sondermüll entsorgen", low: 20, high: 30, unit: "pro m² Gebäudefläche", note: "Orientierung für die Entsorgung bei einem typischen Hausabriss; Schadstoffe können deutlich höhere Kosten verursachen", sourceKey: "blauarbeitHausAbriss" },
-        { name: "Wanddurchbruch nichttragende Wand", low: 500, high: 1500, unit: "pro Durchbruch", note: "Kompletter Richtwert inklusive typischer Arbeits-, Material- und Entsorgungskosten", sourceKey: "blauarbeitWanddurchbruch" },
-        { name: "Wanddurchbruch tragende Wand", low: 2000, high: 5000, unit: "pro Durchbruch", note: "Inklusive typischer Statik-, Abstützungs-, Stahlträger- und Entsorgungsanteile", sourceKey: "blauarbeitWanddurchbruch" },
       ],
     };
   }
