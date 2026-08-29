@@ -3,17 +3,45 @@ import Link from "next/link";
 import { priceSources } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
 
+const methodologyDescription =
+  "So sammelt, prüft und strukturiert BauKostenRadar Handwerker- und Renovierungspreise, Modellbänder und regionale Richtwerte für Deutschland.";
+
 export const metadata: Metadata = {
   title: "Methodik: Preisquellen, Modelle & Regionalfaktoren",
-  description: "So sammelt, prüft und strukturiert BauKostenRadar Handwerker- und Renovierungspreise, Modellbänder und regionale Richtwerte für Deutschland.",
+  description: methodologyDescription,
   alternates: { canonical: "/methodik" },
 };
 
 export default function MethodologyPage() {
   const sourceCount = new Set(Object.values(priceSources).map((source) => source.url)).size;
+  const base = siteConfig.url.replace(/\/$/, "");
+  const canonicalUrl = `${base}/methodik`;
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Startseite", item: base },
+        { "@type": "ListItem", position: 2, name: "Methodik", item: canonicalUrl },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "@id": `${canonicalUrl}#webpage`,
+      url: canonicalUrl,
+      name: "Methodik, Preisquellen und Kostenmodelle",
+      description: methodologyDescription,
+      isPartOf: { "@id": `${base}/#website` },
+      publisher: { "@id": `${base}/#organization` },
+      inLanguage: "de-DE",
+    },
+  ];
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+
       <section className="contentHero">
         <div className="shell">
           <nav className="visibleBreadcrumbs" aria-label="Breadcrumb">

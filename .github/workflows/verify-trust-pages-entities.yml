@@ -1,0 +1,156 @@
+name: Verify trust page entities
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-trust-page-entities:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Methodik and Quellen pages
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch_with_retry() {
+            local url="$1"
+            local output="$2"
+            for i in 1 2 3 4 5; do
+              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then
+                return 0
+              fi
+              if [[ "$i" == "5" ]]; then
+                return 1
+              fi
+              sleep 4
+            done
+          }
+
+          fetch_with_retry 'https://baukostenradar.de/methodik' /tmp/methodik.html
+          fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
+
+      - name: Verify structured data and visible breadcrumbs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python - <<'PY'
+          import json
+          from html.parser import HTMLParser
+
+          BASE = 'https://baukostenradar.de'
+          WEBSITE = f'{BASE}/#website'
+          ORGANIZATION = f'{BASE}/#organization'
+
+          class JsonLdParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.capture = False
+                  self.current = []
+                  self.blocks = []
+
+              def handle_starttag(self, tag, attrs):
+                  data = dict(attrs)
+                  if tag == 'script' and data.get('type') == 'application/ld+json':
+                      self.capture = True
+                      self.current = []
+
+              def handle_data(self, data):
+                  if self.capture:
+                      self.current.append(data)
+
+              def handle_endtag(self, tag):
+                  if tag == 'script' and self.capture:
+                      self.capture = False
+                      raw = ''.join(self.current).strip()
+                      if raw:
+                          self.blocks.append(json.loads(raw))
+
+          def flatten(value):
+              if isinstance(value, list):
+                  for item in value:
+                      yield from flatten(item)
+              else:
+                  yield value
+
+          def parse(path):
+              parser = JsonLdParser()
+              with open(path, encoding='utf-8') as handle:
+                  html = handle.read()
+                  parser.feed(html)
+              objects = [obj for block in parser.blocks for obj in flatten(block) if isinstance(obj, dict)]
+              return html, objects
+
+          def verify_breadcrumb(objects, expected_url):
+              breadcrumb = next((obj for obj in objects if obj.get('@type') == 'BreadcrumbList'), None)
+              if not breadcrumb:
+                  raise SystemExit(f'BreadcrumbList missing for {expected_url}')
+              items = breadcrumb.get('itemListElement', [])
+              if len(items) != 2:
+                  raise SystemExit(f'Unexpected breadcrumb length for {expected_url}')
+              if items[0].get('item') != BASE or items[-1].get('item') != expected_url:
+                  raise SystemExit(f'Unexpected breadcrumb trail for {expected_url}')
+
+          methodik_html, methodik_objects = parse('/tmp/methodik.html')
+          methodik_url = f'{BASE}/methodik'
+          verify_breadcrumb(methodik_objects, methodik_url)
+          methodology = next(
+              (obj for obj in methodik_objects if obj.get('@type') == 'WebPage' and obj.get('@id') == f'{methodik_url}#webpage'),
+              None,
+          )
+          if not methodology:
+              raise SystemExit('Methodik WebPage structured data missing')
+          if methodology.get('url') != methodik_url:
+              raise SystemExit('Unexpected Methodik WebPage URL')
+          if methodology.get('isPartOf', {}).get('@id') != WEBSITE:
+              raise SystemExit('Methodik WebPage does not link canonical WebSite')
+          if methodology.get('publisher', {}).get('@id') != ORGANIZATION:
+              raise SystemExit('Methodik WebPage does not link canonical Organization publisher')
+          if methodology.get('inLanguage') != 'de-DE':
+              raise SystemExit('Methodik WebPage language missing')
+          if 'class="visibleBreadcrumbs"' not in methodik_html or 'Methodik, Preisquellen und Kostenmodelle' not in methodik_html:
+              raise SystemExit('Visible Methodik trust signals missing')
+
+          quellen_html, quellen_objects = parse('/tmp/quellen.html')
+          quellen_url = f'{BASE}/quellen'
+          verify_breadcrumb(quellen_objects, quellen_url)
+          collection = next(
+              (obj for obj in quellen_objects if obj.get('@type') == 'CollectionPage' and obj.get('@id') == f'{quellen_url}#webpage'),
+              None,
+          )
+          if not collection:
+              raise SystemExit('Quellen CollectionPage structured data missing')
+          if collection.get('url') != quellen_url:
+              raise SystemExit('Unexpected Quellen CollectionPage URL')
+          if collection.get('isPartOf', {}).get('@id') != WEBSITE:
+              raise SystemExit('Quellen CollectionPage does not link canonical WebSite')
+          if collection.get('publisher', {}).get('@id') != ORGANIZATION:
+              raise SystemExit('Quellen CollectionPage does not link canonical Organization publisher')
+          if collection.get('inLanguage') != 'de-DE':
+              raise SystemExit('Quellen CollectionPage language missing')
+
+          source_list = collection.get('mainEntity')
+          if not isinstance(source_list, dict) or source_list.get('@type') != 'ItemList':
+              raise SystemExit('Quellen ItemList missing')
+          count = source_list.get('numberOfItems')
+          items = source_list.get('itemListElement', [])
+          if not isinstance(count, int) or count <= 0:
+              raise SystemExit('Quellen source count is invalid')
+          if len(items) != count:
+              raise SystemExit('Quellen ItemList count does not match itemListElement')
+          for expected_position, list_item in enumerate(items, start=1):
+              if list_item.get('@type') != 'ListItem' or list_item.get('position') != expected_position:
+                  raise SystemExit('Quellen ItemList positions are invalid')
+              item = list_item.get('item')
+              if not isinstance(item, dict) or item.get('@type') != 'WebPage':
+                  raise SystemExit('Quellen ItemList WebPage entry missing')
+              if not item.get('name') or not str(item.get('url', '')).startswith('https://'):
+                  raise SystemExit('Quellen ItemList entry is missing a name or HTTPS URL')
+
+          if 'class="visibleBreadcrumbs"' not in quellen_html or 'Aktuell verwendete Quellen' not in quellen_html:
+              raise SystemExit('Visible Quellen trust signals missing')
+          PY

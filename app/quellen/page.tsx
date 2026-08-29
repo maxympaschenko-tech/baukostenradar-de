@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { priceSources } from "@/lib/pricing";
+import { siteConfig } from "@/lib/site";
+
+const sourcesDescription =
+  "Quellenverzeichnis von BauKostenRadar: öffentlich nachvollziehbare Preisquellen, Prüfdatum, Auswahlkriterien und transparente Einordnung der Richtwerte.";
 
 export const metadata: Metadata = {
   title: "Quellen für Bau- und Handwerkerpreise 2026",
-  description: "Quellenverzeichnis von BauKostenRadar: öffentlich nachvollziehbare Preisquellen, Prüfdatum, Auswahlkriterien und transparente Einordnung der Richtwerte.",
+  description: sourcesDescription,
   alternates: { canonical: "/quellen" },
 };
 
@@ -15,8 +19,49 @@ const sources = Array.from(
 ).sort((a, b) => a.name.localeCompare(b.name, "de"));
 
 export default function SourcesPage() {
+  const base = siteConfig.url.replace(/\/$/, "");
+  const canonicalUrl = `${base}/quellen`;
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Startseite", item: base },
+        { "@type": "ListItem", position: 2, name: "Quellen", item: canonicalUrl },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "@id": `${canonicalUrl}#webpage`,
+      url: canonicalUrl,
+      name: "Quellen für Bau- und Handwerkerpreise",
+      description: sourcesDescription,
+      isPartOf: { "@id": `${base}/#website` },
+      publisher: { "@id": `${base}/#organization` },
+      inLanguage: "de-DE",
+      mainEntity: {
+        "@type": "ItemList",
+        "@id": `${canonicalUrl}#sources`,
+        name: "Aktuell verwendete Quellen",
+        numberOfItems: sources.length,
+        itemListElement: sources.map((source, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          item: {
+            "@type": "WebPage",
+            name: source.name,
+            url: source.url,
+          },
+        })),
+      },
+    },
+  ];
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+
       <section className="contentHero">
         <div className="shell">
           <nav className="visibleBreadcrumbs" aria-label="Breadcrumb">
