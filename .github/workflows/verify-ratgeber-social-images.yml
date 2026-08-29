@@ -1,0 +1,98 @@
+name: Verify Ratgeber social images
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-ratgeber-social-images:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch representative guide pages
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch_with_retry() {
+            local url="$1"
+            local output="$2"
+            for i in 1 2 3 4 5; do
+              if curl -sS --fail --connect-timeout 10 --max-time 30 "$url" -o "$output"; then
+                return 0
+              fi
+              if [[ "$i" == "5" ]]; then
+                return 1
+              fi
+              sleep 4
+            done
+          }
+
+          fetch_with_retry 'https://baukostenradar.de/ratgeber/sanierungskosten-pro-qm' /tmp/guide-a.html
+          fetch_with_retry 'https://baukostenradar.de/ratgeber/bad-komplett-sanieren-kosten' /tmp/guide-b.html
+
+      - name: Extract social image URLs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python - <<'PY'
+          from html.parser import HTMLParser
+
+          class MetaParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.values = {}
+
+              def handle_starttag(self, tag, attrs):
+                  if tag != "meta":
+                      return
+                  data = dict(attrs)
+                  key = data.get("property") or data.get("name")
+                  if key and data.get("content"):
+                      self.values[key] = data["content"]
+
+          for label in ("a", "b"):
+              parser = MetaParser()
+              with open(f"/tmp/guide-{label}.html", encoding="utf-8") as handle:
+                  parser.feed(handle.read())
+
+              for key in ("og:image", "twitter:image"):
+                  if key not in parser.values:
+                      raise SystemExit(f"Missing {key} on guide {label}")
+                  value = parser.values[key]
+                  if not value.startswith("https://baukostenradar.de/"):
+                      raise SystemExit(f"Unexpected {key} host on guide {label}: {value}")
+                  filename = key.replace(":", "-")
+                  with open(f"/tmp/{label}-{filename}-url.txt", "w", encoding="utf-8") as handle:
+                      handle.write(value)
+          PY
+
+      - name: Verify page-specific PNG output
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for label in a b; do
+            for kind in og-image twitter-image; do
+              url=$(cat "/tmp/${label}-${kind}-url.txt")
+              curl -sS --fail --connect-timeout 10 --max-time 30 -D "/tmp/${label}-${kind}.headers" "$url" -o "/tmp/${label}-${kind}.png"
+              grep -qi '^content-type: image/png' "/tmp/${label}-${kind}.headers"
+              test "$(wc -c < "/tmp/${label}-${kind}.png")" -gt 10000
+            done
+          done
+
+          og_a=$(sha256sum /tmp/a-og-image.png | awk '{print $1}')
+          og_b=$(sha256sum /tmp/b-og-image.png | awk '{print $1}')
+          twitter_a=$(sha256sum /tmp/a-twitter-image.png | awk '{print $1}')
+          twitter_b=$(sha256sum /tmp/b-twitter-image.png | awk '{print $1}')
+
+          echo "Guide A OG SHA: $og_a"
+          echo "Guide B OG SHA: $og_b"
+          echo "Guide A Twitter SHA: $twitter_a"
+          echo "Guide B Twitter SHA: $twitter_b"
+
+          test "$og_a" != "$og_b"
+          test "$twitter_a" != "$twitter_b"
