@@ -1,0 +1,140 @@
+name: Verify Estrich guide cluster
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Ukraine.com.ua"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-estrich-guide-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify exact Estrich price-item guide mappings
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/kosten/estrich' /tmp/estrich.html
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+
+          ! grep -qi 'noindex' /tmp/estrich.html
+
+          mappings=$(cat <<'EOF'
+          zementestrich-verlegen|zementestrich-kosten-pro-qm
+          fliessestrich-verlegen|fliessestrich-kosten-pro-qm
+          trockenestrich-verlegen|trockenestrich-kosten-pro-qm
+          schnellestrich|schnellestrich-kosten-pro-qm
+          bodenausgleich-5-20-mm|bodenausgleich-kosten-pro-qm
+          estrich-rissreparatur|estrich-rissreparatur-kosten
+          EOF
+          )
+
+          checked=0
+          while IFS='|' read -r item guide; do
+            item="${item#${item%%[![:space:]]*}}"
+            [ -n "$item" ] || continue
+
+            item_url="https://baukostenradar.de/kosten/estrich/leistung/${item}"
+            guide_url="https://baukostenradar.de/ratgeber/${guide}"
+            item_output="/tmp/estrich-item-${item}.html"
+            guide_output="/tmp/estrich-guide-${guide}.html"
+
+            grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Estrich item missing in sitemap: ${item}"; exit 1; }
+            grep -q "/kosten/estrich/leistung/${item}" /tmp/estrich.html || { echo "Estrich item missing on category: ${item}"; exit 1; }
+
+            fetch "$item_url" "$item_output"
+            grep -q 'Passender Ratgeber' "$item_output"
+            grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong Estrich guide mapping: ${item} -> ${guide}"; exit 1; }
+            ! grep -qi 'noindex' "$item_output"
+
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+
+            fetch "$guide_url" "$guide_output"
+            grep -q "$guide_url" "$guide_output"
+            grep -q '"@type":"Article"' "$guide_output"
+            grep -q '/kosten/estrich' "$guide_output"
+            grep -q '/kosten/estrich/berlin' "$guide_output"
+            grep -q 'gewerk=estrich' "$guide_output"
+            grep -q "leistung=${item}" "$guide_output"
+            ! grep -qi 'noindex' "$guide_output"
+
+            checked=$((checked + 1))
+          done <<< "$mappings"
+
+          test "$checked" -eq 6
+          echo "Verified ${checked} exact Estrich price-item guide mappings"
+
+      - name: Verify 100 m² Estrich scenario calculator
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          guide='estrich-100-qm-kosten'
+          guide_url="https://baukostenradar.de/ratgeber/${guide}"
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          fetch "$guide_url" /tmp/estrich-parent.html
+
+          grep -q "${guide_url}</loc>" /tmp/sitemap.xml
+          grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+          grep -q "$guide_url" /tmp/estrich-parent.html
+          grep -q '"@type":"Article"' /tmp/estrich-parent.html
+          grep -q '/kosten/estrich' /tmp/estrich-parent.html
+          grep -q '/kosten/estrich/berlin' /tmp/estrich-parent.html
+          grep -q 'gewerk=estrich' /tmp/estrich-parent.html
+          grep -q 'leistung=zementestrich-verlegen' /tmp/estrich-parent.html
+          grep -q 'menge=100' /tmp/estrich-parent.html
+          ! grep -qi 'noindex' /tmp/estrich-parent.html
+
+      - name: Verify full Estrich hub and peer-link silo
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+
+          guides=(
+            estrich-100-qm-kosten
+            zementestrich-kosten-pro-qm
+            fliessestrich-kosten-pro-qm
+            trockenestrich-kosten-pro-qm
+            schnellestrich-kosten-pro-qm
+            bodenausgleich-kosten-pro-qm
+            estrich-rissreparatur-kosten
+          )
+
+          for source in "${guides[@]}"; do
+            guide_url="https://baukostenradar.de/ratgeber/${source}"
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Estrich guide missing in sitemap: ${source}"; exit 1; }
+            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Estrich guide missing from hub: ${source}"; exit 1; }
+
+            fetch "$guide_url" "/tmp/${source}.html"
+            grep -q "$guide_url" "/tmp/${source}.html"
+            grep -q '"@type":"Article"' "/tmp/${source}.html"
+            ! grep -qi 'noindex' "/tmp/${source}.html"
+
+            for target in "${guides[@]}"; do
+              [ "$source" = "$target" ] && continue
+              grep -q "/ratgeber/${target}" "/tmp/${source}.html" || { echo "${source} missing Estrich peer ${target}"; exit 1; }
+            done
+          done
+
+          echo "Verified Estrich hub visibility and full seven-guide peer-link silo"
