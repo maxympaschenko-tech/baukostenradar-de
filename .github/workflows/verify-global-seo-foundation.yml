@@ -59,6 +59,75 @@ jobs:
             exit 1
           fi
 
+      - name: Verify branded social preview metadata and images
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python - <<'PY'
+          from html.parser import HTMLParser
+
+          class MetaParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.values = {}
+
+              def handle_starttag(self, tag, attrs):
+                  if tag != "meta":
+                      return
+                  data = dict(attrs)
+                  key = data.get("property") or data.get("name")
+                  if key and data.get("content"):
+                      self.values[key] = data["content"]
+
+          parser = MetaParser()
+          with open('/tmp/home.html', encoding='utf-8') as handle:
+              parser.feed(handle.read())
+
+          expected = {
+              'og:image',
+              'og:image:width',
+              'og:image:height',
+              'og:image:alt',
+              'twitter:card',
+              'twitter:image',
+              'twitter:image:alt',
+          }
+          missing = sorted(expected - parser.values.keys())
+          if missing:
+              raise SystemExit(f"Missing social metadata: {', '.join(missing)}")
+
+          if parser.values['og:image:width'] != '1200' or parser.values['og:image:height'] != '630':
+              raise SystemExit('Open Graph image dimensions must be 1200x630')
+          if parser.values['twitter:card'] != 'summary_large_image':
+              raise SystemExit('Twitter card must be summary_large_image')
+          if 'BauKostenRadar' not in parser.values['og:image:alt']:
+              raise SystemExit('Open Graph image alt must identify BauKostenRadar')
+          if 'BauKostenRadar' not in parser.values['twitter:image:alt']:
+              raise SystemExit('Twitter image alt must identify BauKostenRadar')
+
+          with open('/tmp/og-image-url.txt', 'w', encoding='utf-8') as handle:
+              handle.write(parser.values['og:image'])
+          with open('/tmp/twitter-image-url.txt', 'w', encoding='utf-8') as handle:
+              handle.write(parser.values['twitter:image'])
+          PY
+
+          og_url=$(cat /tmp/og-image-url.txt)
+          twitter_url=$(cat /tmp/twitter-image-url.txt)
+          echo "Open Graph image: $og_url"
+          echo "Twitter image: $twitter_url"
+
+          [[ "$og_url" == https://baukostenradar.de/* ]]
+          [[ "$twitter_url" == https://baukostenradar.de/* ]]
+
+          curl -sS --fail --connect-timeout 10 --max-time 30 -D /tmp/og.headers "$og_url" -o /tmp/og.png
+          curl -sS --fail --connect-timeout 10 --max-time 30 -D /tmp/twitter.headers "$twitter_url" -o /tmp/twitter.png
+
+          grep -qi '^content-type: image/png' /tmp/og.headers
+          grep -qi '^content-type: image/png' /tmp/twitter.headers
+          test "$(wc -c < /tmp/og.png)" -gt 10000
+          test "$(wc -c < /tmp/twitter.png)" -gt 10000
+
       - name: Verify robots points to canonical sitemap
         shell: bash
         run: |
