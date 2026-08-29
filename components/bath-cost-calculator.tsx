@@ -40,8 +40,9 @@ export function BathCostCalculator({ initialArea = 8 }: { initialArea?: number }
     };
   }, [area, regionValue, squareMeterItem]);
 
-  const cityPart = result.region.value === "de" ? "" : `&stadt=${encodeURIComponent(result.region.slug)}`;
-  const requestUrl = `/angebot?leistung=badsanierung${cityPart}&position=${encodeURIComponent(`Komplette Badsanierung, ca. ${result.area.toLocaleString("de-DE")} m²`)}&quelle=badsanierung-rechner`;
+  const regionHref = result.region.value === "de"
+    ? "/kosten/badsanierung"
+    : `/kosten/badsanierung/${result.region.slug}`;
 
   return (
     <div className="calculator">
@@ -104,8 +105,11 @@ export function BathCostCalculator({ initialArea = 8 }: { initialArea?: number }
       </div>
 
       <div className="heroActions">
-        <Link className="primaryButton" href={requestUrl}>Badsanierung anfragen</Link>
-        <Link className="ghostButton" href="/kosten/badsanierung">Badsanierung-Preise ansehen</Link>
+        <Link className="primaryButton" href={regionHref}>
+          {result.region.value === "de" ? "Badsanierung-Preise ansehen" : `Badsanierung in ${result.region.label}`}
+        </Link>
+        <Link className="ghostButton" href="/ratgeber/bad-komplett-sanieren-kosten">Badsanierung-Ratgeber</Link>
+        <Link className="ghostButton" href="/rechner/handwerkerkosten?gewerk=badsanierung">Einzelarbeiten berechnen</Link>
       </div>
     </div>
   );
