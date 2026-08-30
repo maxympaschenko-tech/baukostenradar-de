@@ -11,6 +11,17 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Configure resilient live fetches
+        shell: bash
+        run: |
+          cat > ~/.curlrc <<'EOF'
+          retry = 6
+          retry-all-errors
+          retry-delay = 5
+          connect-timeout = 10
+          max-time = 30
+          EOF
+
       - name: Fetch production pages
         shell: bash
         run: |
@@ -23,11 +34,30 @@ jobs:
               sleep 5
             done
           }
+          fetch_until_contains() {
+            local base_url="$1" output="$2" needle="$3" label="$4"
+            for attempt in 1 2 3 4 5 6; do
+              if curl -sSL --fail --connect-timeout 10 --max-time 25 \
+                -H 'Cache-Control: no-cache' \
+                "${base_url}?verify=${GITHUB_SHA}-${attempt}" -o "$output" && \
+                grep -Fq "$needle" "$output"; then
+                return 0
+              fi
+              if [ "$attempt" -eq 6 ]; then
+                echo "MISSING after retries: $label" >&2
+                echo "Expected in $output: $needle" >&2
+                return 1
+              fi
+              sleep 10
+            done
+          }
 
           fetch_with_retry 'https://baukostenradar.de/datenschutz' /tmp/datenschutz.html
           fetch_with_retry 'https://baukostenradar.de/kosten/kueche' /tmp/kueche.html
           fetch_with_retry 'https://baukostenradar.de/kosten/kueche/muenchen' /tmp/kueche-muenchen.html
-          fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
+          fetch_until_contains \
+            'https://baukostenradar.de/quellen' /tmp/quellen.html \
+            'MyHammer - Küche einbauen lassen Kosten 2026' 'current Küche source directory'
           fetch_with_retry 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
 
       - name: Verify Hostinger privacy disclosure

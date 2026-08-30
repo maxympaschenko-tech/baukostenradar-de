@@ -11,29 +11,48 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Configure resilient live fetches
+        shell: bash
+        run: |
+          cat > ~/.curlrc <<'EOF'
+          retry = 6
+          retry-all-errors
+          retry-delay = 5
+          connect-timeout = 10
+          max-time = 30
+          EOF
+
       - name: Fetch Zaunbau production pages
         shell: bash
         run: |
           set -euo pipefail
+          fetch_until_contains() {
+            local base_url="$1" output="$2" needle="$3" label="$4"
+            for attempt in 1 2 3 4 5 6; do
+              if curl -sSL --fail -H 'Cache-Control: no-cache' \
+                "${base_url}?verify=${GITHUB_SHA}-${attempt}" -o "$output"; then
+                if grep -Fq "$needle" "$output"; then
+                  return 0
+                fi
+              fi
+              if [ "$attempt" -eq 6 ]; then
+                echo "MISSING after retries: $label" >&2
+                echo "Expected in $output: $needle" >&2
+                return 1
+              fi
+              sleep 10
+            done
+          }
+
           curl -sSL --fail 'https://baukostenradar.de/kosten/zaunbau' -o /tmp/zaunbau.html
           curl -sSL --fail 'https://baukostenradar.de/kosten/zaunbau/berlin' -o /tmp/zaunbau-berlin.html
-          curl -sSL --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+          fetch_until_contains \
+            'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html \
+            '/ratgeber/zaun-bauen-kosten-pro-meter' 'Zaunbau guide directory'
+          fetch_until_contains \
+            'https://baukostenradar.de/quellen' /tmp/quellen.html \
+            'MyHammer - Zaunbau Kosten 2026' 'Zaunbau source'
           curl -sSL --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
-
-          source='MyHammer - Zaunbau Kosten 2026'
-          for attempt in 1 2 3 4 5 6; do
-            curl -sSL --fail -H 'Cache-Control: no-cache' \
-              "https://baukostenradar.de/quellen?verify=${GITHUB_SHA}-${attempt}" \
-              -o /tmp/quellen.html
-            if grep -Fq "$source" /tmp/quellen.html; then
-              break
-            fi
-            if [ "$attempt" -eq 6 ]; then
-              echo "MISSING after retries: $source" >&2
-              exit 1
-            fi
-            sleep 10
-          done
 
       - name: Verify category, city and source signals
         shell: bash
