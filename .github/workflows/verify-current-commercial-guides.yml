@@ -1,0 +1,74 @@
+name: Verify current Küche and Treppen guides
+
+on:
+  workflow_run:
+    workflows: ["Hostinger production ready"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-current-guides:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch hubs and sitemap
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+          curl -sS --fail 'https://baukostenradar.de/kosten/kueche' -o /tmp/kueche.html
+          curl -sS --fail 'https://baukostenradar.de/kosten/treppen' -o /tmp/treppen.html
+
+      - name: Verify new guide pages and internal links
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          check_guide() {
+            local slug="$1"
+            local service="$2"
+            local item="$3"
+            local output="/tmp/${slug}.html"
+            local url="https://baukostenradar.de/ratgeber/${slug}"
+
+            grep -q "${url}</loc>" /tmp/sitemap.xml
+            grep -q "/ratgeber/${slug}" /tmp/ratgeber.html
+            curl -sS --fail "$url" -o "$output"
+            grep -q "$url" "$output"
+            grep -q '"@type":"Article"' "$output"
+            grep -q 'FAQPage' "$output"
+            grep -q "/kosten/${service}" "$output"
+            grep -q "gewerk=${service}" "$output"
+            grep -q "leistung=${item}" "$output"
+            ! grep -qi 'noindex' "$output"
+          }
+
+          check_guide 'kuechensanierung-komplett-kosten' 'kueche' 'kuechensanierung-komplett'
+          check_guide 'kuechenmontage-laufender-meter-kosten' 'kueche' 'kuechenmontage-je-laufendem-meter'
+          check_guide 'betontreppe-kosten-2026' 'treppen' 'fertigteil-betontreppe-inkl-einbau'
+          check_guide 'treppengelaender-edelstahl-kosten' 'treppen' 'treppengelaender-edelstahl-10-m-inkl-montage'
+
+      - name: Verify price-detail to guide links
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          check_item() {
+            local service="$1"
+            local item="$2"
+            local guide="$3"
+            local output="/tmp/${service}-${item}.html"
+            local url="https://baukostenradar.de/kosten/${service}/leistung/${item}"
+
+            grep -q "${url}</loc>" /tmp/sitemap.xml
+            curl -sS --fail "$url" -o "$output"
+            grep -q 'Passender Ratgeber' "$output"
+            grep -q "/ratgeber/${guide}" "$output"
+            ! grep -qi 'noindex' "$output"
+          }
+
+          check_item 'kueche' 'kuechensanierung-komplett' 'kuechensanierung-komplett-kosten'
+          check_item 'kueche' 'kuechenmontage-je-laufendem-meter' 'kuechenmontage-laufender-meter-kosten'
+          check_item 'treppen' 'fertigteil-betontreppe-inkl-einbau' 'betontreppe-kosten-2026'
+          check_item 'treppen' 'treppengelaender-edelstahl-10-m-inkl-montage' 'treppengelaender-edelstahl-kosten'
