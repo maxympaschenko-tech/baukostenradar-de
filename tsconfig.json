@@ -15,11 +15,11 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/lib/pricing": ["./lib/catalog-chimney.ts"],
-      "@/lib/price-guide-links": ["./lib/price-guide-links-chimney.ts"],
-      "@/lib/all-guides": ["./lib/all-guides-chimney.ts"],
-      "@/lib/guide-groups": ["./lib/guide-groups-chimney.ts"],
-      "@/lib/guide-silo": ["./lib/guide-silo-chimney.ts"],
+      "@/lib/pricing": ["./lib/catalog-fence.ts"],
+      "@/lib/price-guide-links": ["./lib/price-guide-links-fence.ts"],
+      "@/lib/all-guides": ["./lib/all-guides-fence.ts"],
+      "@/lib/guide-groups": ["./lib/guide-groups-fence.ts"],
+      "@/lib/guide-silo": ["./lib/guide-silo-fence.ts"],
       "@/*": ["./*"]
     }
   },
