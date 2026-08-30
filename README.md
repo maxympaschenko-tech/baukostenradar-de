@@ -48,13 +48,21 @@ NEXT_PUBLIC_SITE_URL=https://baukostenradar.de
 
 ## Deployment
 
-GitHub is the source of truth for production. Every push to `main` runs TypeScript checks and a Next.js production build, deploys the standalone bundle over SSH to Ukraine.com.ua Business Hosting, restarts the Node.js application through the ADM.TOOLS API, and verifies the public site over HTTPS.
+GitHub is the source of truth for production. The `main` branch is connected directly to the BauKostenRadar Node.js Web App on Hostinger. Hostinger automatically builds and deploys the Next.js application after changes are pushed to `main`.
 
-Production path:
+Production domain:
 
 ```text
-/home/uageek/baukostenradar.de/www
+https://baukostenradar.de
 ```
+
+Production environment:
+
+- Hostinger Node.js Web App
+- Node.js 24.x
+- Next.js production build
+- Hostinger SSL and CDN
+- Automatic deployment from GitHub `main`
 
 No manual file uploads are part of the normal deployment flow.
 
