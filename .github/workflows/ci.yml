@@ -47,3 +47,57 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_SITE_URL: https://example.de
+
+      - name: Verify catalog hubs in production runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          HOSTNAME=127.0.0.1 PORT=3001 NEXT_PUBLIC_SITE_URL=https://example.de node .next/standalone/server.js > /tmp/baukostenradar-ci-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl -sS --fail 'http://127.0.0.1:3001/ratgeber' -o /tmp/ratgeber.html; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$ready" -ne 1 ]; then
+            echo 'Production runtime did not become ready.' >&2
+            cat /tmp/baukostenradar-ci-server.log >&2 || true
+            exit 1
+          fi
+
+          curl -sS --fail 'http://127.0.0.1:3001/quellen' -o /tmp/quellen.html
+
+          require_contains() {
+            local file="$1"
+            local needle="$2"
+            local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+
+          for guide in \
+            '/ratgeber/balkon-sanieren-kosten-pro-qm' \
+            '/ratgeber/garage-bauen-kosten' \
+            '/ratgeber/carport-kosten' \
+            '/ratgeber/schornstein-sanieren-kosten' \
+            '/ratgeber/kamin-bauen-kosten'; do
+            require_contains /tmp/ratgeber.html "$guide" "Ratgeber hub link $guide"
+          done
+
+          for source in \
+            'MyHammer - Garage bauen Kosten 2026' \
+            'MyHammer - Carport bauen Kosten 2026' \
+            'MyHammer - Schornstein sanieren Kosten 2026' \
+            'MyHammer - Kaminbau Kosten 2026'; do
+            require_contains /tmp/quellen.html "$source" "active source $source"
+          done

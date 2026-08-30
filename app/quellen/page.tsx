@@ -3,6 +3,8 @@ import Link from "next/link";
 import { getActivePriceSources } from "@/lib/active-price-sources";
 import { siteConfig } from "@/lib/site";
 
+export const dynamic = "force-dynamic";
+
 const sourcesDescription =
   "Quellenverzeichnis von BauKostenRadar: öffentlich nachvollziehbare Preisquellen, Prüfdatum, Auswahlkriterien und transparente Einordnung der Richtwerte.";
 
@@ -12,9 +14,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/quellen" },
 };
 
-const sources = getActivePriceSources();
-
 export default function SourcesPage() {
+  const sources = getActivePriceSources();
   const base = siteConfig.url.replace(/\/$/, "");
   const canonicalUrl = `${base}/quellen`;
   const structuredData = [
@@ -104,7 +105,7 @@ export default function SourcesPage() {
           </p>
           <div className="sourceList">
             {sources.map((source) => (
-              <a href={source.url} key={source.url} target="_blank" rel="noreferrer">
+              <a href={source.url} key={`${source.name}:${source.url}`} target="_blank" rel="noreferrer">
                 <strong>{source.name}</strong>
                 <span>Zuletzt geprüft: {source.checkedAt} · Originalquelle öffnen →</span>
               </a>
