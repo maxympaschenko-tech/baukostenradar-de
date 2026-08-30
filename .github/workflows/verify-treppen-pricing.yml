@@ -2,7 +2,7 @@ name: Verify Treppen pricing expansion
 
 on:
   workflow_run:
-    workflows: ["Deploy to Ukraine.com.ua"]
+    workflows: ["Hostinger production ready"]
     types: [completed]
   workflow_dispatch:
 
@@ -67,8 +67,8 @@ jobs:
               sitemap = handle.read()
 
           expected_main = (
-              '21 Preispositionen',
-              '4 geprüfte Quellen',
+              '27 Preispositionen',
+              '6 geprüfte Quellen',
               'Treppenbauer Stundensatz',
               'Raumspartreppe komplett',
               'Bolzentreppe komplett',
@@ -84,8 +84,12 @@ jobs:
               'Holztreppe Stufen verkleiden',
               'Treppenwangen verkleiden',
               'Handlauf erneuern',
-              'MyHammer - Treppenbau Kosten 2026',
-              'MyHammer - Holztreppe sanieren Kosten 2026',
+              'Fertigteil-Betontreppe inkl. Einbau',
+              'Ortbetontreppe inkl. Einbau',
+              'Betontreppe mit Fliesen verkleiden',
+              'Betontreppe mit Holzstufen verkleiden',
+              'Betontreppe mit Naturstein verkleiden',
+              'Treppengeländer Edelstahl 10 m inkl. Montage',
           )
           for needle in expected_main:
               if needle not in treppen:
@@ -96,7 +100,8 @@ jobs:
               'Raumspartreppe komplett',
               'Gerade Betontreppe komplett',
               'Gerade Holztreppe komplett',
-              'Holztreppe Stufen verkleiden',
+              'Fertigteil-Betontreppe inkl. Einbau',
+              'Treppengeländer Edelstahl 10 m inkl. Montage',
           )
           for needle in expected_city:
               if needle not in muenchen:
@@ -105,6 +110,8 @@ jobs:
           for needle in (
               'MyHammer - Treppenbau Kosten 2026',
               'MyHammer - Holztreppe sanieren Kosten 2026',
+              'Blauarbeit - Betontreppe Kosten 2026',
+              'MyHammer - Treppengeländer montieren Kosten 2026',
           ):
               if needle not in quellen:
                   raise SystemExit(f'Missing Treppen source in central source catalog: {needle}')
@@ -112,19 +119,14 @@ jobs:
           sitemap_needles = (
               '/kosten/treppen/leistung/treppenbauer-stundensatz',
               '/kosten/treppen/leistung/raumspartreppe-komplett',
-              '/kosten/treppen/leistung/bolzentreppe-komplett',
-              '/kosten/treppen/leistung/wangentreppe-komplett',
-              '/kosten/treppen/leistung/faltwerktreppe-komplett',
-              '/kosten/treppen/leistung/kragarmtreppe-komplett',
-              '/kosten/treppen/leistung/stahlwangentreppe-komplett',
-              '/kosten/treppen/leistung/wendeltreppe-komplett',
               '/kosten/treppen/leistung/gerade-betontreppe-komplett',
               '/kosten/treppen/leistung/gerade-holztreppe-komplett',
-              '/kosten/treppen/leistung/massgefertigte-holztreppe-komplett',
-              '/kosten/treppen/leistung/einfache-aussentreppe-stahl-oder-holz',
-              '/kosten/treppen/leistung/holztreppe-stufen-verkleiden',
-              '/kosten/treppen/leistung/treppenwangen-verkleiden',
-              '/kosten/treppen/leistung/handlauf-erneuern',
+              '/kosten/treppen/leistung/fertigteil-betontreppe-inkl-einbau',
+              '/kosten/treppen/leistung/ortbetontreppe-inkl-einbau',
+              '/kosten/treppen/leistung/betontreppe-mit-fliesen-verkleiden',
+              '/kosten/treppen/leistung/betontreppe-mit-holzstufen-verkleiden',
+              '/kosten/treppen/leistung/betontreppe-mit-naturstein-verkleiden',
+              '/kosten/treppen/leistung/treppengelaender-edelstahl-10-m-inkl-montage',
           )
           for needle in sitemap_needles:
               if needle not in sitemap:
