@@ -163,3 +163,7 @@ export { regions, renovationModel };
 export function getService(slug: string) {
   return services.find((service) => service.slug === slug);
 }
+
+export function getRegion(slug: string) {
+  return regions.find((region) => region.slug === slug);
+}
