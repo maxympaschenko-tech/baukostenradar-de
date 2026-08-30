@@ -93,7 +93,8 @@ jobs:
             '/ratgeber/schornstein-sanieren-kosten' \
             '/ratgeber/kamin-bauen-kosten' \
             '/ratgeber/zaun-bauen-kosten-pro-meter' \
-            '/ratgeber/pool-bauen-kosten'; do
+            '/ratgeber/pool-bauen-kosten' \
+            '/ratgeber/terrasse-bauen-kosten'; do
             require_contains /tmp/ratgeber.html "$guide" "Ratgeber hub link $guide"
           done
 
@@ -104,7 +105,13 @@ jobs:
             'MyHammer - Kaminbau Kosten 2026' \
             'MyHammer - Zaunbau Kosten 2026' \
             'MyHammer - Pool bauen Kosten 2026' \
-            'Aroundhome - Pool bauen lassen Kosten 2026'; do
+            'Aroundhome - Pool bauen lassen Kosten 2026' \
+            'MyHammer - Terrassenbau Kosten 2026' \
+            'Aroundhome - Terrasse Kosten 2026' \
+            'Blauarbeit - Holzterrasse Kosten 2026' \
+            'Blauarbeit - WPC-Terrasse Kosten 2026' \
+            'MyHammer - Erhöhte Terrasse Kosten 2026' \
+            'MyHammer - Dachterrasse Kosten 2026'; do
             require_contains /tmp/quellen.html "$source" "active source $source"
           done
 
@@ -112,6 +119,8 @@ jobs:
           require_contains /tmp/sitemap.xml 'https://example.de/ratgeber/zaun-bauen-kosten-pro-meter</loc>' 'Zaunbau sitemap guide'
           require_contains /tmp/sitemap.xml 'https://example.de/kosten/poolbau</loc>' 'Poolbau sitemap service'
           require_contains /tmp/sitemap.xml 'https://example.de/ratgeber/pool-bauen-kosten</loc>' 'Poolbau sitemap guide'
+          require_contains /tmp/sitemap.xml 'https://example.de/kosten/terrassenbau</loc>' 'Terrassenbau sitemap service'
+          require_contains /tmp/sitemap.xml 'https://example.de/ratgeber/terrasse-bauen-kosten</loc>' 'Terrassenbau sitemap guide'
 
           check_fence_item() {
             local item="$1"
@@ -175,3 +184,36 @@ jobs:
           check_pool_item 'verrohrung-skimmer-und-duesen' 'pool-bauen-kosten'
           check_pool_item 'poolbetrieb-jaehrlich' 'pool-betriebskosten'
           check_pool_item 'poolbetrieb-beheizt-intensiv-jaehrlich' 'pool-betriebskosten'
+
+          check_terrace_item() {
+            local item="$1"
+            local guide="$2"
+            local output="/tmp/ci-terrassenbau-${item}.html"
+            local local_url="http://127.0.0.1:3001/kosten/terrassenbau/leistung/${item}"
+            local canonical="https://example.de/kosten/terrassenbau/leistung/${item}"
+            curl -sS --fail "$local_url" -o "$output"
+            require_contains /tmp/sitemap.xml "${canonical}</loc>" "Terrassenbau sitemap item $item"
+            require_contains "$output" 'Passender Ratgeber' "Terrassenbau guide CTA $item"
+            require_contains "$output" "/ratgeber/${guide}" "Terrassenbau guide mapping $item"
+          }
+
+          check_terrace_item 'terrasse-bauen-lassen-gesamtprojekt' 'terrasse-bauen-kosten'
+          check_terrace_item 'terrasse-20-quadratmeter-komplett' 'terrasse-bauen-kosten'
+          check_terrace_item 'planung-terrassenbau' 'terrasse-bauen-kosten'
+          check_terrace_item 'fundament-inkl-bodenaushub' 'terrasse-unterbau-kosten'
+          check_terrace_item 'montage-terrassenbau' 'terrasse-bauen-kosten'
+          check_terrace_item 'terrassenbauer-stundensatz' 'terrasse-bauen-kosten'
+          check_terrace_item 'holzterrasse-komplett' 'holzterrasse-kosten'
+          check_terrace_item 'holzterrasse-laerche-oder-douglasie-komplett' 'holzterrasse-kosten'
+          check_terrace_item 'holzdielen-material' 'holzterrasse-kosten'
+          check_terrace_item 'holzterrasse-unterkonstruktion' 'terrasse-unterbau-kosten'
+          check_terrace_item 'wpc-terrasse-komplett' 'wpc-terrasse-kosten'
+          check_terrace_item 'wpc-terrasse-20-quadratmeter-komplett' 'wpc-terrasse-kosten'
+          check_terrace_item 'wpc-hohlkammerdiele-material' 'wpc-terrasse-kosten'
+          check_terrace_item 'wpc-vollprofil-material' 'wpc-terrasse-kosten'
+          check_terrace_item 'wpc-coextrudiert-material' 'wpc-terrasse-kosten'
+          check_terrace_item 'steinterrasse-fundament-und-pflasterarbeiten' 'terrasse-pflastern-kosten'
+          check_terrace_item 'natursteinterrasse-20-quadratmeter-komplett' 'terrasse-pflastern-kosten'
+          check_terrace_item 'erhoehte-terrasse-fachbetrieb' 'terrasse-bauen-kosten'
+          check_terrace_item 'dachterrasse-gesamtprojekt' 'dachterrasse-kosten'
+          check_terrace_item 'dachterrasse-kosten-pro-quadratmeter' 'dachterrasse-kosten'
