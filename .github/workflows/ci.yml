@@ -92,7 +92,8 @@ jobs:
             '/ratgeber/carport-kosten' \
             '/ratgeber/schornstein-sanieren-kosten' \
             '/ratgeber/kamin-bauen-kosten' \
-            '/ratgeber/zaun-bauen-kosten-pro-meter'; do
+            '/ratgeber/zaun-bauen-kosten-pro-meter' \
+            '/ratgeber/pool-bauen-kosten'; do
             require_contains /tmp/ratgeber.html "$guide" "Ratgeber hub link $guide"
           done
 
@@ -101,12 +102,16 @@ jobs:
             'MyHammer - Carport bauen Kosten 2026' \
             'MyHammer - Schornstein sanieren Kosten 2026' \
             'MyHammer - Kaminbau Kosten 2026' \
-            'MyHammer - Zaunbau Kosten 2026'; do
+            'MyHammer - Zaunbau Kosten 2026' \
+            'MyHammer - Pool bauen Kosten 2026' \
+            'Aroundhome - Pool bauen lassen Kosten 2026'; do
             require_contains /tmp/quellen.html "$source" "active source $source"
           done
 
           require_contains /tmp/sitemap.xml 'https://example.de/kosten/zaunbau</loc>' 'Zaunbau sitemap service'
           require_contains /tmp/sitemap.xml 'https://example.de/ratgeber/zaun-bauen-kosten-pro-meter</loc>' 'Zaunbau sitemap guide'
+          require_contains /tmp/sitemap.xml 'https://example.de/kosten/poolbau</loc>' 'Poolbau sitemap service'
+          require_contains /tmp/sitemap.xml 'https://example.de/ratgeber/pool-bauen-kosten</loc>' 'Poolbau sitemap guide'
 
           check_fence_item() {
             local item="$1"
@@ -136,3 +141,37 @@ jobs:
           check_fence_item 'metallzaun-20-meter-beispiel' 'doppelstabmattenzaun-kosten-pro-meter'
           check_fence_item 'sichtschutzzaun-holz-20-meter-beispiel' 'sichtschutzzaun-kosten-pro-meter'
           check_fence_item 'sichtschutzzaun-kunststoff-20-meter-beispiel' 'sichtschutzzaun-kosten-pro-meter'
+
+          check_pool_item() {
+            local item="$1"
+            local guide="$2"
+            local output="/tmp/ci-poolbau-${item}.html"
+            local local_url="http://127.0.0.1:3001/kosten/poolbau/leistung/${item}"
+            local canonical="https://example.de/kosten/poolbau/leistung/${item}"
+            curl -sS --fail "$local_url" -o "$output"
+            require_contains /tmp/sitemap.xml "${canonical}</loc>" "Poolbau sitemap item $item"
+            require_contains "$output" 'Passender Ratgeber' "Poolbau guide CTA $item"
+            require_contains "$output" "/ratgeber/${guide}" "Poolbau guide mapping $item"
+          }
+
+          check_pool_item 'pool-bauen-lassen-gesamtprojekt' 'pool-bauen-kosten'
+          check_pool_item 'materialkosten-poolbau' 'pool-bauen-kosten'
+          check_pool_item 'arbeitskosten-poolbauer' 'pool-bauen-kosten'
+          check_pool_item 'erdarbeiten-mit-abtransport' 'pool-erdarbeiten-kosten'
+          check_pool_item 'stahlwandpool-freistehend' 'pool-bauen-kosten'
+          check_pool_item 'stahlwandpool-teilversenkt' 'pool-bauen-kosten'
+          check_pool_item 'gfk-fertigbecken-poolart' 'gfk-pool-kosten'
+          check_pool_item 'gfk-pool-4-x-3-m-komplett' 'gfk-pool-kosten'
+          check_pool_item 'gfk-pool-6-x-3-m-komplett' 'gfk-pool-kosten'
+          check_pool_item 'gfk-pool-8-x-4-m-komplett' 'gfk-pool-kosten'
+          check_pool_item 'styroporpool-durch-fachfirma' 'pool-bauen-kosten'
+          check_pool_item 'betonpool-4-x-3-m-komplett' 'betonpool-kosten'
+          check_pool_item 'betonpool-6-x-3-m-komplett' 'betonpool-kosten'
+          check_pool_item 'betonpool-8-x-4-m-komplett' 'betonpool-kosten'
+          check_pool_item 'edelstahlpool-6-x-3-m' 'pool-bauen-kosten'
+          check_pool_item 'naturpool-oder-schwimmteich' 'pool-bauen-kosten'
+          check_pool_item 'filteranlage' 'pool-bauen-kosten'
+          check_pool_item 'poolpumpe' 'pool-bauen-kosten'
+          check_pool_item 'verrohrung-skimmer-und-duesen' 'pool-bauen-kosten'
+          check_pool_item 'poolbetrieb-jaehrlich' 'pool-betriebskosten'
+          check_pool_item 'poolbetrieb-beheizt-intensiv-jaehrlich' 'pool-betriebskosten'
