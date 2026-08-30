@@ -1,0 +1,88 @@
+name: Verify Hostinger production
+
+on:
+  workflow_run:
+    workflows: ["Hostinger production ready"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-production:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify canonical site and deployed version
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sS --fail 'https://baukostenradar.de/' -o /tmp/home.html
+          curl -sS --fail 'https://baukostenradar.de/api/version' -o /tmp/version.json
+          grep -qi 'BauKostenRadar' /tmp/home.html
+          jq -e '.service == "BauKostenRadar" and (.sha | length > 7) and .sha != "development"' /tmp/version.json >/dev/null
+
+      - name: Verify www redirects to apex
+        shell: bash
+        run: |
+          set -euo pipefail
+          headers=$(curl -sSI --connect-timeout 10 --max-time 20 'https://www.baukostenradar.de/' | tr -d '\r')
+          code=$(printf '%s\n' "$headers" | awk 'NR==1 {print $2}')
+          location=$(printf '%s\n' "$headers" | awk 'tolower($1)=="location:" {print $2}' | tail -1)
+          echo "www HTTP: $code"
+          echo "Location: $location"
+          [[ "$code" == "308" || "$code" == "301" ]]
+          [[ "$location" == "https://baukostenradar.de" || "$location" == "https://baukostenradar.de/" ]]
+
+      - name: Verify legal and crawler rules
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sS --fail 'https://baukostenradar.de/impressum' -o /tmp/impressum.html
+          curl -sS --fail 'https://baukostenradar.de/datenschutz' -o /tmp/datenschutz.html
+          curl -sS --fail 'https://baukostenradar.de/robots.txt' -o /tmp/robots.txt
+          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+
+          grep -qi 'noindex' /tmp/impressum.html
+          grep -qi 'noindex' /tmp/datenschutz.html
+          grep -q 'Disallow: /api/' /tmp/robots.txt
+
+          for path in '/impressum' '/datenschutz' '/angebot'; do
+            if grep -q "$path" /tmp/sitemap.xml; then
+              echo "$path must not be present in sitemap.xml" >&2
+              exit 1
+            fi
+          done
+
+      - name: Verify representative SEO templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sS --fail 'https://baukostenradar.de/kosten' -o /tmp/costs.html
+          curl -sS --fail 'https://baukostenradar.de/kosten/maler' -o /tmp/service.html
+          curl -sS --fail 'https://baukostenradar.de/kosten/maler/leistung/waende-streichen' -o /tmp/item.html
+          curl -sS --fail 'https://baukostenradar.de/staedte/berlin' -o /tmp/city.html
+          curl -sS --fail 'https://baukostenradar.de/kosten/maler/berlin' -o /tmp/local.html
+          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/guides.html
+          curl -sS --fail 'https://baukostenradar.de/rechner/handwerkerkosten' -o /tmp/calculator.html
+
+          for page in /tmp/costs.html /tmp/service.html /tmp/item.html /tmp/city.html /tmp/local.html /tmp/guides.html /tmp/calculator.html; do
+            if grep -qi 'noindex' "$page"; then
+              echo "Unexpected noindex in $page" >&2
+              exit 1
+            fi
+          done
+
+          grep -q 'BreadcrumbList' /tmp/costs.html
+          grep -q 'ItemList' /tmp/costs.html
+          grep -q 'BreadcrumbList' /tmp/item.html
+          grep -q 'FAQPage' /tmp/item.html
+          grep -q 'CollectionPage' /tmp/guides.html
+          grep -q 'WebApplication' /tmp/calculator.html
+
+      - name: Verify retired lead routes stay removed
+        shell: bash
+        run: |
+          set -euo pipefail
+          api_code=$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 10 --max-time 20 'https://baukostenradar.de/api/project-request')
+          page_code=$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 10 --max-time 20 'https://baukostenradar.de/angebot')
+          test "$api_code" = "404"
+          test "$page_code" = "404"
