@@ -1,0 +1,134 @@
+name: Verify Zaunbau pricing cluster
+
+on:
+  workflow_run:
+    workflows: ["Hostinger production ready"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-fence-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Zaunbau production pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sSL --fail 'https://baukostenradar.de/kosten/zaunbau' -o /tmp/zaunbau.html
+          curl -sSL --fail 'https://baukostenradar.de/kosten/zaunbau/berlin' -o /tmp/zaunbau-berlin.html
+          curl -sSL --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+          curl -sSL --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+
+          source='MyHammer - Zaunbau Kosten 2026'
+          for attempt in 1 2 3 4 5 6; do
+            curl -sSL --fail -H 'Cache-Control: no-cache' \
+              "https://baukostenradar.de/quellen?verify=${GITHUB_SHA}-${attempt}" \
+              -o /tmp/quellen.html
+            if grep -Fq "$source" /tmp/quellen.html; then
+              break
+            fi
+            if [ "$attempt" -eq 6 ]; then
+              echo "MISSING after retries: $source" >&2
+              exit 1
+            fi
+            sleep 10
+          done
+
+      - name: Verify category, city and source signals
+        shell: bash
+        run: |
+          set -euo pipefail
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+
+          for needle in \
+            'Zaun bauen lassen Standardspanne' \
+            'Maschendrahtzaun Material' \
+            'Holzzaun Material' \
+            'Sichtschutzzaun Holz komplett' \
+            'Sichtschutzzaun Kunststoff komplett' \
+            'Metallzaun oder Doppelstabmatten Material' \
+            'Schmiedeeisen Zaun Material' \
+            'Sichtschutzzaun montieren'; do
+            require_contains /tmp/zaunbau.html "$needle" "Zaunbau item: $needle"
+          done
+
+          require_contains /tmp/zaunbau-berlin.html 'Zaunbau' 'Zaunbau Berlin city page'
+          require_contains /tmp/quellen.html 'MyHammer - Zaunbau Kosten 2026' 'Zaunbau source'
+          ! grep -qi 'noindex' /tmp/zaunbau.html
+
+      - name: Verify five Zaunbau guides
+        shell: bash
+        run: |
+          set -euo pipefail
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+          check_guide() {
+            local slug="$1"; local item="$2"
+            local url="https://baukostenradar.de/ratgeber/${slug}"
+            local output="/tmp/${slug}.html"
+            require_contains /tmp/sitemap.xml "${url}</loc>" "guide sitemap $slug"
+            require_contains /tmp/ratgeber.html "/ratgeber/${slug}" "guide directory $slug"
+            curl -sSL --fail "$url" -o "$output"
+            require_contains "$output" "$url" "canonical $slug"
+            require_contains "$output" '"@type":"Article"' "Article schema $slug"
+            require_contains "$output" 'FAQPage' "FAQ schema $slug"
+            require_contains "$output" '/kosten/zaunbau' "Zaunbau service link $slug"
+            require_contains "$output" 'gewerk=zaunbau' "calculator service $slug"
+            require_contains "$output" "leistung=${item}" "calculator item $slug"
+            ! grep -qi 'noindex' "$output"
+          }
+
+          check_guide 'zaun-bauen-kosten-pro-meter' 'zaun-bauen-lassen-standardspanne'
+          check_guide 'doppelstabmattenzaun-kosten-pro-meter' 'metallzaun-oder-doppelstabmatten-material'
+          check_guide 'sichtschutzzaun-kosten-pro-meter' 'sichtschutzzaun-holz-komplett'
+          check_guide 'maschendrahtzaun-kosten-pro-meter' 'maschendrahtzaun-material'
+          check_guide 'holzzaun-kosten-pro-meter' 'holzzaun-material'
+
+      - name: Verify all price-detail mappings and sitemap expansion
+        shell: bash
+        run: |
+          set -euo pipefail
+          check_item() {
+            local item="$1"; local guide="$2"
+            local url="https://baukostenradar.de/kosten/zaunbau/leistung/${item}"
+            local output="/tmp/zaunbau-${item}.html"
+            grep -Fq "${url}</loc>" /tmp/sitemap.xml || { echo "Missing sitemap URL: $item" >&2; exit 1; }
+            curl -sSL --fail "$url" -o "$output"
+            grep -Fq 'Passender Ratgeber' "$output" || { echo "Missing guide CTA: $item" >&2; exit 1; }
+            grep -Fq "/ratgeber/${guide}" "$output" || { echo "Wrong guide mapping: $item -> $guide" >&2; exit 1; }
+            ! grep -qi 'noindex' "$output"
+          }
+
+          grep -Fq 'https://baukostenradar.de/kosten/zaunbau</loc>' /tmp/sitemap.xml
+          grep -Fq 'https://baukostenradar.de/kosten/zaunbau/berlin</loc>' /tmp/sitemap.xml
+
+          check_item 'zaun-bauen-lassen-standardspanne' 'zaun-bauen-kosten-pro-meter'
+          check_item 'maschendrahtzaun-material' 'maschendrahtzaun-kosten-pro-meter'
+          check_item 'holzzaun-material' 'holzzaun-kosten-pro-meter'
+          check_item 'sichtschutzzaun-holz-komplett' 'sichtschutzzaun-kosten-pro-meter'
+          check_item 'kunststoffzaun-material' 'sichtschutzzaun-kosten-pro-meter'
+          check_item 'sichtschutzzaun-kunststoff-komplett' 'sichtschutzzaun-kosten-pro-meter'
+          check_item 'metallzaun-oder-doppelstabmatten-material' 'doppelstabmattenzaun-kosten-pro-meter'
+          check_item 'schmiedeeisen-zaun-material' 'zaun-bauen-kosten-pro-meter'
+          check_item 'zaunmontage-einfach-holz-kunststoff-oder-matten' 'zaun-bauen-kosten-pro-meter'
+          check_item 'maschendrahtzaun-montieren' 'maschendrahtzaun-kosten-pro-meter'
+          check_item 'sichtschutzzaun-montieren' 'sichtschutzzaun-kosten-pro-meter'
+          check_item 'maschendrahtzaun-20-meter-beispiel' 'maschendrahtzaun-kosten-pro-meter'
+          check_item 'holzzaun-20-meter-beispiel' 'holzzaun-kosten-pro-meter'
+          check_item 'metallzaun-20-meter-beispiel' 'doppelstabmattenzaun-kosten-pro-meter'
+          check_item 'sichtschutzzaun-holz-20-meter-beispiel' 'sichtschutzzaun-kosten-pro-meter'
+          check_item 'sichtschutzzaun-kunststoff-20-meter-beispiel' 'sichtschutzzaun-kosten-pro-meter'
