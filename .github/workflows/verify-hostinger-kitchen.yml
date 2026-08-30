@@ -1,0 +1,112 @@
+name: Verify Hostinger privacy and Küche pricing
+
+on:
+  workflow_run:
+    workflows: ["Hostinger production ready"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-hostinger-kitchen:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch production pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          fetch_with_retry() {
+            local url="$1" output="$2"
+            for i in $(seq 1 12); do
+              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then return 0; fi
+              [[ "$i" == "12" ]] && return 1
+              sleep 5
+            done
+          }
+
+          fetch_with_retry 'https://baukostenradar.de/datenschutz' /tmp/datenschutz.html
+          fetch_with_retry 'https://baukostenradar.de/kosten/kueche' /tmp/kueche.html
+          fetch_with_retry 'https://baukostenradar.de/kosten/kueche/muenchen' /tmp/kueche-muenchen.html
+          fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
+          fetch_with_retry 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+
+      - name: Verify Hostinger privacy disclosure
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'Hostinger International Ltd.' /tmp/datenschutz.html
+          grep -q 'Serverstandort in Deutschland' /tmp/datenschutz.html
+          grep -q 'Data Processing Addendum' /tmp/datenschutz.html
+          if grep -q 'Hosting Ukraine LLC' /tmp/datenschutz.html; then
+            echo 'Old Ukraine.com.ua hosting disclosure is still present.' >&2
+            exit 1
+          fi
+
+      - name: Verify expanded Küche price catalog
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import re
+          from html.parser import HTMLParser
+
+          class TextParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.parts = []
+              def handle_data(self, data):
+                  value = data.strip()
+                  if value:
+                      self.parts.append(value)
+
+          def text(path):
+              parser = TextParser()
+              with open(path, encoding='utf-8') as handle:
+                  parser.feed(handle.read())
+              return re.sub(r'\s+', ' ', ' '.join(parser.parts))
+
+          main = text('/tmp/kueche.html')
+          city = text('/tmp/kueche-muenchen.html')
+          sources = text('/tmp/quellen.html')
+          sitemap = open('/tmp/sitemap.xml', encoding='utf-8').read()
+
+          expected_main = (
+              'Küchensanierung Teilsanierung',
+              'Küchensanierung komplett',
+              'Kleine Küche bis 8 m² sanieren',
+              'Mittlere Küche 8 bis 15 m² sanieren',
+              'Große Küche ab 15 m² sanieren',
+              'Standardküche 3 bis 5 m montieren',
+              'Große Küche mit Kochinsel montieren',
+              'Küchenmontage je laufendem Meter',
+              'Altküche demontieren und entsorgen',
+              'Arbeitsplatte gerade bis 3 m montieren',
+              'Naturstein oder Quarzkomposit Arbeitsplatte inkl. Montage',
+          )
+          for needle in expected_main:
+              if needle not in main:
+                  raise SystemExit(f'Missing Küche production signal: {needle}')
+
+          for needle in ('Küche renovieren Kosten 2026', 'Küchensanierung komplett', 'Küchenmontage je laufendem Meter'):
+              if needle not in city:
+                  raise SystemExit(f'Missing München Küche signal: {needle}')
+
+          for needle in (
+              'Blauarbeit - Küchensanierung Kosten 2026',
+              'Blauarbeit - Küche montieren Kosten 2026',
+              'Blauarbeit - Arbeitsplatte montieren Kosten 2026',
+              'MyHammer - Küche einbauen lassen Kosten 2026',
+              'Aroundhome - Küchen Preise & Kosten 2026',
+          ):
+              if needle not in sources:
+                  raise SystemExit(f'Missing Küche source: {needle}')
+
+          for needle in (
+              '/kosten/kueche/leistung/kuechensanierung-teilsanierung',
+              '/kosten/kueche/leistung/kuechensanierung-komplett',
+              '/kosten/kueche/leistung/kuechenmontage-je-laufendem-meter',
+              '/kosten/kueche/leistung/arbeitsplatte-gerade-bis-3-m-montieren',
+          ):
+              if needle not in sitemap:
+                  raise SystemExit(f'Missing Küche detail URL in sitemap: {needle}')
+          PY
