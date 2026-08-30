@@ -15,11 +15,29 @@ function resolveGitSha() {
   }
 }
 
+const liveCatalogHeaders = [
+  { key: "Cache-Control", value: "no-store, no-cache, must-revalidate, max-age=0, s-maxage=0" },
+  { key: "CDN-Cache-Control", value: "no-store" },
+  { key: "Vercel-CDN-Cache-Control", value: "no-store" },
+];
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   output: "standalone",
   env: {
     NEXT_PUBLIC_GIT_SHA: resolveGitSha(),
+  },
+  async headers() {
+    return [
+      {
+        source: "/ratgeber",
+        headers: liveCatalogHeaders,
+      },
+      {
+        source: "/quellen",
+        headers: liveCatalogHeaders,
+      },
+    ];
   },
   async redirects() {
     return [
