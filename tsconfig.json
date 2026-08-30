@@ -16,8 +16,8 @@
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/lib/pricing": ["./lib/catalog-stairs-current.ts"],
-      "@/lib/price-guide-links": ["./lib/price-guide-links-catalog.ts"],
-      "@/lib/all-guides": ["./lib/all-guides-catalog.ts"],
+      "@/lib/price-guide-links": ["./lib/price-guide-links-current.ts"],
+      "@/lib/all-guides": ["./lib/all-guides-current.ts"],
       "@/lib/guide-silo": ["./lib/guide-silo-catalog.ts"],
       "@/*": ["./*"]
     }
