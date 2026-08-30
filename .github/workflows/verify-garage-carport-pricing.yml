@@ -1,0 +1,134 @@
+name: Verify Garage and Carport pricing cluster
+
+on:
+  workflow_run:
+    workflows: ["Hostinger production ready"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-garage-carport-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Garage and Carport production pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sSL --fail 'https://baukostenradar.de/kosten/garage' -o /tmp/garage.html
+          curl -sSL --fail 'https://baukostenradar.de/kosten/carport' -o /tmp/carport.html
+          curl -sSL --fail 'https://baukostenradar.de/kosten/garage/berlin' -o /tmp/garage-berlin.html
+          curl -sSL --fail 'https://baukostenradar.de/kosten/carport/muenchen' -o /tmp/carport-muenchen.html
+          curl -sSL --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+          curl -sSL --fail 'https://baukostenradar.de/quellen' -o /tmp/quellen.html
+          curl -sSL --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+
+      - name: Verify category, city and source signals
+        shell: bash
+        run: |
+          set -euo pipefail
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+
+          for needle in \
+            'Einzelgarage bauen' \
+            'Doppelgarage bauen' \
+            'Fertiggarage Einzelgarage Grundpreis' \
+            'Gemauerte Massivgarage' \
+            'Garagentor einbauen oder austauschen'; do
+            require_contains /tmp/garage.html "$needle" "Garage item: $needle"
+          done
+
+          for needle in \
+            'Carport Holz inkl. Montage' \
+            'Carport Aluminium oder Stahl inkl. Montage' \
+            'Doppelcarport Aluminium' \
+            'Punktfundament Carport typisch'; do
+            require_contains /tmp/carport.html "$needle" "Carport item: $needle"
+          done
+
+          require_contains /tmp/garage-berlin.html 'Garage' 'Garage Berlin city page'
+          require_contains /tmp/carport-muenchen.html 'Carport' 'Carport München city page'
+
+          for source in \
+            'MyHammer - Garage bauen Kosten 2026' \
+            'MyHammer - Fertiggarage Kosten 2026' \
+            'Aroundhome - Fertiggaragen Preise 2026' \
+            'Aroundhome - Massivgarage Kosten 2026' \
+            'MyHammer - Carport bauen Kosten 2026' \
+            'MyHammer - Carport oder Garage Kostenvergleich 2026' \
+            'MyHammer - Garagentor einbauen Kosten 2026' \
+            'MyHammer - Punktfundament Kosten 2026'; do
+            require_contains /tmp/quellen.html "$source" "source: $source"
+          done
+
+          ! grep -qi 'noindex' /tmp/garage.html
+          ! grep -qi 'noindex' /tmp/carport.html
+
+      - name: Verify commercial guide pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+          check_guide() {
+            local slug="$1"; local service="$2"; local item="$3"
+            local url="https://baukostenradar.de/ratgeber/${slug}"
+            local output="/tmp/${slug}.html"
+            require_contains /tmp/sitemap.xml "${url}</loc>" "guide sitemap $slug"
+            require_contains /tmp/ratgeber.html "/ratgeber/${slug}" "guide directory $slug"
+            curl -sSL --fail "$url" -o "$output"
+            require_contains "$output" "$url" "canonical $slug"
+            require_contains "$output" '"@type":"Article"' "Article schema $slug"
+            require_contains "$output" 'FAQPage' "FAQ schema $slug"
+            require_contains "$output" "/kosten/${service}" "service link $slug"
+            require_contains "$output" "gewerk=${service}" "calculator service $slug"
+            require_contains "$output" "leistung=${item}" "calculator item $slug"
+            ! grep -qi 'noindex' "$output"
+          }
+
+          check_guide 'garage-bauen-kosten' 'garage' 'einzelgarage-bauen'
+          check_guide 'fertiggarage-kosten' 'garage' 'fertiggarage-einzelgarage-grundpreis'
+          check_guide 'massivgarage-kosten' 'garage' 'gemauerte-massivgarage'
+          check_guide 'garagenfundament-kosten-pro-qm' 'garage' 'garagenfundament-plattenfundament'
+          check_guide 'garagentor-einbauen-kosten' 'garage' 'garagentor-einbauen-oder-austauschen'
+          check_guide 'carport-kosten' 'carport' 'carport-holz-inkl-montage'
+
+      - name: Verify detail mappings and sitemap expansion
+        shell: bash
+        run: |
+          set -euo pipefail
+          check_item() {
+            local service="$1"; local item="$2"; local guide="$3"
+            local url="https://baukostenradar.de/kosten/${service}/leistung/${item}"
+            local output="/tmp/${service}-${item}.html"
+            grep -Fq "${url}</loc>" /tmp/sitemap.xml || { echo "Missing sitemap URL: $service/$item" >&2; exit 1; }
+            curl -sSL --fail "$url" -o "$output"
+            grep -Fq 'Passender Ratgeber' "$output" || { echo "Missing guide CTA: $service/$item" >&2; exit 1; }
+            grep -Fq "/ratgeber/${guide}" "$output" || { echo "Wrong guide mapping: $service/$item -> $guide" >&2; exit 1; }
+            ! grep -qi 'noindex' "$output"
+          }
+
+          grep -Fq 'https://baukostenradar.de/kosten/garage</loc>' /tmp/sitemap.xml
+          grep -Fq 'https://baukostenradar.de/kosten/carport</loc>' /tmp/sitemap.xml
+          grep -Fq 'https://baukostenradar.de/kosten/garage/berlin</loc>' /tmp/sitemap.xml
+          grep -Fq 'https://baukostenradar.de/kosten/carport/muenchen</loc>' /tmp/sitemap.xml
+
+          check_item 'garage' 'einzelgarage-bauen' 'garage-bauen-kosten'
+          check_item 'garage' 'fertiggarage-einzelgarage-grundpreis' 'fertiggarage-kosten'
+          check_item 'garage' 'gemauerte-massivgarage' 'massivgarage-kosten'
+          check_item 'garage' 'garagenfundament-plattenfundament' 'garagenfundament-kosten-pro-qm'
+          check_item 'garage' 'garagentor-einbauen-oder-austauschen' 'garagentor-einbauen-kosten'
+          check_item 'carport' 'carport-holz-inkl-montage' 'carport-kosten'
