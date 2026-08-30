@@ -1,0 +1,58 @@
+name: Hostinger production ready
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+  workflow_dispatch:
+
+concurrency:
+  group: hostinger-production-ready
+  cancel-in-progress: true
+
+jobs:
+  wait-for-production:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Wait for Hostinger to serve the expected commit
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.event.workflow_run.head_sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            EXPECTED_SHA=""
+          fi
+
+          for i in $(seq 1 60); do
+            code=$(curl -sS -o /tmp/version.json -w '%{http_code}' --connect-timeout 10 --max-time 20 'https://baukostenradar.de/api/version' || true)
+            deployed_sha=$(jq -r '.sha // empty' /tmp/version.json 2>/dev/null || true)
+            echo "Attempt $i: HTTP $code, deployed SHA '$deployed_sha'"
+
+            if [[ "$code" == "200" && -n "$deployed_sha" && "$deployed_sha" != "development" ]]; then
+              if [[ -z "$EXPECTED_SHA" || "$deployed_sha" == "$EXPECTED_SHA" ]]; then
+                echo "Hostinger production is ready: $deployed_sha"
+                exit 0
+              fi
+
+              compare=$(curl -sS --fail \
+                -H "Authorization: Bearer $GH_TOKEN" \
+                -H 'Accept: application/vnd.github+json' \
+                "https://api.github.com/repos/$GITHUB_REPOSITORY/compare/$EXPECTED_SHA...$deployed_sha" || true)
+              compare_status=$(printf '%s' "$compare" | jq -r '.status // empty' 2>/dev/null || true)
+              if [[ "$compare_status" == "ahead" ]]; then
+                echo "Hostinger has already advanced to newer descendant commit $deployed_sha"
+                exit 0
+              fi
+            fi
+
+            sleep 10
+          done
+
+          echo "Hostinger did not expose the expected or a newer production commit in time." >&2
+          exit 1
