@@ -1,8 +1,26 @@
+import { execSync } from "node:child_process";
 import type { NextConfig } from "next";
+
+function resolveGitSha() {
+  const explicitSha = process.env.NEXT_PUBLIC_GIT_SHA?.trim();
+  if (explicitSha) return explicitSha;
+
+  try {
+    return execSync("git rev-parse HEAD", {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+  } catch {
+    return "development";
+  }
+}
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   output: "standalone",
+  env: {
+    NEXT_PUBLIC_GIT_SHA: resolveGitSha(),
+  },
   async redirects() {
     return [
       {
