@@ -1,0 +1,134 @@
+name: Verify Schornstein and Kamin pricing cluster
+
+on:
+  workflow_run:
+    workflows: ["Hostinger production ready"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-schornstein-kamin-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Schornstein and Kamin production pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sSL --fail 'https://baukostenradar.de/kosten/schornstein' -o /tmp/schornstein.html
+          curl -sSL --fail 'https://baukostenradar.de/kosten/kamin' -o /tmp/kamin.html
+          curl -sSL --fail 'https://baukostenradar.de/kosten/schornstein/berlin' -o /tmp/schornstein-berlin.html
+          curl -sSL --fail 'https://baukostenradar.de/kosten/kamin/muenchen' -o /tmp/kamin-muenchen.html
+          curl -sSL --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+          curl -sSL --fail 'https://baukostenradar.de/quellen' -o /tmp/quellen.html
+          curl -sSL --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+
+      - name: Verify category, city and source signals
+        shell: bash
+        run: |
+          set -euo pipefail
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+
+          for needle in \
+            'Schornsteinsanierung gesamt' \
+            'Schornstein Edelstahlauskleidung inkl. Montage' \
+            'Versotteten Schornstein sanieren' \
+            'Edelstahlschornstein außen nachrüsten' \
+            'Schornsteinfeger Einsatz'; do
+            require_contains /tmp/schornstein.html "$needle" "Schornstein item: $needle"
+          done
+
+          for needle in \
+            'Kamin bauen gesamt' \
+            'Kernbohrung für Kamin oder Ofenrohr' \
+            'Kaminkassette nachrüsten gesamt' \
+            'Kaminofen Anschaffung'; do
+            require_contains /tmp/kamin.html "$needle" "Kamin item: $needle"
+          done
+
+          require_contains /tmp/schornstein-berlin.html 'Schornstein' 'Schornstein Berlin city page'
+          require_contains /tmp/kamin-muenchen.html 'Kamin' 'Kamin München city page'
+
+          for source in \
+            'MyHammer - Schornstein sanieren Kosten 2026' \
+            'MyHammer - Kaminbau Kosten 2026' \
+            'MyHammer - Kaminsanierung und Kaminkassette Kosten 2026' \
+            'MyHammer - Kamin- und Ofenbauer Kosten 2026' \
+            'MyHammer - Schornsteinfeger Kosten 2026' \
+            'Aroundhome - Kamin Preise und Kosten'; do
+            require_contains /tmp/quellen.html "$source" "source: $source"
+          done
+
+          ! grep -qi 'noindex' /tmp/schornstein.html
+          ! grep -qi 'noindex' /tmp/kamin.html
+
+      - name: Verify commercial guide pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+          check_guide() {
+            local slug="$1"; local service="$2"; local item="$3"
+            local url="https://baukostenradar.de/ratgeber/${slug}"
+            local output="/tmp/${slug}.html"
+            require_contains /tmp/sitemap.xml "${url}</loc>" "guide sitemap $slug"
+            require_contains /tmp/ratgeber.html "/ratgeber/${slug}" "guide directory $slug"
+            curl -sSL --fail "$url" -o "$output"
+            require_contains "$output" "$url" "canonical $slug"
+            require_contains "$output" '"@type":"Article"' "Article schema $slug"
+            require_contains "$output" 'FAQPage' "FAQ schema $slug"
+            require_contains "$output" "/kosten/${service}" "service link $slug"
+            require_contains "$output" "gewerk=${service}" "calculator service $slug"
+            require_contains "$output" "leistung=${item}" "calculator item $slug"
+            ! grep -qi 'noindex' "$output"
+          }
+
+          check_guide 'schornstein-sanieren-kosten' 'schornstein' 'schornsteinsanierung-gesamt'
+          check_guide 'edelstahlschornstein-nachruesten-kosten' 'schornstein' 'edelstahlschornstein-aussen-nachruesten'
+          check_guide 'versottung-schornstein-sanieren-kosten' 'schornstein' 'versotteten-schornstein-sanieren'
+          check_guide 'schornsteinfeger-kosten' 'schornstein' 'schornsteinfeger-einsatz'
+          check_guide 'kamin-bauen-kosten' 'kamin' 'kamin-bauen-gesamt'
+          check_guide 'kaminkassette-nachruesten-kosten' 'kamin' 'kaminkassette-nachruesten-gesamt'
+          check_guide 'kaminofen-kosten' 'kamin' 'kaminofen-anschaffung'
+
+      - name: Verify detail mappings and sitemap expansion
+        shell: bash
+        run: |
+          set -euo pipefail
+          check_item() {
+            local service="$1"; local item="$2"; local guide="$3"
+            local url="https://baukostenradar.de/kosten/${service}/leistung/${item}"
+            local output="/tmp/${service}-${item}.html"
+            grep -Fq "${url}</loc>" /tmp/sitemap.xml || { echo "Missing sitemap URL: $service/$item" >&2; exit 1; }
+            curl -sSL --fail "$url" -o "$output"
+            grep -Fq 'Passender Ratgeber' "$output" || { echo "Missing guide CTA: $service/$item" >&2; exit 1; }
+            grep -Fq "/ratgeber/${guide}" "$output" || { echo "Wrong guide mapping: $service/$item -> $guide" >&2; exit 1; }
+            ! grep -qi 'noindex' "$output"
+          }
+
+          grep -Fq 'https://baukostenradar.de/kosten/schornstein</loc>' /tmp/sitemap.xml
+          grep -Fq 'https://baukostenradar.de/kosten/kamin</loc>' /tmp/sitemap.xml
+          grep -Fq 'https://baukostenradar.de/kosten/schornstein/berlin</loc>' /tmp/sitemap.xml
+          grep -Fq 'https://baukostenradar.de/kosten/kamin/muenchen</loc>' /tmp/sitemap.xml
+
+          check_item 'schornstein' 'schornsteinsanierung-gesamt' 'schornstein-sanieren-kosten'
+          check_item 'schornstein' 'edelstahlschornstein-aussen-nachruesten' 'edelstahlschornstein-nachruesten-kosten'
+          check_item 'schornstein' 'versotteten-schornstein-sanieren' 'versottung-schornstein-sanieren-kosten'
+          check_item 'schornstein' 'schornsteinfeger-einsatz' 'schornsteinfeger-kosten'
+          check_item 'kamin' 'kamin-bauen-gesamt' 'kamin-bauen-kosten'
+          check_item 'kamin' 'kaminkassette-nachruesten-gesamt' 'kaminkassette-nachruesten-kosten'
+          check_item 'kamin' 'kaminofen-anschaffung' 'kaminofen-kosten'
