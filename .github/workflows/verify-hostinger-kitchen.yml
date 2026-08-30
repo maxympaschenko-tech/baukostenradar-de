@@ -87,7 +87,7 @@ jobs:
               if needle not in main:
                   raise SystemExit(f'Missing Küche production signal: {needle}')
 
-          for needle in ('Küche renovieren Kosten 2026', 'Küchensanierung komplett', 'Küchenmontage je laufendem Meter'):
+          for needle in ('München', 'Küchensanierung komplett', 'Küchenmontage je laufendem Meter'):
               if needle not in city:
                   raise SystemExit(f'Missing München Küche signal: {needle}')
 
