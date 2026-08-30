@@ -15,11 +15,11 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/lib/pricing": ["./lib/catalog-balcony.ts"],
-      "@/lib/price-guide-links": ["./lib/price-guide-links-balcony.ts"],
-      "@/lib/all-guides": ["./lib/all-guides-balcony.ts"],
-      "@/lib/guide-groups": ["./lib/guide-groups-balcony.ts"],
-      "@/lib/guide-silo": ["./lib/guide-silo-balcony.ts"],
+      "@/lib/pricing": ["./lib/catalog-garage.ts"],
+      "@/lib/price-guide-links": ["./lib/price-guide-links-garage.ts"],
+      "@/lib/all-guides": ["./lib/all-guides-garage.ts"],
+      "@/lib/guide-groups": ["./lib/guide-groups-garage.ts"],
+      "@/lib/guide-silo": ["./lib/guide-silo-garage.ts"],
       "@/*": ["./*"]
     }
   },
