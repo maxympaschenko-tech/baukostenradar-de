@@ -15,11 +15,11 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/lib/pricing": ["./lib/catalog-pool.ts"],
-      "@/lib/price-guide-links": ["./lib/price-guide-links-pool.ts"],
-      "@/lib/all-guides": ["./lib/all-guides-pool.ts"],
-      "@/lib/guide-groups": ["./lib/guide-groups-pool.ts"],
-      "@/lib/guide-silo": ["./lib/guide-silo-pool.ts"],
+      "@/lib/pricing": ["./lib/catalog-terrace.ts"],
+      "@/lib/price-guide-links": ["./lib/price-guide-links-terrace.ts"],
+      "@/lib/all-guides": ["./lib/all-guides-terrace.ts"],
+      "@/lib/guide-groups": ["./lib/guide-groups-terrace.ts"],
+      "@/lib/guide-silo": ["./lib/guide-silo-terrace.ts"],
       "@/*": ["./*"]
     }
   },
