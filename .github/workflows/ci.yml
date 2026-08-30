@@ -73,6 +73,7 @@ jobs:
           fi
 
           curl -sS --fail 'http://127.0.0.1:3001/quellen' -o /tmp/quellen.html
+          curl -sS --fail 'http://127.0.0.1:3001/sitemap.xml' -o /tmp/sitemap.xml
 
           require_contains() {
             local file="$1"
@@ -103,3 +104,35 @@ jobs:
             'MyHammer - Zaunbau Kosten 2026'; do
             require_contains /tmp/quellen.html "$source" "active source $source"
           done
+
+          require_contains /tmp/sitemap.xml 'https://example.de/kosten/zaunbau</loc>' 'Zaunbau sitemap service'
+          require_contains /tmp/sitemap.xml 'https://example.de/ratgeber/zaun-bauen-kosten-pro-meter</loc>' 'Zaunbau sitemap guide'
+
+          check_fence_item() {
+            local item="$1"
+            local guide="$2"
+            local output="/tmp/ci-zaunbau-${item}.html"
+            local local_url="http://127.0.0.1:3001/kosten/zaunbau/leistung/${item}"
+            local canonical="https://example.de/kosten/zaunbau/leistung/${item}"
+            curl -sS --fail "$local_url" -o "$output"
+            require_contains /tmp/sitemap.xml "${canonical}</loc>" "Zaunbau sitemap item $item"
+            require_contains "$output" 'Passender Ratgeber' "Zaunbau guide CTA $item"
+            require_contains "$output" "/ratgeber/${guide}" "Zaunbau guide mapping $item"
+          }
+
+          check_fence_item 'zaun-bauen-lassen-standardspanne' 'zaun-bauen-kosten-pro-meter'
+          check_fence_item 'maschendrahtzaun-material' 'maschendrahtzaun-kosten-pro-meter'
+          check_fence_item 'holzzaun-material' 'holzzaun-kosten-pro-meter'
+          check_fence_item 'sichtschutzzaun-holz-komplett' 'sichtschutzzaun-kosten-pro-meter'
+          check_fence_item 'kunststoffzaun-material' 'sichtschutzzaun-kosten-pro-meter'
+          check_fence_item 'sichtschutzzaun-kunststoff-komplett' 'sichtschutzzaun-kosten-pro-meter'
+          check_fence_item 'metallzaun-oder-doppelstabmatten-material' 'doppelstabmattenzaun-kosten-pro-meter'
+          check_fence_item 'schmiedeeisen-zaun-material' 'zaun-bauen-kosten-pro-meter'
+          check_fence_item 'zaunmontage-einfach-holz-kunststoff-oder-matten' 'zaun-bauen-kosten-pro-meter'
+          check_fence_item 'maschendrahtzaun-montieren' 'maschendrahtzaun-kosten-pro-meter'
+          check_fence_item 'sichtschutzzaun-montieren' 'sichtschutzzaun-kosten-pro-meter'
+          check_fence_item 'maschendrahtzaun-20-meter-beispiel' 'maschendrahtzaun-kosten-pro-meter'
+          check_fence_item 'holzzaun-20-meter-beispiel' 'holzzaun-kosten-pro-meter'
+          check_fence_item 'metallzaun-20-meter-beispiel' 'doppelstabmattenzaun-kosten-pro-meter'
+          check_fence_item 'sichtschutzzaun-holz-20-meter-beispiel' 'sichtschutzzaun-kosten-pro-meter'
+          check_fence_item 'sichtschutzzaun-kunststoff-20-meter-beispiel' 'sichtschutzzaun-kosten-pro-meter'
