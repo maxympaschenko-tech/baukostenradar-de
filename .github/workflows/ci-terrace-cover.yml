@@ -1,0 +1,113 @@
+name: CI Terrassenueberdachung cluster
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-terrace-cover-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-terrace-cover-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://example.de
+
+      - name: Verify Terrassenueberdachung standalone runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          HOSTNAME=127.0.0.1 PORT=3001 NEXT_PUBLIC_SITE_URL=https://example.de node .next/standalone/server.js > /tmp/baukostenradar-ci-cover-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl -sS --fail 'http://127.0.0.1:3001/kosten/terrassenueberdachung' -o /tmp/terrassenueberdachung.html; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$ready" -ne 1 ]; then
+            echo 'Production runtime did not become ready.' >&2
+            cat /tmp/baukostenradar-ci-cover-server.log >&2 || true
+            exit 1
+          fi
+
+          curl -sS --fail 'http://127.0.0.1:3001/ratgeber' -o /tmp/ratgeber.html
+          curl -sS --fail 'http://127.0.0.1:3001/quellen' -o /tmp/quellen.html
+          curl -sS --fail 'http://127.0.0.1:3001/sitemap.xml' -o /tmp/sitemap.xml
+
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+
+          require_contains /tmp/ratgeber.html '/ratgeber/terrassenueberdachung-kosten' 'Terrassenueberdachung guide hub link'
+          require_contains /tmp/quellen.html 'Aroundhome - Terrassenüberdachung Kosten 2026' 'Aroundhome Terrassenueberdachung source'
+          require_contains /tmp/quellen.html 'Aroundhome - Lamellendach Kosten 2026' 'Aroundhome Lamellendach source'
+          require_contains /tmp/quellen.html 'Blauarbeit - Terrassenüberdachung Kosten 2026' 'Blauarbeit Terrassenueberdachung source'
+          require_contains /tmp/quellen.html 'Blauarbeit - Pergola Kosten 2026' 'Blauarbeit Pergola source'
+          require_contains /tmp/sitemap.xml 'https://example.de/kosten/terrassenueberdachung</loc>' 'Terrassenueberdachung sitemap service'
+          require_contains /tmp/sitemap.xml 'https://example.de/ratgeber/terrassenueberdachung-kosten</loc>' 'Terrassenueberdachung sitemap guide'
+
+          check_item() {
+            local item="$1"; local guide="$2"
+            local output="/tmp/ci-terrassenueberdachung-${item}.html"
+            local local_url="http://127.0.0.1:3001/kosten/terrassenueberdachung/leistung/${item}"
+            local canonical="https://example.de/kosten/terrassenueberdachung/leistung/${item}"
+            curl -sS --fail "$local_url" -o "$output"
+            require_contains /tmp/sitemap.xml "${canonical}</loc>" "Terrassenueberdachung sitemap item $item"
+            require_contains "$output" 'Passender Ratgeber' "Terrassenueberdachung guide CTA $item"
+            require_contains "$output" "/ratgeber/${guide}" "Terrassenueberdachung guide mapping $item"
+          }
+
+          check_item 'terrassenueberdachung-komplett-mit-montage-und-fundament' 'terrassenueberdachung-kosten'
+          check_item 'terrassenueberdachung-guenstiges-segment-mit-montage' 'terrassenueberdachung-kosten'
+          check_item 'design-terrassenueberdachung-oder-massanfertigung' 'terrassenueberdachung-kosten'
+          check_item 'terrassendach-ohne-montage' 'terrassenueberdachung-kosten'
+          check_item 'lieferung-terrassenueberdachung' 'terrassenueberdachung-kosten'
+          check_item 'montage-terrassenueberdachung' 'terrassenueberdachung-kosten'
+          check_item 'punktfundament-terrassendach' 'terrassenueberdachung-kosten'
+          check_item 'holz-terrassenueberdachung-mit-kunststoff-4-x-3-m-wandmontage' 'holz-terrassenueberdachung-kosten'
+          check_item 'holz-terrassenueberdachung-mit-sicherheitsglas-4-x-3-m-wandmontage' 'holz-terrassenueberdachung-kosten'
+          check_item 'holz-terrassenueberdachung-mit-dachziegeln-4-x-3-m-wandmontage' 'holz-terrassenueberdachung-kosten'
+          check_item 'aluminium-terrassenueberdachung-mit-kunststoff-4-x-3-m-wandmontage' 'alu-terrassenueberdachung-kosten'
+          check_item 'aluminium-terrassenueberdachung-mit-sicherheitsglas-4-x-3-m-wandmontage' 'alu-terrassenueberdachung-kosten'
+          check_item 'aluminium-lamellendach-4-x-3-m-wandmontage' 'lamellendach-pergola-kosten'
+          check_item 'vsg-klarglas-terrassendach' 'glasdach-terrasse-kosten'
+          check_item 'vsg-mattglas-terrassendach' 'glasdach-terrasse-kosten'
+          check_item 'acrylglas-terrassendach' 'glasdach-terrasse-kosten'
+          check_item 'doppelstegplatte-terrassendach' 'glasdach-terrasse-kosten'
+          check_item 'terrassenueberdachung-guenstiges-preissegment' 'terrassenueberdachung-kosten'
+          check_item 'design-terrassendach-hochwertig' 'terrassenueberdachung-kosten'
+          check_item 'lamellenpergola-bausatz-mit-verstellbarem-dach' 'lamellendach-pergola-kosten'
+          check_item 'pergola-massanfertigung-fachbetrieb' 'lamellendach-pergola-kosten'
+          check_item 'pergola-montage-fachbetrieb' 'lamellendach-pergola-kosten'
