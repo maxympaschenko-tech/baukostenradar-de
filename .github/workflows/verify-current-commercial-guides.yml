@@ -15,15 +15,35 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
-          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
-          curl -sS --fail 'https://baukostenradar.de/kosten/kueche' -o /tmp/kueche.html
-          curl -sS --fail 'https://baukostenradar.de/kosten/treppen' -o /tmp/treppen.html
+          curl -sSL --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sSL --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+          curl -sSL --fail 'https://baukostenradar.de/kosten/kueche' -o /tmp/kueche.html
+          curl -sSL --fail 'https://baukostenradar.de/kosten/treppen' -o /tmp/treppen.html
 
       - name: Verify new guide pages and internal links
         shell: bash
         run: |
           set -euo pipefail
+
+          require_contains() {
+            local file="$1"
+            local needle="$2"
+            local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+
+          require_noindex_absent() {
+            local file="$1"
+            local label="$2"
+            if grep -qi 'noindex' "$file"; then
+              echo "UNEXPECTED NOINDEX: $label" >&2
+              exit 1
+            fi
+          }
 
           check_guide() {
             local slug="$1"
@@ -32,16 +52,17 @@ jobs:
             local output="/tmp/${slug}.html"
             local url="https://baukostenradar.de/ratgeber/${slug}"
 
-            grep -q "${url}</loc>" /tmp/sitemap.xml
-            grep -q "/ratgeber/${slug}" /tmp/ratgeber.html
-            curl -sS --fail "$url" -o "$output"
-            grep -q "$url" "$output"
-            grep -q '"@type":"Article"' "$output"
-            grep -q 'FAQPage' "$output"
-            grep -q "/kosten/${service}" "$output"
-            grep -q "gewerk=${service}" "$output"
-            grep -q "leistung=${item}" "$output"
-            ! grep -qi 'noindex' "$output"
+            echo "Checking guide: $slug"
+            require_contains /tmp/sitemap.xml "${url}</loc>" "guide sitemap URL $slug"
+            require_contains /tmp/ratgeber.html "/ratgeber/${slug}" "guide hub link $slug"
+            curl -sSL --fail "$url" -o "$output"
+            require_contains "$output" "$url" "canonical URL $slug"
+            require_contains "$output" '"@type":"Article"' "Article schema $slug"
+            require_contains "$output" 'FAQPage' "FAQ schema $slug"
+            require_contains "$output" "/kosten/${service}" "service link $slug"
+            require_contains "$output" "gewerk=${service}" "calculator service preset $slug"
+            require_contains "$output" "leistung=${item}" "calculator item preset $slug"
+            require_noindex_absent "$output" "$slug"
           }
 
           check_guide 'kuechensanierung-komplett-kosten' 'kueche' 'kuechensanierung-komplett'
@@ -54,6 +75,17 @@ jobs:
         run: |
           set -euo pipefail
 
+          require_contains() {
+            local file="$1"
+            local needle="$2"
+            local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+
           check_item() {
             local service="$1"
             local item="$2"
@@ -61,11 +93,15 @@ jobs:
             local output="/tmp/${service}-${item}.html"
             local url="https://baukostenradar.de/kosten/${service}/leistung/${item}"
 
-            grep -q "${url}</loc>" /tmp/sitemap.xml
-            curl -sS --fail "$url" -o "$output"
-            grep -q 'Passender Ratgeber' "$output"
-            grep -q "/ratgeber/${guide}" "$output"
-            ! grep -qi 'noindex' "$output"
+            echo "Checking price item: $service/$item"
+            require_contains /tmp/sitemap.xml "${url}</loc>" "price sitemap URL $service/$item"
+            curl -sSL --fail "$url" -o "$output"
+            require_contains "$output" 'Passender Ratgeber' "guide CTA $service/$item"
+            require_contains "$output" "/ratgeber/${guide}" "guide mapping $service/$item -> $guide"
+            if grep -qi 'noindex' "$output"; then
+              echo "UNEXPECTED NOINDEX: $service/$item" >&2
+              exit 1
+            fi
           }
 
           check_item 'kueche' 'kuechensanierung-komplett' 'kuechensanierung-komplett-kosten'
