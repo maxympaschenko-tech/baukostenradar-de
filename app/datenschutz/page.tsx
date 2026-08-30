@@ -52,21 +52,27 @@ export default function DatenschutzPage() {
 
           <h2>3. Hosting und Server-Logfiles</h2>
           <p>
-            Diese Website wird bei Hosting Ukraine LLC (ТОВ «Хостінг Україна») gehostet. Beim Aufruf der Website
-            können technisch erforderliche Verbindungsdaten verarbeitet werden. Dazu können insbesondere
-            IP-Adresse, Datum und Uhrzeit des Zugriffs, aufgerufene URL, übertragene Datenmenge, HTTP-Statuscode,
-            Referrer-URL, Browsertyp, Betriebssystem und Hostname des zugreifenden Geräts gehören.
+            Diese Website wird über Hostinger gehostet. Vertragspartner für die Hosting-Dienste ist Hostinger
+            International Ltd., 61 Lordou Vironos str., 6023 Larnaca, Zypern. Für BauKostenRadar wurde ein
+            Serverstandort in Deutschland gewählt. Beim Aufruf der Website können technisch erforderliche
+            Verbindungsdaten verarbeitet werden. Dazu können insbesondere IP-Adresse, Datum und Uhrzeit des Zugriffs,
+            aufgerufene URL, übertragene Datenmenge, HTTP-Statuscode, Referrer-URL, Browsertyp, Betriebssystem und
+            Hostname des zugreifenden Geräts gehören.
           </p>
           <p>
             Die Verarbeitung erfolgt zur sicheren und stabilen Bereitstellung der Website sowie zur Erkennung und
             Abwehr technischer Angriffe auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes Interesse
-            liegt in einem sicheren, funktionsfähigen und missbrauchsgeschützten Webangebot.
+            liegt in einem sicheren, funktionsfähigen und missbrauchsgeschützten Webangebot. Soweit Hostinger
+            personenbezogene Daten in unserem Auftrag verarbeitet, erfolgt dies auf Grundlage einer Vereinbarung zur
+            Auftragsverarbeitung nach Art. 28 DSGVO.
           </p>
           <p>
-            Nach Angaben des Hosting-Anbieters befinden sich dessen Rechenzentren in der Ukraine. Dadurch kann eine
-            Verarbeitung personenbezogener Daten außerhalb der Europäischen Union und des Europäischen
-            Wirtschaftsraums stattfinden. Weitere Informationen zur Datenverarbeitung des Hosting-Anbieters finden
-            Sie in dessen <a className="textLink" href="https://www.ukraine.com.ua/legal/privacypolicy/" target="_blank" rel="noreferrer">Datenschutzerklärung</a>.
+            Hostinger ist innerhalb der Europäischen Union ansässig. Im Rahmen einzelner Support-, Sicherheits- oder
+            Infrastrukturleistungen können von Hostinger eingesetzte Unterauftragnehmer Daten auch außerhalb des
+            Europäischen Wirtschaftsraums verarbeiten. In solchen Fällen kommen die nach der DSGVO vorgesehenen
+            Schutzmechanismen zur Anwendung. Weitere Informationen finden Sie in der
+            <a className="textLink" href="https://www.hostinger.com/legal/privacy-policy" target="_blank" rel="noreferrer"> Datenschutzerklärung von Hostinger</a>
+            sowie im <a className="textLink" href="https://www.hostinger.com/legal/dpa" target="_blank" rel="noreferrer">Data Processing Addendum</a>.
           </p>
 
           <h2>4. Kontaktaufnahme per E-Mail oder Telefon</h2>
