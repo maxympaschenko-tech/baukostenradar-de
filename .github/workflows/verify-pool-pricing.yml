@@ -1,0 +1,160 @@
+name: Verify Poolbau pricing cluster
+
+on:
+  workflow_run:
+    workflows: ["Hostinger production ready"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-pool-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure resilient live fetches
+        shell: bash
+        run: |
+          cat > ~/.curlrc <<'EOF'
+          retry = 6
+          retry-all-errors
+          retry-delay = 5
+          connect-timeout = 10
+          max-time = 30
+          EOF
+
+      - name: Fetch Poolbau production pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          fetch_until_contains() {
+            local base_url="$1" output="$2" needle="$3" label="$4"
+            for attempt in 1 2 3 4 5 6; do
+              if curl -sSL --fail -H 'Cache-Control: no-cache' \
+                "${base_url}?verify=${GITHUB_SHA}-${attempt}" -o "$output"; then
+                if grep -Fq "$needle" "$output"; then
+                  return 0
+                fi
+              fi
+              if [ "$attempt" -eq 6 ]; then
+                echo "MISSING after retries: $label" >&2
+                echo "Expected in $output: $needle" >&2
+                return 1
+              fi
+              sleep 10
+            done
+          }
+
+          curl -sSL --fail 'https://baukostenradar.de/kosten/poolbau' -o /tmp/poolbau.html
+          curl -sSL --fail 'https://baukostenradar.de/kosten/poolbau/berlin' -o /tmp/poolbau-berlin.html
+          fetch_until_contains \
+            'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html \
+            '/ratgeber/pool-bauen-kosten' 'Poolbau guide directory'
+          fetch_until_contains \
+            'https://baukostenradar.de/quellen' /tmp/quellen.html \
+            'MyHammer - Pool bauen Kosten 2026' 'Poolbau source directory'
+          curl -sSL --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+
+      - name: Verify category, city and source signals
+        shell: bash
+        run: |
+          set -euo pipefail
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+
+          for needle in \
+            'Pool bauen lassen Gesamtprojekt' \
+            'Erdarbeiten mit Abtransport' \
+            'GFK Pool 6 x 3 m komplett' \
+            'Styroporpool durch Fachfirma' \
+            'Betonpool 6 x 3 m komplett' \
+            'Edelstahlpool 6 x 3 m' \
+            'Naturpool oder Schwimmteich' \
+            'Filteranlage' \
+            'Poolbetrieb jährlich'; do
+            require_contains /tmp/poolbau.html "$needle" "Poolbau item: $needle"
+          done
+
+          require_contains /tmp/poolbau-berlin.html 'Poolbau' 'Poolbau Berlin city page'
+          require_contains /tmp/quellen.html 'MyHammer - Pool bauen Kosten 2026' 'MyHammer Poolbau source'
+          require_contains /tmp/quellen.html 'Aroundhome - Pool bauen lassen Kosten 2026' 'Aroundhome Poolbau source'
+          ! grep -qi 'noindex' /tmp/poolbau.html
+
+      - name: Verify five Poolbau guides
+        shell: bash
+        run: |
+          set -euo pipefail
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+          check_guide() {
+            local slug="$1"; local item="$2"
+            local url="https://baukostenradar.de/ratgeber/${slug}"
+            local output="/tmp/${slug}.html"
+            require_contains /tmp/sitemap.xml "${url}</loc>" "guide sitemap $slug"
+            require_contains /tmp/ratgeber.html "/ratgeber/${slug}" "guide directory $slug"
+            curl -sSL --fail "$url" -o "$output"
+            require_contains "$output" "$url" "canonical $slug"
+            require_contains "$output" '"@type":"Article"' "Article schema $slug"
+            require_contains "$output" 'FAQPage' "FAQ schema $slug"
+            require_contains "$output" '/kosten/poolbau' "Poolbau service link $slug"
+            require_contains "$output" 'gewerk=poolbau' "calculator service $slug"
+            require_contains "$output" "leistung=${item}" "calculator item $slug"
+            ! grep -qi 'noindex' "$output"
+          }
+
+          check_guide 'pool-bauen-kosten' 'pool-bauen-lassen-gesamtprojekt'
+          check_guide 'gfk-pool-kosten' 'gfk-pool-6-x-3-m-komplett'
+          check_guide 'betonpool-kosten' 'betonpool-6-x-3-m-komplett'
+          check_guide 'pool-erdarbeiten-kosten' 'erdarbeiten-mit-abtransport'
+          check_guide 'pool-betriebskosten' 'poolbetrieb-jaehrlich'
+
+      - name: Verify all price-detail mappings and sitemap expansion
+        shell: bash
+        run: |
+          set -euo pipefail
+          check_item() {
+            local item="$1"; local guide="$2"
+            local url="https://baukostenradar.de/kosten/poolbau/leistung/${item}"
+            local output="/tmp/poolbau-${item}.html"
+            grep -Fq "${url}</loc>" /tmp/sitemap.xml || { echo "Missing sitemap URL: $item" >&2; exit 1; }
+            curl -sSL --fail "$url" -o "$output"
+            grep -Fq 'Passender Ratgeber' "$output" || { echo "Missing guide CTA: $item" >&2; exit 1; }
+            grep -Fq "/ratgeber/${guide}" "$output" || { echo "Wrong guide mapping: $item -> $guide" >&2; exit 1; }
+            ! grep -qi 'noindex' "$output"
+          }
+
+          grep -Fq 'https://baukostenradar.de/kosten/poolbau</loc>' /tmp/sitemap.xml
+          grep -Fq 'https://baukostenradar.de/kosten/poolbau/berlin</loc>' /tmp/sitemap.xml
+
+          check_item 'pool-bauen-lassen-gesamtprojekt' 'pool-bauen-kosten'
+          check_item 'materialkosten-poolbau' 'pool-bauen-kosten'
+          check_item 'arbeitskosten-poolbauer' 'pool-bauen-kosten'
+          check_item 'erdarbeiten-mit-abtransport' 'pool-erdarbeiten-kosten'
+          check_item 'stahlwandpool-freistehend' 'pool-bauen-kosten'
+          check_item 'stahlwandpool-teilversenkt' 'pool-bauen-kosten'
+          check_item 'gfk-fertigbecken-poolart' 'gfk-pool-kosten'
+          check_item 'gfk-pool-4-x-3-m-komplett' 'gfk-pool-kosten'
+          check_item 'gfk-pool-6-x-3-m-komplett' 'gfk-pool-kosten'
+          check_item 'gfk-pool-8-x-4-m-komplett' 'gfk-pool-kosten'
+          check_item 'styroporpool-durch-fachfirma' 'pool-bauen-kosten'
+          check_item 'betonpool-4-x-3-m-komplett' 'betonpool-kosten'
+          check_item 'betonpool-6-x-3-m-komplett' 'betonpool-kosten'
+          check_item 'betonpool-8-x-4-m-komplett' 'betonpool-kosten'
+          check_item 'edelstahlpool-6-x-3-m' 'pool-bauen-kosten'
+          check_item 'naturpool-oder-schwimmteich' 'pool-bauen-kosten'
+          check_item 'filteranlage' 'pool-bauen-kosten'
+          check_item 'poolpumpe' 'pool-bauen-kosten'
+          check_item 'verrohrung-skimmer-und-duesen' 'pool-bauen-kosten'
+          check_item 'poolbetrieb-jaehrlich' 'pool-betriebskosten'
+          check_item 'poolbetrieb-beheizt-intensiv-jaehrlich' 'pool-betriebskosten'
