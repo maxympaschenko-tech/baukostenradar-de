@@ -1,0 +1,160 @@
+name: Verify Terrassenueberdachung pricing cluster
+
+on:
+  workflow_run:
+    workflows: ["Hostinger production ready"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-terrace-cover-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure resilient live fetches
+        shell: bash
+        run: |
+          cat > ~/.curlrc <<'EOF'
+          retry = 6
+          retry-all-errors
+          retry-delay = 5
+          connect-timeout = 10
+          max-time = 30
+          EOF
+
+      - name: Fetch Terrassenueberdachung production pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          fetch_until_contains() {
+            local base_url="$1" output="$2" needle="$3" label="$4"
+            for attempt in 1 2 3 4 5 6; do
+              if curl -sSL --fail -H 'Cache-Control: no-cache' \
+                "${base_url}?verify=${GITHUB_SHA}-${attempt}" -o "$output"; then
+                if grep -Fq "$needle" "$output"; then
+                  return 0
+                fi
+              fi
+              if [ "$attempt" -eq 6 ]; then
+                echo "MISSING after retries: $label" >&2
+                echo "Expected in $output: $needle" >&2
+                return 1
+              fi
+              sleep 10
+            done
+          }
+
+          curl -sSL --fail 'https://baukostenradar.de/kosten/terrassenueberdachung' -o /tmp/terrassenueberdachung.html
+          curl -sSL --fail 'https://baukostenradar.de/kosten/terrassenueberdachung/berlin' -o /tmp/terrassenueberdachung-berlin.html
+          fetch_until_contains \
+            'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html \
+            '/ratgeber/terrassenueberdachung-kosten' 'Terrassenueberdachung guide directory'
+          fetch_until_contains \
+            'https://baukostenradar.de/quellen' /tmp/quellen.html \
+            'Aroundhome - Terrassenüberdachung Kosten 2026' 'Terrassenueberdachung source directory'
+          curl -sSL --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+
+      - name: Verify category, city and source signals
+        shell: bash
+        run: |
+          set -euo pipefail
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+
+          for needle in \
+            'Terrassenüberdachung komplett mit Montage und Fundament' \
+            'Punktfundament Terrassendach' \
+            'Holz Terrassenüberdachung mit Sicherheitsglas 4 x 3 m Wandmontage' \
+            'Aluminium Terrassenüberdachung mit Sicherheitsglas 4 x 3 m Wandmontage' \
+            'VSG Klarglas Terrassendach' \
+            'Lamellenpergola Bausatz mit verstellbarem Dach'; do
+            require_contains /tmp/terrassenueberdachung.html "$needle" "Terrassenueberdachung item: $needle"
+          done
+
+          require_contains /tmp/terrassenueberdachung-berlin.html 'Terrassenüberdachung' 'Terrassenueberdachung Berlin city page'
+          require_contains /tmp/quellen.html 'Aroundhome - Terrassenüberdachung Kosten 2026' 'Aroundhome Terrassenueberdachung source'
+          require_contains /tmp/quellen.html 'Aroundhome - Lamellendach Kosten 2026' 'Aroundhome Lamellendach source'
+          require_contains /tmp/quellen.html 'Blauarbeit - Terrassenüberdachung Kosten 2026' 'Blauarbeit Terrassenueberdachung source'
+          require_contains /tmp/quellen.html 'Blauarbeit - Pergola Kosten 2026' 'Blauarbeit Pergola source'
+          ! grep -qi 'noindex' /tmp/terrassenueberdachung.html
+
+      - name: Verify five Terrassenueberdachung guides
+        shell: bash
+        run: |
+          set -euo pipefail
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+          check_guide() {
+            local slug="$1"; local item="$2"
+            local url="https://baukostenradar.de/ratgeber/${slug}"
+            local output="/tmp/${slug}.html"
+            require_contains /tmp/sitemap.xml "${url}</loc>" "guide sitemap $slug"
+            require_contains /tmp/ratgeber.html "/ratgeber/${slug}" "guide directory $slug"
+            curl -sSL --fail "$url" -o "$output"
+            require_contains "$output" "$url" "canonical $slug"
+            require_contains "$output" '"@type":"Article"' "Article schema $slug"
+            require_contains "$output" 'FAQPage' "FAQ schema $slug"
+            require_contains "$output" '/kosten/terrassenueberdachung' "Terrassenueberdachung service link $slug"
+            require_contains "$output" 'gewerk=terrassenueberdachung' "calculator service $slug"
+            require_contains "$output" "leistung=${item}" "calculator item $slug"
+            ! grep -qi 'noindex' "$output"
+          }
+
+          check_guide 'terrassenueberdachung-kosten' 'terrassenueberdachung-komplett-mit-montage-und-fundament'
+          check_guide 'holz-terrassenueberdachung-kosten' 'holz-terrassenueberdachung-mit-kunststoff-4-x-3-m-wandmontage'
+          check_guide 'alu-terrassenueberdachung-kosten' 'aluminium-terrassenueberdachung-mit-sicherheitsglas-4-x-3-m-wandmontage'
+          check_guide 'glasdach-terrasse-kosten' 'vsg-klarglas-terrassendach'
+          check_guide 'lamellendach-pergola-kosten' 'lamellenpergola-bausatz-mit-verstellbarem-dach'
+
+      - name: Verify all price-detail mappings and sitemap expansion
+        shell: bash
+        run: |
+          set -euo pipefail
+          check_item() {
+            local item="$1"; local guide="$2"
+            local url="https://baukostenradar.de/kosten/terrassenueberdachung/leistung/${item}"
+            local output="/tmp/terrassenueberdachung-${item}.html"
+            grep -Fq "${url}</loc>" /tmp/sitemap.xml || { echo "Missing sitemap URL: $item" >&2; exit 1; }
+            curl -sSL --fail "$url" -o "$output"
+            grep -Fq 'Passender Ratgeber' "$output" || { echo "Missing guide CTA: $item" >&2; exit 1; }
+            grep -Fq "/ratgeber/${guide}" "$output" || { echo "Wrong guide mapping: $item -> $guide" >&2; exit 1; }
+            ! grep -qi 'noindex' "$output"
+          }
+
+          grep -Fq 'https://baukostenradar.de/kosten/terrassenueberdachung</loc>' /tmp/sitemap.xml
+          grep -Fq 'https://baukostenradar.de/kosten/terrassenueberdachung/berlin</loc>' /tmp/sitemap.xml
+
+          check_item 'terrassenueberdachung-komplett-mit-montage-und-fundament' 'terrassenueberdachung-kosten'
+          check_item 'terrassenueberdachung-guenstiges-segment-mit-montage' 'terrassenueberdachung-kosten'
+          check_item 'design-terrassenueberdachung-oder-massanfertigung' 'terrassenueberdachung-kosten'
+          check_item 'terrassendach-ohne-montage' 'terrassenueberdachung-kosten'
+          check_item 'lieferung-terrassenueberdachung' 'terrassenueberdachung-kosten'
+          check_item 'montage-terrassenueberdachung' 'terrassenueberdachung-kosten'
+          check_item 'punktfundament-terrassendach' 'terrassenueberdachung-kosten'
+          check_item 'holz-terrassenueberdachung-mit-kunststoff-4-x-3-m-wandmontage' 'holz-terrassenueberdachung-kosten'
+          check_item 'holz-terrassenueberdachung-mit-sicherheitsglas-4-x-3-m-wandmontage' 'holz-terrassenueberdachung-kosten'
+          check_item 'holz-terrassenueberdachung-mit-dachziegeln-4-x-3-m-wandmontage' 'holz-terrassenueberdachung-kosten'
+          check_item 'aluminium-terrassenueberdachung-mit-kunststoff-4-x-3-m-wandmontage' 'alu-terrassenueberdachung-kosten'
+          check_item 'aluminium-terrassenueberdachung-mit-sicherheitsglas-4-x-3-m-wandmontage' 'alu-terrassenueberdachung-kosten'
+          check_item 'aluminium-lamellendach-4-x-3-m-wandmontage' 'lamellendach-pergola-kosten'
+          check_item 'vsg-klarglas-terrassendach' 'glasdach-terrasse-kosten'
+          check_item 'vsg-mattglas-terrassendach' 'glasdach-terrasse-kosten'
+          check_item 'acrylglas-terrassendach' 'glasdach-terrasse-kosten'
+          check_item 'doppelstegplatte-terrassendach' 'glasdach-terrasse-kosten'
+          check_item 'terrassenueberdachung-guenstiges-preissegment' 'terrassenueberdachung-kosten'
+          check_item 'design-terrassendach-hochwertig' 'terrassenueberdachung-kosten'
+          check_item 'lamellenpergola-bausatz-mit-verstellbarem-dach' 'lamellendach-pergola-kosten'
+          check_item 'pergola-massanfertigung-fachbetrieb' 'lamellendach-pergola-kosten'
+          check_item 'pergola-montage-fachbetrieb' 'lamellendach-pergola-kosten'
