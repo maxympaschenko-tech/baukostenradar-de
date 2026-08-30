@@ -90,7 +90,8 @@ jobs:
             '/ratgeber/garage-bauen-kosten' \
             '/ratgeber/carport-kosten' \
             '/ratgeber/schornstein-sanieren-kosten' \
-            '/ratgeber/kamin-bauen-kosten'; do
+            '/ratgeber/kamin-bauen-kosten' \
+            '/ratgeber/zaun-bauen-kosten-pro-meter'; do
             require_contains /tmp/ratgeber.html "$guide" "Ratgeber hub link $guide"
           done
 
@@ -98,6 +99,7 @@ jobs:
             'MyHammer - Garage bauen Kosten 2026' \
             'MyHammer - Carport bauen Kosten 2026' \
             'MyHammer - Schornstein sanieren Kosten 2026' \
-            'MyHammer - Kaminbau Kosten 2026'; do
+            'MyHammer - Kaminbau Kosten 2026' \
+            'MyHammer - Zaunbau Kosten 2026'; do
             require_contains /tmp/quellen.html "$source" "active source $source"
           done
