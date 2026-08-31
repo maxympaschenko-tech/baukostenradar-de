@@ -123,11 +123,13 @@ jobs:
         run: |
           set -euo pipefail
           violations=0
+          gate_name='Hostinger production ready'
           for file in .github/workflows/*.yml .github/workflows/*.yaml; do
             [[ -f "$file" ]] || continue
-            grep -Fq 'workflows: ["Hostinger production ready"]' "$file" || continue
+            grep -Fq "workflows: [\"${gate_name}\"]" "$file" || continue
 
             if grep -nE 'fetch_with_retry\(\)|fetch_until_contains\(\)|^[[:space:]]*fetch\(\)[[:space:]]*\{|^[[:space:]]*curl[[:space:]]|^[[:space:]].*curl[[:space:]]+-' "$file" >/tmp/legacy-fetch.txt; then
+              echo "LEGACY_FETCH_FILE=${file}"
               echo "::error file=${file}::Hostinger production verifier still owns live curl/fetch transport; use scripts/hostinger-verify.sh"
               cat /tmp/legacy-fetch.txt
               violations=1
