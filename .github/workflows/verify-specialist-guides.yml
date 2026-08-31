@@ -11,10 +11,13 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Verify all specialist guides are indexed
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
           guides=(
             maler-kosten-pro-qm
@@ -27,9 +30,10 @@ jobs:
             daemmung-kosten-pro-qm
             fassade-sanieren-kosten
             garten-anlegen-kosten
+            zaun-bauen-kosten-pro-meter
           )
 
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
           total=$(grep -oE 'https://baukostenradar.de/ratgeber/[a-z0-9-]+</loc>' /tmp/sitemap.xml | sort -u | wc -l | tr -d ' ')
           echo "Indexed guides: ${total}"
           test "$total" -ge 38
@@ -37,7 +41,7 @@ jobs:
           for guide in "${guides[@]}"; do
             grep -q "https://baukostenradar.de/ratgeber/${guide}</loc>" /tmp/sitemap.xml
             output="/tmp/guide-${guide}.html"
-            curl -sS --fail "https://baukostenradar.de/ratgeber/${guide}" -o "$output"
+            fetch_hostinger "https://baukostenradar.de/ratgeber/${guide}" "$output"
             grep -q "https://baukostenradar.de/ratgeber/${guide}" "$output"
             grep -q '"@type":"Article"' "$output"
             grep -q 'Passende Kosten in allen 8 Städten vergleichen' "$output"
@@ -49,6 +53,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
           check_mapping() {
             local service="$1"
@@ -56,14 +61,14 @@ jobs:
             local item="$3"
             local item_guide="$4"
 
-            curl -sS --fail "https://baukostenradar.de/kosten/${service}" -o /tmp/service.html
+            fetch_hostinger "https://baukostenradar.de/kosten/${service}" /tmp/service.html
             grep -q "/ratgeber/${service_guide}" /tmp/service.html
 
-            curl -sS --fail "https://baukostenradar.de/kosten/${service}/berlin" -o /tmp/city.html
+            fetch_hostinger "https://baukostenradar.de/kosten/${service}/berlin" /tmp/city.html
             grep -q "/ratgeber/${service_guide}" /tmp/city.html
             grep -q 'Passender Ratgeber' /tmp/city.html
 
-            curl -sS --fail "https://baukostenradar.de/kosten/${service}/leistung/${item}" -o /tmp/item.html
+            fetch_hostinger "https://baukostenradar.de/kosten/${service}/leistung/${item}" /tmp/item.html
             grep -q "/ratgeber/${item_guide}" /tmp/item.html
             grep -q 'Passender Ratgeber' /tmp/item.html
           }
@@ -77,12 +82,14 @@ jobs:
           check_mapping photovoltaik photovoltaik-kosten-2026 pv-anlage-10-kwp-inkl-installation photovoltaik-10-kwp-kosten
           check_mapping daemmung daemmung-kosten-pro-qm innendaemmung innendaemmung-kosten-pro-qm
           check_mapping fassade fassade-sanieren-kosten putz-fassade-neu putzfassade-kosten-pro-qm
-          check_mapping garten garten-anlegen-kosten doppelstabmattenzaun-inkl-montage doppelstabmattenzaun-kosten-pro-meter
+          check_mapping garten garten-anlegen-kosten einfahrt-pflastern einfahrt-pflastern-kosten
+          check_mapping zaunbau zaun-bauen-kosten-pro-meter metallzaun-oder-doppelstabmatten-material doppelstabmattenzaun-kosten-pro-meter
 
       - name: Verify specialist reverse silo and calculators
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
           declare -A services=(
             [maler-kosten-pro-qm]=maler
@@ -95,11 +102,12 @@ jobs:
             [daemmung-kosten-pro-qm]=daemmung
             [fassade-sanieren-kosten]=fassade
             [garten-anlegen-kosten]=garten
+            [zaun-bauen-kosten-pro-meter]=zaunbau
           )
 
           for guide in "${!services[@]}"; do
             service="${services[$guide]}"
-            curl -sS --fail "https://baukostenradar.de/ratgeber/${guide}" -o /tmp/guide.html
+            fetch_hostinger "https://baukostenradar.de/ratgeber/${guide}" /tmp/guide.html
             grep -q "/kosten/${service}/berlin" /tmp/guide.html
             grep -q "/kosten/${service}/muenchen" /tmp/guide.html
             grep -q "/rechner/handwerkerkosten?gewerk=${service}" /tmp/guide.html
