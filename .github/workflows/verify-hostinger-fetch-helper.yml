@@ -34,7 +34,8 @@ jobs:
           grep -q 'Cache-Control: no-cache' scripts/hostinger-verify.sh
           grep -q 'ci_verify=' scripts/hostinger-verify.sh
           grep -q -- '--retry-all-errors' scripts/hostinger-verify.sh
-          grep -q 'HOSTINGER_VERIFY_JITTER_DONE' scripts/hostinger-verify.sh
+          grep -q '_hostinger_verify_startup_jitter' scripts/hostinger-verify.sh
+          grep -q 'baukostenradar-hostinger-jitter-' scripts/hostinger-verify.sh
           grep -q 'RANDOM % 21' scripts/hostinger-verify.sh
 
       - name: Verify production workflows use shared Hostinger fetch
