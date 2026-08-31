@@ -1,0 +1,35 @@
+name: Verify hosting workflow migration
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-hosting-workflow-migration:
+    name: Reject legacy Ukraine.com.ua deploy triggers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Reject legacy deployment workflow references
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t stale_files < <(
+            grep -RIl --include='*.yml' --include='*.yaml' \
+              'Deploy to Ukraine.com.ua' .github/workflows || true
+          )
+
+          if (( ${#stale_files[@]} > 0 )); then
+            echo 'Legacy Ukraine.com.ua deployment workflow references remain:' >&2
+            printf ' - %s\n' "${stale_files[@]}" >&2
+            exit 1
+          fi
+
+          echo 'All workflows are detached from the legacy Ukraine.com.ua deploy workflow.'
