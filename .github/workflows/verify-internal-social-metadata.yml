@@ -11,10 +11,13 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Fetch representative indexable pages
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
           urls=(
             'https://baukostenradar.de/kosten'
@@ -37,16 +40,7 @@ jobs:
           for index in "${!urls[@]}"; do
             url="${urls[$index]}"
             output="/tmp/social-meta/${index}.html"
-            for attempt in 1 2 3 4 5; do
-              if curl -sS --fail --connect-timeout 10 --max-time 30 "$url" -o "$output"; then
-                break
-              fi
-              if [[ "$attempt" == "5" ]]; then
-                echo "Failed to fetch $url" >&2
-                exit 1
-              fi
-              sleep 4
-            done
+            fetch_hostinger "$url" "$output"
           done
 
       - name: Verify page-specific Open Graph and Twitter metadata
