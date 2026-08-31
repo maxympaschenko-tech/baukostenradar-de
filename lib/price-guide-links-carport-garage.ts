@@ -6,25 +6,39 @@ import {
 
 export type { PriceGuideLink } from "./price-guide-links-wintergarten";
 
-const serviceGuides: Record<string, PriceGuideLink> = {
-  carport: {
-    href: "/ratgeber/carport-kosten",
-    title: "Carport bauen: Kosten 2026",
-    cta: "Carport-Ratgeber öffnen",
-  },
-  garage: {
-    href: "/ratgeber/garage-bauen-kosten",
-    title: "Garage bauen: Kosten 2026",
-    cta: "Garagen-Ratgeber öffnen",
-  },
-};
+const newCarportItems = new Set([
+  "einzelcarport-bausatz-flachdach",
+  "einzelcarport-bausatz-satteldach",
+  "carport-aufbau-durch-fachbetrieb",
+  "einzelcarport-komplett-mit-aufbau",
+  "doppelcarport-komplett-mit-aufbau",
+  "carport-integrierter-geraeteraum-aufpreis",
+  "carport-stellflaeche-pflaster-schotterrasen-oder-betonplatte",
+  "carport-satteldach-aufpreis",
+]);
 
-const fertiggarageItems = new Set([
-  "fertiggarage-allgemeiner-richtwert",
-  "fertiggarage-einzelgarage",
-  "fertiggarage-doppelgarage",
+const newCarportFoundationItems = new Set([
+  "carport-fundamente-komplett",
+  "carport-punktfundament",
+]);
+
+const newGarageFoundationItems = new Set([
+  "garage-fundament-zusatzkosten",
+  "garage-erdarbeiten",
+  "garage-fundamenterstellung",
+  "garage-bodengutachten",
+]);
+
+const newGarageMassiveItems = new Set([
+  "garage-mauerarbeiten",
+  "garage-dacharbeiten",
+  "gemauerte-massivgarage-selbstbau",
+  "gemauerte-doppelgarage",
+  "massivgarage-dach-komplett",
+]);
+
+const newGaragePrefabItems = new Set([
   "fertiggarage-grossraumgarage",
-  "fertiggarage-montage",
   "fertiggarage-mit-fundament",
   "fertiggarage-mit-montage-und-fundament",
   "holz-fertiggarage-3-x-6-m-komplett",
@@ -34,54 +48,8 @@ const fertiggarageItems = new Set([
   "fertiggarage-6-x-9-m",
 ]);
 
-const massivgarageItems = new Set([
-  "garage-mauerarbeiten",
-  "garage-dacharbeiten",
-  "gemauerte-massivgarage",
-  "gemauerte-massivgarage-fachbetrieb",
-  "gemauerte-massivgarage-selbstbau",
-  "gemauerte-doppelgarage",
-  "massivgarage-dach-komplett",
-]);
-
-const fundamentItems = new Set([
-  "garage-fundament-zusatzkosten",
-  "garage-erdarbeiten",
-  "garage-fundamenterstellung",
-  "massivgarage-bodenplatte-fundament",
-  "garage-bodengutachten",
-]);
-
-function guideForGarageItem(itemSlug: string) {
-  if (fundamentItems.has(itemSlug)) {
-    return {
-      href: "/ratgeber/garagenfundament-kosten",
-      cta: "Fundament-Ratgeber öffnen",
-    };
-  }
-
-  if (fertiggarageItems.has(itemSlug)) {
-    return {
-      href: "/ratgeber/fertiggarage-kosten",
-      cta: "Fertiggaragen-Ratgeber öffnen",
-    };
-  }
-
-  if (massivgarageItems.has(itemSlug)) {
-    return {
-      href: "/ratgeber/massivgarage-kosten",
-      cta: "Massivgaragen-Ratgeber öffnen",
-    };
-  }
-
-  return {
-    href: "/ratgeber/garage-bauen-kosten",
-    cta: "Garagen-Ratgeber öffnen",
-  };
-}
-
 export function getServiceGuideLink(serviceSlug: string): PriceGuideLink {
-  return serviceGuides[serviceSlug] ?? getWintergartenServiceGuideLink(serviceSlug);
+  return getWintergartenServiceGuideLink(serviceSlug);
 }
 
 export function getPriceGuideLink(options: {
@@ -91,19 +59,55 @@ export function getPriceGuideLink(options: {
   unit: string;
 }): PriceGuideLink {
   if (options.serviceSlug === "carport") {
-    return {
-      href: "/ratgeber/carport-kosten",
-      title: `${options.itemName}: Kosten 2026`,
-      cta: "Carport-Ratgeber öffnen",
-    };
+    if (newCarportFoundationItems.has(options.itemSlug)) {
+      return {
+        href: "/ratgeber/garagenfundament-kosten-pro-qm",
+        title: `${options.itemName}: Kosten 2026`,
+        cta: "Fundament-Ratgeber öffnen",
+      };
+    }
+
+    if (newCarportItems.has(options.itemSlug)) {
+      return {
+        href: "/ratgeber/carport-kosten",
+        title: `${options.itemName}: Kosten 2026`,
+        cta: "Carport-Ratgeber öffnen",
+      };
+    }
   }
 
   if (options.serviceSlug === "garage") {
-    const guide = guideForGarageItem(options.itemSlug);
-    return {
-      ...guide,
-      title: `${options.itemName}: Kosten 2026`,
-    };
+    if (options.itemSlug === "garage-als-anbau") {
+      return {
+        href: "/ratgeber/garage-bauen-kosten",
+        title: `${options.itemName}: Kosten 2026`,
+        cta: "Garagenbau-Ratgeber öffnen",
+      };
+    }
+
+    if (newGarageFoundationItems.has(options.itemSlug)) {
+      return {
+        href: "/ratgeber/garagenfundament-kosten-pro-qm",
+        title: `${options.itemName}: Kosten 2026`,
+        cta: "Fundament-Ratgeber öffnen",
+      };
+    }
+
+    if (newGarageMassiveItems.has(options.itemSlug)) {
+      return {
+        href: "/ratgeber/massivgarage-kosten",
+        title: `${options.itemName}: Kosten 2026`,
+        cta: "Massivgaragen-Ratgeber öffnen",
+      };
+    }
+
+    if (newGaragePrefabItems.has(options.itemSlug)) {
+      return {
+        href: "/ratgeber/fertiggarage-kosten",
+        title: `${options.itemName}: Kosten 2026`,
+        cta: "Fertiggaragen-Ratgeber öffnen",
+      };
+    }
   }
 
   return getWintergartenPriceGuideLink(options);
