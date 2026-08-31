@@ -1,0 +1,200 @@
+name: Verify Carport and Garage pricing cluster
+
+on:
+  workflow_run:
+    workflows: ["Hostinger production ready"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-carport-garage-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure resilient live fetches
+        shell: bash
+        run: |
+          cat > ~/.curlrc <<'EOF'
+          retry = 6
+          retry-all-errors
+          retry-delay = 5
+          connect-timeout = 10
+          max-time = 30
+          EOF
+
+      - name: Fetch Carport and Garage production pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          fetch_until_contains() {
+            local base_url="$1" output="$2" needle="$3" label="$4"
+            for attempt in 1 2 3 4 5 6; do
+              if curl -sSL --fail -H 'Cache-Control: no-cache' \
+                "${base_url}?verify=${GITHUB_SHA}-${attempt}" -o "$output"; then
+                if grep -Fq "$needle" "$output"; then
+                  return 0
+                fi
+              fi
+              if [ "$attempt" -eq 6 ]; then
+                echo "MISSING after retries: $label" >&2
+                echo "Expected in $output: $needle" >&2
+                return 1
+              fi
+              sleep 10
+            done
+          }
+
+          curl -sSL --fail 'https://baukostenradar.de/kosten/carport' -o /tmp/carport.html
+          curl -sSL --fail 'https://baukostenradar.de/kosten/carport/berlin' -o /tmp/carport-berlin.html
+          curl -sSL --fail 'https://baukostenradar.de/kosten/garage' -o /tmp/garage.html
+          curl -sSL --fail 'https://baukostenradar.de/kosten/garage/berlin' -o /tmp/garage-berlin.html
+          fetch_until_contains \
+            'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html \
+            '/ratgeber/carport-kosten' 'Carport/Garage guide directory'
+          fetch_until_contains \
+            'https://baukostenradar.de/quellen' /tmp/quellen.html \
+            'Blauarbeit - Carport Kosten 2026' 'Carport/Garage source directory'
+          curl -sSL --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+
+      - name: Verify category, city and source signals
+        shell: bash
+        run: |
+          set -euo pipefail
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+
+          for needle in \
+            'Einzelcarport komplett mit Aufbau' \
+            'Doppelcarport komplett mit Aufbau' \
+            'Carport Fundamente komplett' \
+            'Aluminium Doppelcarport'; do
+            require_contains /tmp/carport.html "$needle" "Carport item: $needle"
+          done
+
+          for needle in \
+            'Einzelgarage' \
+            'Fertiggarage Doppelgarage' \
+            'Gemauerte Massivgarage Fachbetrieb' \
+            'Massivgarage Bodenplatte Fundament'; do
+            require_contains /tmp/garage.html "$needle" "Garage item: $needle"
+          done
+
+          require_contains /tmp/carport-berlin.html 'Carport' 'Carport Berlin city page'
+          require_contains /tmp/garage-berlin.html 'Garage' 'Garage Berlin city page'
+          require_contains /tmp/quellen.html 'Blauarbeit - Carport Kosten 2026' 'Blauarbeit Carport source'
+          require_contains /tmp/quellen.html 'MyHammer - Carport Kosten' 'MyHammer Carport source'
+          require_contains /tmp/quellen.html 'MyHammer - Garage bauen Kosten 2026' 'MyHammer Garage source'
+          require_contains /tmp/quellen.html 'Aroundhome - Fertiggarage Preise 2026' 'Aroundhome Fertiggarage source'
+          require_contains /tmp/quellen.html 'Aroundhome - Gemauerte Garage Kosten' 'Aroundhome Massivgarage source'
+          ! grep -qi 'noindex' /tmp/carport.html
+          ! grep -qi 'noindex' /tmp/garage.html
+
+      - name: Verify five Carport and Garage guides
+        shell: bash
+        run: |
+          set -euo pipefail
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+          check_guide() {
+            local slug="$1"; local service="$2"; local item="$3"
+            local url="https://baukostenradar.de/ratgeber/${slug}"
+            local output="/tmp/${slug}.html"
+            require_contains /tmp/sitemap.xml "${url}</loc>" "guide sitemap $slug"
+            require_contains /tmp/ratgeber.html "/ratgeber/${slug}" "guide directory $slug"
+            curl -sSL --fail "$url" -o "$output"
+            require_contains "$output" "$url" "canonical $slug"
+            require_contains "$output" '"@type":"Article"' "Article schema $slug"
+            require_contains "$output" 'FAQPage' "FAQ schema $slug"
+            require_contains "$output" "/kosten/${service}" "service link $slug"
+            require_contains "$output" "gewerk=${service}" "calculator service $slug"
+            require_contains "$output" "leistung=${item}" "calculator item $slug"
+            ! grep -qi 'noindex' "$output"
+          }
+
+          check_guide 'carport-kosten' 'carport' 'einzelcarport-komplett-mit-aufbau'
+          check_guide 'garage-bauen-kosten' 'garage' 'garage-gesamtprojekt'
+          check_guide 'fertiggarage-kosten' 'garage' 'fertiggarage-einzelgarage'
+          check_guide 'massivgarage-kosten' 'garage' 'gemauerte-massivgarage-fachbetrieb'
+          check_guide 'garagenfundament-kosten' 'garage' 'massivgarage-bodenplatte-fundament'
+
+      - name: Verify all price-detail mappings and sitemap expansion
+        shell: bash
+        run: |
+          set -euo pipefail
+          check_item() {
+            local service="$1"; local item="$2"; local guide="$3"
+            local url="https://baukostenradar.de/kosten/${service}/leistung/${item}"
+            local output="/tmp/${service}-${item}.html"
+            grep -Fq "${url}</loc>" /tmp/sitemap.xml || { echo "Missing sitemap URL: $service/$item" >&2; exit 1; }
+            curl -sSL --fail "$url" -o "$output"
+            grep -Fq 'Passender Ratgeber' "$output" || { echo "Missing guide CTA: $service/$item" >&2; exit 1; }
+            grep -Fq "/ratgeber/${guide}" "$output" || { echo "Wrong guide mapping: $service/$item -> $guide" >&2; exit 1; }
+            ! grep -qi 'noindex' "$output"
+          }
+
+          grep -Fq 'https://baukostenradar.de/kosten/carport</loc>' /tmp/sitemap.xml
+          grep -Fq 'https://baukostenradar.de/kosten/carport/berlin</loc>' /tmp/sitemap.xml
+          grep -Fq 'https://baukostenradar.de/kosten/garage</loc>' /tmp/sitemap.xml
+          grep -Fq 'https://baukostenradar.de/kosten/garage/berlin</loc>' /tmp/sitemap.xml
+
+          check_item carport 'carport-bausatz' 'carport-kosten'
+          check_item carport 'einzelcarport-bausatz-flachdach' 'carport-kosten'
+          check_item carport 'einzelcarport-bausatz-satteldach' 'carport-kosten'
+          check_item carport 'carport-aufbau-durch-fachbetrieb' 'carport-kosten'
+          check_item carport 'einzelcarport-komplett-mit-aufbau' 'carport-kosten'
+          check_item carport 'doppelcarport-komplett-mit-aufbau' 'carport-kosten'
+          check_item carport 'carport-massanfertigung-zimmerer-oder-tischler' 'carport-kosten'
+          check_item carport 'carport-integrierter-geraeteraum-aufpreis' 'carport-kosten'
+          check_item carport 'carport-fundamente-komplett' 'carport-kosten'
+          check_item carport 'carport-punktfundament' 'carport-kosten'
+          check_item carport 'carport-stellflaeche-pflaster-schotterrasen-oder-betonplatte' 'carport-kosten'
+          check_item carport 'carport-satteldach-aufpreis' 'carport-kosten'
+          check_item carport 'holzcarport' 'carport-kosten'
+          check_item carport 'aluminium-einzelcarport' 'carport-kosten'
+          check_item carport 'aluminium-doppelcarport' 'carport-kosten'
+
+          check_item garage 'garage-gesamtprojekt' 'garage-bauen-kosten'
+          check_item garage 'einzelgarage' 'garage-bauen-kosten'
+          check_item garage 'doppelgarage' 'garage-bauen-kosten'
+          check_item garage 'garage-als-anbau' 'garage-bauen-kosten'
+          check_item garage 'garagentor-inklusive-montage' 'garage-bauen-kosten'
+          check_item garage 'garage-elektroinstallation' 'garage-bauen-kosten'
+
+          check_item garage 'garage-fundament-zusatzkosten' 'garagenfundament-kosten'
+          check_item garage 'garage-erdarbeiten' 'garagenfundament-kosten'
+          check_item garage 'garage-fundamenterstellung' 'garagenfundament-kosten'
+          check_item garage 'massivgarage-bodenplatte-fundament' 'garagenfundament-kosten'
+          check_item garage 'garage-bodengutachten' 'garagenfundament-kosten'
+
+          check_item garage 'garage-mauerarbeiten' 'massivgarage-kosten'
+          check_item garage 'garage-dacharbeiten' 'massivgarage-kosten'
+          check_item garage 'gemauerte-massivgarage' 'massivgarage-kosten'
+          check_item garage 'gemauerte-massivgarage-fachbetrieb' 'massivgarage-kosten'
+          check_item garage 'gemauerte-massivgarage-selbstbau' 'massivgarage-kosten'
+          check_item garage 'gemauerte-doppelgarage' 'massivgarage-kosten'
+          check_item garage 'massivgarage-dach-komplett' 'massivgarage-kosten'
+
+          check_item garage 'fertiggarage-allgemeiner-richtwert' 'fertiggarage-kosten'
+          check_item garage 'fertiggarage-einzelgarage' 'fertiggarage-kosten'
+          check_item garage 'fertiggarage-doppelgarage' 'fertiggarage-kosten'
+          check_item garage 'fertiggarage-grossraumgarage' 'fertiggarage-kosten'
+          check_item garage 'fertiggarage-montage' 'fertiggarage-kosten'
+          check_item garage 'fertiggarage-mit-fundament' 'fertiggarage-kosten'
+          check_item garage 'fertiggarage-mit-montage-und-fundament' 'fertiggarage-kosten'
+          check_item garage 'holz-fertiggarage-3-x-6-m-komplett' 'fertiggarage-kosten'
+          check_item garage 'stahl-fertiggarage-3-x-6-m-komplett' 'fertiggarage-kosten'
+          check_item garage 'beton-fertiggarage-3-x-6-m-komplett' 'fertiggarage-kosten'
+          check_item garage 'fertiggarage-langgarage-3-x-9-m' 'fertiggarage-kosten'
+          check_item garage 'fertiggarage-6-x-9-m' 'fertiggarage-kosten'
