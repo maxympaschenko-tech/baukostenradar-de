@@ -75,17 +75,10 @@ jobs:
           source scripts/hostinger-verify.sh
 
           cities=(berlin hamburg muenchen koeln frankfurt stuttgart duesseldorf leipzig)
-          guides=(
-            /ratgeber/bad-komplett-sanieren-kosten
-            /ratgeber/dach-sanieren-kosten-pro-qm
-            /ratgeber/elektrik-erneuern-altbau
-            /ratgeber/fenster-austauschen-kosten-haus
-            /ratgeber/heizung-erneuern-kosten
-            /ratgeber/kueche-10-qm-renovieren-kosten
-          )
-
           checked=0
           baseline_service_count=''
+          baseline_guide_count=''
+
           for city in "${cities[@]}"; do
             output="/tmp/city-${city}.html"
             url="https://baukostenradar.de/staedte/${city}"
@@ -98,13 +91,17 @@ jobs:
             grep -q "region=${city}" "$output"
 
             service_count=$(grep -oE "/kosten/[a-z0-9-]+/${city}" "$output" | sort -u | wc -l | tr -d ' ')
-            echo "${city}: ${service_count} live Gewerke"
+            guide_count=$(grep -oE '/ratgeber/[a-z0-9-]+' "$output" | sort -u | wc -l | tr -d ' ')
+            echo "${city}: ${service_count} live Gewerke; ${guide_count} unique Ratgeber links"
             test "$service_count" -ge 20
+            test "$guide_count" -ge 6
 
             if [[ -z "$baseline_service_count" ]]; then
               baseline_service_count="$service_count"
+              baseline_guide_count="$guide_count"
             else
               test "$service_count" -eq "$baseline_service_count"
+              test "$guide_count" -eq "$baseline_guide_count"
             fi
 
             python3 - "$output" "$service_count" "$city" <<'PY'
@@ -149,10 +146,6 @@ jobs:
               raise SystemExit(f"Trade ItemList contains non-city URLs for {city}")
           print(f"JSON-LD ItemList verified: {actual} Gewerke")
           PY
-
-            for guide in "${guides[@]}"; do
-              grep -q "$guide" "$output"
-            done
 
             checked=$((checked + 1))
           done

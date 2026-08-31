@@ -11,29 +11,18 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Fetch representative Ratgeber pages
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
-          fetch_with_retry() {
-            local url="$1"
-            local output="$2"
-            for i in 1 2 3 4 5; do
-              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then
-                return 0
-              fi
-              if [[ "$i" == "5" ]]; then
-                return 1
-              fi
-              sleep 4
-            done
-          }
-
-          fetch_with_retry 'https://baukostenradar.de/ratgeber/sanierungskosten-pro-qm' /tmp/guide-1.html
-          fetch_with_retry 'https://baukostenradar.de/ratgeber/bad-komplett-sanieren-kosten' /tmp/guide-2.html
-          fetch_with_retry 'https://baukostenradar.de/ratgeber/sanitaer-kosten' /tmp/guide-3.html
-          fetch_with_retry 'https://baukostenradar.de/ratgeber/kernsanierung-kosten' /tmp/guide-4.html
+          fetch_hostinger 'https://baukostenradar.de/ratgeber/sanierungskosten-pro-qm' /tmp/guide-1.html
+          fetch_hostinger 'https://baukostenradar.de/ratgeber/bad-komplett-sanieren-kosten' /tmp/guide-2.html
+          fetch_hostinger 'https://baukostenradar.de/ratgeber/sanitaer-kosten' /tmp/guide-3.html
+          fetch_hostinger 'https://baukostenradar.de/ratgeber/kernsanierung-kosten' /tmp/guide-4.html
 
       - name: Verify Article markup without invented dates
         shell: bash

@@ -9,16 +9,22 @@ on:
       - 'app/ratgeber/page.tsx'
       - '.github/workflows/verify-about-organization-entity.yml'
       - '.github/workflows/verify-bad-pricing.yml'
+      - '.github/workflows/verify-boden-guide-cluster.yml'
+      - '.github/workflows/verify-catalog-integrity.yml'
       - '.github/workflows/verify-city-hubs.yml'
+      - '.github/workflows/verify-fassade-pricing.yml'
       - '.github/workflows/verify-garten-guide-cluster.yml'
       - '.github/workflows/verify-garten-pricing.yml'
       - '.github/workflows/verify-global-seo-foundation.yml'
       - '.github/workflows/verify-internal-social-metadata.yml'
+      - '.github/workflows/verify-kellerabdichtung-guide-cluster.yml'
       - '.github/workflows/verify-opportunity-guides.yml'
       - '.github/workflows/verify-price-guide-silo.yml'
+      - '.github/workflows/verify-ratgeber-article-dates.yml'
       - '.github/workflows/verify-sanitaer-pricing.yml'
       - '.github/workflows/verify-service-city-guide-silo.yml'
       - '.github/workflows/verify-specialist-guides.yml'
+      - '.github/workflows/verify-waermepumpe-guide-cluster.yml'
       - '.github/workflows/verify-hostinger-fetch-helper.yml'
   workflow_dispatch:
 
@@ -40,6 +46,8 @@ jobs:
           grep -q '_hostinger_verify_startup_jitter' scripts/hostinger-verify.sh
           grep -q 'baukostenradar-hostinger-jitter-' scripts/hostinger-verify.sh
           grep -q 'RANDOM % 181' scripts/hostinger-verify.sh
+          grep -q 'fetch_hostinger_redirect()' scripts/hostinger-verify.sh
+          grep -q "'%{http_code} %{redirect_url}'" scripts/hostinger-verify.sh
 
       - name: Verify production workflows use shared Hostinger fetch
         shell: bash
@@ -48,24 +56,46 @@ jobs:
           for file in \
             .github/workflows/verify-about-organization-entity.yml \
             .github/workflows/verify-bad-pricing.yml \
+            .github/workflows/verify-boden-guide-cluster.yml \
+            .github/workflows/verify-catalog-integrity.yml \
+            .github/workflows/verify-city-hubs.yml \
+            .github/workflows/verify-fassade-pricing.yml \
             .github/workflows/verify-garten-pricing.yml \
             .github/workflows/verify-garten-guide-cluster.yml \
             .github/workflows/verify-global-seo-foundation.yml \
             .github/workflows/verify-internal-social-metadata.yml \
+            .github/workflows/verify-kellerabdichtung-guide-cluster.yml \
             .github/workflows/verify-opportunity-guides.yml \
             .github/workflows/verify-price-guide-silo.yml \
+            .github/workflows/verify-ratgeber-article-dates.yml \
             .github/workflows/verify-sanitaer-pricing.yml \
             .github/workflows/verify-service-city-guide-silo.yml \
-            .github/workflows/verify-specialist-guides.yml; do
+            .github/workflows/verify-specialist-guides.yml \
+            .github/workflows/verify-waermepumpe-guide-cluster.yml; do
             grep -q 'source scripts/hostinger-verify.sh' "$file"
           done
 
           for file in \
             .github/workflows/verify-about-organization-entity.yml \
+            .github/workflows/verify-fassade-pricing.yml \
             .github/workflows/verify-global-seo-foundation.yml \
+            .github/workflows/verify-ratgeber-article-dates.yml \
             .github/workflows/verify-sanitaer-pricing.yml; do
             ! grep -q 'fetch_with_retry()' "$file"
           done
+          ! grep -q '^          fetch() {' .github/workflows/verify-kellerabdichtung-guide-cluster.yml
+
+          for file in \
+            .github/workflows/verify-boden-guide-cluster.yml \
+            .github/workflows/verify-waermepumpe-guide-cluster.yml; do
+            ! grep -q 'curl -sS --fail' "$file"
+            grep -q 'id=\"ratgeber\"' "$file"
+            ! grep -q "grep -q 'Passender Ratgeber'" "$file"
+          done
+
+          grep -q 'fetch_hostinger_redirect' .github/workflows/verify-catalog-integrity.yml
+          ! grep -q 'curl -sS --fail' .github/workflows/verify-catalog-integrity.yml
+          grep -q "grep -Eq '^(301|308) '" .github/workflows/verify-catalog-integrity.yml
 
           ! grep -q "'14 Preispositionen'" .github/workflows/verify-bad-pricing.yml
           ! grep -q "'17 Preispositionen'" .github/workflows/verify-garten-pricing.yml
@@ -78,6 +108,11 @@ jobs:
           set -euo pipefail
 
           grep -q 'entry.get("url", "")' .github/workflows/verify-city-hubs.yml
+          grep -q 'guide_count=' .github/workflows/verify-city-hubs.yml
+          grep -q 'test "$guide_count" -ge 6' .github/workflows/verify-city-hubs.yml
+          grep -q 'baseline_guide_count' .github/workflows/verify-city-hubs.yml
+          ! grep -q '/ratgeber/bad-komplett-sanieren-kosten' .github/workflows/verify-city-hubs.yml
+
           grep -q 'Sichtschutzzaun Holz inkl. Montage' .github/workflows/verify-garten-pricing.yml
           grep -q '/kosten/garten/leistung/sichtschutzzaun-holz-inkl-montage' .github/workflows/verify-garten-pricing.yml
           ! grep -q 'Sichtschutzzaun Holz 1,80 m inkl. Montage' .github/workflows/verify-garten-pricing.yml
@@ -87,7 +122,7 @@ jobs:
           grep -q 'Primary guide continuity missing' .github/workflows/verify-service-city-guide-silo.yml
           ! grep -q "grep -q 'Passender Ratgeber'" .github/workflows/verify-service-city-guide-silo.yml
 
-      - name: Verify Zaunbau taxonomy contracts
+      - name: Verify specialist taxonomy contracts
         shell: bash
         run: |
           set -euo pipefail
@@ -100,9 +135,24 @@ jobs:
             .github/workflows/verify-specialist-guides.yml
           grep -q 'check_mapping garten garten-anlegen-kosten einfahrt-pflastern einfahrt-pflastern-kosten' \
             .github/workflows/verify-specialist-guides.yml
+          grep -q 'check_mapping waermepumpe luft-wasser-waermepumpe-kosten luft-wasser-waermepumpe-komplett luft-wasser-waermepumpe-kosten' \
+            .github/workflows/verify-specialist-guides.yml
+          ! grep -q 'check_mapping waermepumpe waermepumpe-kosten-2026 ' \
+            .github/workflows/verify-specialist-guides.yml
           grep -q 'Price-detail guide mapping missing' .github/workflows/verify-specialist-guides.yml
           grep -q 'id=\"ratgeber\"' .github/workflows/verify-specialist-guides.yml
           ! grep -q "grep -q 'Passender Ratgeber'" .github/workflows/verify-specialist-guides.yml
+
+      - name: Verify Ratgeber date guard stays strict
+        shell: bash
+        run: |
+          set -euo pipefail
+          file=.github/workflows/verify-ratgeber-article-dates.yml
+          grep -q 'Unexpected datePublished' "$file"
+          grep -q 'Unexpected dateModified' "$file"
+          grep -q 'article:published_time' "$file"
+          grep -q 'article:modified_time' "$file"
+          grep -q 'Aktualisiert:</strong> 27. August 2026' "$file"
 
       - name: Verify Ratgeber page and social descriptions match
         shell: bash
