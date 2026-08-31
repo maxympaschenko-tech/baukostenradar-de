@@ -11,17 +11,20 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Verify extended services and price items
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
-          curl -sS --fail 'https://baukostenradar.de/kosten/tueren' -o /tmp/tueren.html
-          curl -sS --fail 'https://baukostenradar.de/kosten/estrich' -o /tmp/estrich.html
-          curl -sS --fail 'https://baukostenradar.de/kosten/maurer' -o /tmp/maurer.html
-          curl -sS --fail 'https://baukostenradar.de/kosten/treppen' -o /tmp/treppen.html
-          curl -sS --fail 'https://baukostenradar.de/kosten/kueche' -o /tmp/kueche.html
-          curl -sS --fail 'https://baukostenradar.de/kosten/abriss-entsorgung' -o /tmp/abriss.html
+          fetch_hostinger 'https://baukostenradar.de/kosten/tueren' /tmp/tueren.html
+          fetch_hostinger 'https://baukostenradar.de/kosten/estrich' /tmp/estrich.html
+          fetch_hostinger 'https://baukostenradar.de/kosten/maurer' /tmp/maurer.html
+          fetch_hostinger 'https://baukostenradar.de/kosten/treppen' /tmp/treppen.html
+          fetch_hostinger 'https://baukostenradar.de/kosten/kueche' /tmp/kueche.html
+          fetch_hostinger 'https://baukostenradar.de/kosten/abriss-entsorgung' /tmp/abriss.html
 
           grep -q 'https://baukostenradar.de/kosten/tueren' /tmp/tueren.html
           grep -q 'https://baukostenradar.de/kosten/estrich' /tmp/estrich.html
@@ -34,7 +37,7 @@ jobs:
             local path="$1"
             local text="$2"
             local out="$3"
-            curl -sS --fail "https://baukostenradar.de${path}" -o "$out"
+            fetch_hostinger "https://baukostenradar.de${path}" "$out"
             grep -q "$text" "$out"
           }
 
@@ -55,12 +58,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
-          curl -sS --fail 'https://baukostenradar.de/ratgeber/6-innentueren-austauschen-kosten' -o /tmp/tueren-guide.html
-          curl -sS --fail 'https://baukostenradar.de/ratgeber/estrich-100-qm-kosten' -o /tmp/estrich-guide.html
-          curl -sS --fail 'https://baukostenradar.de/ratgeber/innenwand-mauern-kosten' -o /tmp/maurer-guide.html
-          curl -sS --fail 'https://baukostenradar.de/ratgeber/14-treppenstufen-renovieren-kosten' -o /tmp/treppen-guide.html
-          curl -sS --fail 'https://baukostenradar.de/ratgeber/kueche-10-qm-renovieren-kosten' -o /tmp/kueche-guide.html
+          fetch_hostinger 'https://baukostenradar.de/ratgeber/6-innentueren-austauschen-kosten' /tmp/tueren-guide.html
+          fetch_hostinger 'https://baukostenradar.de/ratgeber/estrich-100-qm-kosten' /tmp/estrich-guide.html
+          fetch_hostinger 'https://baukostenradar.de/ratgeber/innenwand-mauern-kosten' /tmp/maurer-guide.html
+          fetch_hostinger 'https://baukostenradar.de/ratgeber/14-treppenstufen-renovieren-kosten' /tmp/treppen-guide.html
+          fetch_hostinger 'https://baukostenradar.de/ratgeber/kueche-10-qm-renovieren-kosten' /tmp/kueche-guide.html
 
           grep -q 'gewerk=tueren' /tmp/tueren-guide.html
           grep -q 'leistung=innentuer-mit-zarge-inkl-montage' /tmp/tueren-guide.html
@@ -86,6 +90,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
           check_guide() {
             local path="$1"
@@ -93,7 +98,7 @@ jobs:
             local expected_service="$3"
             local expected_item="$4"
             local output="$5"
-            curl -sS --fail "https://baukostenradar.de${path}" -o "$output"
+            fetch_hostinger "https://baukostenradar.de${path}" "$output"
             grep -q "$expected_text" "$output"
             grep -q "gewerk=${expected_service}" "$output"
             grep -q "leistung=${expected_item}" "$output"
@@ -117,13 +122,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
           check_calculator() {
             local url="$1"
             local expected_value="$2"
             local expected_text="$3"
             local output="$4"
-            curl -sS --fail "$url" -o "$output"
+            fetch_hostinger "$url" "$output"
             grep -q 'https://baukostenradar.de/rechner/handwerkerkosten' "$output"
             grep -q 'Vorauswahl aus der vorherigen Kostenseite übernommen' "$output"
             grep -q "$expected_text" "$output"
@@ -143,14 +149,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
           check_redirect() {
             local source="$1"
             local target="$2"
-            local result
-            result="$(curl -sS -o /dev/null -w '%{http_code} %{redirect_url}' "https://baukostenradar.de${source}")"
-            echo "$result" | grep -Eq '^(301|308) '
-            echo "$result" | grep -q "https://baukostenradar.de${target}"
+            local output="/tmp/redirect-${RANDOM}.txt"
+            fetch_hostinger_redirect "https://baukostenradar.de${source}" "$output"
+            grep -Eq '^(301|308) ' "$output" || { echo "Retired URL did not return permanent redirect: ${source}" >&2; cat "$output" >&2; exit 1; }
+            grep -q "https://baukostenradar.de${target}" "$output" || { echo "Wrong redirect target: ${source} -> ${target}" >&2; cat "$output" >&2; exit 1; }
           }
 
           check_redirect '/kosten/tueren/leistung/innentuer-einbauen-inkl-zarge' '/kosten/tueren/leistung/innentuer-mit-zarge-inkl-montage'
@@ -168,7 +175,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          source scripts/hostinger-verify.sh
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
 
           for path in \
             '/kosten/tueren' \
