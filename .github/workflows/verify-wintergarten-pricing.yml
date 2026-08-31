@@ -1,0 +1,169 @@
+name: Verify Wintergarten pricing cluster
+
+on:
+  workflow_run:
+    workflows: ["Hostinger production ready"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-wintergarten-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure resilient live fetches
+        shell: bash
+        run: |
+          cat > ~/.curlrc <<'EOF'
+          retry = 6
+          retry-all-errors
+          retry-delay = 5
+          connect-timeout = 10
+          max-time = 30
+          EOF
+
+      - name: Fetch Wintergarten production pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          fetch_until_contains() {
+            local base_url="$1" output="$2" needle="$3" label="$4"
+            for attempt in 1 2 3 4 5 6; do
+              if curl -sSL --fail -H 'Cache-Control: no-cache' \
+                "${base_url}?verify=${GITHUB_SHA}-${attempt}" -o "$output"; then
+                if grep -Fq "$needle" "$output"; then
+                  return 0
+                fi
+              fi
+              if [ "$attempt" -eq 6 ]; then
+                echo "MISSING after retries: $label" >&2
+                echo "Expected in $output: $needle" >&2
+                return 1
+              fi
+              sleep 10
+            done
+          }
+
+          curl -sSL --fail 'https://baukostenradar.de/kosten/wintergarten' -o /tmp/wintergarten.html
+          curl -sSL --fail 'https://baukostenradar.de/kosten/wintergarten/berlin' -o /tmp/wintergarten-berlin.html
+          fetch_until_contains \
+            'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html \
+            '/ratgeber/wintergarten-kosten' 'Wintergarten guide directory'
+          fetch_until_contains \
+            'https://baukostenradar.de/quellen' /tmp/quellen.html \
+            'Aroundhome - Wintergarten Kosten 2026' 'Wintergarten source directory'
+          curl -sSL --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+
+      - name: Verify category, city and source signals
+        shell: bash
+        run: |
+          set -euo pipefail
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+
+          for needle in \
+            'Kaltwintergarten Komplettpreis inklusive Montage' \
+            'Warmwintergarten Komplettpreis inklusive Montage' \
+            'Wohnwintergarten Aluminium Konstruktion' \
+            'Wintergarten Dreifachverglasung' \
+            'Wintergarten Bodenplatte gedämmt' \
+            'Wintergarten Heizung einbauen'; do
+            require_contains /tmp/wintergarten.html "$needle" "Wintergarten item: $needle"
+          done
+
+          require_contains /tmp/wintergarten-berlin.html 'Wintergarten' 'Wintergarten Berlin city page'
+          require_contains /tmp/quellen.html 'Aroundhome - Wintergarten Kosten 2026' 'Aroundhome Wintergarten source'
+          require_contains /tmp/quellen.html 'Blauarbeit - Kaltwintergarten Kosten 2026' 'Blauarbeit Kaltwintergarten source'
+          require_contains /tmp/quellen.html 'Blauarbeit - Wohnwintergarten Kosten 2026' 'Blauarbeit Wohnwintergarten source'
+          require_contains /tmp/quellen.html 'Blauarbeit - Wintergarten Fundament Kosten 2026' 'Blauarbeit Wintergarten Fundament source'
+          ! grep -qi 'noindex' /tmp/wintergarten.html
+
+      - name: Verify five Wintergarten guides
+        shell: bash
+        run: |
+          set -euo pipefail
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+          check_guide() {
+            local slug="$1"; local item="$2"
+            local url="https://baukostenradar.de/ratgeber/${slug}"
+            local output="/tmp/${slug}.html"
+            require_contains /tmp/sitemap.xml "${url}</loc>" "guide sitemap $slug"
+            require_contains /tmp/ratgeber.html "/ratgeber/${slug}" "guide directory $slug"
+            curl -sSL --fail "$url" -o "$output"
+            require_contains "$output" "$url" "canonical $slug"
+            require_contains "$output" '"@type":"Article"' "Article schema $slug"
+            require_contains "$output" 'FAQPage' "FAQ schema $slug"
+            require_contains "$output" '/kosten/wintergarten' "Wintergarten service link $slug"
+            require_contains "$output" 'gewerk=wintergarten' "calculator service $slug"
+            require_contains "$output" "leistung=${item}" "calculator item $slug"
+            ! grep -qi 'noindex' "$output"
+          }
+
+          check_guide 'wintergarten-kosten' 'wintergarten-gesamtprojekt'
+          check_guide 'kaltwintergarten-kosten' 'kaltwintergarten-durch-fachbetrieb'
+          check_guide 'wohnwintergarten-kosten' 'wohnwintergarten-fachbetrieb'
+          check_guide 'wintergarten-verglasung-kosten' 'wintergarten-dreifachverglasung'
+          check_guide 'wintergarten-fundament-kosten' 'wintergarten-bodenplatte-gedaemmt'
+
+      - name: Verify all price-detail mappings and sitemap expansion
+        shell: bash
+        run: |
+          set -euo pipefail
+          check_item() {
+            local item="$1"; local guide="$2"
+            local url="https://baukostenradar.de/kosten/wintergarten/leistung/${item}"
+            local output="/tmp/wintergarten-${item}.html"
+            grep -Fq "${url}</loc>" /tmp/sitemap.xml || { echo "Missing sitemap URL: $item" >&2; exit 1; }
+            curl -sSL --fail "$url" -o "$output"
+            grep -Fq 'Passender Ratgeber' "$output" || { echo "Missing guide CTA: $item" >&2; exit 1; }
+            grep -Fq "/ratgeber/${guide}" "$output" || { echo "Wrong guide mapping: $item -> $guide" >&2; exit 1; }
+            ! grep -qi 'noindex' "$output"
+          }
+
+          grep -Fq 'https://baukostenradar.de/kosten/wintergarten</loc>' /tmp/sitemap.xml
+          grep -Fq 'https://baukostenradar.de/kosten/wintergarten/berlin</loc>' /tmp/sitemap.xml
+
+          check_item 'wintergarten-gesamtprojekt' 'wintergarten-kosten'
+          check_item 'kaltwintergarten-komplettpreis-inklusive-montage' 'kaltwintergarten-kosten'
+          check_item 'mittelwarmer-wintergarten-komplettpreis' 'wintergarten-kosten'
+          check_item 'warmwintergarten-komplettpreis-inklusive-montage' 'wohnwintergarten-kosten'
+          check_item 'kaltwintergarten-durch-fachbetrieb' 'kaltwintergarten-kosten'
+          check_item 'kaltwintergarten-aluminium-bausatz-eigenmontage' 'kaltwintergarten-kosten'
+          check_item 'kaltwintergarten-bausatz-montiert' 'kaltwintergarten-kosten'
+          check_item 'kaltwintergarten-aluminium-massanfertigung' 'kaltwintergarten-kosten'
+          check_item 'kaltwintergarten-holz-oder-holz-aluminium-massanfertigung' 'kaltwintergarten-kosten'
+          check_item 'wohnwintergarten-fachbetrieb' 'wohnwintergarten-kosten'
+          check_item 'wohnwintergarten-kunststoff-konstruktion' 'wohnwintergarten-kosten'
+          check_item 'wohnwintergarten-holz-konstruktion' 'wohnwintergarten-kosten'
+          check_item 'wohnwintergarten-holz-aluminium-konstruktion' 'wohnwintergarten-kosten'
+          check_item 'wohnwintergarten-aluminium-konstruktion' 'wohnwintergarten-kosten'
+          check_item 'wohnwintergarten-stahl-konstruktion' 'wohnwintergarten-kosten'
+          check_item 'wintergarten-einfachverglasung' 'wintergarten-verglasung-kosten'
+          check_item 'wintergarten-isolierglas-doppelverglasung' 'wintergarten-verglasung-kosten'
+          check_item 'wintergarten-dreifachverglasung' 'wintergarten-verglasung-kosten'
+          check_item 'wintergarten-glasdach' 'wintergarten-verglasung-kosten'
+          check_item 'wintergarten-polycarbonat-stegplatten-dach' 'wintergarten-verglasung-kosten'
+          check_item 'wintergarten-punktfundament' 'wintergarten-fundament-kosten'
+          check_item 'wintergarten-streifenfundament' 'wintergarten-fundament-kosten'
+          check_item 'wintergarten-bodenplatte-ungedaemmt' 'wintergarten-fundament-kosten'
+          check_item 'wintergarten-bodenplatte-gedaemmt' 'wintergarten-fundament-kosten'
+          check_item 'wintergarten-bodenplatte-mit-fussbodenheizung' 'wintergarten-fundament-kosten'
+          check_item 'wintergarten-heizung-einbauen' 'wohnwintergarten-kosten'
+          check_item 'wintergarten-belueftungssystem' 'wohnwintergarten-kosten'
+          check_item 'wintergarten-beschattungssystem' 'wintergarten-kosten'
+          check_item 'wintergarten-baugenehmigung' 'wintergarten-kosten'
+          check_item 'kaltwintergarten-laufende-nebenkosten' 'kaltwintergarten-kosten'
+          check_item 'warmwintergarten-laufende-nebenkosten' 'wohnwintergarten-kosten'
