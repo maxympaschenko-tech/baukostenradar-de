@@ -1,0 +1,134 @@
+name: CI Wintergarten cluster
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-wintergarten-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-wintergarten-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://example.de
+
+      - name: Verify Wintergarten standalone runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          HOSTNAME=127.0.0.1 PORT=3001 NEXT_PUBLIC_SITE_URL=https://example.de node .next/standalone/server.js > /tmp/baukostenradar-ci-wintergarten-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl -sS --fail 'http://127.0.0.1:3001/kosten/wintergarten' -o /tmp/wintergarten.html; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$ready" -ne 1 ]; then
+            echo 'Production runtime did not become ready.' >&2
+            cat /tmp/baukostenradar-ci-wintergarten-server.log >&2 || true
+            exit 1
+          fi
+
+          curl -sS --fail 'http://127.0.0.1:3001/ratgeber' -o /tmp/ratgeber.html
+          curl -sS --fail 'http://127.0.0.1:3001/quellen' -o /tmp/quellen.html
+          curl -sS --fail 'http://127.0.0.1:3001/sitemap.xml' -o /tmp/sitemap.xml
+
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+
+          for guide in \
+            'wintergarten-kosten' \
+            'kaltwintergarten-kosten' \
+            'wohnwintergarten-kosten' \
+            'wintergarten-verglasung-kosten' \
+            'wintergarten-fundament-kosten'; do
+            require_contains /tmp/ratgeber.html "/ratgeber/${guide}" "Wintergarten guide hub link $guide"
+            require_contains /tmp/sitemap.xml "https://example.de/ratgeber/${guide}</loc>" "Wintergarten guide sitemap $guide"
+          done
+
+          for source in \
+            'Aroundhome - Wintergarten Kosten 2026' \
+            'Blauarbeit - Kaltwintergarten Kosten 2026' \
+            'Blauarbeit - Wohnwintergarten Kosten 2026' \
+            'Blauarbeit - Wintergarten Fundament Kosten 2026'; do
+            require_contains /tmp/quellen.html "$source" "active Wintergarten source $source"
+          done
+
+          require_contains /tmp/sitemap.xml 'https://example.de/kosten/wintergarten</loc>' 'Wintergarten sitemap service'
+
+          check_item() {
+            local item="$1"; local guide="$2"
+            local output="/tmp/ci-wintergarten-${item}.html"
+            local local_url="http://127.0.0.1:3001/kosten/wintergarten/leistung/${item}"
+            local canonical="https://example.de/kosten/wintergarten/leistung/${item}"
+            curl -sS --fail "$local_url" -o "$output"
+            require_contains /tmp/sitemap.xml "${canonical}</loc>" "Wintergarten sitemap item $item"
+            require_contains "$output" 'Passender Ratgeber' "Wintergarten guide CTA $item"
+            require_contains "$output" "/ratgeber/${guide}" "Wintergarten guide mapping $item"
+          }
+
+          check_item 'wintergarten-gesamtprojekt' 'wintergarten-kosten'
+          check_item 'kaltwintergarten-komplettpreis-inklusive-montage' 'kaltwintergarten-kosten'
+          check_item 'mittelwarmer-wintergarten-komplettpreis' 'wintergarten-kosten'
+          check_item 'warmwintergarten-komplettpreis-inklusive-montage' 'wohnwintergarten-kosten'
+          check_item 'kaltwintergarten-durch-fachbetrieb' 'kaltwintergarten-kosten'
+          check_item 'kaltwintergarten-aluminium-bausatz-eigenmontage' 'kaltwintergarten-kosten'
+          check_item 'kaltwintergarten-bausatz-montiert' 'kaltwintergarten-kosten'
+          check_item 'kaltwintergarten-aluminium-massanfertigung' 'kaltwintergarten-kosten'
+          check_item 'kaltwintergarten-holz-oder-holz-aluminium-massanfertigung' 'kaltwintergarten-kosten'
+          check_item 'wohnwintergarten-fachbetrieb' 'wohnwintergarten-kosten'
+          check_item 'wohnwintergarten-kunststoff-konstruktion' 'wohnwintergarten-kosten'
+          check_item 'wohnwintergarten-holz-konstruktion' 'wohnwintergarten-kosten'
+          check_item 'wohnwintergarten-holz-aluminium-konstruktion' 'wohnwintergarten-kosten'
+          check_item 'wohnwintergarten-aluminium-konstruktion' 'wohnwintergarten-kosten'
+          check_item 'wohnwintergarten-stahl-konstruktion' 'wohnwintergarten-kosten'
+          check_item 'wintergarten-einfachverglasung' 'wintergarten-verglasung-kosten'
+          check_item 'wintergarten-isolierglas-doppelverglasung' 'wintergarten-verglasung-kosten'
+          check_item 'wintergarten-dreifachverglasung' 'wintergarten-verglasung-kosten'
+          check_item 'wintergarten-glasdach' 'wintergarten-verglasung-kosten'
+          check_item 'wintergarten-polycarbonat-stegplatten-dach' 'wintergarten-verglasung-kosten'
+          check_item 'wintergarten-punktfundament' 'wintergarten-fundament-kosten'
+          check_item 'wintergarten-streifenfundament' 'wintergarten-fundament-kosten'
+          check_item 'wintergarten-bodenplatte-ungedaemmt' 'wintergarten-fundament-kosten'
+          check_item 'wintergarten-bodenplatte-gedaemmt' 'wintergarten-fundament-kosten'
+          check_item 'wintergarten-bodenplatte-mit-fussbodenheizung' 'wintergarten-fundament-kosten'
+          check_item 'wintergarten-heizung-einbauen' 'wohnwintergarten-kosten'
+          check_item 'wintergarten-belueftungssystem' 'wohnwintergarten-kosten'
+          check_item 'wintergarten-beschattungssystem' 'wintergarten-kosten'
+          check_item 'wintergarten-baugenehmigung' 'wintergarten-kosten'
+          check_item 'kaltwintergarten-laufende-nebenkosten' 'kaltwintergarten-kosten'
+          check_item 'warmwintergarten-laufende-nebenkosten' 'wohnwintergarten-kosten'
