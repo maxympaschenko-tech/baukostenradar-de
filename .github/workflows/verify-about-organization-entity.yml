@@ -11,27 +11,16 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Fetch homepage and About page
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
-          fetch_with_retry() {
-            local url="$1"
-            local output="$2"
-            for i in 1 2 3 4 5; do
-              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then
-                return 0
-              fi
-              if [[ "$i" == "5" ]]; then
-                return 1
-              fi
-              sleep 4
-            done
-          }
-
-          fetch_with_retry 'https://baukostenradar.de/' /tmp/home.html
-          fetch_with_retry 'https://baukostenradar.de/ueber-uns' /tmp/about.html
+          fetch_hostinger 'https://baukostenradar.de/' /tmp/home.html
+          fetch_hostinger 'https://baukostenradar.de/ueber-uns' /tmp/about.html
 
       - name: Verify Organization administrative details
         shell: bash
