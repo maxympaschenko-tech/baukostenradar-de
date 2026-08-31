@@ -11,12 +11,15 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Verify current opportunity guides and exact item mappings
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
 
           opportunities=$(cat <<'EOF'
           einfahrt-pflastern-kosten|garten|einfahrt-pflastern|garten-anlegen-kosten
@@ -109,7 +112,7 @@ jobs:
             grep -q "https://baukostenradar.de/ratgeber/${guide}</loc>" /tmp/sitemap.xml || { echo "Missing guide in sitemap: ${guide}"; exit 1; }
 
             guide_output="/tmp/guide-${guide}.html"
-            curl -sS --fail "https://baukostenradar.de/ratgeber/${guide}" -o "$guide_output"
+            fetch_hostinger "https://baukostenradar.de/ratgeber/${guide}" "$guide_output"
             grep -q "https://baukostenradar.de/ratgeber/${guide}" "$guide_output" || { echo "Canonical missing: ${guide}"; exit 1; }
             grep -q '"@type":"Article"' "$guide_output" || { echo "Article schema missing: ${guide}"; exit 1; }
             grep -q "/kosten/${service}" "$guide_output" || { echo "Service link missing: ${guide}"; exit 1; }
@@ -119,13 +122,13 @@ jobs:
             ! grep -qi 'noindex' "$guide_output" || { echo "Unexpected noindex: ${guide}"; exit 1; }
 
             item_output="/tmp/item-${service}-${item}.html"
-            curl -sS --fail "https://baukostenradar.de/kosten/${service}/leistung/${item}" -o "$item_output"
+            fetch_hostinger "https://baukostenradar.de/kosten/${service}/leistung/${item}" "$item_output"
             grep -q 'Passender Ratgeber' "$item_output" || { echo "Ratgeber block missing on ${service}/${item}"; exit 1; }
             grep -q "/ratgeber/${guide}" "$item_output" || { echo "Exact guide mapping missing on ${service}/${item}: ${guide}"; exit 1; }
             ! grep -qi 'noindex' "$item_output" || { echo "Unexpected item noindex: ${service}/${item}"; exit 1; }
 
             parent_output="/tmp/parent-${parent}.html"
-            curl -sS --fail "https://baukostenradar.de/ratgeber/${parent}" -o "$parent_output"
+            fetch_hostinger "https://baukostenradar.de/ratgeber/${parent}" "$parent_output"
             grep -q "/ratgeber/${guide}" "$parent_output" || { echo "Parent ${parent} does not link to ${guide}"; exit 1; }
 
             checked=$((checked + 1))
@@ -138,7 +141,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          source scripts/hostinger-verify.sh
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
 
           deprecated=(
             tuer-lackieren-kosten
