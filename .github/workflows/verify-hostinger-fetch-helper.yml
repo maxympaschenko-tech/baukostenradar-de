@@ -1,0 +1,68 @@
+name: Verify production verifier helpers
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/hostinger-verify.sh'
+      - 'scripts/check-service-count.py'
+      - 'app/ratgeber/layout.tsx'
+      - 'app/ratgeber/page.tsx'
+      - '.github/workflows/verify-bad-pricing.yml'
+      - '.github/workflows/verify-garten-pricing.yml'
+      - '.github/workflows/verify-internal-social-metadata.yml'
+      - '.github/workflows/verify-opportunity-guides.yml'
+      - '.github/workflows/verify-price-guide-silo.yml'
+      - '.github/workflows/verify-hostinger-fetch-helper.yml'
+  workflow_dispatch:
+
+jobs:
+  verify-helper-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate helper syntax and cache-busting contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n scripts/hostinger-verify.sh
+          python3 -m py_compile scripts/check-service-count.py
+          grep -q 'Cache-Control: no-cache' scripts/hostinger-verify.sh
+          grep -q 'ci_verify=' scripts/hostinger-verify.sh
+          grep -q -- '--retry-all-errors' scripts/hostinger-verify.sh
+
+      - name: Verify production workflows use shared Hostinger fetch
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in \
+            .github/workflows/verify-bad-pricing.yml \
+            .github/workflows/verify-garten-pricing.yml \
+            .github/workflows/verify-internal-social-metadata.yml \
+            .github/workflows/verify-opportunity-guides.yml \
+            .github/workflows/verify-price-guide-silo.yml; do
+            grep -q 'source scripts/hostinger-verify.sh' "$file"
+          done
+
+          ! grep -q "'14 Preispositionen'" .github/workflows/verify-bad-pricing.yml
+          ! grep -q "'17 Preispositionen'" .github/workflows/verify-garten-pricing.yml
+          grep -q 'check-service-count.py /tmp/bad.html 14 Bad' .github/workflows/verify-bad-pricing.yml
+          grep -q 'check-service-count.py /tmp/garten.html 17 Garten' .github/workflows/verify-garten-pricing.yml
+
+      - name: Verify Ratgeber page and social descriptions match
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+
+          layout = Path('app/ratgeber/layout.tsx').read_text(encoding='utf-8')
+          page = Path('app/ratgeber/page.tsx').read_text(encoding='utf-8')
+          layout_match = re.search(r'const description = "([^"]+)";', layout)
+          page_match = re.search(r'description: "([^"]+)"', page)
+          assert layout_match, 'Ratgeber layout description missing'
+          assert page_match, 'Ratgeber page description missing'
+          assert layout_match.group(1) == page_match.group(1), 'Ratgeber page/social descriptions drifted'
+          print('Ratgeber metadata descriptions match')
+          PY
