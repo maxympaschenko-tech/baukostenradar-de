@@ -1,0 +1,230 @@
+[
+  {
+    "path": ".github/workflows/verify-abriss-guide-cluster.yml",
+    "sha": "4aac7ff52c3ab9ffcdddf3e1a67a33bf2dba2b17"
+  },
+  {
+    "path": ".github/workflows/verify-abriss-pricing.yml",
+    "sha": "e27b006b6db3302dc616a0e8f86589a1787c1423"
+  },
+  {
+    "path": ".github/workflows/verify-balcony-pricing.yml",
+    "sha": "3f84a1446f5d9b3c912790f58a7fb02c869eb9f0"
+  },
+  {
+    "path": ".github/workflows/verify-bath-guide-cluster.yml",
+    "sha": "a96edd3a2c31bf0b19a8ba10046469c14403cb14"
+  },
+  {
+    "path": ".github/workflows/verify-bodenleger-pricing.yml",
+    "sha": "c5bfc251647c64c037b3c0d027cd2a76f7f59f70"
+  },
+  {
+    "path": ".github/workflows/verify-calculator-quick-starts.yml",
+    "sha": "611060e8116b9a7076d28b82abfc51a16d27ce19"
+  },
+  {
+    "path": ".github/workflows/verify-carport-garage-pricing.yml",
+    "sha": "37185cc0bfb05ae778515263e395fe3ad9ce3265"
+  },
+  {
+    "path": ".github/workflows/verify-consent-readiness.yml",
+    "sha": "a04b3495cd0cc0d76f435ea4f68201696faa2707"
+  },
+  {
+    "path": ".github/workflows/verify-contact-entity.yml",
+    "sha": "19966f1726035bb4281bc1067a65c37e2045f4c7"
+  },
+  {
+    "path": ".github/workflows/verify-cost-directory.yml",
+    "sha": "4343ea5e38478b6643e3266a7c0ab5800532c46f"
+  },
+  {
+    "path": ".github/workflows/verify-current-commercial-guides.yml",
+    "sha": "f1d6c4ef24dfddcf30b38fcd47348b10b276ca51"
+  },
+  {
+    "path": ".github/workflows/verify-dach-pricing.yml",
+    "sha": "cf79a0842d99bee27be5879e331416cbb7134f53"
+  },
+  {
+    "path": ".github/workflows/verify-dachausbau-pricing.yml",
+    "sha": "223e4b307c457807548ce6a644a6ba881a3c6bc5"
+  },
+  {
+    "path": ".github/workflows/verify-daemmung-guide-cluster.yml",
+    "sha": "1802a38bf66c651fe0265d2dd4c648c2ea7c2cdb"
+  },
+  {
+    "path": ".github/workflows/verify-daemmung-pricing.yml",
+    "sha": "b924a954820c42ed38b1d3ebcdebbcd9fbe3ebf6"
+  },
+  {
+    "path": ".github/workflows/verify-electrical-guide-cluster.yml",
+    "sha": "e0e5866bf8e9b09fbcf3120ed6f4654582a18313"
+  },
+  {
+    "path": ".github/workflows/verify-elektriker-pricing.yml",
+    "sha": "4690d14a54b9d7bb7e8785ae52de1c67203ce02c"
+  },
+  {
+    "path": ".github/workflows/verify-estrich-guide-cluster.yml",
+    "sha": "c059b865af8b26ca3cf40fdfd67d36f1500216a3"
+  },
+  {
+    "path": ".github/workflows/verify-fassade-guide-cluster.yml",
+    "sha": "b1bbc2d3ce17cc8327a1602fea1ab3d1084eaa1e"
+  },
+  {
+    "path": ".github/workflows/verify-fenster-pricing.yml",
+    "sha": "38c100fc4fd5b8492e6b8ec0432cdc4bf1595a87"
+  },
+  {
+    "path": ".github/workflows/verify-fliesen-guide-cluster.yml",
+    "sha": "17d8f3e16c7c8beca01feff5caea5c85e86dc4c4"
+  },
+  {
+    "path": ".github/workflows/verify-fliesenleger-pricing.yml",
+    "sha": "429958060331f8084e9ee4fef45dfd5ee61e7f60"
+  },
+  {
+    "path": ".github/workflows/verify-garage-carport-pricing.yml",
+    "sha": "b8a3dad53c2d6549a625d905e9cf2ed5533245c3"
+  },
+  {
+    "path": ".github/workflows/verify-guide-regional-silo.yml",
+    "sha": "d2cac2dbed6fbcff2493dcc4ea273572211c47b3"
+  },
+  {
+    "path": ".github/workflows/verify-hausanbau-pricing.yml",
+    "sha": "69ef87eba7dee4c17004d628c2c1cfa965e6b6a8"
+  },
+  {
+    "path": ".github/workflows/verify-heating-guide-cluster.yml",
+    "sha": "36179c6cbf6b936d26d8abee36963866a75cd4b5"
+  },
+  {
+    "path": ".github/workflows/verify-heizung-pricing.yml",
+    "sha": "aa3e6451ef3b36f5aa27fc3386e4b921412c736b"
+  },
+  {
+    "path": ".github/workflows/verify-hostinger-kitchen.yml",
+    "sha": "f1f4011b481256bdc55c25318bc2bff887708e18"
+  },
+  {
+    "path": ".github/workflows/verify-kellerabdichtung-pricing.yml",
+    "sha": "73690817d63aa9ab0faddac3045a3cc7c697e7c0"
+  },
+  {
+    "path": ".github/workflows/verify-kellerbau-pricing.yml",
+    "sha": "744ec46eaa3a53050c149161760b9a80690bbf12"
+  },
+  {
+    "path": ".github/workflows/verify-kitchen-guide-cluster.yml",
+    "sha": "c7bad5dd09422fbd7bd8089aa56bffed20c3794c"
+  },
+  {
+    "path": ".github/workflows/verify-maler-guide-cluster.yml",
+    "sha": "9df0d4cdc7714145095133664aa192aefc38d9d2"
+  },
+  {
+    "path": ".github/workflows/verify-maler-pricing.yml",
+    "sha": "0cacf7ff072283ccd7eb85810db99bac8c5b7d8a"
+  },
+  {
+    "path": ".github/workflows/verify-masonry-guide-cluster.yml",
+    "sha": "5a4863622b6f73dc9e9f71068cbd7b958ba7ab3f"
+  },
+  {
+    "path": ".github/workflows/verify-organization-logo.yml",
+    "sha": "b7aa76c1d455a9dcd7221bb64d43fbbf1fd98e5a"
+  },
+  {
+    "path": ".github/workflows/verify-photovoltaik-guide-cluster.yml",
+    "sha": "5752600360ae57102d173e0a3838de3a0cf39933"
+  },
+  {
+    "path": ".github/workflows/verify-photovoltaik-pricing.yml",
+    "sha": "299017ef40631e73b45558aa9e717923cac1c236"
+  },
+  {
+    "path": ".github/workflows/verify-planning-cost-guide-cluster.yml",
+    "sha": "0442efd4ce51cd8cf87fc27bbd3fe635365f86d2"
+  },
+  {
+    "path": ".github/workflows/verify-pool-pricing.yml",
+    "sha": "a3dd5d8adcaa979d9470bd49e6873bf58d5c68e8"
+  },
+  {
+    "path": ".github/workflows/verify-production-hostinger.yml",
+    "sha": "21f235f3769165076ee061a08ab76e668cd98da8"
+  },
+  {
+    "path": ".github/workflows/verify-ratgeber-directory.yml",
+    "sha": "92677d40478c2573dd543fc65aa2f67424cda606"
+  },
+  {
+    "path": ".github/workflows/verify-ratgeber-social-images.yml",
+    "sha": "2ae99535237d8ba17d1d02f411c4728f97174ec2"
+  },
+  {
+    "path": ".github/workflows/verify-renovation-area-guide-cluster.yml",
+    "sha": "a3c10bac680095cb197c8fcb106286ba296980cf"
+  },
+  {
+    "path": ".github/workflows/verify-roof-guide-cluster.yml",
+    "sha": "4c51ea6c90071c170757a79bf26d85ad810ea938"
+  },
+  {
+    "path": ".github/workflows/verify-sanitaer-guide-cluster.yml",
+    "sha": "d893caf25ea2b745ee7e385defada63313222488"
+  },
+  {
+    "path": ".github/workflows/verify-schornstein-kamin-pricing.yml",
+    "sha": "e947e8f1726433759c13d3867936be42c45c0bab"
+  },
+  {
+    "path": ".github/workflows/verify-service-guide-links.yml",
+    "sha": "a095dcad555bfa097df09d5501b6892fb552cbc0"
+  },
+  {
+    "path": ".github/workflows/verify-terrace-cover-pricing.yml",
+    "sha": "1a092230524f68604333b800cd8ad21de050e9da"
+  },
+  {
+    "path": ".github/workflows/verify-terrace-pricing.yml",
+    "sha": "522e44e73901445803a3dc536c526c8247da46af"
+  },
+  {
+    "path": ".github/workflows/verify-treppen-guide-cluster.yml",
+    "sha": "4b0df81f4ca30df7473914deb49c06fe20d71cc5"
+  },
+  {
+    "path": ".github/workflows/verify-treppen-pricing.yml",
+    "sha": "facaa858464b45393153c2f0d9a74c031c7a0a1c"
+  },
+  {
+    "path": ".github/workflows/verify-trockenbau-guide-cluster.yml",
+    "sha": "0b8bcfa75be6f0169a3d6d4da99aadd8334127ce"
+  },
+  {
+    "path": ".github/workflows/verify-trockenbau-pricing.yml",
+    "sha": "903aae2e69b04ee998af6b2426bbb6f65d15549d"
+  },
+  {
+    "path": ".github/workflows/verify-tueren-pricing.yml",
+    "sha": "2eb54585a28e11a023c9134b42370942823837b3"
+  },
+  {
+    "path": ".github/workflows/verify-waermepumpe-pricing.yml",
+    "sha": "933eec87aafe3d252ed0beb5868a0fd8acf5b7cc"
+  },
+  {
+    "path": ".github/workflows/verify-window-guide-cluster.yml",
+    "sha": "f76f41afbd7100773b2c076e66f7e2917dba5de8"
+  },
+  {
+    "path": ".github/workflows/verify-wintergarten-pricing.yml",
+    "sha": "fd8da953f2d5cd75855cb20eb9947b8354dd0f07"
+  }
+]
