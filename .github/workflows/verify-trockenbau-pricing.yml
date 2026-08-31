@@ -2,7 +2,7 @@ name: Verify Trockenbau pricing expansion
 
 on:
   workflow_run:
-    workflows: ["Deploy to Ukraine.com.ua"]
+    workflows: ["Hostinger production ready"]
     types: [completed]
   workflow_dispatch:
 
