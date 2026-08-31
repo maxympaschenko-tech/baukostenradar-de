@@ -69,8 +69,8 @@ export const tuerenGuides: Guide[] = [
           rows: [
             { cells: ["Holzzarge Innentür 10 cm", "100-180 €"], href: "/kosten/tueren/leistung/holzzarge-innentuer-10-cm" },
             { cells: ["Stahlzarge Innentür 10 cm", "65-75 €"], href: "/kosten/tueren/leistung/stahlzarge-innentuer-10-cm" },
-            { cells: ["Holzzarge Eingangstür 20,5 cm", "150-250 €"], href: "/kosten/tueren/leistung/holzzarge-eingangstuer-205-cm" },
-            { cells: ["Stahlzarge Eingangstür 28,5 cm", "90-100 €"], href: "/kosten/tueren/leistung/stahlzarge-eingangstuer-285-cm" },
+            { cells: ["Holzzarge Eingangstür 20,5 cm", "150-250 €"], href: "/kosten/tueren/leistung/holzzarge-eingangstuer-20-5-cm" },
+            { cells: ["Stahlzarge Eingangstür 28,5 cm", "90-100 €"], href: "/kosten/tueren/leistung/stahlzarge-eingangstuer-28-5-cm" },
           ],
         },
       },
