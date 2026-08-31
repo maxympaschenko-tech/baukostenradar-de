@@ -11,19 +11,18 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Verify city directory and direct trade navigation
         shell: bash
         run: |
           set -euo pipefail
-
-          fetch() {
-            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
-          }
+          source scripts/hostinger-verify.sh
 
           cities=(berlin hamburg muenchen koeln frankfurt stuttgart duesseldorf leipzig)
           services=(badsanierung dachsanierung elektriker fenster heizung kueche)
 
-          fetch 'https://baukostenradar.de/staedte' /tmp/cities.html
+          fetch_hostinger 'https://baukostenradar.de/staedte' /tmp/cities.html
 
           grep -q '"@type":"CollectionPage"' /tmp/cities.html
           grep -q 'Beliebte Handwerkerkosten nach Stadt' /tmp/cities.html
@@ -73,10 +72,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
-          fetch() {
-            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
-          }
+          source scripts/hostinger-verify.sh
 
           cities=(berlin hamburg muenchen koeln frankfurt stuttgart duesseldorf leipzig)
           guides=(
@@ -89,10 +85,11 @@ jobs:
           )
 
           checked=0
+          baseline_service_count=''
           for city in "${cities[@]}"; do
             output="/tmp/city-${city}.html"
             url="https://baukostenradar.de/staedte/${city}"
-            fetch "$url" "$output"
+            fetch_hostinger "$url" "$output"
 
             grep -q "https://baukostenradar.de/staedte/${city}" "$output"
             ! grep -qi 'noindex' "$output"
@@ -104,13 +101,20 @@ jobs:
             echo "${city}: ${service_count} live Gewerke"
             test "$service_count" -ge 20
 
-            python3 - "$output" "$service_count" <<'PY'
+            if [[ -z "$baseline_service_count" ]]; then
+              baseline_service_count="$service_count"
+            else
+              test "$service_count" -eq "$baseline_service_count"
+            fi
+
+            python3 - "$output" "$service_count" "$city" <<'PY'
           import json
           import re
           import sys
 
           html = open(sys.argv[1], encoding="utf-8").read()
           expected = int(sys.argv[2])
+          city = sys.argv[3]
           scripts = re.findall(r'<script[^>]*type="application/ld\+json"[^>]*>(.*?)</script>', html, flags=re.S)
           found = []
           for script in scripts:
@@ -135,11 +139,16 @@ jobs:
           elements = item_list.get("itemListElement", [])
           if actual != expected or len(elements) != expected:
               raise SystemExit(f"ItemList mismatch: numberOfItems={actual}, entries={len(elements)}, expected={expected}")
+
+          urls = [str(entry.get("item", "")) for entry in elements if isinstance(entry, dict)]
+          unique_urls = set(urls)
+          if len(unique_urls) != expected:
+              raise SystemExit(f"Trade ItemList has duplicate/missing URLs: {len(unique_urls)} unique, expected {expected}")
+          suffix = f"/{city}"
+          if not all(url.startswith("https://baukostenradar.de/kosten/") and url.endswith(suffix) for url in unique_urls):
+              raise SystemExit(f"Trade ItemList contains non-city URLs for {city}")
           print(f"JSON-LD ItemList verified: {actual} Gewerke")
           PY
-
-            grep -q "/kosten/kellerabdichtung/${city}" "$output"
-            grep -q "/kosten/abriss-entsorgung/${city}" "$output"
 
             for guide in "${guides[@]}"; do
               grep -q "$guide" "$output"
@@ -154,8 +163,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
-          curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
           cities='berlin|hamburg|muenchen|koeln|frankfurt|stuttgart|duesseldorf|leipzig'
           count=$(grep -oE "https://baukostenradar.de/staedte/(${cities})</loc>" /tmp/sitemap.xml | wc -l | tr -d ' ')
           test "$count" -eq 8
@@ -164,10 +174,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
           for city in berlin hamburg muenchen koeln frankfurt stuttgart duesseldorf leipzig; do
             output="/tmp/calculator-${city}.html"
-            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "https://baukostenradar.de/rechner/handwerkerkosten?region=${city}" -o "$output"
+            fetch_hostinger "https://baukostenradar.de/rechner/handwerkerkosten?region=${city}" "$output"
             grep -q 'Vorauswahl aus der vorherigen Kostenseite übernommen' "$output"
             grep -q "/kosten/badsanierung/${city}" "$output"
             ! grep -qi 'noindex' "$output"
