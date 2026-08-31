@@ -1,0 +1,165 @@
+name: CI Dachausbau cluster
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-dachausbau-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-dachausbau-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://example.de
+
+      - name: Verify Dachausbau standalone runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          HOSTNAME=127.0.0.1 PORT=3001 NEXT_PUBLIC_SITE_URL=https://example.de node .next/standalone/server.js > /tmp/baukostenradar-ci-dachausbau-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl -sS --fail 'http://127.0.0.1:3001/kosten/dachausbau' -o /tmp/dachausbau.html; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$ready" -ne 1 ]; then
+            echo 'Production runtime did not become ready.' >&2
+            cat /tmp/baukostenradar-ci-dachausbau-server.log >&2 || true
+            exit 1
+          fi
+
+          curl -sS --fail 'http://127.0.0.1:3001/kosten/dachausbau/berlin' -o /tmp/dachausbau-berlin.html
+          curl -sS --fail 'http://127.0.0.1:3001/ratgeber' -o /tmp/ratgeber.html
+          curl -sS --fail 'http://127.0.0.1:3001/quellen' -o /tmp/quellen.html
+          curl -sS --fail 'http://127.0.0.1:3001/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'http://127.0.0.1:3001/kosten/carport' -o /tmp/carport-regression.html
+          curl -sS --fail 'http://127.0.0.1:3001/kosten/garage' -o /tmp/garage-regression.html
+          curl -sS --fail 'http://127.0.0.1:3001/kosten/wintergarten' -o /tmp/wintergarten-regression.html
+
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+
+          require_contains /tmp/dachausbau.html 'Dachausbau komplett zum Wohnraum' 'Dachausbau core position'
+          require_contains /tmp/dachausbau.html 'Standard Fertiggaube' 'Dachgaube position'
+          require_contains /tmp/dachausbau.html 'Dachaufstockung neues Geschoss' 'Dachaufstockung position'
+          require_contains /tmp/dachausbau-berlin.html 'Dachausbau' 'Dachausbau Berlin city page'
+          require_contains /tmp/carport-regression.html 'Carport' 'Carport regression'
+          require_contains /tmp/garage-regression.html 'Garage' 'Garage regression'
+          require_contains /tmp/wintergarten-regression.html 'Wintergarten' 'Wintergarten regression'
+
+          for guide in \
+            'dachausbau-kosten' \
+            'dachboden-ausbauen-kosten-pro-qm' \
+            'dachgaube-kosten' \
+            'dach-anheben-kosten' \
+            'dachaufstockung-kosten'; do
+            require_contains /tmp/ratgeber.html "/ratgeber/${guide}" "Dachausbau guide hub link $guide"
+            require_contains /tmp/sitemap.xml "https://example.de/ratgeber/${guide}</loc>" "Dachausbau guide sitemap $guide"
+            curl -sS --fail "http://127.0.0.1:3001/ratgeber/${guide}" -o "/tmp/${guide}.html"
+            ! grep -qi 'noindex' "/tmp/${guide}.html"
+          done
+
+          for source in \
+            'Blauarbeit - Dachausbau Kosten 2026' \
+            'Blauarbeit - Dachaufstockung Kosten 2026' \
+            'MyHammer - Dach anheben Kosten 2026' \
+            'MyHammer - Dachgaube Kosten 2026'; do
+            require_contains /tmp/quellen.html "$source" "active Dachausbau source $source"
+          done
+
+          require_contains /tmp/sitemap.xml 'https://example.de/kosten/dachausbau</loc>' 'Dachausbau sitemap service'
+          require_contains /tmp/sitemap.xml 'https://example.de/kosten/dachausbau/berlin</loc>' 'Dachausbau Berlin sitemap'
+          ! grep -qi 'noindex' /tmp/dachausbau.html
+
+          check_item() {
+            local item="$1"; local guide="$2"
+            local output="/tmp/dachausbau-${item}.html"
+            local local_url="http://127.0.0.1:3001/kosten/dachausbau/leistung/${item}"
+            local canonical="https://example.de/kosten/dachausbau/leistung/${item}"
+            curl -sS --fail "$local_url" -o "$output"
+            require_contains /tmp/sitemap.xml "${canonical}</loc>" "Dachausbau sitemap item $item"
+            require_contains "$output" 'Passender Ratgeber' "Dachausbau guide CTA $item"
+            require_contains "$output" "/ratgeber/${guide}" "Dachausbau guide mapping $item"
+            ! grep -qi 'noindex' "$output"
+          }
+
+          mappings=(
+            'dachausbau-komplett-zum-wohnraum|dachausbau-kosten'
+            'dachausbau-80-m2-komplett-zum-wohnraum|dachausbau-kosten'
+            'dachausbau-grundausbau-beispiel-80-m2|dachausbau-kosten'
+            'dachdaemmung-beim-dachausbau|dachboden-ausbauen-kosten-pro-qm'
+            'untersparrendaemmung-dachausbau|dachboden-ausbauen-kosten-pro-qm'
+            'zwischensparrendaemmung-dachausbau|dachboden-ausbauen-kosten-pro-qm'
+            'aufsparrendaemmung-dachausbau|dachboden-ausbauen-kosten-pro-qm'
+            'heizkoerper-dachgeschoss-inklusive-leitungsverlegung|dachboden-ausbauen-kosten-pro-qm'
+            'fussbodenheizung-dachgeschoss|dachboden-ausbauen-kosten-pro-qm'
+            'dachfenster-beim-dachausbau|dachboden-ausbauen-kosten-pro-qm'
+            'dachgaube-material-und-einbau|dachgaube-kosten'
+            'standard-fertiggaube|dachgaube-kosten'
+            'dachgaube-einbaukosten|dachgaube-kosten'
+            'dachoeffnung-fuer-gaube|dachgaube-kosten'
+            'statischer-nachweis-dachgaube|dachgaube-kosten'
+            'baugenehmigung-dachgaube|dachgaube-kosten'
+            'fliessestrich-dachgeschoss-vom-fachbetrieb|dachboden-ausbauen-kosten-pro-qm'
+            'trittschalldaemmung-dachgeschoss|dachboden-ausbauen-kosten-pro-qm'
+            'bodenbelag-dachgeschoss-professionell-verlegt|dachboden-ausbauen-kosten-pro-qm'
+            'trockenbau-staenderwand-dachgeschoss-vom-fachbetrieb|dachboden-ausbauen-kosten-pro-qm'
+            'tapezieren-und-streichen-dachgeschoss-professionell|dachboden-ausbauen-kosten-pro-qm'
+            'elektroinstallation-dachgeschoss|dachboden-ausbauen-kosten-pro-qm'
+            'innentuer-dachgeschoss|dachboden-ausbauen-kosten-pro-qm'
+            'einfache-kniestockerhoehung|dach-anheben-kosten'
+            'hydraulische-dachanhebung|dach-anheben-kosten'
+            'dachanhebung-mit-grundausbau|dach-anheben-kosten'
+            'dachaufstockung-neues-geschoss|dachaufstockung-kosten'
+            'statik-dachaufstockung-bestand|dachaufstockung-kosten'
+            'bauantrag-und-genehmigung-dachaufstockung|dachaufstockung-kosten'
+            'altes-dach-demontieren-fuer-dachaufstockung|dachaufstockung-kosten'
+            'dachaufstockung-rohbau-neues-geschoss-und-dach|dachaufstockung-kosten'
+            'innenausbau-dachaufstockung|dachaufstockung-kosten'
+            'fenster-und-tueren-dachaufstockung|dachaufstockung-kosten'
+            'bad-und-heizung-dachaufstockung|dachaufstockung-kosten'
+          )
+
+          [ "${#mappings[@]}" -eq 34 ] || { echo 'Expected exactly 34 Dachausbau mappings' >&2; exit 1; }
+          for mapping in "${mappings[@]}"; do
+            IFS='|' read -r item guide <<< "$mapping"
+            check_item "$item" "$guide"
+          done
+
+          require_contains /tmp/dachausbau-kosten.html '/kosten/dachausbau/leistung/dachausbau-80-m2-komplett-zum-wohnraum' 'correct 80 m2 detail link in Dachausbau guide'
+          require_contains /tmp/dachausbau-kosten.html '/kosten/dachausbau/leistung/dachausbau-grundausbau-beispiel-80-m2' 'correct 80 m2 basic detail link in Dachausbau guide'
