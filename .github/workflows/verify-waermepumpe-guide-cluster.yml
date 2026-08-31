@@ -11,14 +11,17 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Verify exact Wärmepumpe price-item guide mappings
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
-          curl -sS --fail 'https://baukostenradar.de/kosten/waermepumpe' -o /tmp/waermepumpe.html
-          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch_hostinger 'https://baukostenradar.de/kosten/waermepumpe' /tmp/waermepumpe.html
+          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
 
           grep -q 'https://baukostenradar.de/kosten/waermepumpe' /tmp/waermepumpe.html
           ! grep -qi 'noindex' /tmp/waermepumpe.html
@@ -42,15 +45,15 @@ jobs:
             grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Wärmepumpe item missing in sitemap: ${item}"; exit 1; }
             grep -q "/kosten/waermepumpe/leistung/${item}" /tmp/waermepumpe.html || { echo "Wärmepumpe item missing on category: ${item}"; exit 1; }
 
-            curl -sS --fail "$item_url" -o "$item_output"
-            grep -q 'Passender Ratgeber' "$item_output"
+            fetch_hostinger "$item_url" "$item_output"
+            grep -q 'id="ratgeber"' "$item_output" || { echo "Wärmepumpe guide section missing: ${item}"; exit 1; }
             grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong Wärmepumpe guide mapping: ${item} -> ${guide}"; exit 1; }
             ! grep -qi 'noindex' "$item_output"
 
             grep -q "${guide_url}</loc>" /tmp/sitemap.xml
             grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
 
-            curl -sS --fail "$guide_url" -o "$guide_output"
+            fetch_hostinger "$guide_url" "$guide_output"
             grep -q "$guide_url" "$guide_output"
             grep -q '"@type":"Article"' "$guide_output"
             grep -q '/kosten/waermepumpe' "$guide_output"
@@ -69,13 +72,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
           guide='waermepumpe-kosten-2026'
           guide_url="https://baukostenradar.de/ratgeber/${guide}"
 
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
-          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
-          curl -sS --fail "$guide_url" -o /tmp/waermepumpe-parent.html
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          fetch_hostinger "$guide_url" /tmp/waermepumpe-parent.html
 
           grep -q "${guide_url}</loc>" /tmp/sitemap.xml
           grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
@@ -91,9 +95,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
-          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
 
           guides=(
             waermepumpe-kosten-2026
@@ -106,7 +111,7 @@ jobs:
             grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Wärmepumpe cluster guide missing in sitemap: ${source}"; exit 1; }
             grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Wärmepumpe cluster guide missing from hub: ${source}"; exit 1; }
 
-            curl -sS --fail "$guide_url" -o "/tmp/${source}.html"
+            fetch_hostinger "$guide_url" "/tmp/${source}.html"
             grep -q "$guide_url" "/tmp/${source}.html"
             grep -q '"@type":"Article"' "/tmp/${source}.html"
             ! grep -qi 'noindex' "/tmp/${source}.html"
