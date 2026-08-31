@@ -15,11 +15,11 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/lib/pricing": ["./lib/catalog-dachausbau.ts"],
-      "@/lib/price-guide-links": ["./lib/price-guide-links-dachausbau.ts"],
-      "@/lib/all-guides": ["./lib/all-guides-dachausbau.ts"],
-      "@/lib/guide-groups": ["./lib/guide-groups-dachausbau.ts"],
-      "@/lib/guide-silo": ["./lib/guide-silo-dachausbau.ts"],
+      "@/lib/pricing": ["./lib/catalog-hausanbau.ts"],
+      "@/lib/price-guide-links": ["./lib/price-guide-links-hausanbau.ts"],
+      "@/lib/all-guides": ["./lib/all-guides-hausanbau.ts"],
+      "@/lib/guide-groups": ["./lib/guide-groups-hausanbau.ts"],
+      "@/lib/guide-silo": ["./lib/guide-silo-hausanbau.ts"],
       "@/*": ["./*"]
     }
   },

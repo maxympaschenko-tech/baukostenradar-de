@@ -1,0 +1,393 @@
+import {
+  priceSources as dachausbauPriceSources,
+  regions,
+  renovationModel,
+  services as dachausbauServices,
+  type PriceItem as DachausbauPriceItem,
+  type Service as DachausbauService,
+} from "./catalog-dachausbau";
+
+export const priceSources = {
+  ...dachausbauPriceSources,
+  bauenHausanbau2026: {
+    name: "bauen.de - Hausanbau Kosten 2026",
+    url: "https://www.bauen.de/anbauhaus/",
+    checkedAt: "31.08.2026",
+  },
+  trustlocalHausanbau2026: {
+    name: "Trustlocal - Anbau Haus Kosten 2026",
+    url: "https://trustlocal.de/kosten/bauunternehmer-kosten/anbau-haus-kosten/",
+    checkedAt: "31.08.2026",
+  },
+  blauarbeitRohbau2026: {
+    name: "Blauarbeit - Rohbau Kosten 2026",
+    url: "https://ratgeber.blauarbeit.de/kosten-preise/rohbau-kosten",
+    checkedAt: "31.08.2026",
+  },
+  blauarbeitMauerarbeiten2026: {
+    name: "Blauarbeit - Mauerarbeiten Kosten 2026",
+    url: "https://ratgeber.blauarbeit.de/kosten-preise/mauerarbeiten-kosten",
+    checkedAt: "31.08.2026",
+  },
+  myhammerBodenplatte2026: {
+    name: "MyHammer - Bodenplatte Kosten 2026",
+    url: "https://www.my-hammer.de/bauen-renovieren/preisradar/was-kostet-fundament-erstellen%29",
+    checkedAt: "31.08.2026",
+  },
+} as const;
+
+type HausanbauSourceKey = keyof typeof priceSources;
+export type PriceItem = Omit<DachausbauPriceItem, "sourceKey"> & { sourceKey: HausanbauSourceKey };
+export type Service = Omit<DachausbauService, "priceItems"> & { priceItems: PriceItem[] };
+
+const inheritedServices = dachausbauServices as unknown as Service[];
+
+const hausanbauService: Service = {
+  slug: "hausanbau",
+  title: "Hausanbau Kosten 2026",
+  shortTitle: "Hausanbau",
+  description: "Aktuelle Richtwerte 2026 für seitliche und rückwärtige Hausanbauten, Fertigmodule, Massiv- und Holzbau, Flachdach, Rohbau, Fundament sowie Innenausbau in Deutschland.",
+  unit: "m² / Projekt / Stück",
+  icon: "▣",
+  priceItems: [
+    {
+      name: "Hausanbau schlüsselfertig massiv",
+      low: 2200,
+      high: 4000,
+      unit: "pro m² Wohnfläche",
+      note: "bauen.de nennt 2.200-4.000+ €/m² für schlüsselfertige seitliche oder rückwärtige Massivanbauten; gehobene Ausstattung kann darüber liegen",
+      sourceKey: "bauenHausanbau2026",
+    },
+    {
+      name: "Seitlicher Anbau massiv ohne Innenausbau",
+      low: 1800,
+      high: 2200,
+      unit: "pro m² Wohnfläche",
+      sourceKey: "bauenHausanbau2026",
+    },
+    {
+      name: "Rückwärtiger Anbau massiv ohne Innenausbau",
+      low: 1800,
+      high: 2200,
+      unit: "pro m² Wohnfläche",
+      sourceKey: "bauenHausanbau2026",
+    },
+    {
+      name: "Fertigmodul Anbau ohne Innenausbau",
+      low: 1800,
+      high: 2200,
+      unit: "pro m² Wohnfläche",
+      sourceKey: "bauenHausanbau2026",
+    },
+    {
+      name: "Fertigmodul Anbau schlüsselfertig",
+      low: 2200,
+      high: 4000,
+      unit: "pro m² Wohnfläche",
+      note: "bauen.de nennt für schlüsselfertige Fertigmodule 2.200-4.000+ €/m²; Zusatzkosten und Ausstattung separat prüfen",
+      sourceKey: "bauenHausanbau2026",
+    },
+    {
+      name: "Hausanbau mit Flachdach",
+      low: 1500,
+      high: 2800,
+      unit: "pro m² Wohnfläche",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Seitliche Verlängerung Haus",
+      low: 1800,
+      high: 3000,
+      unit: "pro m² Wohnfläche",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Haus verbreitern Anbau",
+      low: 2000,
+      high: 3800,
+      unit: "pro m² Wohnfläche",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Mehrgeschossiger Hausanbau drei Etagen",
+      low: 2500,
+      high: 4500,
+      unit: "pro m² Wohnfläche",
+      note: "Trustlocal-Richtwert für einen mehrgeschossigen Anbau; hoher Statik- und Anschlussaufwand möglich",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Hausanbau 20 m² einfache Erweiterung",
+      low: 30000,
+      high: 50000,
+      unit: "pro 20 m² Anbau",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Hausanbau 30 m² mittelgroß",
+      low: 45000,
+      high: 75000,
+      unit: "pro 30 m² Anbau",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Hausanbau 50 m² groß",
+      low: 75000,
+      high: 125000,
+      unit: "pro 50 m² Anbau",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Hausanbau 60 m² Gesamtbeispiel",
+      low: 84000,
+      high: 166000,
+      unit: "pro 60 m² Anbau",
+      note: "Trustlocal-Beispiel inklusive Fundament, Gebäudehülle, Technik, Innenausbau und Baunebenkosten",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Hausanbau Holzständerbauweise",
+      low: 1500,
+      high: 2500,
+      unit: "pro m² Wohnfläche",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Hausanbau Massivbauweise Ziegel oder Beton",
+      low: 2000,
+      high: 3500,
+      unit: "pro m² Wohnfläche",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Hausanbau Fertigbauweise",
+      low: 1700,
+      high: 2800,
+      unit: "pro m² Wohnfläche",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Hausanbau Stahlkonstruktion",
+      low: 2500,
+      high: 4000,
+      unit: "pro m² Wohnfläche",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Rohbau Hausanbau Gebäudehülle",
+      low: 700,
+      high: 900,
+      unit: "pro m² Wohnfläche",
+      note: "Bundesweiter Blauarbeit-Richtwert für Rohbauarbeiten; für einen Anbau können Anschlüsse an den Bestand zusätzliche Kosten erzeugen",
+      sourceKey: "blauarbeitRohbau2026",
+    },
+    {
+      name: "Fundament 60 m² Hausanbau",
+      low: 10000,
+      high: 18000,
+      unit: "pro 60 m² Anbau",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Mauerwerk und Dämmung 60 m² Hausanbau",
+      low: 24000,
+      high: 36000,
+      unit: "pro 60 m² Anbau",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Dach 60 m² Hausanbau",
+      low: 12000,
+      high: 25000,
+      unit: "pro 60 m² Anbau",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Fenster und Türen 60 m² Hausanbau",
+      low: 6000,
+      high: 18000,
+      unit: "pro 60 m² Anbau",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Elektroinstallation 60 m² Hausanbau",
+      low: 4000,
+      high: 12000,
+      unit: "pro 60 m² Anbau",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Heizung und Sanitär 60 m² Hausanbau",
+      low: 8000,
+      high: 15000,
+      unit: "pro 60 m² Anbau",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Innenausbau 60 m² Hausanbau",
+      low: 15000,
+      high: 30000,
+      unit: "pro 60 m² Anbau",
+      note: "Wände, Boden und Decken im Trustlocal-Beispiel",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Baunebenkosten 60 m² Hausanbau",
+      low: 5000,
+      high: 12000,
+      unit: "pro 60 m² Anbau",
+      note: "Trustlocal-Beispiel für Genehmigungen, Architekt und Statik; konkrete Planungskosten sind projektspezifisch",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Standardfenster Hausanbau doppelt verglast",
+      low: 300,
+      high: 1200,
+      unit: "pro Fenster",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Energiesparfenster Hausanbau Dreifachverglasung",
+      low: 800,
+      high: 2500,
+      unit: "pro Fenster",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Innentür Hausanbau Standard",
+      low: 300,
+      high: 800,
+      unit: "pro Tür",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Außentür Hausanbau Holz oder Aluminium",
+      low: 2000,
+      high: 5000,
+      unit: "pro Tür",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Laminat Hausanbau einfach",
+      low: 20,
+      high: 50,
+      unit: "pro m²",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Parkett Hausanbau hochwertig",
+      low: 80,
+      high: 150,
+      unit: "pro m²",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Fußbodenheizung Hausanbau",
+      low: 40,
+      high: 100,
+      unit: "pro m²",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Smart Home Integration Hausanbau",
+      low: 2000,
+      high: 10000,
+      unit: "pro Projekt",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Innenwände und Decken Hausanbau",
+      low: 40,
+      high: 100,
+      unit: "pro m²",
+      note: "Trockenbau, Verputzen und Spachteln laut Trustlocal-Kostenübersicht",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Malerarbeiten und Tapeten Hausanbau",
+      low: 10,
+      high: 30,
+      unit: "pro m²",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Fassade verputzen Hausanbau",
+      low: 50,
+      high: 150,
+      unit: "pro m² Fassadenfläche",
+      sourceKey: "trustlocalHausanbau2026",
+    },
+    {
+      name: "Bodenplatte Fundament Hausanbau",
+      low: 6000,
+      high: 15000,
+      unit: "pro Projekt",
+      note: "MyHammer-Gesamtspanne für eine Bodenplatte; Größe, Boden und Fundamentart bestimmen den konkreten Preis",
+      sourceKey: "myhammerBodenplatte2026",
+    },
+    {
+      name: "Streifenfundament Referenz 100 m²",
+      low: 6600,
+      high: 10400,
+      unit: "pro 100 m² Fundament",
+      note: "MyHammer-Referenzgröße 100 m²; kleinere Anbauten werden nicht proportional günstig, da Fixkosten bestehen",
+      sourceKey: "myhammerBodenplatte2026",
+    },
+    {
+      name: "Plattenfundament Referenz 100 m²",
+      low: 10000,
+      high: 14400,
+      unit: "pro 100 m² Fundament",
+      note: "MyHammer-Referenzgröße 100 m²",
+      sourceKey: "myhammerBodenplatte2026",
+    },
+    {
+      name: "Mauerarbeiten Hausanbau komplett mit Lohn",
+      low: 60,
+      high: 150,
+      unit: "pro m² Wandfläche",
+      sourceKey: "blauarbeitMauerarbeiten2026",
+    },
+    {
+      name: "Porenbeton Wand Hausanbau",
+      low: 60,
+      high: 90,
+      unit: "pro m² Wandfläche",
+      note: "Material und Arbeitslohn für gängige Wanddicken laut Blauarbeit",
+      sourceKey: "blauarbeitMauerarbeiten2026",
+    },
+    {
+      name: "Kalksandstein Wand Hausanbau",
+      low: 70,
+      high: 110,
+      unit: "pro m² Wandfläche",
+      sourceKey: "blauarbeitMauerarbeiten2026",
+    },
+    {
+      name: "Ziegel Wand Hausanbau",
+      low: 80,
+      high: 130,
+      unit: "pro m² Wandfläche",
+      sourceKey: "blauarbeitMauerarbeiten2026",
+    },
+    {
+      name: "Klinker Verblender Hausanbau",
+      low: 100,
+      high: 150,
+      unit: "pro m² Wandfläche",
+      sourceKey: "blauarbeitMauerarbeiten2026",
+    },
+  ],
+};
+
+export const services: Service[] = [...inheritedServices, hausanbauService];
+
+export { regions, renovationModel };
+
+export function getService(slug: string) {
+  return services.find((service) => service.slug === slug);
+}
+
+export function getRegion(slug: string) {
+  return regions.find((region) => region.slug === slug);
+}
