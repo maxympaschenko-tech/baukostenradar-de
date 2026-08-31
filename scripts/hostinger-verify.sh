@@ -1,11 +1,29 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+_hostinger_verify_startup_jitter() {
+  if [[ "${GITHUB_ACTIONS:-false}" != "true" ]]; then
+    return 0
+  fi
+
+  local marker="${RUNNER_TEMP:-/tmp}/baukostenradar-hostinger-jitter-${GITHUB_RUN_ID:-local}-${GITHUB_RUN_ATTEMPT:-1}"
+  if [[ -e "$marker" ]]; then
+    return 0
+  fi
+
+  local delay=$((RANDOM % 21))
+  echo "Hostinger verifier startup jitter: ${delay}s"
+  sleep "$delay"
+  : > "$marker"
+}
+
 fetch_hostinger() {
   local url="$1"
   local output="$2"
   local attempts="${3:-6}"
   local base_url separator attempt cache_bust
+
+  _hostinger_verify_startup_jitter
 
   base_url="$url"
   separator='?'

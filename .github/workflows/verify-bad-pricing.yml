@@ -57,8 +57,15 @@ jobs:
           with open('/tmp/sitemap.xml', encoding='utf-8') as handle:
               sitemap = handle.read()
 
+          source_count_match = re.search(r'(\d+)\s+geprüfte Quellen', bad)
+          if not source_count_match:
+              raise SystemExit('Bad source count missing')
+          source_count = int(source_count_match.group(1))
+          if source_count < 4:
+              raise SystemExit(f'Bad source count regressed: {source_count} < 4')
+          print(f'Bad: {source_count} geprüfte Quellen (minimum 4)')
+
           expected_main = (
-              '4 geprüfte Quellen',
               'Bad-Teilsanierung',
               'Demontage & Entsorgung altes Bad',
               'Rohinstallation Wasser & Elektro',
