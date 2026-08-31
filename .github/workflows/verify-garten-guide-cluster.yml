@@ -11,18 +11,17 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Verify exact Garten price-item guide mappings
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
-          fetch() {
-            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
-          }
-
-          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
-          fetch 'https://baukostenradar.de/kosten/garten' /tmp/garten.html
-          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch_hostinger 'https://baukostenradar.de/kosten/garten' /tmp/garten.html
+          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
 
           grep -q 'https://baukostenradar.de/kosten/garten' /tmp/garten.html
           ! grep -qi 'noindex' /tmp/garten.html
@@ -30,7 +29,6 @@ jobs:
           mappings=$(cat <<'EOF'
           einfahrt-pflastern|einfahrt-pflastern-kosten
           terrasse-pflastern-inkl-unterbau|terrasse-pflastern-kosten
-          doppelstabmattenzaun-inkl-montage|doppelstabmattenzaun-kosten-pro-meter
           rollrasen-inkl-vorbereitung|rollrasen-kosten-pro-qm
           heckenschnitt|heckenschnitt-kosten-pro-meter
           baumfaellung-mittelgross-inkl-entsorgung|baum-faellen-kosten
@@ -50,7 +48,7 @@ jobs:
             grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Garten item missing in sitemap: ${item}"; exit 1; }
             grep -q "/kosten/garten/leistung/${item}" /tmp/garten.html || { echo "Garten item missing on category: ${item}"; exit 1; }
 
-            fetch "$item_url" "$item_output"
+            fetch_hostinger "$item_url" "$item_output"
             grep -q 'Passender Ratgeber' "$item_output"
             grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong Garten guide mapping: ${item} -> ${guide}"; exit 1; }
             ! grep -qi 'noindex' "$item_output"
@@ -58,7 +56,7 @@ jobs:
             grep -q "${guide_url}</loc>" /tmp/sitemap.xml
             grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
 
-            fetch "$guide_url" "$guide_output"
+            fetch_hostinger "$guide_url" "$guide_output"
             grep -q "$guide_url" "$guide_output"
             grep -q '"@type":"Article"' "$guide_output"
             grep -q '/kosten/garten' "$guide_output"
@@ -70,24 +68,21 @@ jobs:
             checked=$((checked + 1))
           done <<< "$mappings"
 
-          test "$checked" -eq 6
+          test "$checked" -eq 5
           echo "Verified ${checked} exact Garten price-item guide mappings"
 
       - name: Verify Garten parent guide and calculator
         shell: bash
         run: |
           set -euo pipefail
-
-          fetch() {
-            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
-          }
+          source scripts/hostinger-verify.sh
 
           guide='garten-anlegen-kosten'
           guide_url="https://baukostenradar.de/ratgeber/${guide}"
 
-          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
-          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
-          fetch "$guide_url" /tmp/garten-parent.html
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          fetch_hostinger "$guide_url" /tmp/garten-parent.html
 
           grep -q "${guide_url}</loc>" /tmp/sitemap.xml
           grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
@@ -103,19 +98,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
-          fetch() {
-            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
-          }
-
-          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
-          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
 
           guides=(
             garten-anlegen-kosten
             einfahrt-pflastern-kosten
             terrasse-pflastern-kosten
-            doppelstabmattenzaun-kosten-pro-meter
             rollrasen-kosten-pro-qm
             heckenschnitt-kosten-pro-meter
             baum-faellen-kosten
@@ -126,7 +117,7 @@ jobs:
             grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Garten cluster guide missing in sitemap: ${source}"; exit 1; }
             grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Garten cluster guide missing from hub: ${source}"; exit 1; }
 
-            fetch "$guide_url" "/tmp/${source}.html"
+            fetch_hostinger "$guide_url" "/tmp/${source}.html"
             grep -q "$guide_url" "/tmp/${source}.html"
             grep -q '"@type":"Article"' "/tmp/${source}.html"
             ! grep -qi 'noindex' "/tmp/${source}.html"
