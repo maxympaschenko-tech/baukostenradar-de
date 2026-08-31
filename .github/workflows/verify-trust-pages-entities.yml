@@ -11,27 +11,16 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Fetch Methodik and Quellen pages
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
-          fetch_with_retry() {
-            local url="$1"
-            local output="$2"
-            for i in 1 2 3 4 5; do
-              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then
-                return 0
-              fi
-              if [[ "$i" == "5" ]]; then
-                return 1
-              fi
-              sleep 4
-            done
-          }
-
-          fetch_with_retry 'https://baukostenradar.de/methodik' /tmp/methodik.html
-          fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
+          fetch_hostinger 'https://baukostenradar.de/methodik' /tmp/methodik.html
+          fetch_hostinger 'https://baukostenradar.de/quellen' /tmp/quellen.html
 
       - name: Verify structured data and visible breadcrumbs
         shell: bash
