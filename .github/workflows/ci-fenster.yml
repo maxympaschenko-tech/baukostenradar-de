@@ -1,67 +1,70 @@
-name: Verify Fenster pricing cluster
+name: CI Fenster cluster
 
 on:
-  workflow_run:
-    workflows: ["Hostinger production ready"]
-    types: [completed]
-  workflow_dispatch:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-fenster-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  verify-fenster-cluster:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+  verify-fenster-runtime:
     runs-on: ubuntu-latest
     steps:
-      - name: Configure resilient live fetches
-        shell: bash
-        run: |
-          cat > ~/.curlrc <<'EOF'
-          retry = 6
-          retry-all-errors
-          retry-delay = 5
-          connect-timeout = 10
-          max-time = 30
-          user-agent = "Mozilla/5.0 (compatible; BauKostenRadarProductionVerifier/1.0)"
-          EOF
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Fetch Fenster production pages
-        shell: bash
-        run: |
-          set -euo pipefail
-          fetch_until_contains() {
-            local base_url="$1" output="$2" needle="$3" label="$4"
-            for attempt in 1 2 3 4 5 6; do
-              if curl -sSL --fail -H 'Cache-Control: no-cache' \
-                "${base_url}?verify=${GITHUB_SHA}-${attempt}" -o "$output"; then
-                if grep -Fq "$needle" "$output"; then
-                  return 0
-                fi
-              fi
-              if [ "$attempt" -eq 6 ]; then
-                echo "MISSING after retries: $label" >&2
-                echo "Expected in $output: $needle" >&2
-                return 1
-              fi
-              sleep 10
-            done
-          }
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
 
-          fetch_until_contains \
-            'https://baukostenradar.de/kosten/fenster' /tmp/fenster.html \
-            'Fenstertausch komplett inklusive Ausbau und Einbau' 'Fenster service page'
-          curl -sSL --fail 'https://baukostenradar.de/kosten/fenster/berlin' -o /tmp/fenster-berlin.html
-          fetch_until_contains \
-            'https://baukostenradar.de/quellen' /tmp/quellen.html \
-            'MyHammer - Dachfenster einbauen Kosten 2026' 'Fenster source directory'
-          curl -sSL --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
-          curl -sSL --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
-          curl -sSL --fail 'https://baukostenradar.de/kosten/kellerbau' -o /tmp/kellerbau-regression.html
-          curl -sSL --fail 'https://baukostenradar.de/ratgeber/fenster-austauschen-kosten-haus' -o /tmp/fenster-guide-regression.html
-          curl -sSL --fail 'https://baukostenradar.de/ratgeber/dachfenster-nachtraeglich-einbauen-kosten' -o /tmp/dachfenster-guide-regression.html
+      - name: Install dependencies
+        run: npm install
 
-      - name: Verify service, city, guides and source signals
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://example.de
+
+      - name: Verify Fenster standalone runtime
         shell: bash
         run: |
           set -euo pipefail
+
+          HOSTNAME=127.0.0.1 PORT=3001 NEXT_PUBLIC_SITE_URL=https://example.de node .next/standalone/server.js > /tmp/baukostenradar-ci-fenster-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl -sS --fail 'http://127.0.0.1:3001/kosten/fenster' -o /tmp/fenster.html; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$ready" -ne 1 ]; then
+            echo 'Production runtime did not become ready.' >&2
+            cat /tmp/baukostenradar-ci-fenster-server.log >&2 || true
+            exit 1
+          fi
+
+          curl -sS --fail 'http://127.0.0.1:3001/kosten/fenster/berlin' -o /tmp/fenster-berlin.html
+          curl -sS --fail 'http://127.0.0.1:3001/ratgeber' -o /tmp/ratgeber.html
+          curl -sS --fail 'http://127.0.0.1:3001/quellen' -o /tmp/quellen.html
+          curl -sS --fail 'http://127.0.0.1:3001/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'http://127.0.0.1:3001/kosten/kellerbau' -o /tmp/kellerbau-regression.html
+          curl -sS --fail 'http://127.0.0.1:3001/ratgeber/fenster-austauschen-kosten-haus' -o /tmp/fenster-guide-regression.html
+          curl -sS --fail 'http://127.0.0.1:3001/ratgeber/dachfenster-nachtraeglich-einbauen-kosten' -o /tmp/dachfenster-guide-regression.html
+
           require_contains() {
             local file="$1"; local needle="$2"; local label="$3"
             if ! grep -Fq "$needle" "$file"; then
@@ -87,8 +90,10 @@ jobs:
             'schallschutzfenster-kosten' \
             'sicherheitsglas-vsg-fenster-kosten' \
             'fenster-rollladen-kosten'; do
-            require_contains /tmp/ratgeber.html "/ratgeber/${guide}" "Fenster guide $guide"
-            require_contains /tmp/sitemap.xml "https://baukostenradar.de/ratgeber/${guide}</loc>" "Fenster guide sitemap $guide"
+            require_contains /tmp/ratgeber.html "/ratgeber/${guide}" "Fenster guide hub link $guide"
+            require_contains /tmp/sitemap.xml "https://example.de/ratgeber/${guide}</loc>" "Fenster guide sitemap $guide"
+            curl -sS --fail "http://127.0.0.1:3001/ratgeber/${guide}" -o "/tmp/${guide}.html"
+            ! grep -qi 'noindex' "/tmp/${guide}.html"
           done
 
           for source in \
@@ -98,22 +103,19 @@ jobs:
             require_contains /tmp/quellen.html "$source" "active Fenster source $source"
           done
 
-          require_contains /tmp/sitemap.xml 'https://baukostenradar.de/kosten/fenster</loc>' 'Fenster sitemap service'
-          require_contains /tmp/sitemap.xml 'https://baukostenradar.de/kosten/fenster/berlin</loc>' 'Fenster Berlin sitemap'
+          require_contains /tmp/sitemap.xml 'https://example.de/kosten/fenster</loc>' 'Fenster sitemap service'
+          require_contains /tmp/sitemap.xml 'https://example.de/kosten/fenster/berlin</loc>' 'Fenster Berlin sitemap'
           ! grep -qi 'noindex' /tmp/fenster.html
 
-      - name: Verify all Fenster price-detail mappings and sitemap
-        shell: bash
-        run: |
-          set -euo pipefail
           check_item() {
             local item="$1"; local guide="$2"
-            local url="https://baukostenradar.de/kosten/fenster/leistung/${item}"
             local output="/tmp/fenster-${item}.html"
-            grep -Fq "${url}</loc>" /tmp/sitemap.xml || { echo "Missing sitemap URL: $item" >&2; exit 1; }
-            curl -sSL --fail "$url" -o "$output"
-            grep -Fq 'Passender Ratgeber' "$output" || { echo "Missing guide CTA: $item" >&2; exit 1; }
-            grep -Fq "/ratgeber/${guide}" "$output" || { echo "Wrong guide mapping: $item -> $guide" >&2; exit 1; }
+            local local_url="http://127.0.0.1:3001/kosten/fenster/leistung/${item}"
+            local canonical="https://example.de/kosten/fenster/leistung/${item}"
+            curl -sS --fail "$local_url" -o "$output"
+            require_contains /tmp/sitemap.xml "${canonical}</loc>" "Fenster sitemap item $item"
+            require_contains "$output" 'Passender Ratgeber' "Fenster guide CTA $item"
+            require_contains "$output" "/ratgeber/${guide}" "Fenster guide mapping $item"
             ! grep -qi 'noindex' "$output"
           }
 

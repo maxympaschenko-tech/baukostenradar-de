@@ -15,11 +15,11 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/lib/pricing": ["./lib/catalog-kellerbau.ts"],
-      "@/lib/price-guide-links": ["./lib/price-guide-links-kellerbau.ts"],
-      "@/lib/all-guides": ["./lib/all-guides-kellerbau.ts"],
-      "@/lib/guide-groups": ["./lib/guide-groups-kellerbau.ts"],
-      "@/lib/guide-silo": ["./lib/guide-silo-kellerbau.ts"],
+      "@/lib/pricing": ["./lib/catalog-fenster.ts"],
+      "@/lib/price-guide-links": ["./lib/price-guide-links-fenster.ts"],
+      "@/lib/all-guides": ["./lib/all-guides-fenster.ts"],
+      "@/lib/guide-groups": ["./lib/guide-groups-fenster.ts"],
+      "@/lib/guide-silo": ["./lib/guide-silo-fenster.ts"],
       "@/*": ["./*"]
     }
   },
