@@ -1,0 +1,160 @@
+name: CI Kellerbau cluster
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-kellerbau-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-kellerbau-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://example.de
+
+      - name: Verify Kellerbau standalone runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          HOSTNAME=127.0.0.1 PORT=3001 NEXT_PUBLIC_SITE_URL=https://example.de node .next/standalone/server.js > /tmp/baukostenradar-ci-kellerbau-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl -sS --fail 'http://127.0.0.1:3001/kosten/kellerbau' -o /tmp/kellerbau.html; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$ready" -ne 1 ]; then
+            echo 'Production runtime did not become ready.' >&2
+            cat /tmp/baukostenradar-ci-kellerbau-server.log >&2 || true
+            exit 1
+          fi
+
+          curl -sS --fail 'http://127.0.0.1:3001/kosten/kellerbau/berlin' -o /tmp/kellerbau-berlin.html
+          curl -sS --fail 'http://127.0.0.1:3001/ratgeber' -o /tmp/ratgeber.html
+          curl -sS --fail 'http://127.0.0.1:3001/quellen' -o /tmp/quellen.html
+          curl -sS --fail 'http://127.0.0.1:3001/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'http://127.0.0.1:3001/kosten/hausanbau' -o /tmp/hausanbau-regression.html
+          curl -sS --fail 'http://127.0.0.1:3001/ratgeber/kellerabdichtung-aussen-oder-innen-kosten' -o /tmp/kellerabdichtung-regression.html
+
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+
+          require_contains /tmp/kellerbau.html 'Standard-Nutzkeller Neubau' 'Kellerbau core position'
+          require_contains /tmp/kellerbau.html 'Fertigkeller 120 m² Komplettkeller' 'Kellerbau size position'
+          require_contains /tmp/kellerbau.html 'Weiße Wanne Keller Mehrpreis' 'Kellerbau water protection position'
+          require_contains /tmp/kellerbau.html 'Perimeterdämmung Keller komplett' 'Kellerbau insulation position'
+          require_contains /tmp/kellerbau-berlin.html 'Kellerbau' 'Kellerbau Berlin city page'
+          require_contains /tmp/hausanbau-regression.html 'Hausanbau' 'Hausanbau regression'
+          require_contains /tmp/kellerabdichtung-regression.html 'Kellerabdichtung' 'Kellerabdichtung regression'
+
+          for guide in \
+            'kellerbau-kosten' \
+            'fertigkeller-kosten' \
+            'massivkeller-wohnkeller-kosten' \
+            'keller-80-100-120-qm-kosten' \
+            'kellerbau-erdarbeiten-weisse-wanne-kosten'; do
+            require_contains /tmp/ratgeber.html "/ratgeber/${guide}" "Kellerbau guide hub link $guide"
+            require_contains /tmp/sitemap.xml "https://example.de/ratgeber/${guide}</loc>" "Kellerbau guide sitemap $guide"
+            curl -sS --fail "http://127.0.0.1:3001/ratgeber/${guide}" -o "/tmp/${guide}.html"
+            ! grep -qi 'noindex' "/tmp/${guide}.html"
+          done
+
+          for source in \
+            'Fertighaus.de - Kellerbau Kosten 2026' \
+            'Fertighaus.de - Fertigkeller Kosten 2026' \
+            'Fertighaus.de - Weiße Wanne Kosten' \
+            'MyHammer - Keller bauen Kosten 2026' \
+            'MyHammer - Fertighaus mit Keller Kosten 2026' \
+            'MyHammer - Fertigkeller Kosten 2026' \
+            'Blauarbeit - Perimeterdämmung Kosten 2026'; do
+            require_contains /tmp/quellen.html "$source" "active Kellerbau source $source"
+          done
+
+          require_contains /tmp/sitemap.xml 'https://example.de/kosten/kellerbau</loc>' 'Kellerbau sitemap service'
+          require_contains /tmp/sitemap.xml 'https://example.de/kosten/kellerbau/berlin</loc>' 'Kellerbau Berlin sitemap'
+          ! grep -qi 'noindex' /tmp/kellerbau.html
+
+          check_item() {
+            local item="$1"; local guide="$2"
+            local output="/tmp/kellerbau-${item}.html"
+            local local_url="http://127.0.0.1:3001/kosten/kellerbau/leistung/${item}"
+            local canonical="https://example.de/kosten/kellerbau/leistung/${item}"
+            curl -sS --fail "$local_url" -o "$output"
+            require_contains /tmp/sitemap.xml "${canonical}</loc>" "Kellerbau sitemap item $item"
+            require_contains "$output" 'Passender Ratgeber' "Kellerbau guide CTA $item"
+            require_contains "$output" "/ratgeber/${guide}" "Kellerbau guide mapping $item"
+            ! grep -qi 'noindex' "$output"
+          }
+
+          mappings=(
+            'standard-nutzkeller-neubau|kellerbau-kosten'
+            'vollunterkellerung-einfamilienhaus-mehrkosten|kellerbau-kosten'
+            'massivkeller-nutzkeller|massivkeller-wohnkeller-kosten'
+            'massivkeller-wohnkeller|massivkeller-wohnkeller-kosten'
+            'fertigkeller-standard|fertigkeller-kosten'
+            'fertigkeller-wohnkeller|fertigkeller-kosten'
+            'fertigkeller-beispiel-87-m2|fertigkeller-kosten'
+            'keller-100-m2-nutz-bis-wohnkeller|keller-80-100-120-qm-kosten'
+            'fertigkeller-80-m2-mitbaukeller|keller-80-100-120-qm-kosten'
+            'fertigkeller-80-m2-ausbaukeller|keller-80-100-120-qm-kosten'
+            'fertigkeller-80-m2-komplettkeller|keller-80-100-120-qm-kosten'
+            'fertigkeller-99-m2-mitbaukeller|keller-80-100-120-qm-kosten'
+            'fertigkeller-99-m2-ausbaukeller|keller-80-100-120-qm-kosten'
+            'fertigkeller-99-m2-komplettkeller|keller-80-100-120-qm-kosten'
+            'fertigkeller-120-m2-mitbaukeller|keller-80-100-120-qm-kosten'
+            'fertigkeller-120-m2-ausbaukeller|keller-80-100-120-qm-kosten'
+            'fertigkeller-120-m2-komplettkeller|keller-80-100-120-qm-kosten'
+            'erdarbeiten-fertigkeller|kellerbau-erdarbeiten-weisse-wanne-kosten'
+            'bodengutachten-kellerbau|kellerbau-erdarbeiten-weisse-wanne-kosten'
+            'aushubentsorgung-kellerbau|kellerbau-erdarbeiten-weisse-wanne-kosten'
+            'abdichtung-und-entwaesserung-kellerbau|kellerbau-erdarbeiten-weisse-wanne-kosten'
+            'weisse-wanne-keller-mehrpreis|kellerbau-erdarbeiten-weisse-wanne-kosten'
+            'perimeterdaemmung-keller-komplett|kellerbau-erdarbeiten-weisse-wanne-kosten'
+            'xps-perimeterdaemmung-keller|kellerbau-erdarbeiten-weisse-wanne-kosten'
+            'schaumglas-perimeterdaemmung-keller|kellerbau-erdarbeiten-weisse-wanne-kosten'
+            'kleber-und-befestigung-perimeterdaemmung|kellerbau-erdarbeiten-weisse-wanne-kosten'
+            'verlegung-perimeterdaemmung-fachbetrieb|kellerbau-erdarbeiten-weisse-wanne-kosten'
+            'drainage-kellerbau|kellerbau-erdarbeiten-weisse-wanne-kosten'
+            'xps-unter-kellerbodenplatte|kellerbau-erdarbeiten-weisse-wanne-kosten'
+            'schaumglasschotter-unter-kellerbodenplatte|kellerbau-erdarbeiten-weisse-wanne-kosten'
+          )
+
+          [ "${#mappings[@]}" -eq 30 ] || { echo 'Expected exactly 30 Kellerbau mappings' >&2; exit 1; }
+          for mapping in "${mappings[@]}"; do
+            IFS='|' read -r item guide <<< "$mapping"
+            check_item "$item" "$guide"
+          done
