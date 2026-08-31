@@ -1,0 +1,30 @@
+name: Verify Ratgeber metadata consistency
+
+on:
+  pull_request:
+  workflow_run:
+    workflows: ["Hostinger production ready"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-ratgeber-metadata:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify source metadata contract
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'openGraph:' app/ratgeber/page.tsx
+          grep -q 'twitter:' app/ratgeber/page.tsx
+      - name: Verify production metadata consistency
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          source scripts/hostinger-verify.sh
+          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          python3 scripts/check-metadata-consistency.py /tmp/ratgeber.html
