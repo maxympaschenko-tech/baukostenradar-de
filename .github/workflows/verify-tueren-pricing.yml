@@ -1,84 +1,181 @@
-name: Verify Türen pricing expansion
+name: Verify Türen pricing cluster
 
 on:
   workflow_run:
-    workflows: ["Deploy to Ukraine.com.ua"]
+    workflows: ["Hostinger production ready"]
     types: [completed]
   workflow_dispatch:
 
 jobs:
-  verify-tueren-pricing:
+  verify-tueren-cluster:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Configure resilient live fetches
+        shell: bash
+        run: |
+          cat > ~/.curlrc <<'EOF'
+          retry = 6
+          retry-all-errors
+          retry-delay = 5
+          connect-timeout = 10
+          max-time = 30
+          user-agent = "Mozilla/5.0 (compatible; BauKostenRadarProductionVerifier/1.0)"
+          EOF
+
       - name: Fetch Türen production pages
         shell: bash
         run: |
           set -euo pipefail
-          fetch_with_retry() {
-            local url="$1" output="$2"
-            for i in 1 2 3 4 5; do
-              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then return 0; fi
-              [[ "$i" == "5" ]] && return 1
-              sleep 4
+          fetch_until_contains() {
+            local base_url="$1" output="$2" needle="$3" label="$4"
+            for attempt in 1 2 3 4 5 6; do
+              if curl -sSL --fail -H 'Cache-Control: no-cache' \
+                "${base_url}?verify=${GITHUB_SHA}-${attempt}" -o "$output"; then
+                if grep -Fq "$needle" "$output"; then
+                  return 0
+                fi
+              fi
+              if [ "$attempt" -eq 6 ]; then
+                echo "MISSING after retries: $label" >&2
+                echo "Expected in $output: $needle" >&2
+                return 1
+              fi
+              sleep 10
             done
           }
-          fetch_with_retry 'https://baukostenradar.de/kosten/tueren' /tmp/main.html
-          fetch_with_retry 'https://baukostenradar.de/kosten/tueren/muenchen' /tmp/city.html
-          fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
-          fetch_with_retry 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
 
-      - name: Verify source-backed Türen data
+          fetch_until_contains \
+            'https://baukostenradar.de/kosten/tueren' /tmp/tueren.html \
+            'Haustür komplett inklusive Einbau' 'Türen service page'
+          curl -sSL --fail 'https://baukostenradar.de/kosten/tueren/berlin' -o /tmp/tueren-berlin.html
+          fetch_until_contains \
+            'https://baukostenradar.de/quellen' /tmp/quellen.html \
+            'MyHammer - Türzarge einbauen Kosten' 'Türen source directory'
+          curl -sSL --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+          curl -sSL --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sSL --fail 'https://baukostenradar.de/kosten/fenster' -o /tmp/fenster-regression.html
+          curl -sSL --fail 'https://baukostenradar.de/ratgeber/haustuer-einbauen-kosten' -o /tmp/haustuer-einbauen-regression.html
+          curl -sSL --fail 'https://baukostenradar.de/ratgeber/haustuer-rc2-kosten' -o /tmp/rc2-regression.html
+          curl -sSL --fail 'https://baukostenradar.de/ratgeber/haustuer-kunststoff-kosten' -o /tmp/kunststoff-regression.html
+          curl -sSL --fail 'https://baukostenradar.de/ratgeber/6-innentueren-austauschen-kosten' -o /tmp/innentueren-regression.html
+
+          for guide in \
+            'innentueren-kosten' \
+            'tuerzarge-einbauen-kosten' \
+            'haustuer-material-kosten' \
+            'haustuer-zusatzausstattung-kosten' \
+            'schiebetuer-einbauen-kosten'; do
+            curl -sSL --fail "https://baukostenradar.de/ratgeber/${guide}" -o "/tmp/${guide}.html"
+          done
+
+      - name: Verify service, city, guides and source signals
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
-          import re
-          from html.parser import HTMLParser
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
 
-          class TextParser(HTMLParser):
-              def __init__(self): super().__init__(); self.parts = []
-              def handle_data(self, data):
-                  value = data.strip()
-                  if value: self.parts.append(value)
+          require_contains /tmp/tueren.html 'Haustür komplett inklusive Einbau' 'Türen complete Haustür position'
+          require_contains /tmp/tueren.html 'Holz-Aluminium-Haustür ohne Montage' 'Türen material position'
+          require_contains /tmp/tueren.html 'Türzarge einbauen komplett allgemein' 'Türen frame position'
+          require_contains /tmp/tueren.html 'Zimmertür inklusive Türelement und Einbau' 'Türen interior position'
+          require_contains /tmp/tueren.html 'Sicherheitshaustür RC3 Markenmodell' 'Türen RC3 position'
+          require_contains /tmp/tueren.html 'Schiebetür einfach vom Fachbetrieb einbauen' 'Türen sliding position'
+          require_contains /tmp/tueren-berlin.html 'Türen' 'Türen Berlin city page'
+          require_contains /tmp/fenster-regression.html 'Fenster' 'Fenster regression'
+          require_contains /tmp/haustuer-einbauen-regression.html 'Haustür' 'existing Haustür guide regression'
+          require_contains /tmp/rc2-regression.html 'RC2' 'existing RC2 guide regression'
+          require_contains /tmp/kunststoff-regression.html 'Kunststoff' 'existing Kunststoff guide regression'
+          require_contains /tmp/innentueren-regression.html 'Innentüren' 'existing Innentüren guide regression'
 
-          def text(path):
-              parser = TextParser()
-              with open(path, encoding='utf-8') as handle: parser.feed(handle.read())
-              return re.sub(r'\s+', ' ', ' '.join(parser.parts))
+          for guide in \
+            'innentueren-kosten' \
+            'tuerzarge-einbauen-kosten' \
+            'haustuer-material-kosten' \
+            'haustuer-zusatzausstattung-kosten' \
+            'schiebetuer-einbauen-kosten'; do
+            require_contains /tmp/ratgeber.html "/ratgeber/${guide}" "Türen guide $guide"
+            require_contains /tmp/sitemap.xml "https://baukostenradar.de/ratgeber/${guide}</loc>" "Türen guide sitemap $guide"
+            ! grep -qi 'noindex' "/tmp/${guide}.html"
+          done
 
-          main = text('/tmp/main.html')
-          city = text('/tmp/city.html')
-          quellen = text('/tmp/quellen.html')
-          sitemap = open('/tmp/sitemap.xml', encoding='utf-8').read()
+          require_contains /tmp/tuerzarge-einbauen-kosten.html '/kosten/tueren/leistung/holzzarge-eingangstuer-20-5-cm' '20.5 cm frame detail link'
+          require_contains /tmp/tuerzarge-einbauen-kosten.html '/kosten/tueren/leistung/stahlzarge-eingangstuer-28-5-cm' '28.5 cm frame detail link'
 
-          expected_main = (
-              '23 Preispositionen', '5 geprüfte Quellen',
-              'Glashaustür ohne Montage',
-              'Kunststoff-Haustür RC2 inkl. Einbau',
-              'Aluminium-Haustür RC2 mit zwei Seitenteilen inkl. Einbau',
-              'Premium-Haustür Massivholz RC2 mit Seitenteil und Oberlicht inkl. Einbau',
-              'Elektronisches Schloss oder Türöffner für Haustür',
-              'Fingerprint oder Motorschloss für Haustür',
-              'Alte Haustür ausbauen und entsorgen',
-              'Sondermaß oder Überhöhe bei Zimmertür',
-              'Eingemauerte alte Stahlzarge ausbauen',
-              'Schiebetür aus Glas Standard komplett einbauen',
-              'Blauarbeit - Schiebetür einbauen Kosten 2026',
+          for source in \
+            'Aroundhome - Haustür Kosten 2026' \
+            'MyHammer - Türzarge einbauen Kosten' \
+            'Blauarbeit - Tür einbauen Kosten 2026' \
+            'Blauarbeit - Schiebetür einbauen Kosten 2026'; do
+            require_contains /tmp/quellen.html "$source" "active Türen source $source"
+          done
+
+          require_contains /tmp/sitemap.xml 'https://baukostenradar.de/kosten/tueren</loc>' 'Türen sitemap service'
+          require_contains /tmp/sitemap.xml 'https://baukostenradar.de/kosten/tueren/berlin</loc>' 'Türen Berlin sitemap'
+          ! grep -qi 'noindex' /tmp/tueren.html
+
+      - name: Verify all Türen price-detail mappings and sitemap
+        shell: bash
+        run: |
+          set -euo pipefail
+          check_item() {
+            local item="$1"; local guide="$2"
+            local url="https://baukostenradar.de/kosten/tueren/leistung/${item}"
+            local output="/tmp/tueren-${item}.html"
+            grep -Fq "${url}</loc>" /tmp/sitemap.xml || { echo "Missing sitemap URL: $item" >&2; exit 1; }
+            curl -sSL --fail "$url" -o "$output"
+            grep -Fq 'Passender Ratgeber' "$output" || { echo "Missing guide CTA: $item" >&2; exit 1; }
+            grep -Fq "/ratgeber/${guide}" "$output" || { echo "Wrong guide mapping: $item -> $guide" >&2; exit 1; }
+            ! grep -qi 'noindex' "$output"
+          }
+
+          mappings=(
+            'haustuer-komplett-inklusive-einbau|haustuer-material-kosten'
+            'kunststoff-haustuer-ohne-montage|haustuer-material-kosten'
+            'aluminium-haustuer-ohne-montage|haustuer-material-kosten'
+            'holz-haustuer-ohne-montage|haustuer-material-kosten'
+            'holz-aluminium-haustuer-ohne-montage|haustuer-material-kosten'
+            'haustuer-fachgerecht-einbauen|haustuer-material-kosten'
+            'glaseinsatz-fuer-haustuer|haustuer-zusatzausstattung-kosten'
+            'seitenteil-oder-oberlicht-fuer-haustuer|haustuer-zusatzausstattung-kosten'
+            'standardschloss-zylinder-und-klinke-haustuer|haustuer-zusatzausstattung-kosten'
+            'sicherheitshaustuer-rc3-markenmodell|haustuer-zusatzausstattung-kosten'
+            'waermeschutz-haustuer-u-wert-unter-1|haustuer-zusatzausstattung-kosten'
+            'schallschutztuer-stahl-hohe-schallschutzklasse|haustuer-zusatzausstattung-kosten'
+            'tuerzarge-einbauen-komplett-allgemein|tuerzarge-einbauen-kosten'
+            'holzzarge-innentuer-10-cm|tuerzarge-einbauen-kosten'
+            'stahlzarge-innentuer-10-cm|tuerzarge-einbauen-kosten'
+            'holzzarge-eingangstuer-20-5-cm|tuerzarge-einbauen-kosten'
+            'stahlzarge-eingangstuer-28-5-cm|tuerzarge-einbauen-kosten'
+            'kleinmaterial-und-bauschaum-fuer-tuerzarge|tuerzarge-einbauen-kosten'
+            'zarge-innentuer-montieren|tuerzarge-einbauen-kosten'
+            'zarge-eingangstuer-montieren|tuerzarge-einbauen-kosten'
+            'zimmertuer-standardmass-reine-montage|innentueren-kosten'
+            'zimmertuer-inklusive-tuerelement-und-einbau|innentueren-kosten'
+            'tuerblatt-tauschen-montage|innentueren-kosten'
+            'tuerblatt-standardausfuehrung|innentueren-kosten'
+            'cpl-tuerblatt|innentueren-kosten'
+            'echtholzfurnier-tuerblatt|innentueren-kosten'
+            'schallschutztuer-oder-brandschutztuer-innen|innentueren-kosten'
+            'tischler-tuereinbau-stundensatz|innentueren-kosten'
+            'alte-innentuer-demontieren-und-entsorgen|innentueren-kosten'
+            'fuenf-zimmertueren-inklusive-elemente-komplett|innentueren-kosten'
+            'fuenf-zimmertueren-montage|innentueren-kosten'
+            'schiebetuer-einfach-vom-fachbetrieb-einbauen|schiebetuer-einbauen-kosten'
+            'schiebetuer-montage-standardbeispiel|schiebetuer-einbauen-kosten'
+            'schiebetuer-sandgestrahlte-glastuer-material|schiebetuer-einbauen-kosten'
+            'schiebetuer-anfahrt-standardbeispiel|schiebetuer-einbauen-kosten'
           )
-          for needle in expected_main:
-              if needle not in main: raise SystemExit(f'Missing Türen signal: {needle}')
 
-          for needle in ('Türen Kosten in München 2026', 'Kunststoff-Haustür RC2 inkl. Einbau', 'Alte Haustür ausbauen und entsorgen', 'Schiebetür aus Glas Standard komplett einbauen'):
-              if needle not in city: raise SystemExit(f'Missing München Türen signal: {needle}')
-
-          for needle in ('Aroundhome - Haustür Preise & Kosten 2026', 'Blauarbeit - Tür einbauen Kosten 2026', 'Blauarbeit - Schiebetür einbauen Kosten 2026'):
-              if needle not in quellen: raise SystemExit(f'Missing Türen source: {needle}')
-
-          for needle in (
-              '/kosten/tueren/leistung/kunststoff-haustuer-rc2-inkl-einbau',
-              '/kosten/tueren/leistung/fingerprint-oder-motorschloss-fuer-haustuer',
-              '/kosten/tueren/leistung/schiebetuer-aus-glas-standard-komplett-einbauen',
-          ):
-              if needle not in sitemap: raise SystemExit(f'Missing Türen URL: {needle}')
-          PY
+          [ "${#mappings[@]}" -eq 35 ] || { echo 'Expected exactly 35 Türen mappings' >&2; exit 1; }
+          for mapping in "${mappings[@]}"; do
+            IFS='|' read -r item guide <<< "$mapping"
+            check_item "$item" "$guide"
+          done
