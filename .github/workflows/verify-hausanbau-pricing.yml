@@ -1,0 +1,165 @@
+name: Verify Hausanbau pricing cluster
+
+on:
+  workflow_run:
+    workflows: ["Hostinger production ready"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-hausanbau-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure resilient live fetches
+        shell: bash
+        run: |
+          cat > ~/.curlrc <<'EOF'
+          retry = 6
+          retry-all-errors
+          retry-delay = 5
+          connect-timeout = 10
+          max-time = 30
+          EOF
+
+      - name: Fetch Hausanbau production pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          fetch_until_contains() {
+            local base_url="$1" output="$2" needle="$3" label="$4"
+            for attempt in 1 2 3 4 5 6; do
+              if curl -sSL --fail -H 'Cache-Control: no-cache' \
+                "${base_url}?verify=${GITHUB_SHA}-${attempt}" -o "$output"; then
+                if grep -Fq "$needle" "$output"; then
+                  return 0
+                fi
+              fi
+              if [ "$attempt" -eq 6 ]; then
+                echo "MISSING after retries: $label" >&2
+                echo "Expected in $output: $needle" >&2
+                return 1
+              fi
+              sleep 10
+            done
+          }
+
+          fetch_until_contains \
+            'https://baukostenradar.de/kosten/hausanbau' /tmp/hausanbau.html \
+            'Hausanbau schlüsselfertig massiv' 'Hausanbau service page'
+          curl -sSL --fail 'https://baukostenradar.de/kosten/hausanbau/berlin' -o /tmp/hausanbau-berlin.html
+          fetch_until_contains \
+            'https://baukostenradar.de/quellen' /tmp/quellen.html \
+            'bauen.de - Hausanbau Kosten 2026' 'Hausanbau source directory'
+          curl -sSL --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+          curl -sSL --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+
+      - name: Verify service, city, guides and source signals
+        shell: bash
+        run: |
+          set -euo pipefail
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+
+          require_contains /tmp/hausanbau.html 'Hausanbau schlüsselfertig massiv' 'Hausanbau core position'
+          require_contains /tmp/hausanbau.html 'Hausanbau 60 m² Gesamtbeispiel' 'Hausanbau size position'
+          require_contains /tmp/hausanbau.html 'Rohbau Hausanbau Gebäudehülle' 'Hausanbau Rohbau position'
+          require_contains /tmp/hausanbau-berlin.html 'Hausanbau' 'Hausanbau Berlin city page'
+
+          for guide in \
+            'hausanbau-kosten' \
+            'hausanbau-20-30-50-qm-kosten' \
+            'hausanbau-massiv-holz-fertigbau-kosten' \
+            'hausanbau-rohbau-fundament-kosten' \
+            'hausanbau-innenausbau-kosten'; do
+            require_contains /tmp/ratgeber.html "/ratgeber/${guide}" "Hausanbau guide $guide"
+            require_contains /tmp/sitemap.xml "https://baukostenradar.de/ratgeber/${guide}</loc>" "Hausanbau guide sitemap $guide"
+          done
+
+          for source in \
+            'bauen.de - Hausanbau Kosten 2026' \
+            'Trustlocal - Anbau Haus Kosten 2026' \
+            'Blauarbeit - Rohbau Kosten 2026' \
+            'Blauarbeit - Mauerarbeiten Kosten 2026' \
+            'MyHammer - Bodenplatte Kosten 2026'; do
+            require_contains /tmp/quellen.html "$source" "active Hausanbau source $source"
+          done
+
+          require_contains /tmp/sitemap.xml 'https://baukostenradar.de/kosten/hausanbau</loc>' 'Hausanbau sitemap service'
+          require_contains /tmp/sitemap.xml 'https://baukostenradar.de/kosten/hausanbau/berlin</loc>' 'Hausanbau Berlin sitemap'
+          ! grep -qi 'noindex' /tmp/hausanbau.html
+
+      - name: Verify all Hausanbau price-detail mappings and sitemap
+        shell: bash
+        run: |
+          set -euo pipefail
+          check_item() {
+            local item="$1"; local guide="$2"
+            local url="https://baukostenradar.de/kosten/hausanbau/leistung/${item}"
+            local output="/tmp/hausanbau-${item}.html"
+            grep -Fq "${url}</loc>" /tmp/sitemap.xml || { echo "Missing sitemap URL: $item" >&2; exit 1; }
+            curl -sSL --fail "$url" -o "$output"
+            grep -Fq 'Passender Ratgeber' "$output" || { echo "Missing guide CTA: $item" >&2; exit 1; }
+            grep -Fq "/ratgeber/${guide}" "$output" || { echo "Wrong guide mapping: $item -> $guide" >&2; exit 1; }
+            ! grep -qi 'noindex' "$output"
+          }
+
+          mappings=(
+            'hausanbau-schluesselfertig-massiv|hausanbau-kosten'
+            'seitlicher-anbau-massiv-ohne-innenausbau|hausanbau-kosten'
+            'rueckwaertiger-anbau-massiv-ohne-innenausbau|hausanbau-kosten'
+            'fertigmodul-anbau-ohne-innenausbau|hausanbau-kosten'
+            'fertigmodul-anbau-schluesselfertig|hausanbau-kosten'
+            'hausanbau-mit-flachdach|hausanbau-kosten'
+            'seitliche-verlaengerung-haus|hausanbau-kosten'
+            'haus-verbreitern-anbau|hausanbau-kosten'
+            'mehrgeschossiger-hausanbau-drei-etagen|hausanbau-kosten'
+            'hausanbau-20-m2-einfache-erweiterung|hausanbau-20-30-50-qm-kosten'
+            'hausanbau-30-m2-mittelgross|hausanbau-20-30-50-qm-kosten'
+            'hausanbau-50-m2-gross|hausanbau-20-30-50-qm-kosten'
+            'hausanbau-60-m2-gesamtbeispiel|hausanbau-20-30-50-qm-kosten'
+            'fundament-60-m2-hausanbau|hausanbau-20-30-50-qm-kosten'
+            'mauerwerk-und-daemmung-60-m2-hausanbau|hausanbau-20-30-50-qm-kosten'
+            'dach-60-m2-hausanbau|hausanbau-20-30-50-qm-kosten'
+            'fenster-und-tueren-60-m2-hausanbau|hausanbau-20-30-50-qm-kosten'
+            'elektroinstallation-60-m2-hausanbau|hausanbau-20-30-50-qm-kosten'
+            'heizung-und-sanitaer-60-m2-hausanbau|hausanbau-20-30-50-qm-kosten'
+            'innenausbau-60-m2-hausanbau|hausanbau-20-30-50-qm-kosten'
+            'baunebenkosten-60-m2-hausanbau|hausanbau-20-30-50-qm-kosten'
+            'hausanbau-holzstaenderbauweise|hausanbau-massiv-holz-fertigbau-kosten'
+            'hausanbau-massivbauweise-ziegel-oder-beton|hausanbau-massiv-holz-fertigbau-kosten'
+            'hausanbau-fertigbauweise|hausanbau-massiv-holz-fertigbau-kosten'
+            'hausanbau-stahlkonstruktion|hausanbau-massiv-holz-fertigbau-kosten'
+            'rohbau-hausanbau-gebaeudehuelle|hausanbau-rohbau-fundament-kosten'
+            'bodenplatte-fundament-hausanbau|hausanbau-rohbau-fundament-kosten'
+            'streifenfundament-referenz-100-m2|hausanbau-rohbau-fundament-kosten'
+            'plattenfundament-referenz-100-m2|hausanbau-rohbau-fundament-kosten'
+            'mauerarbeiten-hausanbau-komplett-mit-lohn|hausanbau-rohbau-fundament-kosten'
+            'porenbeton-wand-hausanbau|hausanbau-rohbau-fundament-kosten'
+            'kalksandstein-wand-hausanbau|hausanbau-rohbau-fundament-kosten'
+            'ziegel-wand-hausanbau|hausanbau-rohbau-fundament-kosten'
+            'klinker-verblender-hausanbau|hausanbau-rohbau-fundament-kosten'
+            'standardfenster-hausanbau-doppelt-verglast|hausanbau-innenausbau-kosten'
+            'energiesparfenster-hausanbau-dreifachverglasung|hausanbau-innenausbau-kosten'
+            'innentuer-hausanbau-standard|hausanbau-innenausbau-kosten'
+            'aussentuer-hausanbau-holz-oder-aluminium|hausanbau-innenausbau-kosten'
+            'laminat-hausanbau-einfach|hausanbau-innenausbau-kosten'
+            'parkett-hausanbau-hochwertig|hausanbau-innenausbau-kosten'
+            'fussbodenheizung-hausanbau|hausanbau-innenausbau-kosten'
+            'smart-home-integration-hausanbau|hausanbau-innenausbau-kosten'
+            'innenwaende-und-decken-hausanbau|hausanbau-innenausbau-kosten'
+            'malerarbeiten-und-tapeten-hausanbau|hausanbau-innenausbau-kosten'
+            'fassade-verputzen-hausanbau|hausanbau-innenausbau-kosten'
+          )
+
+          [ "${#mappings[@]}" -eq 45 ] || { echo 'Expected exactly 45 Hausanbau mappings' >&2; exit 1; }
+          for mapping in "${mappings[@]}"; do
+            IFS='|' read -r item guide <<< "$mapping"
+            check_item "$item" "$guide"
+          done
