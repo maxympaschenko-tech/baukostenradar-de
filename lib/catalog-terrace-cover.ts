@@ -141,7 +141,7 @@ const terraceCoverService: Service = {
       low: 4000,
       high: 15000,
       unit: "pro Projekt",
-      sourceKey: "aroundhomeTerrassenueberdachung2026",
+      sourceKey: "aroundhomeLamellendach2026",
     },
     {
       name: "VSG Klarglas Terrassendach",
