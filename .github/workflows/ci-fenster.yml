@@ -1,0 +1,157 @@
+name: CI Fenster cluster
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-fenster-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-fenster-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://example.de
+
+      - name: Verify Fenster standalone runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          HOSTNAME=127.0.0.1 PORT=3001 NEXT_PUBLIC_SITE_URL=https://example.de node .next/standalone/server.js > /tmp/baukostenradar-ci-fenster-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl -sS --fail 'http://127.0.0.1:3001/kosten/fenster' -o /tmp/fenster.html; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$ready" -ne 1 ]; then
+            echo 'Production runtime did not become ready.' >&2
+            cat /tmp/baukostenradar-ci-fenster-server.log >&2 || true
+            exit 1
+          fi
+
+          curl -sS --fail 'http://127.0.0.1:3001/kosten/fenster/berlin' -o /tmp/fenster-berlin.html
+          curl -sS --fail 'http://127.0.0.1:3001/ratgeber' -o /tmp/ratgeber.html
+          curl -sS --fail 'http://127.0.0.1:3001/quellen' -o /tmp/quellen.html
+          curl -sS --fail 'http://127.0.0.1:3001/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'http://127.0.0.1:3001/kosten/kellerbau' -o /tmp/kellerbau-regression.html
+          curl -sS --fail 'http://127.0.0.1:3001/ratgeber/fenster-austauschen-kosten-haus' -o /tmp/fenster-guide-regression.html
+          curl -sS --fail 'http://127.0.0.1:3001/ratgeber/dachfenster-nachtraeglich-einbauen-kosten' -o /tmp/dachfenster-guide-regression.html
+
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+
+          require_contains /tmp/fenster.html 'Fenstertausch komplett inklusive Ausbau und Einbau' 'Fenster complete replacement position'
+          require_contains /tmp/fenster.html 'Holz-Aluminiumfenster 1300 x 1300 mm Dreifachverglasung' 'Fenster frame material position'
+          require_contains /tmp/fenster.html 'Schallschutzfenster Kunststoff bis 43 dB' 'Fenster soundproof position'
+          require_contains /tmp/fenster.html 'Neues Fenster mit Rollladen inklusive Einbau' 'Fenster shutter position'
+          require_contains /tmp/fenster.html 'Dachfenster mit Balkonfunktion nachträglich komplett' 'Fenster roof position'
+          require_contains /tmp/fenster-berlin.html 'Fenster' 'Fenster Berlin city page'
+          require_contains /tmp/kellerbau-regression.html 'Kellerbau' 'Kellerbau regression'
+          require_contains /tmp/fenster-guide-regression.html 'Fenster' 'existing Fenster guide regression'
+          require_contains /tmp/dachfenster-guide-regression.html 'Dachfenster' 'existing Dachfenster guide regression'
+
+          for guide in \
+            'fenster-rahmenmaterial-kosten' \
+            'waermeschutzfenster-kosten' \
+            'schallschutzfenster-kosten' \
+            'sicherheitsglas-vsg-fenster-kosten' \
+            'fenster-rollladen-kosten'; do
+            require_contains /tmp/ratgeber.html "/ratgeber/${guide}" "Fenster guide hub link $guide"
+            require_contains /tmp/sitemap.xml "https://example.de/ratgeber/${guide}</loc>" "Fenster guide sitemap $guide"
+            curl -sS --fail "http://127.0.0.1:3001/ratgeber/${guide}" -o "/tmp/${guide}.html"
+            ! grep -qi 'noindex' "/tmp/${guide}.html"
+          done
+
+          for source in \
+            'MyHammer - Fenstereinbau Kosten 2026' \
+            'MyHammer - Dachfenster einbauen Kosten 2026' \
+            'Aroundhome - Rollladen Kosten'; do
+            require_contains /tmp/quellen.html "$source" "active Fenster source $source"
+          done
+
+          require_contains /tmp/sitemap.xml 'https://example.de/kosten/fenster</loc>' 'Fenster sitemap service'
+          require_contains /tmp/sitemap.xml 'https://example.de/kosten/fenster/berlin</loc>' 'Fenster Berlin sitemap'
+          ! grep -qi 'noindex' /tmp/fenster.html
+
+          check_item() {
+            local item="$1"; local guide="$2"
+            local output="/tmp/fenster-${item}.html"
+            local local_url="http://127.0.0.1:3001/kosten/fenster/leistung/${item}"
+            local canonical="https://example.de/kosten/fenster/leistung/${item}"
+            curl -sS --fail "$local_url" -o "$output"
+            require_contains /tmp/sitemap.xml "${canonical}</loc>" "Fenster sitemap item $item"
+            require_contains "$output" 'Passender Ratgeber' "Fenster guide CTA $item"
+            require_contains "$output" "/ratgeber/${guide}" "Fenster guide mapping $item"
+            ! grep -qi 'noindex' "$output"
+          }
+
+          mappings=(
+            'fenstertausch-komplett-inklusive-ausbau-und-einbau|fenster-austauschen-kosten-haus'
+            'kunststofffenster-1300-x-1300-mm-zweifachverglasung|fenster-rahmenmaterial-kosten'
+            'aluminiumfenster-1300-x-1300-mm-zweifachverglasung|fenster-rahmenmaterial-kosten'
+            'holzfenster-1300-x-1300-mm-zweifachverglasung|fenster-rahmenmaterial-kosten'
+            'kunststoff-aluminiumfenster-1300-x-1300-mm-zweifachverglasung|fenster-rahmenmaterial-kosten'
+            'holz-aluminiumfenster-1300-x-1300-mm-zweifachverglasung|fenster-rahmenmaterial-kosten'
+            'kunststofffenster-1300-x-1300-mm-dreifachverglasung|fenster-rahmenmaterial-kosten'
+            'holzfenster-1300-x-1300-mm-dreifachverglasung|fenster-rahmenmaterial-kosten'
+            'aluminiumfenster-1300-x-1300-mm-dreifachverglasung|fenster-rahmenmaterial-kosten'
+            'kunststoff-aluminiumfenster-1300-x-1300-mm-dreifachverglasung|fenster-rahmenmaterial-kosten'
+            'holz-aluminiumfenster-1300-x-1300-mm-dreifachverglasung|fenster-rahmenmaterial-kosten'
+            'waermeschutzfenster-1100-x-1400-mm|waermeschutzfenster-kosten'
+            'waermeschutzglas-fenster|waermeschutzfenster-kosten'
+            'kunststofffenster-vsg-innen-1300-x-1300-mm|sicherheitsglas-vsg-fenster-kosten'
+            'kunststofffenster-vsg-aussen-1300-x-1300-mm|sicherheitsglas-vsg-fenster-kosten'
+            'kunststofffenster-vsg-beidseitig-1300-x-1300-mm|sicherheitsglas-vsg-fenster-kosten'
+            'schallschutzfenster-kunststoff-bis-34-db|schallschutzfenster-kosten'
+            'schallschutzfenster-kunststoff-bis-37-db|schallschutzfenster-kosten'
+            'schallschutzfenster-kunststoff-bis-40-db|schallschutzfenster-kosten'
+            'schallschutzfenster-kunststoff-bis-43-db|schallschutzfenster-kosten'
+            'rollladen-inklusive-montage-am-fenster|fenster-rollladen-kosten'
+            'neues-fenster-mit-rollladen-inklusive-einbau|fenster-rollladen-kosten'
+            'rollladen-nachtraeglich-inklusive-montage|fenster-rollladen-kosten'
+            'dachfenster-schwingfenster-inklusive-einbau|dachfenster-nachtraeglich-einbauen-kosten'
+            'dachfenster-klapp-schwing-fenster-inklusive-einbau|dachfenster-nachtraeglich-einbauen-kosten'
+            'dachfenster-mit-elektroantrieb|dachfenster-nachtraeglich-einbauen-kosten'
+            'dachfenster-nachtraeglich-klassisches-schwingfenster-komplett|dachfenster-nachtraeglich-einbauen-kosten'
+            'dachfenster-mit-balkonfunktion-nachtraeglich-komplett|dachfenster-nachtraeglich-einbauen-kosten'
+          )
+
+          [ "${#mappings[@]}" -eq 28 ] || { echo 'Expected exactly 28 Fenster mappings' >&2; exit 1; }
+          for mapping in "${mappings[@]}"; do
+            IFS='|' read -r item guide <<< "$mapping"
+            check_item "$item" "$guide"
+          done
