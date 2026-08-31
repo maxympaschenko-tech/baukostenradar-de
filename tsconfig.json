@@ -15,11 +15,11 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/lib/pricing": ["./lib/catalog-wintergarten.ts"],
-      "@/lib/price-guide-links": ["./lib/price-guide-links-wintergarten.ts"],
-      "@/lib/all-guides": ["./lib/all-guides-wintergarten.ts"],
-      "@/lib/guide-groups": ["./lib/guide-groups-wintergarten.ts"],
-      "@/lib/guide-silo": ["./lib/guide-silo-wintergarten.ts"],
+      "@/lib/pricing": ["./lib/catalog-carport-garage.ts"],
+      "@/lib/price-guide-links": ["./lib/price-guide-links-carport-garage.ts"],
+      "@/lib/all-guides": ["./lib/all-guides-carport-garage.ts"],
+      "@/lib/guide-groups": ["./lib/guide-groups-carport-garage.ts"],
+      "@/lib/guide-silo": ["./lib/guide-silo-carport-garage.ts"],
       "@/*": ["./*"]
     }
   },
