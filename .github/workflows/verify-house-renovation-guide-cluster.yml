@@ -11,17 +11,16 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Verify house renovation guides and full peer silo
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
-          fetch() {
-            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
-          }
-
-          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
-          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
 
           guides=(
             sanierungskosten-pro-qm
@@ -38,7 +37,7 @@ jobs:
             grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "House renovation guide missing in sitemap: ${source}"; exit 1; }
             grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "House renovation guide missing from hub: ${source}"; exit 1; }
 
-            fetch "$guide_url" "$guide_html"
+            fetch_hostinger "$guide_url" "$guide_html"
             grep -q "$guide_url" "$guide_html"
             grep -q '"@type":"Article"' "$guide_html"
             grep -q '/rechner/renovierungskosten' "$guide_html"
@@ -58,18 +57,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
-          fetch() {
-            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
-          }
+          source scripts/hostinger-verify.sh
 
           guide='kernsanierung-kosten'
           calculator_url='https://baukostenradar.de/rechner/renovierungskosten?umfang=core'
 
-          fetch "https://baukostenradar.de/ratgeber/${guide}" /tmp/kernsanierung.html
+          fetch_hostinger "https://baukostenradar.de/ratgeber/${guide}" /tmp/kernsanierung.html
           grep -q '/rechner/renovierungskosten?umfang=core' /tmp/kernsanierung.html
 
-          fetch "$calculator_url" /tmp/kernsanierung-calculator.html
+          fetch_hostinger "$calculator_url" /tmp/kernsanierung-calculator.html
           grep -q 'Renovierungskosten Rechner 2026' /tmp/kernsanierung-calculator.html
           grep -Eq 'value="core"[^>]*selected|selected[^>]*value="core"' /tmp/kernsanierung-calculator.html || { echo 'Calculator did not preload Kernsanierung scope'; exit 1; }
           grep -q 'Kernsanierung' /tmp/kernsanierung-calculator.html
