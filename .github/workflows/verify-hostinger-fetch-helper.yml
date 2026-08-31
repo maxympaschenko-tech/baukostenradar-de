@@ -8,10 +8,14 @@ on:
       - 'app/ratgeber/layout.tsx'
       - 'app/ratgeber/page.tsx'
       - '.github/workflows/verify-bad-pricing.yml'
+      - '.github/workflows/verify-city-hubs.yml'
+      - '.github/workflows/verify-garten-guide-cluster.yml'
       - '.github/workflows/verify-garten-pricing.yml'
       - '.github/workflows/verify-internal-social-metadata.yml'
       - '.github/workflows/verify-opportunity-guides.yml'
       - '.github/workflows/verify-price-guide-silo.yml'
+      - '.github/workflows/verify-service-city-guide-silo.yml'
+      - '.github/workflows/verify-specialist-guides.yml'
       - '.github/workflows/verify-hostinger-fetch-helper.yml'
   workflow_dispatch:
 
@@ -30,6 +34,8 @@ jobs:
           grep -q 'Cache-Control: no-cache' scripts/hostinger-verify.sh
           grep -q 'ci_verify=' scripts/hostinger-verify.sh
           grep -q -- '--retry-all-errors' scripts/hostinger-verify.sh
+          grep -q 'HOSTINGER_VERIFY_JITTER_DONE' scripts/hostinger-verify.sh
+          grep -q 'RANDOM % 21' scripts/hostinger-verify.sh
 
       - name: Verify production workflows use shared Hostinger fetch
         shell: bash
@@ -38,9 +44,12 @@ jobs:
           for file in \
             .github/workflows/verify-bad-pricing.yml \
             .github/workflows/verify-garten-pricing.yml \
+            .github/workflows/verify-garten-guide-cluster.yml \
             .github/workflows/verify-internal-social-metadata.yml \
             .github/workflows/verify-opportunity-guides.yml \
-            .github/workflows/verify-price-guide-silo.yml; do
+            .github/workflows/verify-price-guide-silo.yml \
+            .github/workflows/verify-service-city-guide-silo.yml \
+            .github/workflows/verify-specialist-guides.yml; do
             grep -q 'source scripts/hostinger-verify.sh' "$file"
           done
 
@@ -48,6 +57,20 @@ jobs:
           ! grep -q "'17 Preispositionen'" .github/workflows/verify-garten-pricing.yml
           grep -q 'check-service-count.py /tmp/bad.html 14 Bad' .github/workflows/verify-bad-pricing.yml
           grep -q 'check-service-count.py /tmp/garten.html 17 Garten' .github/workflows/verify-garten-pricing.yml
+
+      - name: Verify Zaunbau taxonomy contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          grep -q 'doppelstabmattenzaun-kosten-pro-meter|zaunbau|metallzaun-oder-doppelstabmatten-material|zaun-bauen-kosten-pro-meter' \
+            .github/workflows/verify-opportunity-guides.yml
+          ! grep -q 'doppelstabmattenzaun-inkl-montage|doppelstabmattenzaun-kosten-pro-meter' \
+            .github/workflows/verify-garten-guide-cluster.yml
+          grep -q 'check_mapping zaunbau zaun-bauen-kosten-pro-meter metallzaun-oder-doppelstabmatten-material doppelstabmattenzaun-kosten-pro-meter' \
+            .github/workflows/verify-specialist-guides.yml
+          grep -q 'check_mapping garten garten-anlegen-kosten einfahrt-pflastern einfahrt-pflastern-kosten' \
+            .github/workflows/verify-specialist-guides.yml
 
       - name: Verify Ratgeber page and social descriptions match
         shell: bash
