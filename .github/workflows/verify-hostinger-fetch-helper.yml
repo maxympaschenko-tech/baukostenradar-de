@@ -16,6 +16,7 @@ on:
       - '.github/workflows/verify-internal-social-metadata.yml'
       - '.github/workflows/verify-opportunity-guides.yml'
       - '.github/workflows/verify-price-guide-silo.yml'
+      - '.github/workflows/verify-ratgeber-article-dates.yml'
       - '.github/workflows/verify-sanitaer-pricing.yml'
       - '.github/workflows/verify-service-city-guide-silo.yml'
       - '.github/workflows/verify-specialist-guides.yml'
@@ -54,6 +55,7 @@ jobs:
             .github/workflows/verify-internal-social-metadata.yml \
             .github/workflows/verify-opportunity-guides.yml \
             .github/workflows/verify-price-guide-silo.yml \
+            .github/workflows/verify-ratgeber-article-dates.yml \
             .github/workflows/verify-sanitaer-pricing.yml \
             .github/workflows/verify-service-city-guide-silo.yml \
             .github/workflows/verify-specialist-guides.yml; do
@@ -63,6 +65,7 @@ jobs:
           for file in \
             .github/workflows/verify-about-organization-entity.yml \
             .github/workflows/verify-global-seo-foundation.yml \
+            .github/workflows/verify-ratgeber-article-dates.yml \
             .github/workflows/verify-sanitaer-pricing.yml; do
             ! grep -q 'fetch_with_retry()' "$file"
           done
@@ -103,6 +106,17 @@ jobs:
           grep -q 'Price-detail guide mapping missing' .github/workflows/verify-specialist-guides.yml
           grep -q 'id=\"ratgeber\"' .github/workflows/verify-specialist-guides.yml
           ! grep -q "grep -q 'Passender Ratgeber'" .github/workflows/verify-specialist-guides.yml
+
+      - name: Verify Ratgeber date guard stays strict
+        shell: bash
+        run: |
+          set -euo pipefail
+          file=.github/workflows/verify-ratgeber-article-dates.yml
+          grep -q 'Unexpected datePublished' "$file"
+          grep -q 'Unexpected dateModified' "$file"
+          grep -q 'article:published_time' "$file"
+          grep -q 'article:modified_time' "$file"
+          grep -q 'Aktualisiert:</strong> 27. August 2026' "$file"
 
       - name: Verify Ratgeber page and social descriptions match
         shell: bash
