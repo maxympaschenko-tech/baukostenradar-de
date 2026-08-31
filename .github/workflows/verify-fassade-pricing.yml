@@ -11,22 +11,17 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Fetch Fassade pages and source catalog
         shell: bash
         run: |
           set -euo pipefail
-          fetch_with_retry() {
-            local url="$1" output="$2"
-            for i in 1 2 3 4 5; do
-              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then return 0; fi
-              [[ "$i" == "5" ]] && return 1
-              sleep 4
-            done
-          }
-          fetch_with_retry 'https://baukostenradar.de/kosten/fassade' /tmp/main.html
-          fetch_with_retry 'https://baukostenradar.de/kosten/fassade/muenchen' /tmp/city.html
-          fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
-          fetch_with_retry 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          source scripts/hostinger-verify.sh
+          fetch_hostinger 'https://baukostenradar.de/kosten/fassade' /tmp/main.html
+          fetch_hostinger 'https://baukostenradar.de/kosten/fassade/muenchen' /tmp/city.html
+          fetch_hostinger 'https://baukostenradar.de/quellen' /tmp/quellen.html
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
 
       - name: Verify expanded source-backed Fassade data
         shell: bash
