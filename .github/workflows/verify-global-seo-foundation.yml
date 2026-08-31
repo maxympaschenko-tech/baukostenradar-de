@@ -132,10 +132,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'User-agent: \*' /tmp/robots.txt
-          grep -q 'Allow: /' /tmp/robots.txt
-          grep -q 'Disallow: /api/' /tmp/robots.txt
-          grep -q 'Sitemap: https://baukostenradar.de/sitemap.xml' /tmp/robots.txt
+          grep -qi '^User-Agent: \*$' /tmp/robots.txt
+          grep -q '^Allow: /$' /tmp/robots.txt
+          grep -q '^Disallow: /api/$' /tmp/robots.txt
+          grep -q '^Sitemap: https://baukostenradar.de/sitemap.xml$' /tmp/robots.txt
 
       - name: Verify sitemap contains canonical indexable URLs and accurate freshness signals
         shell: bash
