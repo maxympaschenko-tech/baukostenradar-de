@@ -1,0 +1,174 @@
+name: CI Hausanbau cluster
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-hausanbau-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-hausanbau-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://example.de
+
+      - name: Verify Hausanbau standalone runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          HOSTNAME=127.0.0.1 PORT=3001 NEXT_PUBLIC_SITE_URL=https://example.de node .next/standalone/server.js > /tmp/baukostenradar-ci-hausanbau-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl -sS --fail 'http://127.0.0.1:3001/kosten/hausanbau' -o /tmp/hausanbau.html; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$ready" -ne 1 ]; then
+            echo 'Production runtime did not become ready.' >&2
+            cat /tmp/baukostenradar-ci-hausanbau-server.log >&2 || true
+            exit 1
+          fi
+
+          curl -sS --fail 'http://127.0.0.1:3001/kosten/hausanbau/berlin' -o /tmp/hausanbau-berlin.html
+          curl -sS --fail 'http://127.0.0.1:3001/ratgeber' -o /tmp/ratgeber.html
+          curl -sS --fail 'http://127.0.0.1:3001/quellen' -o /tmp/quellen.html
+          curl -sS --fail 'http://127.0.0.1:3001/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'http://127.0.0.1:3001/kosten/dachausbau' -o /tmp/dachausbau-regression.html
+          curl -sS --fail 'http://127.0.0.1:3001/kosten/wintergarten' -o /tmp/wintergarten-regression.html
+          curl -sS --fail 'http://127.0.0.1:3001/kosten/garage' -o /tmp/garage-regression.html
+
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+
+          require_contains /tmp/hausanbau.html 'Hausanbau schlüsselfertig massiv' 'Hausanbau core position'
+          require_contains /tmp/hausanbau.html 'Hausanbau 60 m² Gesamtbeispiel' 'Hausanbau 60 m2 position'
+          require_contains /tmp/hausanbau.html 'Rohbau Hausanbau Gebäudehülle' 'Hausanbau Rohbau position'
+          require_contains /tmp/hausanbau-berlin.html 'Hausanbau' 'Hausanbau Berlin city page'
+          require_contains /tmp/dachausbau-regression.html 'Dachausbau' 'Dachausbau regression'
+          require_contains /tmp/wintergarten-regression.html 'Wintergarten' 'Wintergarten regression'
+          require_contains /tmp/garage-regression.html 'Garage' 'Garage regression'
+
+          for guide in \
+            'hausanbau-kosten' \
+            'hausanbau-20-30-50-qm-kosten' \
+            'hausanbau-massiv-holz-fertigbau-kosten' \
+            'hausanbau-rohbau-fundament-kosten' \
+            'hausanbau-innenausbau-kosten'; do
+            require_contains /tmp/ratgeber.html "/ratgeber/${guide}" "Hausanbau guide hub link $guide"
+            require_contains /tmp/sitemap.xml "https://example.de/ratgeber/${guide}</loc>" "Hausanbau guide sitemap $guide"
+            curl -sS --fail "http://127.0.0.1:3001/ratgeber/${guide}" -o "/tmp/${guide}.html"
+            ! grep -qi 'noindex' "/tmp/${guide}.html"
+          done
+
+          for source in \
+            'bauen.de - Hausanbau Kosten 2026' \
+            'Trustlocal - Anbau Haus Kosten 2026' \
+            'Blauarbeit - Rohbau Kosten 2026' \
+            'Blauarbeit - Mauerarbeiten Kosten 2026' \
+            'MyHammer - Bodenplatte Kosten 2026'; do
+            require_contains /tmp/quellen.html "$source" "active Hausanbau source $source"
+          done
+
+          require_contains /tmp/sitemap.xml 'https://example.de/kosten/hausanbau</loc>' 'Hausanbau sitemap service'
+          require_contains /tmp/sitemap.xml 'https://example.de/kosten/hausanbau/berlin</loc>' 'Hausanbau Berlin sitemap'
+          ! grep -qi 'noindex' /tmp/hausanbau.html
+
+          check_item() {
+            local item="$1"; local guide="$2"
+            local output="/tmp/hausanbau-${item}.html"
+            local local_url="http://127.0.0.1:3001/kosten/hausanbau/leistung/${item}"
+            local canonical="https://example.de/kosten/hausanbau/leistung/${item}"
+            curl -sS --fail "$local_url" -o "$output"
+            require_contains /tmp/sitemap.xml "${canonical}</loc>" "Hausanbau sitemap item $item"
+            require_contains "$output" 'Passender Ratgeber' "Hausanbau guide CTA $item"
+            require_contains "$output" "/ratgeber/${guide}" "Hausanbau guide mapping $item"
+            ! grep -qi 'noindex' "$output"
+          }
+
+          mappings=(
+            'hausanbau-schluesselfertig-massiv|hausanbau-kosten'
+            'seitlicher-anbau-massiv-ohne-innenausbau|hausanbau-kosten'
+            'rueckwaertiger-anbau-massiv-ohne-innenausbau|hausanbau-kosten'
+            'fertigmodul-anbau-ohne-innenausbau|hausanbau-kosten'
+            'fertigmodul-anbau-schluesselfertig|hausanbau-kosten'
+            'hausanbau-mit-flachdach|hausanbau-kosten'
+            'seitliche-verlaengerung-haus|hausanbau-kosten'
+            'haus-verbreitern-anbau|hausanbau-kosten'
+            'mehrgeschossiger-hausanbau-drei-etagen|hausanbau-kosten'
+            'hausanbau-20-m2-einfache-erweiterung|hausanbau-20-30-50-qm-kosten'
+            'hausanbau-30-m2-mittelgross|hausanbau-20-30-50-qm-kosten'
+            'hausanbau-50-m2-gross|hausanbau-20-30-50-qm-kosten'
+            'hausanbau-60-m2-gesamtbeispiel|hausanbau-20-30-50-qm-kosten'
+            'fundament-60-m2-hausanbau|hausanbau-20-30-50-qm-kosten'
+            'mauerwerk-und-daemmung-60-m2-hausanbau|hausanbau-20-30-50-qm-kosten'
+            'dach-60-m2-hausanbau|hausanbau-20-30-50-qm-kosten'
+            'fenster-und-tueren-60-m2-hausanbau|hausanbau-20-30-50-qm-kosten'
+            'elektroinstallation-60-m2-hausanbau|hausanbau-20-30-50-qm-kosten'
+            'heizung-und-sanitaer-60-m2-hausanbau|hausanbau-20-30-50-qm-kosten'
+            'innenausbau-60-m2-hausanbau|hausanbau-20-30-50-qm-kosten'
+            'baunebenkosten-60-m2-hausanbau|hausanbau-20-30-50-qm-kosten'
+            'hausanbau-holzstaenderbauweise|hausanbau-massiv-holz-fertigbau-kosten'
+            'hausanbau-massivbauweise-ziegel-oder-beton|hausanbau-massiv-holz-fertigbau-kosten'
+            'hausanbau-fertigbauweise|hausanbau-massiv-holz-fertigbau-kosten'
+            'hausanbau-stahlkonstruktion|hausanbau-massiv-holz-fertigbau-kosten'
+            'rohbau-hausanbau-gebaeudehuelle|hausanbau-rohbau-fundament-kosten'
+            'bodenplatte-fundament-hausanbau|hausanbau-rohbau-fundament-kosten'
+            'streifenfundament-referenz-100-m2|hausanbau-rohbau-fundament-kosten'
+            'plattenfundament-referenz-100-m2|hausanbau-rohbau-fundament-kosten'
+            'mauerarbeiten-hausanbau-komplett-mit-lohn|hausanbau-rohbau-fundament-kosten'
+            'porenbeton-wand-hausanbau|hausanbau-rohbau-fundament-kosten'
+            'kalksandstein-wand-hausanbau|hausanbau-rohbau-fundament-kosten'
+            'ziegel-wand-hausanbau|hausanbau-rohbau-fundament-kosten'
+            'klinker-verblender-hausanbau|hausanbau-rohbau-fundament-kosten'
+            'standardfenster-hausanbau-doppelt-verglast|hausanbau-innenausbau-kosten'
+            'energiesparfenster-hausanbau-dreifachverglasung|hausanbau-innenausbau-kosten'
+            'innentuer-hausanbau-standard|hausanbau-innenausbau-kosten'
+            'aussentuer-hausanbau-holz-oder-aluminium|hausanbau-innenausbau-kosten'
+            'laminat-hausanbau-einfach|hausanbau-innenausbau-kosten'
+            'parkett-hausanbau-hochwertig|hausanbau-innenausbau-kosten'
+            'fussbodenheizung-hausanbau|hausanbau-innenausbau-kosten'
+            'smart-home-integration-hausanbau|hausanbau-innenausbau-kosten'
+            'innenwaende-und-decken-hausanbau|hausanbau-innenausbau-kosten'
+            'malerarbeiten-und-tapeten-hausanbau|hausanbau-innenausbau-kosten'
+            'fassade-verputzen-hausanbau|hausanbau-innenausbau-kosten'
+          )
+
+          [ "${#mappings[@]}" -eq 45 ] || { echo 'Expected exactly 45 Hausanbau mappings' >&2; exit 1; }
+          for mapping in "${mappings[@]}"; do
+            IFS='|' read -r item guide <<< "$mapping"
+            check_item "$item" "$guide"
+          done
