@@ -1,0 +1,21 @@
+name: Verify Hostinger fetch helper
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/hostinger-verify.sh'
+      - '.github/workflows/verify-hostinger-fetch-helper.yml'
+  workflow_dispatch:
+
+jobs:
+  verify-helper:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate shell helper
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n scripts/hostinger-verify.sh
+          grep -q 'Cache-Control: no-cache' scripts/hostinger-verify.sh
+          grep -q 'ci_verify=' scripts/hostinger-verify.sh
