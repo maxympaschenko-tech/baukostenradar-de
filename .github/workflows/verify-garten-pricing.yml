@@ -74,7 +74,7 @@ jobs:
               'Granitpflaster inkl. Unterbau verlegen',
               'Natursteinpflaster inkl. Unterbau verlegen',
               'Maschendrahtzaun 80 cm inkl. Montage',
-              'Sichtschutzzaun Holz 1,80 m inkl. Montage',
+              'Sichtschutzzaun Holz inkl. Montage',
               'Gabionenzaun 1,80 m inkl. Montage',
               'HandwerkerMatch - Garten anlegen Kosten 2026',
               'Gartenbau.org - Gartenzaun Kosten 2026',
@@ -89,7 +89,7 @@ jobs:
               'Rasen neu anlegen mit Saat',
               'Hecke pflanzen',
               'Natursteinpflaster inkl. Unterbau verlegen',
-              'Sichtschutzzaun Holz 1,80 m inkl. Montage',
+              'Sichtschutzzaun Holz inkl. Montage',
           )
           for needle in expected_city:
               if needle not in muenchen:
@@ -112,7 +112,7 @@ jobs:
               '/kosten/garten/leistung/granitpflaster-inkl-unterbau-verlegen',
               '/kosten/garten/leistung/natursteinpflaster-inkl-unterbau-verlegen',
               '/kosten/garten/leistung/maschendrahtzaun-80-cm-inkl-montage',
-              '/kosten/garten/leistung/sichtschutzzaun-holz-1-80-m-inkl-montage',
+              '/kosten/garten/leistung/sichtschutzzaun-holz-inkl-montage',
               '/kosten/garten/leistung/gabionenzaun-1-80-m-inkl-montage',
           )
           for needle in sitemap_needles:

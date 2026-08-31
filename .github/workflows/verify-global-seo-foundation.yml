@@ -11,29 +11,18 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Fetch global SEO resources
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
-          fetch_with_retry() {
-            local url="$1"
-            local output="$2"
-            for i in 1 2 3 4 5; do
-              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then
-                return 0
-              fi
-              if [[ "$i" == "5" ]]; then
-                return 1
-              fi
-              sleep 4
-            done
-          }
-
-          fetch_with_retry 'https://baukostenradar.de/' /tmp/home.html
-          fetch_with_retry 'https://baukostenradar.de/kosten' /tmp/costs.html
-          fetch_with_retry 'https://baukostenradar.de/robots.txt' /tmp/robots.txt
-          fetch_with_retry 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch_hostinger 'https://baukostenradar.de/' /tmp/home.html
+          fetch_hostinger 'https://baukostenradar.de/kosten' /tmp/costs.html
+          fetch_hostinger 'https://baukostenradar.de/robots.txt' /tmp/robots.txt
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
 
       - name: Verify homepage site-name structured data
         shell: bash
@@ -63,6 +52,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
           python - <<'PY'
           from html.parser import HTMLParser
@@ -120,13 +110,17 @@ jobs:
           [[ "$og_url" == https://baukostenradar.de/* ]]
           [[ "$twitter_url" == https://baukostenradar.de/* ]]
 
-          curl -sS --fail --connect-timeout 10 --max-time 30 -D /tmp/og.headers "$og_url" -o /tmp/og.png
-          curl -sS --fail --connect-timeout 10 --max-time 30 -D /tmp/twitter.headers "$twitter_url" -o /tmp/twitter.png
+          fetch_hostinger "$og_url" /tmp/og.png
+          fetch_hostinger "$twitter_url" /tmp/twitter.png
 
-          grep -qi '^content-type: image/png' /tmp/og.headers
-          grep -qi '^content-type: image/png' /tmp/twitter.headers
-          test "$(wc -c < /tmp/og.png)" -gt 10000
-          test "$(wc -c < /tmp/twitter.png)" -gt 10000
+          python - <<'PY'
+          for path in ('/tmp/og.png', '/tmp/twitter.png'):
+              data = open(path, 'rb').read()
+              if len(data) <= 10000:
+                  raise SystemExit(f'Social image too small: {path} ({len(data)} bytes)')
+              if not data.startswith(b'\x89PNG\r\n\x1a\n'):
+                  raise SystemExit(f'Social image is not PNG: {path}')
+          PY
 
       - name: Verify robots points to canonical sitemap
         shell: bash

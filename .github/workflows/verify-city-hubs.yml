@@ -140,7 +140,7 @@ jobs:
           if actual != expected or len(elements) != expected:
               raise SystemExit(f"ItemList mismatch: numberOfItems={actual}, entries={len(elements)}, expected={expected}")
 
-          urls = [str(entry.get("item", "")) for entry in elements if isinstance(entry, dict)]
+          urls = [str(entry.get("url", "")) for entry in elements if isinstance(entry, dict)]
           unique_urls = set(urls)
           if len(unique_urls) != expected:
               raise SystemExit(f"Trade ItemList has duplicate/missing URLs: {len(unique_urls)} unique, expected {expected}")

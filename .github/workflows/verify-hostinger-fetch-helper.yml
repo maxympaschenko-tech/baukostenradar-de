@@ -7,13 +7,16 @@ on:
       - 'scripts/check-service-count.py'
       - 'app/ratgeber/layout.tsx'
       - 'app/ratgeber/page.tsx'
+      - '.github/workflows/verify-about-organization-entity.yml'
       - '.github/workflows/verify-bad-pricing.yml'
       - '.github/workflows/verify-city-hubs.yml'
       - '.github/workflows/verify-garten-guide-cluster.yml'
       - '.github/workflows/verify-garten-pricing.yml'
+      - '.github/workflows/verify-global-seo-foundation.yml'
       - '.github/workflows/verify-internal-social-metadata.yml'
       - '.github/workflows/verify-opportunity-guides.yml'
       - '.github/workflows/verify-price-guide-silo.yml'
+      - '.github/workflows/verify-sanitaer-pricing.yml'
       - '.github/workflows/verify-service-city-guide-silo.yml'
       - '.github/workflows/verify-specialist-guides.yml'
       - '.github/workflows/verify-hostinger-fetch-helper.yml'
@@ -36,28 +39,53 @@ jobs:
           grep -q -- '--retry-all-errors' scripts/hostinger-verify.sh
           grep -q '_hostinger_verify_startup_jitter' scripts/hostinger-verify.sh
           grep -q 'baukostenradar-hostinger-jitter-' scripts/hostinger-verify.sh
-          grep -q 'RANDOM % 21' scripts/hostinger-verify.sh
+          grep -q 'RANDOM % 181' scripts/hostinger-verify.sh
 
       - name: Verify production workflows use shared Hostinger fetch
         shell: bash
         run: |
           set -euo pipefail
           for file in \
+            .github/workflows/verify-about-organization-entity.yml \
             .github/workflows/verify-bad-pricing.yml \
             .github/workflows/verify-garten-pricing.yml \
             .github/workflows/verify-garten-guide-cluster.yml \
+            .github/workflows/verify-global-seo-foundation.yml \
             .github/workflows/verify-internal-social-metadata.yml \
             .github/workflows/verify-opportunity-guides.yml \
             .github/workflows/verify-price-guide-silo.yml \
+            .github/workflows/verify-sanitaer-pricing.yml \
             .github/workflows/verify-service-city-guide-silo.yml \
             .github/workflows/verify-specialist-guides.yml; do
             grep -q 'source scripts/hostinger-verify.sh' "$file"
+          done
+
+          for file in \
+            .github/workflows/verify-about-organization-entity.yml \
+            .github/workflows/verify-global-seo-foundation.yml \
+            .github/workflows/verify-sanitaer-pricing.yml; do
+            ! grep -q 'fetch_with_retry()' "$file"
           done
 
           ! grep -q "'14 Preispositionen'" .github/workflows/verify-bad-pricing.yml
           ! grep -q "'17 Preispositionen'" .github/workflows/verify-garten-pricing.yml
           grep -q 'check-service-count.py /tmp/bad.html 14 Bad' .github/workflows/verify-bad-pricing.yml
           grep -q 'check-service-count.py /tmp/garten.html 17 Garten' .github/workflows/verify-garten-pricing.yml
+
+      - name: Verify current city and Garten contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          grep -q 'entry.get("url", "")' .github/workflows/verify-city-hubs.yml
+          grep -q 'Sichtschutzzaun Holz inkl. Montage' .github/workflows/verify-garten-pricing.yml
+          grep -q '/kosten/garten/leistung/sichtschutzzaun-holz-inkl-montage' .github/workflows/verify-garten-pricing.yml
+          ! grep -q 'Sichtschutzzaun Holz 1,80 m inkl. Montage' .github/workflows/verify-garten-pricing.yml
+          ! grep -q '/kosten/garten/leistung/sichtschutzzaun-holz-1-80-m-inkl-montage' .github/workflows/verify-garten-pricing.yml
+
+          grep -q 'primary_guide_from_service' .github/workflows/verify-service-city-guide-silo.yml
+          grep -q 'Primary guide continuity missing' .github/workflows/verify-service-city-guide-silo.yml
+          ! grep -q "grep -q 'Passender Ratgeber'" .github/workflows/verify-service-city-guide-silo.yml
 
       - name: Verify Zaunbau taxonomy contracts
         shell: bash
@@ -72,6 +100,9 @@ jobs:
             .github/workflows/verify-specialist-guides.yml
           grep -q 'check_mapping garten garten-anlegen-kosten einfahrt-pflastern einfahrt-pflastern-kosten' \
             .github/workflows/verify-specialist-guides.yml
+          grep -q 'Price-detail guide mapping missing' .github/workflows/verify-specialist-guides.yml
+          grep -q 'id=\"ratgeber\"' .github/workflows/verify-specialist-guides.yml
+          ! grep -q "grep -q 'Passender Ratgeber'" .github/workflows/verify-specialist-guides.yml
 
       - name: Verify Ratgeber page and social descriptions match
         shell: bash

@@ -53,17 +53,52 @@ jobs:
           set -euo pipefail
           source scripts/hostinger-verify.sh
 
+          primary_guide_from_service() {
+            python3 - "$1" <<'PY'
+          import sys
+          from html.parser import HTMLParser
+
+          class GuideParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.in_ratgeber = False
+                  self.href = None
+
+              def handle_starttag(self, tag, attrs):
+                  data = dict(attrs)
+                  if tag == 'section' and data.get('id') == 'ratgeber':
+                      self.in_ratgeber = True
+                  elif self.in_ratgeber and tag == 'a' and self.href is None:
+                      href = data.get('href', '')
+                      if href.startswith('/ratgeber/'):
+                          self.href = href
+
+              def handle_endtag(self, tag):
+                  if self.in_ratgeber and tag == 'section':
+                      self.in_ratgeber = False
+
+          parser = GuideParser()
+          with open(sys.argv[1], encoding='utf-8') as handle:
+              parser.feed(handle.read())
+          if not parser.href:
+              raise SystemExit('Primary guide link missing from section#ratgeber')
+          print(parser.href)
+          PY
+          }
+
           checked=0
+          : > /tmp/service-guides.tsv
           while IFS= read -r service; do
             [ -n "$service" ] || continue
             output="/tmp/trade-${service}.html"
             url="https://baukostenradar.de/kosten/${service}"
             fetch_hostinger "$url" "$output"
 
-            grep -q "$url" "$output" || { echo "Canonical/service URL missing: ${service}"; exit 1; }
-            grep -q 'Passender Ratgeber' "$output" || { echo "Primary guide block missing: ${service}"; exit 1; }
-            grep -Eq '/ratgeber/[a-z0-9-]+' "$output" || { echo "Primary guide link missing: ${service}"; exit 1; }
+            grep -Fq "$url" "$output" || { echo "Canonical/service URL missing: ${service}"; exit 1; }
             ! grep -qi 'noindex' "$output" || { echo "Unexpected noindex: ${service}"; exit 1; }
+            primary_guide=$(primary_guide_from_service "$output") || { echo "Primary guide missing: ${service}"; exit 1; }
+            printf '%s\t%s\n' "$service" "$primary_guide" >> /tmp/service-guides.tsv
+            echo "${service}: ${primary_guide}"
             checked=$((checked + 1))
           done < /tmp/services.txt
 
@@ -80,22 +115,22 @@ jobs:
           cities=(berlin hamburg muenchen koeln frankfurt stuttgart duesseldorf leipzig)
           checked=0
           index=0
-          while IFS= read -r service; do
+          while IFS=$'\t' read -r service primary_guide; do
             [ -n "$service" ] || continue
+            [ -n "$primary_guide" ] || { echo "Stored primary guide missing: ${service}"; exit 1; }
             city="${cities[$((index % ${#cities[@]}))]}"
             output="/tmp/local-${service}-${city}.html"
             url="https://baukostenradar.de/kosten/${service}/${city}"
             fetch_hostinger "$url" "$output"
 
-            grep -q "$url" "$output" || { echo "Local canonical URL missing: ${service}/${city}"; exit 1; }
-            grep -q 'Passender Ratgeber' "$output" || { echo "Local guide block missing: ${service}/${city}"; exit 1; }
-            grep -Eq '/ratgeber/[a-z0-9-]+' "$output" || { echo "Local guide link missing: ${service}/${city}"; exit 1; }
+            grep -Fq "$url" "$output" || { echo "Local canonical URL missing: ${service}/${city}"; exit 1; }
+            grep -Fq "$primary_guide" "$output" || { echo "Primary guide continuity missing: ${service}/${city} -> ${primary_guide}"; exit 1; }
             grep -q 'Regionalfaktor' "$output" || { echo "Regional factor missing: ${service}/${city}"; exit 1; }
             ! grep -qi 'noindex' "$output" || { echo "Unexpected local noindex: ${service}/${city}"; exit 1; }
 
             checked=$((checked + 1))
             index=$((index + 1))
-          done < /tmp/services.txt
+          done < /tmp/service-guides.tsv
 
           service_count=$(wc -l < /tmp/services.txt | tr -d ' ')
           test "$checked" -eq "$service_count"
@@ -107,7 +142,6 @@ jobs:
           set -euo pipefail
 
           python3 - <<'PY'
-          import re
           from pathlib import Path
 
           sitemap = Path('/tmp/sitemap.xml').read_text(encoding='utf-8')
