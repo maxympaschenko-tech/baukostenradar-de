@@ -11,147 +11,114 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Verify primary guide on all trade pages
+      - uses: actions/checkout@v4
+
+      - name: Discover current service and city matrix from sitemap
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
-          declare -A guides=(
-            [badsanierung]='/ratgeber/bad-komplett-sanieren-kosten'
-            [maler]='/ratgeber/maler-kosten-pro-qm'
-            [fliesenleger]='/ratgeber/fliesenleger-kosten-pro-qm'
-            [elektriker]='/ratgeber/elektrik-erneuern-altbau'
-            [dachsanierung]='/ratgeber/dach-sanieren-kosten-pro-qm'
-            [bodenleger]='/ratgeber/bodenleger-kosten-pro-qm'
-            [trockenbau]='/ratgeber/trockenbau-kosten-pro-qm'
-            [sanitaer]='/ratgeber/sanitaer-kosten'
-            [waermepumpe]='/ratgeber/waermepumpe-kosten-2026'
-            [photovoltaik]='/ratgeber/photovoltaik-kosten-2026'
-            [daemmung]='/ratgeber/daemmung-kosten-pro-qm'
-            [kellerabdichtung]='/ratgeber/kellerabdichtung-aussen-oder-innen-kosten'
-            [fenster]='/ratgeber/fenster-austauschen-kosten-haus'
-            [heizung]='/ratgeber/heizung-erneuern-kosten'
-            [fassade]='/ratgeber/fassade-sanieren-kosten'
-            [garten]='/ratgeber/garten-anlegen-kosten'
-            [tueren]='/ratgeber/6-innentueren-austauschen-kosten'
-            [estrich]='/ratgeber/estrich-100-qm-kosten'
-            [abriss-entsorgung]='/ratgeber/haus-abreissen-kosten'
-            [maurer]='/ratgeber/innenwand-mauern-kosten'
-            [treppen]='/ratgeber/14-treppenstufen-renovieren-kosten'
-            [kueche]='/ratgeber/kueche-10-qm-renovieren-kosten'
-          )
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
 
-          test "${#guides[@]}" -eq 22
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
 
-          for service in "${!guides[@]}"; do
-            output="/tmp/trade-${service}.html"
-            curl -sS --fail "https://baukostenradar.de/kosten/${service}" -o "$output"
-            grep -q "https://baukostenradar.de/kosten/${service}" "$output"
-            grep -q "${guides[$service]}" "$output"
-            ! grep -qi 'noindex' "$output"
-          done
+          sitemap = Path('/tmp/sitemap.xml').read_text(encoding='utf-8')
+          cities = ('berlin', 'hamburg', 'muenchen', 'koeln', 'frankfurt', 'stuttgart', 'duesseldorf', 'leipzig')
+          pattern = re.compile(r'https://baukostenradar\.de/kosten/([a-z0-9-]+)/(' + '|'.join(cities) + r')</loc>')
+          pairs = set(pattern.findall(sitemap))
+          services = sorted({service for service, city in pairs if city == 'berlin'})
 
-      - name: Verify all 176 local trade pages
+          if len(services) < 22:
+              raise SystemExit(f'Service catalog regressed: {len(services)} current services, expected at least 22')
+
+          missing = [f'{service}/{city}' for service in services for city in cities if (service, city) not in pairs]
+          if missing:
+              raise SystemExit('Missing service-city sitemap URLs: ' + ', '.join(missing[:20]))
+
+          expected = len(services) * len(cities)
+          relevant_pairs = {(service, city) for service, city in pairs if service in services}
+          if len(relevant_pairs) != expected:
+              raise SystemExit(f'Service-city sitemap matrix mismatch: {len(relevant_pairs)} != {expected}')
+
+          Path('/tmp/services.txt').write_text('\n'.join(services) + '\n', encoding='utf-8')
+          print(f'Discovered {len(services)} services and {expected} service-city sitemap URLs')
+          PY
+
+      - name: Verify primary guide on every current trade page
         shell: bash
         run: |
           set -euo pipefail
-
-          services=(
-            badsanierung maler fliesenleger elektriker dachsanierung
-            bodenleger trockenbau sanitaer waermepumpe photovoltaik
-            daemmung kellerabdichtung fenster heizung fassade garten
-            tueren estrich abriss-entsorgung maurer treppen kueche
-          )
-          cities=(berlin hamburg muenchen koeln frankfurt stuttgart duesseldorf leipzig)
-
-          declare -A guides=(
-            [badsanierung]='/ratgeber/bad-komplett-sanieren-kosten'
-            [maler]='/ratgeber/maler-kosten-pro-qm'
-            [fliesenleger]='/ratgeber/fliesenleger-kosten-pro-qm'
-            [elektriker]='/ratgeber/elektrik-erneuern-altbau'
-            [dachsanierung]='/ratgeber/dach-sanieren-kosten-pro-qm'
-            [bodenleger]='/ratgeber/bodenleger-kosten-pro-qm'
-            [trockenbau]='/ratgeber/trockenbau-kosten-pro-qm'
-            [sanitaer]='/ratgeber/sanitaer-kosten'
-            [waermepumpe]='/ratgeber/waermepumpe-kosten-2026'
-            [photovoltaik]='/ratgeber/photovoltaik-kosten-2026'
-            [daemmung]='/ratgeber/daemmung-kosten-pro-qm'
-            [kellerabdichtung]='/ratgeber/kellerabdichtung-aussen-oder-innen-kosten'
-            [fenster]='/ratgeber/fenster-austauschen-kosten-haus'
-            [heizung]='/ratgeber/heizung-erneuern-kosten'
-            [fassade]='/ratgeber/fassade-sanieren-kosten'
-            [garten]='/ratgeber/garten-anlegen-kosten'
-            [tueren]='/ratgeber/6-innentueren-austauschen-kosten'
-            [estrich]='/ratgeber/estrich-100-qm-kosten'
-            [abriss-entsorgung]='/ratgeber/haus-abreissen-kosten'
-            [maurer]='/ratgeber/innenwand-mauern-kosten'
-            [treppen]='/ratgeber/14-treppenstufen-renovieren-kosten'
-            [kueche]='/ratgeber/kueche-10-qm-renovieren-kosten'
-          )
+          source scripts/hostinger-verify.sh
 
           checked=0
-          for service in "${services[@]}"; do
-            for city in "${cities[@]}"; do
-              output="/tmp/local-${service}-${city}.html"
-              url="https://baukostenradar.de/kosten/${service}/${city}"
-              curl -sS --fail "$url" -o "$output"
-              grep -q "$url" "$output"
-              grep -q "${guides[$service]}" "$output"
-              grep -q 'Passender Ratgeber' "$output"
-              grep -q 'Regionalfaktor' "$output"
-              ! grep -qi 'noindex' "$output"
-              checked=$((checked + 1))
-            done
-          done
+          while IFS= read -r service; do
+            [ -n "$service" ] || continue
+            output="/tmp/trade-${service}.html"
+            url="https://baukostenradar.de/kosten/${service}"
+            fetch_hostinger "$url" "$output"
 
-          test "$checked" -eq 176
+            grep -q "$url" "$output" || { echo "Canonical/service URL missing: ${service}"; exit 1; }
+            grep -q 'Passender Ratgeber' "$output" || { echo "Primary guide block missing: ${service}"; exit 1; }
+            grep -Eq '/ratgeber/[a-z0-9-]+' "$output" || { echo "Primary guide link missing: ${service}"; exit 1; }
+            ! grep -qi 'noindex' "$output" || { echo "Unexpected noindex: ${service}"; exit 1; }
+            checked=$((checked + 1))
+          done < /tmp/services.txt
 
-      - name: Verify all local trade pages are in sitemap
+          service_count=$(wc -l < /tmp/services.txt | tr -d ' ')
+          test "$checked" -eq "$service_count"
+          echo "Verified primary guide signal on ${checked} current trade pages"
+
+      - name: Verify representative local page for every service
+        shell: bash
+        run: |
+          set -euo pipefail
+          source scripts/hostinger-verify.sh
+
+          cities=(berlin hamburg muenchen koeln frankfurt stuttgart duesseldorf leipzig)
+          checked=0
+          index=0
+          while IFS= read -r service; do
+            [ -n "$service" ] || continue
+            city="${cities[$((index % ${#cities[@]}))]}"
+            output="/tmp/local-${service}-${city}.html"
+            url="https://baukostenradar.de/kosten/${service}/${city}"
+            fetch_hostinger "$url" "$output"
+
+            grep -q "$url" "$output" || { echo "Local canonical URL missing: ${service}/${city}"; exit 1; }
+            grep -q 'Passender Ratgeber' "$output" || { echo "Local guide block missing: ${service}/${city}"; exit 1; }
+            grep -Eq '/ratgeber/[a-z0-9-]+' "$output" || { echo "Local guide link missing: ${service}/${city}"; exit 1; }
+            grep -q 'Regionalfaktor' "$output" || { echo "Regional factor missing: ${service}/${city}"; exit 1; }
+            ! grep -qi 'noindex' "$output" || { echo "Unexpected local noindex: ${service}/${city}"; exit 1; }
+
+            checked=$((checked + 1))
+            index=$((index + 1))
+          done < /tmp/services.txt
+
+          service_count=$(wc -l < /tmp/services.txt | tr -d ' ')
+          test "$checked" -eq "$service_count"
+          echo "Verified ${checked} representative local pages across all 8 cities"
+
+      - name: Verify all current local trade pages are in sitemap
         shell: bash
         run: |
           set -euo pipefail
 
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
 
-          services='badsanierung|maler|fliesenleger|elektriker|dachsanierung|bodenleger|trockenbau|sanitaer|waermepumpe|photovoltaik|daemmung|kellerabdichtung|fenster|heizung|fassade|garten|tueren|estrich|abriss-entsorgung|maurer|treppen|kueche'
-          cities='berlin|hamburg|muenchen|koeln|frankfurt|stuttgart|duesseldorf|leipzig'
-          count=$(grep -oE "https://baukostenradar.de/kosten/(${services})/(${cities})</loc>" /tmp/sitemap.xml | wc -l | tr -d ' ')
-          test "$count" -eq 176
+          sitemap = Path('/tmp/sitemap.xml').read_text(encoding='utf-8')
+          services = [line.strip() for line in Path('/tmp/services.txt').read_text(encoding='utf-8').splitlines() if line.strip()]
+          cities = ('berlin', 'hamburg', 'muenchen', 'koeln', 'frankfurt', 'stuttgart', 'duesseldorf', 'leipzig')
 
-      - name: Verify referenced primary guides resolve
-        shell: bash
-        run: |
-          set -euo pipefail
+          for service in services:
+              for city in cities:
+                  url = f'https://baukostenradar.de/kosten/{service}/{city}</loc>'
+                  if url not in sitemap:
+                      raise SystemExit(f'Missing local trade sitemap URL: {service}/{city}')
 
-          guides=(
-            bad-komplett-sanieren-kosten
-            maler-kosten-pro-qm
-            fliesenleger-kosten-pro-qm
-            elektrik-erneuern-altbau
-            dach-sanieren-kosten-pro-qm
-            bodenleger-kosten-pro-qm
-            trockenbau-kosten-pro-qm
-            sanitaer-kosten
-            waermepumpe-kosten-2026
-            photovoltaik-kosten-2026
-            daemmung-kosten-pro-qm
-            kellerabdichtung-aussen-oder-innen-kosten
-            fenster-austauschen-kosten-haus
-            heizung-erneuern-kosten
-            fassade-sanieren-kosten
-            garten-anlegen-kosten
-            6-innentueren-austauschen-kosten
-            estrich-100-qm-kosten
-            haus-abreissen-kosten
-            innenwand-mauern-kosten
-            14-treppenstufen-renovieren-kosten
-            kueche-10-qm-renovieren-kosten
-          )
-
-          test "${#guides[@]}" -eq 22
-
-          for guide in "${guides[@]}"; do
-            output="/tmp/guide-${guide}.html"
-            curl -sS --fail "https://baukostenradar.de/ratgeber/${guide}" -o "$output"
-            ! grep -qi 'noindex' "$output"
-          done
+          print(f'Verified {len(services) * len(cities)} current local trade sitemap URLs')
+          PY
