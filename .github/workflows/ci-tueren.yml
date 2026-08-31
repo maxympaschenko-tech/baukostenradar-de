@@ -1,0 +1,173 @@
+name: CI Türen cluster
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-tueren-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-tueren-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://example.de
+
+      - name: Verify Türen standalone runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          HOSTNAME=127.0.0.1 PORT=3002 NEXT_PUBLIC_SITE_URL=https://example.de node .next/standalone/server.js > /tmp/baukostenradar-ci-tueren-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl -sS --fail 'http://127.0.0.1:3002/kosten/tueren' -o /tmp/tueren.html; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$ready" -ne 1 ]; then
+            echo 'Production runtime did not become ready.' >&2
+            cat /tmp/baukostenradar-ci-tueren-server.log >&2 || true
+            exit 1
+          fi
+
+          curl -sS --fail 'http://127.0.0.1:3002/kosten/tueren/berlin' -o /tmp/tueren-berlin.html
+          curl -sS --fail 'http://127.0.0.1:3002/ratgeber' -o /tmp/ratgeber.html
+          curl -sS --fail 'http://127.0.0.1:3002/quellen' -o /tmp/quellen.html
+          curl -sS --fail 'http://127.0.0.1:3002/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sS --fail 'http://127.0.0.1:3002/kosten/fenster' -o /tmp/fenster-regression.html
+          curl -sS --fail 'http://127.0.0.1:3002/ratgeber/haustuer-einbauen-kosten' -o /tmp/haustuer-einbauen-regression.html
+          curl -sS --fail 'http://127.0.0.1:3002/ratgeber/haustuer-rc2-kosten' -o /tmp/rc2-regression.html
+          curl -sS --fail 'http://127.0.0.1:3002/ratgeber/haustuer-kunststoff-kosten' -o /tmp/kunststoff-regression.html
+          curl -sS --fail 'http://127.0.0.1:3002/ratgeber/6-innentueren-austauschen-kosten' -o /tmp/innentueren-regression.html
+
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
+
+          require_contains /tmp/tueren.html 'Haustür komplett inklusive Einbau' 'Türen complete Haustür position'
+          require_contains /tmp/tueren.html 'Holz-Aluminium-Haustür ohne Montage' 'Türen material position'
+          require_contains /tmp/tueren.html 'Türzarge einbauen komplett allgemein' 'Türen frame position'
+          require_contains /tmp/tueren.html 'Zimmertür inklusive Türelement und Einbau' 'Türen interior position'
+          require_contains /tmp/tueren.html 'Sicherheitshaustür RC3 Markenmodell' 'Türen RC3 position'
+          require_contains /tmp/tueren.html 'Schiebetür einfach vom Fachbetrieb einbauen' 'Türen sliding position'
+          require_contains /tmp/tueren-berlin.html 'Türen' 'Türen Berlin city page'
+          require_contains /tmp/fenster-regression.html 'Fenster' 'Fenster regression'
+          require_contains /tmp/haustuer-einbauen-regression.html 'Haustür' 'existing Haustür guide regression'
+          require_contains /tmp/rc2-regression.html 'RC2' 'existing RC2 guide regression'
+          require_contains /tmp/kunststoff-regression.html 'Kunststoff' 'existing Kunststoff guide regression'
+          require_contains /tmp/innentueren-regression.html 'Innentüren' 'existing Innentüren guide regression'
+
+          for guide in \
+            'innentueren-kosten' \
+            'tuerzarge-einbauen-kosten' \
+            'haustuer-material-kosten' \
+            'haustuer-zusatzausstattung-kosten' \
+            'schiebetuer-einbauen-kosten'; do
+            require_contains /tmp/ratgeber.html "/ratgeber/${guide}" "Türen guide hub link $guide"
+            require_contains /tmp/sitemap.xml "https://example.de/ratgeber/${guide}</loc>" "Türen guide sitemap $guide"
+            curl -sS --fail "http://127.0.0.1:3002/ratgeber/${guide}" -o "/tmp/${guide}.html"
+            ! grep -qi 'noindex' "/tmp/${guide}.html"
+          done
+
+          require_contains /tmp/tuerzarge-einbauen-kosten.html '/kosten/tueren/leistung/holzzarge-eingangstuer-20-5-cm' '20.5 cm frame detail link'
+          require_contains /tmp/tuerzarge-einbauen-kosten.html '/kosten/tueren/leistung/stahlzarge-eingangstuer-28-5-cm' '28.5 cm frame detail link'
+
+          for source in \
+            'Aroundhome - Haustür Kosten 2026' \
+            'MyHammer - Türzarge einbauen Kosten' \
+            'Blauarbeit - Tür einbauen Kosten 2026' \
+            'Blauarbeit - Schiebetür einbauen Kosten 2026'; do
+            require_contains /tmp/quellen.html "$source" "active Türen source $source"
+          done
+
+          require_contains /tmp/sitemap.xml 'https://example.de/kosten/tueren</loc>' 'Türen sitemap service'
+          require_contains /tmp/sitemap.xml 'https://example.de/kosten/tueren/berlin</loc>' 'Türen Berlin sitemap'
+          ! grep -qi 'noindex' /tmp/tueren.html
+
+          check_item() {
+            local item="$1"; local guide="$2"
+            local output="/tmp/tueren-${item}.html"
+            local local_url="http://127.0.0.1:3002/kosten/tueren/leistung/${item}"
+            local canonical="https://example.de/kosten/tueren/leistung/${item}"
+            curl -sS --fail "$local_url" -o "$output"
+            require_contains /tmp/sitemap.xml "${canonical}</loc>" "Türen sitemap item $item"
+            require_contains "$output" 'Passender Ratgeber' "Türen guide CTA $item"
+            require_contains "$output" "/ratgeber/${guide}" "Türen guide mapping $item"
+            ! grep -qi 'noindex' "$output"
+          }
+
+          mappings=(
+            'haustuer-komplett-inklusive-einbau|haustuer-material-kosten'
+            'kunststoff-haustuer-ohne-montage|haustuer-material-kosten'
+            'aluminium-haustuer-ohne-montage|haustuer-material-kosten'
+            'holz-haustuer-ohne-montage|haustuer-material-kosten'
+            'holz-aluminium-haustuer-ohne-montage|haustuer-material-kosten'
+            'haustuer-fachgerecht-einbauen|haustuer-material-kosten'
+            'glaseinsatz-fuer-haustuer|haustuer-zusatzausstattung-kosten'
+            'seitenteil-oder-oberlicht-fuer-haustuer|haustuer-zusatzausstattung-kosten'
+            'standardschloss-zylinder-und-klinke-haustuer|haustuer-zusatzausstattung-kosten'
+            'sicherheitshaustuer-rc3-markenmodell|haustuer-zusatzausstattung-kosten'
+            'waermeschutz-haustuer-u-wert-unter-1|haustuer-zusatzausstattung-kosten'
+            'schallschutztuer-stahl-hohe-schallschutzklasse|haustuer-zusatzausstattung-kosten'
+            'tuerzarge-einbauen-komplett-allgemein|tuerzarge-einbauen-kosten'
+            'holzzarge-innentuer-10-cm|tuerzarge-einbauen-kosten'
+            'stahlzarge-innentuer-10-cm|tuerzarge-einbauen-kosten'
+            'holzzarge-eingangstuer-20-5-cm|tuerzarge-einbauen-kosten'
+            'stahlzarge-eingangstuer-28-5-cm|tuerzarge-einbauen-kosten'
+            'kleinmaterial-und-bauschaum-fuer-tuerzarge|tuerzarge-einbauen-kosten'
+            'zarge-innentuer-montieren|tuerzarge-einbauen-kosten'
+            'zarge-eingangstuer-montieren|tuerzarge-einbauen-kosten'
+            'zimmertuer-standardmass-reine-montage|innentueren-kosten'
+            'zimmertuer-inklusive-tuerelement-und-einbau|innentueren-kosten'
+            'tuerblatt-tauschen-montage|innentueren-kosten'
+            'tuerblatt-standardausfuehrung|innentueren-kosten'
+            'cpl-tuerblatt|innentueren-kosten'
+            'echtholzfurnier-tuerblatt|innentueren-kosten'
+            'schallschutztuer-oder-brandschutztuer-innen|innentueren-kosten'
+            'tischler-tuereinbau-stundensatz|innentueren-kosten'
+            'alte-innentuer-demontieren-und-entsorgen|innentueren-kosten'
+            'fuenf-zimmertueren-inklusive-elemente-komplett|innentueren-kosten'
+            'fuenf-zimmertueren-montage|innentueren-kosten'
+            'schiebetuer-einfach-vom-fachbetrieb-einbauen|schiebetuer-einbauen-kosten'
+            'schiebetuer-montage-standardbeispiel|schiebetuer-einbauen-kosten'
+            'schiebetuer-sandgestrahlte-glastuer-material|schiebetuer-einbauen-kosten'
+            'schiebetuer-anfahrt-standardbeispiel|schiebetuer-einbauen-kosten'
+          )
+
+          [ "${#mappings[@]}" -eq 35 ] || { echo 'Expected exactly 35 Türen mappings' >&2; exit 1; }
+          for mapping in "${mappings[@]}"; do
+            IFS='|' read -r item guide <<< "$mapping"
+            check_item "$item" "$guide"
+          done
