@@ -19,11 +19,6 @@ export const priceSources = {
     url: "https://www.aroundhome.de/terrassenueberdachung/lamellen/",
     checkedAt: "30.08.2026",
   },
-  blauarbeitTerrassenueberdachung2026: {
-    name: "Blauarbeit - Terrassenüberdachung Kosten 2026",
-    url: "https://ratgeber.blauarbeit.de/garten-und-aussen",
-    checkedAt: "30.08.2026",
-  },
   blauarbeitPergola2026: {
     name: "Blauarbeit - Pergola Kosten 2026",
     url: "https://ratgeber.blauarbeit.de/kosten-preise/pergola-kosten",
