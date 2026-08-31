@@ -15,11 +15,11 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/lib/pricing": ["./lib/catalog-hausanbau.ts"],
-      "@/lib/price-guide-links": ["./lib/price-guide-links-hausanbau.ts"],
-      "@/lib/all-guides": ["./lib/all-guides-hausanbau.ts"],
-      "@/lib/guide-groups": ["./lib/guide-groups-hausanbau.ts"],
-      "@/lib/guide-silo": ["./lib/guide-silo-hausanbau.ts"],
+      "@/lib/pricing": ["./lib/catalog-kellerbau.ts"],
+      "@/lib/price-guide-links": ["./lib/price-guide-links-kellerbau.ts"],
+      "@/lib/all-guides": ["./lib/all-guides-kellerbau.ts"],
+      "@/lib/guide-groups": ["./lib/guide-groups-kellerbau.ts"],
+      "@/lib/guide-silo": ["./lib/guide-silo-kellerbau.ts"],
       "@/*": ["./*"]
     }
   },
