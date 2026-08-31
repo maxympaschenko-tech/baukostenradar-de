@@ -11,48 +11,22 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Configure resilient live fetches
-        shell: bash
-        run: |
-          cat > ~/.curlrc <<'EOF'
-          retry = 6
-          retry-all-errors
-          retry-delay = 5
-          connect-timeout = 10
-          max-time = 30
-          EOF
+      - uses: actions/checkout@v4
 
       - name: Fetch Zaunbau production pages
         shell: bash
         run: |
           set -euo pipefail
-          fetch_until_contains() {
-            local base_url="$1" output="$2" needle="$3" label="$4"
-            for attempt in 1 2 3 4 5 6; do
-              if curl -sSL --fail -H 'Cache-Control: no-cache' \
-                "${base_url}?verify=${GITHUB_SHA}-${attempt}" -o "$output"; then
-                if grep -Fq "$needle" "$output"; then
-                  return 0
-                fi
-              fi
-              if [ "$attempt" -eq 6 ]; then
-                echo "MISSING after retries: $label" >&2
-                echo "Expected in $output: $needle" >&2
-                return 1
-              fi
-              sleep 10
-            done
-          }
+          source scripts/hostinger-verify.sh
 
-          curl -sSL --fail 'https://baukostenradar.de/kosten/zaunbau' -o /tmp/zaunbau.html
-          curl -sSL --fail 'https://baukostenradar.de/kosten/zaunbau/berlin' -o /tmp/zaunbau-berlin.html
-          fetch_until_contains \
-            'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html \
-            '/ratgeber/zaun-bauen-kosten-pro-meter' 'Zaunbau guide directory'
-          fetch_until_contains \
-            'https://baukostenradar.de/quellen' /tmp/quellen.html \
-            'MyHammer - Zaunbau Kosten 2026' 'Zaunbau source'
-          curl -sSL --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          fetch_hostinger 'https://baukostenradar.de/kosten/zaunbau' /tmp/zaunbau.html
+          fetch_hostinger 'https://baukostenradar.de/kosten/zaunbau/berlin' /tmp/zaunbau-berlin.html
+          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          fetch_hostinger 'https://baukostenradar.de/quellen' /tmp/quellen.html
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+
+          grep -Fq '/ratgeber/zaun-bauen-kosten-pro-meter' /tmp/ratgeber.html || { echo 'Zaunbau guide directory signal missing' >&2; exit 1; }
+          grep -Fq 'MyHammer - Zaunbau Kosten 2026' /tmp/quellen.html || { echo 'Zaunbau source signal missing' >&2; exit 1; }
 
       - name: Verify category, city and source signals
         shell: bash
@@ -87,6 +61,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
+
           require_contains() {
             local file="$1"; local needle="$2"; local label="$3"
             if ! grep -Fq "$needle" "$file"; then
@@ -101,7 +77,7 @@ jobs:
             local output="/tmp/${slug}.html"
             require_contains /tmp/sitemap.xml "${url}</loc>" "guide sitemap $slug"
             require_contains /tmp/ratgeber.html "/ratgeber/${slug}" "guide directory $slug"
-            curl -sSL --fail "$url" -o "$output"
+            fetch_hostinger "$url" "$output"
             require_contains "$output" "$url" "canonical $slug"
             require_contains "$output" '"@type":"Article"' "Article schema $slug"
             require_contains "$output" 'FAQPage' "FAQ schema $slug"
@@ -121,13 +97,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
+
           check_item() {
             local item="$1"; local guide="$2"
             local url="https://baukostenradar.de/kosten/zaunbau/leistung/${item}"
             local output="/tmp/zaunbau-${item}.html"
             grep -Fq "${url}</loc>" /tmp/sitemap.xml || { echo "Missing sitemap URL: $item" >&2; exit 1; }
-            curl -sSL --fail "$url" -o "$output"
-            grep -Fq 'Passender Ratgeber' "$output" || { echo "Missing guide CTA: $item" >&2; exit 1; }
+            fetch_hostinger "$url" "$output"
+            grep -Fq 'id="ratgeber"' "$output" || { echo "Missing guide section: $item" >&2; exit 1; }
             grep -Fq "/ratgeber/${guide}" "$output" || { echo "Wrong guide mapping: $item -> $guide" >&2; exit 1; }
             ! grep -qi 'noindex' "$output"
           }

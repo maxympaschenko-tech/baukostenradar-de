@@ -7,23 +7,29 @@ on:
       - 'scripts/check-service-count.py'
       - 'app/ratgeber/layout.tsx'
       - 'app/ratgeber/page.tsx'
+      - '.github/actions/setup-hostinger-verifier/action.yml'
+      - '.github/workflows/verify-*.yml'
       - '.github/workflows/verify-about-organization-entity.yml'
       - '.github/workflows/verify-bad-pricing.yml'
       - '.github/workflows/verify-boden-guide-cluster.yml'
       - '.github/workflows/verify-catalog-integrity.yml'
       - '.github/workflows/verify-city-hubs.yml'
       - '.github/workflows/verify-fassade-pricing.yml'
+      - '.github/workflows/verify-fence-pricing.yml'
       - '.github/workflows/verify-garten-guide-cluster.yml'
       - '.github/workflows/verify-garten-pricing.yml'
       - '.github/workflows/verify-global-seo-foundation.yml'
+      - '.github/workflows/verify-house-renovation-guide-cluster.yml'
       - '.github/workflows/verify-internal-social-metadata.yml'
       - '.github/workflows/verify-kellerabdichtung-guide-cluster.yml'
       - '.github/workflows/verify-opportunity-guides.yml'
       - '.github/workflows/verify-price-guide-silo.yml'
       - '.github/workflows/verify-ratgeber-article-dates.yml'
+      - '.github/workflows/verify-rc2-guide.yml'
       - '.github/workflows/verify-sanitaer-pricing.yml'
       - '.github/workflows/verify-service-city-guide-silo.yml'
       - '.github/workflows/verify-specialist-guides.yml'
+      - '.github/workflows/verify-trust-pages-entities.yml'
       - '.github/workflows/verify-waermepumpe-guide-cluster.yml'
       - '.github/workflows/verify-hostinger-fetch-helper.yml'
   workflow_dispatch:
@@ -49,6 +55,14 @@ jobs:
           grep -q 'fetch_hostinger_redirect()' scripts/hostinger-verify.sh
           grep -q "'%{http_code} %{redirect_url}'" scripts/hostinger-verify.sh
 
+          action=.github/actions/setup-hostinger-verifier/action.yml
+          grep -q 'RANDOM % 181' "$action"
+          grep -q 'baukostenradar-hostinger-curl' "$action"
+          grep -q 'exec /usr/bin/curl -q' "$action"
+          grep -q -- '--retry-all-errors' "$action"
+          grep -q 'ci_verify=' "$action"
+          grep -q 'GITHUB_PATH' "$action"
+
       - name: Verify production workflows use shared Hostinger fetch
         shell: bash
         run: |
@@ -60,17 +74,21 @@ jobs:
             .github/workflows/verify-catalog-integrity.yml \
             .github/workflows/verify-city-hubs.yml \
             .github/workflows/verify-fassade-pricing.yml \
+            .github/workflows/verify-fence-pricing.yml \
             .github/workflows/verify-garten-pricing.yml \
             .github/workflows/verify-garten-guide-cluster.yml \
             .github/workflows/verify-global-seo-foundation.yml \
+            .github/workflows/verify-house-renovation-guide-cluster.yml \
             .github/workflows/verify-internal-social-metadata.yml \
             .github/workflows/verify-kellerabdichtung-guide-cluster.yml \
             .github/workflows/verify-opportunity-guides.yml \
             .github/workflows/verify-price-guide-silo.yml \
             .github/workflows/verify-ratgeber-article-dates.yml \
+            .github/workflows/verify-rc2-guide.yml \
             .github/workflows/verify-sanitaer-pricing.yml \
             .github/workflows/verify-service-city-guide-silo.yml \
             .github/workflows/verify-specialist-guides.yml \
+            .github/workflows/verify-trust-pages-entities.yml \
             .github/workflows/verify-waermepumpe-guide-cluster.yml; do
             grep -q 'source scripts/hostinger-verify.sh' "$file"
           done
@@ -80,10 +98,13 @@ jobs:
             .github/workflows/verify-fassade-pricing.yml \
             .github/workflows/verify-global-seo-foundation.yml \
             .github/workflows/verify-ratgeber-article-dates.yml \
-            .github/workflows/verify-sanitaer-pricing.yml; do
+            .github/workflows/verify-sanitaer-pricing.yml \
+            .github/workflows/verify-trust-pages-entities.yml; do
             ! grep -q 'fetch_with_retry()' "$file"
           done
           ! grep -q '^          fetch() {' .github/workflows/verify-kellerabdichtung-guide-cluster.yml
+          ! grep -q '^          fetch() {' .github/workflows/verify-house-renovation-guide-cluster.yml
+          ! grep -q '^          fetch() {' .github/workflows/verify-rc2-guide.yml
 
           for file in \
             .github/workflows/verify-boden-guide-cluster.yml \
@@ -97,10 +118,39 @@ jobs:
           ! grep -q 'curl -sS --fail' .github/workflows/verify-catalog-integrity.yml
           grep -q "grep -Eq '^(301|308) '" .github/workflows/verify-catalog-integrity.yml
 
+          ! grep -q 'Configure resilient live fetches' .github/workflows/verify-fence-pricing.yml
+          ! grep -q 'fetch_until_contains()' .github/workflows/verify-fence-pricing.yml
+          grep -q 'id=\"ratgeber\"' .github/workflows/verify-fence-pricing.yml
+          ! grep -q 'Passender Ratgeber' .github/workflows/verify-fence-pricing.yml
+
           ! grep -q "'14 Preispositionen'" .github/workflows/verify-bad-pricing.yml
           ! grep -q "'17 Preispositionen'" .github/workflows/verify-garten-pricing.yml
           grep -q 'check-service-count.py /tmp/bad.html 14 Bad' .github/workflows/verify-bad-pricing.yml
           grep -q 'check-service-count.py /tmp/garten.html 17 Garten' .github/workflows/verify-garten-pricing.yml
+
+      - name: Audit every Hostinger production verifier transport
+        shell: bash
+        run: |
+          set -euo pipefail
+          violations=0
+          gate_name='Hostinger production ready'
+          for file in .github/workflows/*.yml .github/workflows/*.yaml; do
+            [[ -f "$file" ]] || continue
+            grep -Fq "workflows: [\"${gate_name}\"]" "$file" || continue
+
+            if grep -nE 'fetch_with_retry\(\)|fetch_until_contains\(\)|^[[:space:]]*fetch\(\)[[:space:]]*\{|^[[:space:]]*curl[[:space:]]|^[[:space:]].*curl[[:space:]]+-' "$file" >/tmp/legacy-fetch.txt; then
+              if grep -Fq 'uses: actions/checkout@v4' "$file" && \
+                 grep -Fq 'uses: ./.github/actions/setup-hostinger-verifier' "$file"; then
+                echo "CENTRALIZED_LEGACY_TRANSPORT=${file}"
+              else
+                echo "UNHARDENED_LEGACY_TRANSPORT=${file}"
+                echo "::error file=${file}::Hostinger verifier owns curl/fetch transport without centralized setup-hostinger-verifier protection"
+                cat /tmp/legacy-fetch.txt
+                violations=1
+              fi
+            fi
+          done
+          test "$violations" -eq 0
 
       - name: Verify current city and Garten contracts
         shell: bash

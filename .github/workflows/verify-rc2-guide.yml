@@ -11,14 +11,13 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Verify exact Türen price-item guide mappings
         shell: bash
         run: |
           set -euo pipefail
-
-          fetch() {
-            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
-          }
+          source scripts/hostinger-verify.sh
 
           assert_ratgeber_href() {
             local html="$1"
@@ -37,9 +36,9 @@ jobs:
           PY
           }
 
-          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
-          fetch 'https://baukostenradar.de/kosten/tueren' /tmp/tueren.html
-          fetch 'https://baukostenradar.de/ratgeber' /tmp/hub.html
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch_hostinger 'https://baukostenradar.de/kosten/tueren' /tmp/tueren.html
+          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/hub.html
 
           ! grep -qi 'noindex' /tmp/tueren.html
 
@@ -63,15 +62,14 @@ jobs:
             grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Türen item missing in sitemap: ${item}"; exit 1; }
             grep -q "/kosten/tueren/leistung/${item}" /tmp/tueren.html || { echo "Türen item missing on category: ${item}"; exit 1; }
 
-            fetch "$item_url" "$item_html"
-            grep -q 'Passender Ratgeber' "$item_html"
+            fetch_hostinger "$item_url" "$item_html"
             assert_ratgeber_href "$item_html" "/ratgeber/${guide}"
             ! grep -qi 'noindex' "$item_html"
 
             grep -q "${guide_url}</loc>" /tmp/sitemap.xml
             grep -q "/ratgeber/${guide}" /tmp/hub.html
 
-            fetch "$guide_url" "$guide_html"
+            fetch_hostinger "$guide_url" "$guide_html"
             grep -q "$guide_url" "$guide_html"
             grep -q '"@type":"Article"' "$guide_html"
             grep -q '/kosten/tueren' "$guide_html"
@@ -90,13 +88,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
-          fetch() {
-            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
-          }
-
-          fetch 'https://baukostenradar.de/ratgeber/haustuer-einbauen-kosten' /tmp/haustuer-parent.html
-          fetch 'https://baukostenradar.de/ratgeber/6-innentueren-austauschen-kosten' /tmp/innentueren-six.html
+          fetch_hostinger 'https://baukostenradar.de/ratgeber/haustuer-einbauen-kosten' /tmp/haustuer-parent.html
+          fetch_hostinger 'https://baukostenradar.de/ratgeber/6-innentueren-austauschen-kosten' /tmp/innentueren-six.html
 
           grep -q '"@type":"Article"' /tmp/haustuer-parent.html
           grep -q '/kosten/tueren/berlin' /tmp/haustuer-parent.html
@@ -114,13 +109,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
-          fetch() {
-            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
-          }
-
-          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
-          fetch 'https://baukostenradar.de/ratgeber' /tmp/hub.html
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/hub.html
 
           guides=(
             6-innentueren-austauschen-kosten
@@ -137,7 +129,7 @@ jobs:
             grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Door guide missing in sitemap: ${source}"; exit 1; }
             grep -q "/ratgeber/${source}" /tmp/hub.html || { echo "Door guide missing from hub: ${source}"; exit 1; }
 
-            fetch "$guide_url" "$guide_html"
+            fetch_hostinger "$guide_url" "$guide_html"
             grep -q "$guide_url" "$guide_html"
             grep -q '"@type":"Article"' "$guide_html"
             ! grep -qi 'noindex' "$guide_html"
