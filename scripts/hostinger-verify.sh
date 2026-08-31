@@ -11,7 +11,11 @@ _hostinger_verify_startup_jitter() {
     return 0
   fi
 
-  local delay=$((RANDOM % 21))
+  # Dozens of workflow_run verifiers are released by the same production gate.
+  # Spread their first live request over three minutes so Hostinger is not hit
+  # by an artificial CI connection storm. The marker keeps later fetches in the
+  # same workflow run from sleeping again.
+  local delay=$((RANDOM % 181))
   echo "Hostinger verifier startup jitter: ${delay}s"
   sleep "$delay"
   : > "$marker"
