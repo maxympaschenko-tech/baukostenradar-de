@@ -1,109 +1,155 @@
-name: Verify Fenster pricing expansion
+name: Verify Fenster pricing cluster
 
 on:
   workflow_run:
-    workflows: ["Deploy to Ukraine.com.ua"]
+    workflows: ["Hostinger production ready"]
     types: [completed]
   workflow_dispatch:
 
 jobs:
-  verify-fenster-pricing:
+  verify-fenster-cluster:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch Fenster pages and source catalog
+      - name: Configure resilient live fetches
+        shell: bash
+        run: |
+          cat > ~/.curlrc <<'EOF'
+          retry = 6
+          retry-all-errors
+          retry-delay = 5
+          connect-timeout = 10
+          max-time = 30
+          user-agent = "Mozilla/5.0 (compatible; BauKostenRadarProductionVerifier/1.0)"
+          EOF
+
+      - name: Fetch Fenster production pages
         shell: bash
         run: |
           set -euo pipefail
-
-          fetch_with_retry() {
-            local url="$1"
-            local output="$2"
-            for i in 1 2 3 4 5; do
-              if curl -sS --fail --connect-timeout 10 --max-time 25 "$url" -o "$output"; then
-                return 0
+          fetch_until_contains() {
+            local base_url="$1" output="$2" needle="$3" label="$4"
+            for attempt in 1 2 3 4 5 6; do
+              if curl -sSL --fail -H 'Cache-Control: no-cache' \
+                "${base_url}?verify=${GITHUB_SHA}-${attempt}" -o "$output"; then
+                if grep -Fq "$needle" "$output"; then
+                  return 0
+                fi
               fi
-              if [[ "$i" == "5" ]]; then
+              if [ "$attempt" -eq 6 ]; then
+                echo "MISSING after retries: $label" >&2
+                echo "Expected in $output: $needle" >&2
                 return 1
               fi
-              sleep 4
+              sleep 10
             done
           }
 
-          fetch_with_retry 'https://baukostenradar.de/kosten/fenster' /tmp/fenster.html
-          fetch_with_retry 'https://baukostenradar.de/kosten/fenster/muenchen' /tmp/fenster-muenchen.html
-          fetch_with_retry 'https://baukostenradar.de/quellen' /tmp/quellen.html
+          fetch_until_contains \
+            'https://baukostenradar.de/kosten/fenster' /tmp/fenster.html \
+            'Fenstertausch komplett inklusive Ausbau und Einbau' 'Fenster service page'
+          curl -sSL --fail 'https://baukostenradar.de/kosten/fenster/berlin' -o /tmp/fenster-berlin.html
+          fetch_until_contains \
+            'https://baukostenradar.de/quellen' /tmp/quellen.html \
+            'MyHammer - Dachfenster einbauen Kosten 2026' 'Fenster source directory'
+          curl -sSL --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+          curl -sSL --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
+          curl -sSL --fail 'https://baukostenradar.de/kosten/kellerbau' -o /tmp/kellerbau-regression.html
+          curl -sSL --fail 'https://baukostenradar.de/ratgeber/fenster-austauschen-kosten-haus' -o /tmp/fenster-guide-regression.html
+          curl -sSL --fail 'https://baukostenradar.de/ratgeber/dachfenster-nachtraeglich-einbauen-kosten' -o /tmp/dachfenster-guide-regression.html
 
-      - name: Verify expanded source-backed Fenster data
+      - name: Verify service, city, guides and source signals
         shell: bash
         run: |
           set -euo pipefail
+          require_contains() {
+            local file="$1"; local needle="$2"; local label="$3"
+            if ! grep -Fq "$needle" "$file"; then
+              echo "MISSING: $label" >&2
+              echo "Expected in $file: $needle" >&2
+              exit 1
+            fi
+          }
 
-          python - <<'PY'
-          import re
-          from html.parser import HTMLParser
+          require_contains /tmp/fenster.html 'Fenstertausch komplett inklusive Ausbau und Einbau' 'Fenster complete replacement position'
+          require_contains /tmp/fenster.html 'Holz-Aluminiumfenster 1300 x 1300 mm Dreifachverglasung' 'Fenster frame material position'
+          require_contains /tmp/fenster.html 'Schallschutzfenster Kunststoff bis 43 dB' 'Fenster soundproof position'
+          require_contains /tmp/fenster.html 'Neues Fenster mit Rollladen inklusive Einbau' 'Fenster shutter position'
+          require_contains /tmp/fenster.html 'Dachfenster mit Balkonfunktion nachträglich komplett' 'Fenster roof position'
+          require_contains /tmp/fenster-berlin.html 'Fenster' 'Fenster Berlin city page'
+          require_contains /tmp/kellerbau-regression.html 'Kellerbau' 'Kellerbau regression'
+          require_contains /tmp/fenster-guide-regression.html 'Fenster' 'existing Fenster guide regression'
+          require_contains /tmp/dachfenster-guide-regression.html 'Dachfenster' 'existing Dachfenster guide regression'
 
-          class TextParser(HTMLParser):
-              def __init__(self):
-                  super().__init__()
-                  self.parts = []
+          for guide in \
+            'fenster-rahmenmaterial-kosten' \
+            'waermeschutzfenster-kosten' \
+            'schallschutzfenster-kosten' \
+            'sicherheitsglas-vsg-fenster-kosten' \
+            'fenster-rollladen-kosten'; do
+            require_contains /tmp/ratgeber.html "/ratgeber/${guide}" "Fenster guide $guide"
+            require_contains /tmp/sitemap.xml "https://baukostenradar.de/ratgeber/${guide}</loc>" "Fenster guide sitemap $guide"
+          done
 
-              def handle_data(self, data):
-                  value = data.strip()
-                  if value:
-                      self.parts.append(value)
+          for source in \
+            'MyHammer - Fenstereinbau Kosten 2026' \
+            'MyHammer - Dachfenster einbauen Kosten 2026' \
+            'Aroundhome - Rollladen Kosten'; do
+            require_contains /tmp/quellen.html "$source" "active Fenster source $source"
+          done
 
-          def text(path):
-              parser = TextParser()
-              with open(path, encoding='utf-8') as handle:
-                  parser.feed(handle.read())
-              return re.sub(r'\s+', ' ', ' '.join(parser.parts))
+          require_contains /tmp/sitemap.xml 'https://baukostenradar.de/kosten/fenster</loc>' 'Fenster sitemap service'
+          require_contains /tmp/sitemap.xml 'https://baukostenradar.de/kosten/fenster/berlin</loc>' 'Fenster Berlin sitemap'
+          ! grep -qi 'noindex' /tmp/fenster.html
 
-          fenster = text('/tmp/fenster.html')
-          muenchen = text('/tmp/fenster-muenchen.html')
-          quellen = text('/tmp/quellen.html')
+      - name: Verify all Fenster price-detail mappings and sitemap
+        shell: bash
+        run: |
+          set -euo pipefail
+          check_item() {
+            local item="$1"; local guide="$2"
+            local url="https://baukostenradar.de/kosten/fenster/leistung/${item}"
+            local output="/tmp/fenster-${item}.html"
+            grep -Fq "${url}</loc>" /tmp/sitemap.xml || { echo "Missing sitemap URL: $item" >&2; exit 1; }
+            curl -sSL --fail "$url" -o "$output"
+            grep -Fq 'Passender Ratgeber' "$output" || { echo "Missing guide CTA: $item" >&2; exit 1; }
+            grep -Fq "/ratgeber/${guide}" "$output" || { echo "Wrong guide mapping: $item -> $guide" >&2; exit 1; }
+            ! grep -qi 'noindex' "$output"
+          }
 
-          expected_main = (
-              '15 Preispositionen',
-              '4 geprüfte Quellen',
-              'Standardfenster inkl. Einbau',
-              'Kunststofffenster',
-              'Holzfenster',
-              'Aluminiumfenster',
-              'Holz-Alu-Fenster',
-              'Fenstermontage durch Fachbetrieb',
-              'Fensterbauer Stundensatz',
-              '10 neue Fenster inkl. Einbau',
-              'Neues Fenster mit Mauerdurchbruch',
-              'Kunststofffenster Standardgröße inkl. Einbau',
-              'Altfenster ausbauen',
-              'Altfenster entsorgen',
-              'co2online - Fenster tauschen 2026',
-              'Aroundhome - Fenster Preise 2026',
-              'MyHammer - Fenstereinbau Kosten 2026',
+          mappings=(
+            'fenstertausch-komplett-inklusive-ausbau-und-einbau|fenster-austauschen-kosten-haus'
+            'kunststofffenster-1300-x-1300-mm-zweifachverglasung|fenster-rahmenmaterial-kosten'
+            'aluminiumfenster-1300-x-1300-mm-zweifachverglasung|fenster-rahmenmaterial-kosten'
+            'holzfenster-1300-x-1300-mm-zweifachverglasung|fenster-rahmenmaterial-kosten'
+            'kunststoff-aluminiumfenster-1300-x-1300-mm-zweifachverglasung|fenster-rahmenmaterial-kosten'
+            'holz-aluminiumfenster-1300-x-1300-mm-zweifachverglasung|fenster-rahmenmaterial-kosten'
+            'kunststofffenster-1300-x-1300-mm-dreifachverglasung|fenster-rahmenmaterial-kosten'
+            'holzfenster-1300-x-1300-mm-dreifachverglasung|fenster-rahmenmaterial-kosten'
+            'aluminiumfenster-1300-x-1300-mm-dreifachverglasung|fenster-rahmenmaterial-kosten'
+            'kunststoff-aluminiumfenster-1300-x-1300-mm-dreifachverglasung|fenster-rahmenmaterial-kosten'
+            'holz-aluminiumfenster-1300-x-1300-mm-dreifachverglasung|fenster-rahmenmaterial-kosten'
+            'waermeschutzfenster-1100-x-1400-mm|waermeschutzfenster-kosten'
+            'waermeschutzglas-fenster|waermeschutzfenster-kosten'
+            'kunststofffenster-vsg-innen-1300-x-1300-mm|sicherheitsglas-vsg-fenster-kosten'
+            'kunststofffenster-vsg-aussen-1300-x-1300-mm|sicherheitsglas-vsg-fenster-kosten'
+            'kunststofffenster-vsg-beidseitig-1300-x-1300-mm|sicherheitsglas-vsg-fenster-kosten'
+            'schallschutzfenster-kunststoff-bis-34-db|schallschutzfenster-kosten'
+            'schallschutzfenster-kunststoff-bis-37-db|schallschutzfenster-kosten'
+            'schallschutzfenster-kunststoff-bis-40-db|schallschutzfenster-kosten'
+            'schallschutzfenster-kunststoff-bis-43-db|schallschutzfenster-kosten'
+            'rollladen-inklusive-montage-am-fenster|fenster-rollladen-kosten'
+            'neues-fenster-mit-rollladen-inklusive-einbau|fenster-rollladen-kosten'
+            'rollladen-nachtraeglich-inklusive-montage|fenster-rollladen-kosten'
+            'dachfenster-schwingfenster-inklusive-einbau|dachfenster-nachtraeglich-einbauen-kosten'
+            'dachfenster-klapp-schwing-fenster-inklusive-einbau|dachfenster-nachtraeglich-einbauen-kosten'
+            'dachfenster-mit-elektroantrieb|dachfenster-nachtraeglich-einbauen-kosten'
+            'dachfenster-nachtraeglich-klassisches-schwingfenster-komplett|dachfenster-nachtraeglich-einbauen-kosten'
+            'dachfenster-mit-balkonfunktion-nachtraeglich-komplett|dachfenster-nachtraeglich-einbauen-kosten'
           )
-          for needle in expected_main:
-              if needle not in fenster:
-                  raise SystemExit(f'Missing Fenster production signal: {needle}')
 
-          expected_city = (
-              'Fenster Kosten in München 2026',
-              'Standardfenster inkl. Einbau',
-              'Fenstermontage durch Fachbetrieb',
-              '10 neue Fenster inkl. Einbau',
-              'Neues Fenster mit Mauerdurchbruch',
-              'Altfenster ausbauen',
-              'Altfenster entsorgen',
-          )
-          for needle in expected_city:
-              if needle not in muenchen:
-                  raise SystemExit(f'Missing München Fenster production signal: {needle}')
-
-          for source_name in (
-              'co2online - Fenster tauschen 2026',
-              'Aroundhome - Fenster Preise 2026',
-              'MyHammer - Fenstereinbau Kosten 2026',
-          ):
-              if source_name not in quellen:
-                  raise SystemExit(f'Missing Fenster source in central source catalog: {source_name}')
-          PY
+          [ "${#mappings[@]}" -eq 28 ] || { echo 'Expected exactly 28 Fenster mappings' >&2; exit 1; }
+          for mapping in "${mappings[@]}"; do
+            IFS='|' read -r item guide <<< "$mapping"
+            check_item "$item" "$guide"
+          done
