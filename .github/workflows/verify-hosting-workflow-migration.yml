@@ -21,9 +21,12 @@ jobs:
         run: |
           set -euo pipefail
 
+          legacy='Deploy to Ukraine'
+          legacy+='.com.ua'
+
           mapfile -t stale_files < <(
             grep -RIl --include='*.yml' --include='*.yaml' \
-              'Deploy to Ukraine.com.ua' .github/workflows || true
+              "$legacy" .github/workflows || true
           )
 
           if (( ${#stale_files[@]} > 0 )); then
