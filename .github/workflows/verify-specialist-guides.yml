@@ -39,14 +39,14 @@ jobs:
           test "$total" -ge 38
 
           for guide in "${guides[@]}"; do
-            grep -q "https://baukostenradar.de/ratgeber/${guide}</loc>" /tmp/sitemap.xml
+            grep -q "https://baukostenradar.de/ratgeber/${guide}</loc>" /tmp/sitemap.xml || { echo "Specialist guide missing from sitemap: ${guide}"; exit 1; }
             output="/tmp/guide-${guide}.html"
             fetch_hostinger "https://baukostenradar.de/ratgeber/${guide}" "$output"
-            grep -q "https://baukostenradar.de/ratgeber/${guide}" "$output"
-            grep -q '"@type":"Article"' "$output"
-            grep -q 'Passende Kosten in allen 8 Städten vergleichen' "$output"
-            grep -q 'Lokale Gewerkseiten' "$output"
-            ! grep -qi 'noindex' "$output"
+            grep -q "https://baukostenradar.de/ratgeber/${guide}" "$output" || { echo "Canonical guide URL missing: ${guide}"; exit 1; }
+            grep -q '"@type":"Article"' "$output" || { echo "Article schema missing: ${guide}"; exit 1; }
+            grep -q 'Passende Kosten in allen 8 Städten vergleichen' "$output" || { echo "Eight-city comparison missing: ${guide}"; exit 1; }
+            grep -q 'Lokale Gewerkseiten' "$output" || { echo "Local trade links missing: ${guide}"; exit 1; }
+            ! grep -qi 'noindex' "$output" || { echo "Unexpected noindex: ${guide}"; exit 1; }
           done
 
       - name: Verify dedicated service city and price links
@@ -61,16 +61,29 @@ jobs:
             local item="$3"
             local item_guide="$4"
 
+            echo "Checking specialist mapping: ${service} -> ${service_guide}; ${item} -> ${item_guide}"
+
             fetch_hostinger "https://baukostenradar.de/kosten/${service}" /tmp/service.html
-            grep -q "/ratgeber/${service_guide}" /tmp/service.html
+            grep -Fq "/ratgeber/${service_guide}" /tmp/service.html || {
+              echo "Service guide mapping missing: ${service} -> ${service_guide}" >&2
+              exit 1
+            }
 
             fetch_hostinger "https://baukostenradar.de/kosten/${service}/berlin" /tmp/city.html
-            grep -q "/ratgeber/${service_guide}" /tmp/city.html
-            grep -q 'Passender Ratgeber' /tmp/city.html
+            grep -Fq "/ratgeber/${service_guide}" /tmp/city.html || {
+              echo "City guide continuity missing: ${service}/berlin -> ${service_guide}" >&2
+              exit 1
+            }
 
             fetch_hostinger "https://baukostenradar.de/kosten/${service}/leistung/${item}" /tmp/item.html
-            grep -q "/ratgeber/${item_guide}" /tmp/item.html
-            grep -q 'Passender Ratgeber' /tmp/item.html
+            grep -Fq "/ratgeber/${item_guide}" /tmp/item.html || {
+              echo "Price-detail guide mapping missing: ${service}/${item} -> ${item_guide}" >&2
+              exit 1
+            }
+            grep -q 'id="ratgeber"' /tmp/item.html || {
+              echo "Price-detail guide section missing: ${service}/${item}" >&2
+              exit 1
+            }
           }
 
           check_mapping maler maler-kosten-pro-qm waende-streichen waende-streichen-kosten-pro-qm
@@ -108,7 +121,7 @@ jobs:
           for guide in "${!services[@]}"; do
             service="${services[$guide]}"
             fetch_hostinger "https://baukostenradar.de/ratgeber/${guide}" /tmp/guide.html
-            grep -q "/kosten/${service}/berlin" /tmp/guide.html
-            grep -q "/kosten/${service}/muenchen" /tmp/guide.html
-            grep -q "/rechner/handwerkerkosten?gewerk=${service}" /tmp/guide.html
+            grep -q "/kosten/${service}/berlin" /tmp/guide.html || { echo "Berlin reverse silo missing: ${guide} -> ${service}"; exit 1; }
+            grep -q "/kosten/${service}/muenchen" /tmp/guide.html || { echo "München reverse silo missing: ${guide} -> ${service}"; exit 1; }
+            grep -q "/rechner/handwerkerkosten?gewerk=${service}" /tmp/guide.html || { echo "Calculator link missing: ${guide} -> ${service}"; exit 1; }
           done
