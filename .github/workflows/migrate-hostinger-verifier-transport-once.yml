@@ -1,0 +1,43 @@
+name: One-off migrate Hostinger verifier transport
+
+on:
+  push:
+    branches:
+      - ci/finish-live-fetch-migration-2
+    paths:
+      - 'scripts/migrate-hostinger-verifier-transport.py'
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ci/finish-live-fetch-migration-2
+          fetch-depth: 0
+
+      - name: Apply mechanical transport setup
+        run: python3 scripts/migrate-hostinger-verifier-transport.py
+
+      - name: Validate generated workflow diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          git diff --stat
+          changed=$(git diff --name-only -- '.github/workflows/*.yml' '.github/workflows/*.yaml' | wc -l | tr -d ' ')
+          echo "Migrated workflow files: ${changed}"
+          test "$changed" -ge 1
+
+      - name: Commit migration to PR branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/workflows
+          git commit -m 'Apply shared Hostinger transport to legacy verifiers'
+          git push origin HEAD:ci/finish-live-fetch-migration-2
