@@ -1,5 +1,6 @@
 from pathlib import Path
 
+# One-off branch migration helper. Removed before merge.
 WORKFLOW_DIR = Path('.github/workflows')
 TRIGGER = 'workflows: ["Hostinger production ready"]'
 SETUP_ACTION = 'uses: ./.github/actions/setup-hostinger-verifier'
