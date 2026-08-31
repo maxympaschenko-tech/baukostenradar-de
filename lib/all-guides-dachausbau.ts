@@ -1,5 +1,5 @@
 import { allGuides as wintergartenGuides } from "./all-guides-wintergarten";
-import { dachausbauGuides } from "./guides-dachausbau";
+import { dachausbauGuides } from "./guides-dachausbau-current";
 
 const dachausbauSlugs = new Set(dachausbauGuides.map((guide) => guide.slug));
 const baseWithoutDachausbauGuides = wintergartenGuides.filter((guide) => !dachausbauSlugs.has(guide.slug));
