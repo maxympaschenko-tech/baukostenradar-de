@@ -73,7 +73,6 @@ jobs:
           require_contains /tmp/ratgeber.html '/ratgeber/terrassenueberdachung-kosten' 'Terrassenueberdachung guide hub link'
           require_contains /tmp/quellen.html 'Aroundhome - Terrassenüberdachung Kosten 2026' 'Aroundhome Terrassenueberdachung source'
           require_contains /tmp/quellen.html 'Aroundhome - Lamellendach Kosten 2026' 'Aroundhome Lamellendach source'
-          require_contains /tmp/quellen.html 'Blauarbeit - Terrassenüberdachung Kosten 2026' 'Blauarbeit Terrassenueberdachung source'
           require_contains /tmp/quellen.html 'Blauarbeit - Pergola Kosten 2026' 'Blauarbeit Pergola source'
           require_contains /tmp/sitemap.xml 'https://example.de/kosten/terrassenueberdachung</loc>' 'Terrassenueberdachung sitemap service'
           require_contains /tmp/sitemap.xml 'https://example.de/ratgeber/terrassenueberdachung-kosten</loc>' 'Terrassenueberdachung sitemap guide'
