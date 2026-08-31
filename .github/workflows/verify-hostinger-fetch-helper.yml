@@ -7,6 +7,8 @@ on:
       - 'scripts/check-service-count.py'
       - 'app/ratgeber/layout.tsx'
       - 'app/ratgeber/page.tsx'
+      - '.github/actions/setup-hostinger-verifier/action.yml'
+      - '.github/workflows/verify-*.yml'
       - '.github/workflows/verify-about-organization-entity.yml'
       - '.github/workflows/verify-bad-pricing.yml'
       - '.github/workflows/verify-boden-guide-cluster.yml'
@@ -52,6 +54,14 @@ jobs:
           grep -q 'RANDOM % 181' scripts/hostinger-verify.sh
           grep -q 'fetch_hostinger_redirect()' scripts/hostinger-verify.sh
           grep -q "'%{http_code} %{redirect_url}'" scripts/hostinger-verify.sh
+
+          action=.github/actions/setup-hostinger-verifier/action.yml
+          grep -q 'RANDOM % 181' "$action"
+          grep -q 'baukostenradar-hostinger-curl' "$action"
+          grep -q 'exec /usr/bin/curl -q' "$action"
+          grep -q -- '--retry-all-errors' "$action"
+          grep -q 'ci_verify=' "$action"
+          grep -q 'GITHUB_PATH' "$action"
 
       - name: Verify production workflows use shared Hostinger fetch
         shell: bash
@@ -129,10 +139,15 @@ jobs:
             grep -Fq "workflows: [\"${gate_name}\"]" "$file" || continue
 
             if grep -nE 'fetch_with_retry\(\)|fetch_until_contains\(\)|^[[:space:]]*fetch\(\)[[:space:]]*\{|^[[:space:]]*curl[[:space:]]|^[[:space:]].*curl[[:space:]]+-' "$file" >/tmp/legacy-fetch.txt; then
-              echo "LEGACY_FETCH_FILE=${file}"
-              echo "::error file=${file}::Hostinger production verifier still owns live curl/fetch transport; use scripts/hostinger-verify.sh"
-              cat /tmp/legacy-fetch.txt
-              violations=1
+              if grep -Fq 'uses: actions/checkout@v4' "$file" && \
+                 grep -Fq 'uses: ./.github/actions/setup-hostinger-verifier' "$file"; then
+                echo "CENTRALIZED_LEGACY_TRANSPORT=${file}"
+              else
+                echo "UNHARDENED_LEGACY_TRANSPORT=${file}"
+                echo "::error file=${file}::Hostinger verifier owns curl/fetch transport without centralized setup-hostinger-verifier protection"
+                cat /tmp/legacy-fetch.txt
+                violations=1
+              fi
             fi
           done
           test "$violations" -eq 0
