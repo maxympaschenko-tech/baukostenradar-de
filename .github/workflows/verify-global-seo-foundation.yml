@@ -2,7 +2,7 @@ name: Verify global SEO foundation
 
 on:
   workflow_run:
-    workflows: ["Deploy to Ukraine.com.ua"]
+    workflows: ["Hostinger production ready"]
     types: [completed]
   workflow_dispatch:
 
@@ -137,7 +137,7 @@ jobs:
           grep -q 'Disallow: /api/' /tmp/robots.txt
           grep -q 'Sitemap: https://baukostenradar.de/sitemap.xml' /tmp/robots.txt
 
-      - name: Verify sitemap contains canonical indexable URLs only
+      - name: Verify sitemap contains canonical indexable URLs and accurate freshness signals
         shell: bash
         run: |
           set -euo pipefail
@@ -157,10 +157,47 @@ jobs:
             fi
           done
 
-          if grep -Eq '<lastmod>|<priority>|<changefreq>' /tmp/sitemap.xml; then
-            echo 'Sitemap contains freshness or priority signals that are not backed by per-URL modification data.' >&2
+          if grep -Eq '<priority>|<changefreq>' /tmp/sitemap.xml; then
+            echo 'Sitemap must not contain ignored priority/changefreq signals.' >&2
             exit 1
           fi
+
+          python - <<'PY'
+          from datetime import date
+          import re
+          import xml.etree.ElementTree as ET
+
+          path = '/tmp/sitemap.xml'
+          root = ET.parse(path).getroot()
+          ns = {'sm': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
+          entries = {}
+          lastmods = []
+
+          for node in root.findall('sm:url', ns):
+              loc = node.findtext('sm:loc', default='', namespaces=ns)
+              lastmod = node.findtext('sm:lastmod', default='', namespaces=ns)
+              entries[loc] = lastmod or None
+              if lastmod:
+                  if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', lastmod):
+                      raise SystemExit(f'Invalid sitemap lastmod format: {lastmod}')
+                  parsed = date.fromisoformat(lastmod)
+                  if parsed > date.today():
+                      raise SystemExit(f'Future sitemap lastmod found: {loc} -> {lastmod}')
+                  lastmods.append(parsed)
+
+          if not lastmods:
+              raise SystemExit('Sitemap must contain source-backed lastmod values')
+
+          freshness_floor = date(2026, 8, 31)
+          for loc in ('https://baukostenradar.de', 'https://baukostenradar.de/kosten', 'https://baukostenradar.de/kosten/tueren'):
+              value = entries.get(loc)
+              if not value:
+                  raise SystemExit(f'Missing expected lastmod for {loc}')
+              if date.fromisoformat(value) < freshness_floor:
+                  raise SystemExit(f'Stale lastmod for {loc}: {value}')
+
+          print(f'Validated {len(lastmods)} source-backed lastmod values')
+          PY
 
           duplicate_count=$(grep -o '<loc>[^<]*</loc>' /tmp/sitemap.xml | sort | uniq -d | wc -l | tr -d ' ')
           echo "Duplicate sitemap URLs: $duplicate_count"
