@@ -92,7 +92,7 @@ jobs:
           check_mapping trockenbau trockenbau-kosten-pro-qm trockenbauwand-beidseitig-beplankt trockenbauwand-kosten-pro-qm
           check_mapping sanitaer sanitaer-kosten sanitaerobjekte-armaturen-fuer-8-m2-bad sanitaerobjekte-bad-kosten
           check_mapping waermepumpe luft-wasser-waermepumpe-kosten luft-wasser-waermepumpe-komplett luft-wasser-waermepumpe-kosten
-          check_mapping photovoltaik photovoltaik-kosten-2026 pv-anlage-10-kwp-inkl-installation photovoltaik-10-kwp-kosten
+          check_mapping photovoltaik photovoltaik-10-kwp-kosten pv-anlage-10-kwp-inkl-installation photovoltaik-10-kwp-kosten
           check_mapping daemmung daemmung-kosten-pro-qm innendaemmung innendaemmung-kosten-pro-qm
           check_mapping fassade fassade-sanieren-kosten putz-fassade-neu putzfassade-kosten-pro-qm
           check_mapping garten garten-anlegen-kosten einfahrt-pflastern einfahrt-pflastern-kosten

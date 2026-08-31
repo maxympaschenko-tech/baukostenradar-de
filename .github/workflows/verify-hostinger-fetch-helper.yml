@@ -189,6 +189,10 @@ jobs:
             .github/workflows/verify-specialist-guides.yml
           ! grep -q 'check_mapping waermepumpe waermepumpe-kosten-2026 ' \
             .github/workflows/verify-specialist-guides.yml
+          grep -q 'check_mapping photovoltaik photovoltaik-10-kwp-kosten pv-anlage-10-kwp-inkl-installation photovoltaik-10-kwp-kosten' \
+            .github/workflows/verify-specialist-guides.yml
+          ! grep -q 'check_mapping photovoltaik photovoltaik-kosten-2026 ' \
+            .github/workflows/verify-specialist-guides.yml
           grep -q 'Price-detail guide mapping missing' .github/workflows/verify-specialist-guides.yml
           grep -q 'id=\"ratgeber\"' .github/workflows/verify-specialist-guides.yml
           ! grep -q "grep -q 'Passender Ratgeber'" .github/workflows/verify-specialist-guides.yml
