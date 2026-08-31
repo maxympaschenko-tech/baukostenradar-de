@@ -15,11 +15,11 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/lib/pricing": ["./lib/catalog-fenster.ts"],
-      "@/lib/price-guide-links": ["./lib/price-guide-links-fenster.ts"],
-      "@/lib/all-guides": ["./lib/all-guides-fenster.ts"],
-      "@/lib/guide-groups": ["./lib/guide-groups-fenster.ts"],
-      "@/lib/guide-silo": ["./lib/guide-silo-fenster.ts"],
+      "@/lib/pricing": ["./lib/catalog-tueren.ts"],
+      "@/lib/price-guide-links": ["./lib/price-guide-links-tueren.ts"],
+      "@/lib/all-guides": ["./lib/all-guides-tueren.ts"],
+      "@/lib/guide-groups": ["./lib/guide-groups-tueren.ts"],
+      "@/lib/guide-silo": ["./lib/guide-silo-tueren.ts"],
       "@/*": ["./*"]
     }
   },
