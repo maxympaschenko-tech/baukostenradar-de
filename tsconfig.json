@@ -16,10 +16,10 @@
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/lib/pricing": ["./lib/catalog-tueren.ts"],
-      "@/lib/price-guide-links": ["./lib/price-guide-links-tueren.ts"],
-      "@/lib/all-guides": ["./lib/all-guides-tueren.ts"],
-      "@/lib/guide-groups": ["./lib/guide-groups-tueren.ts"],
-      "@/lib/guide-silo": ["./lib/guide-silo-tueren.ts"],
+      "@/lib/price-guide-links": ["./lib/price-guide-links-heizung.ts"],
+      "@/lib/all-guides": ["./lib/all-guides-heizung.ts"],
+      "@/lib/guide-groups": ["./lib/guide-groups-heizung.ts"],
+      "@/lib/guide-silo": ["./lib/guide-silo-heizung.ts"],
       "@/*": ["./*"]
     }
   },
