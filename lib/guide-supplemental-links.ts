@@ -43,6 +43,15 @@ const abrissGuideLinks: SupplementalGuide[] = [
   { slug: "bauschuttcontainer-30-m3-kosten", label: "Bauschuttcontainer 30 m³ Kosten", href: "/ratgeber/bauschuttcontainer-30-m3-kosten" },
 ];
 
+const heatingGuideLinks: SupplementalGuide[] = [
+  { slug: "heizung-erneuern-kosten", label: "Heizung erneuern Kosten", href: "/ratgeber/heizung-erneuern-kosten" },
+  { slug: "fussbodenheizung-100-qm-kosten", label: "Fußbodenheizung 100 m² Kosten", href: "/ratgeber/fussbodenheizung-100-qm-kosten" },
+  { slug: "gasheizung-austauschen-kosten", label: "Gasheizung austauschen Kosten", href: "/ratgeber/gasheizung-austauschen-kosten" },
+  { slug: "heizkoerper-montieren-kosten", label: "Heizkörper montieren Kosten", href: "/ratgeber/heizkoerper-montieren-kosten" },
+  { slug: "thermostat-installieren-kosten", label: "Thermostat installieren Kosten", href: "/ratgeber/thermostat-installieren-kosten" },
+  { slug: "heizungswartung-kosten", label: "Heizungswartung Kosten", href: "/ratgeber/heizungswartung-kosten" },
+];
+
 const renovationAreaGuideLinks: SupplementalGuide[] = [
   { slug: "wohnung-renovieren-kosten", label: "Wohnung renovieren Kosten", href: "/ratgeber/wohnung-renovieren-kosten" },
   { slug: "renovierungskosten-haus", label: "Renovierungskosten Haus", href: "/ratgeber/renovierungskosten-haus" },
@@ -86,6 +95,7 @@ const supplementalClusters = [
   tuerenGuideLinks,
   estrichGuideLinks,
   abrissGuideLinks,
+  heatingGuideLinks,
   renovationAreaGuideLinks,
   houseRenovationGuideLinks,
   planningCostGuideLinks,
