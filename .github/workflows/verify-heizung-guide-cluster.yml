@@ -1,0 +1,231 @@
+name: Verify Heizung guide cluster
+
+on:
+  workflow_run:
+    workflows: ["Hostinger production ready"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-heizung-guide-cluster:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-hostinger-verifier
+
+      - name: Verify exact Heizung price-item guide mappings
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --location \
+              --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 \
+              -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' \
+              -H 'User-Agent: BauKostenRadar-CI/1.0' \
+              "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/kosten/heizung' /tmp/heizung.html
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+
+          grep -q 'https://baukostenradar.de/kosten/heizung' /tmp/heizung.html
+          ! grep -qi 'noindex' /tmp/heizung.html
+
+          mappings=$(cat <<'EOF'
+          standardflachheizkoerper-austauschen-inkl-montage|heizkoerper-austauschen-kosten
+          badheizkoerper-austauschen-inkl-montage|heizkoerper-austauschen-kosten
+          niedertemperaturheizkoerper-austauschen-inkl-montage|heizkoerper-austauschen-kosten
+          designheizkoerper-austauschen-inkl-montage|heizkoerper-austauschen-kosten
+          fussbodenheizung-nasssystem-verlegen|fussbodenheizung-kosten
+          fussbodenheizung-duennschichtsystem-verlegen|fussbodenheizung-kosten
+          fussbodenheizung-trockenbausystem-verlegen|fussbodenheizung-kosten
+          fussbodenheizung-im-altbau-nachruesten|fussbodenheizung-kosten
+          heizkreisverteiler-fuer-fussbodenheizung|fussbodenheizung-kosten
+          hydraulischer-abgleich-einfamilienhaus|hydraulischer-abgleich-kosten
+          heizungspumpe-plus-hydraulischer-abgleich|hydraulischer-abgleich-kosten
+          heizungspumpe-gegen-hocheffizienzpumpe-tauschen|heizungspumpe-tauschen-kosten
+          schlamm-oder-magnetabscheider-inkl-installation|heizungspumpe-tauschen-kosten
+          EOF
+          )
+
+          checked=0
+          while IFS='|' read -r item guide; do
+            item="${item#${item%%[![:space:]]*}}"
+            [ -n "$item" ] || continue
+
+            item_url="https://baukostenradar.de/kosten/heizung/leistung/${item}"
+            guide_url="https://baukostenradar.de/ratgeber/${guide}"
+            item_output="/tmp/heizung-item-${item}.html"
+            guide_output="/tmp/heizung-guide-${guide}.html"
+
+            grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Heizung item missing in sitemap: ${item}"; exit 1; }
+            grep -q "/kosten/heizung/leistung/${item}" /tmp/heizung.html || { echo "Heizung item missing on category: ${item}"; exit 1; }
+
+            fetch "$item_url" "$item_output"
+            grep -q 'Passender Ratgeber' "$item_output"
+            grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong Heizung guide mapping: ${item} -> ${guide}"; exit 1; }
+            ! grep -qi 'noindex' "$item_output"
+
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Heizung guide missing in sitemap: ${guide}"; exit 1; }
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "Heizung guide missing from Ratgeber hub: ${guide}"; exit 1; }
+
+            fetch "$guide_url" "$guide_output"
+            grep -q "$guide_url" "$guide_output"
+            grep -q '"@type":"Article"' "$guide_output"
+            grep -q '/kosten/heizung' "$guide_output"
+            ! grep -qi 'noindex' "$guide_output"
+
+            checked=$((checked + 1))
+          done <<< "$mappings"
+
+          test "$checked" -eq 13
+          echo "Verified ${checked} exact Heizung price-item guide mappings"
+
+      - name: Verify Heizung parent and new child silo
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --location \
+              --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 \
+              -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' \
+              -H 'User-Agent: BauKostenRadar-CI/1.0' \
+              "$1" -o "$2"
+          }
+
+          guide='heizung-erneuern-kosten'
+          guide_url="https://baukostenradar.de/ratgeber/${guide}"
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          fetch "$guide_url" /tmp/heizung-parent.html
+
+          grep -q "${guide_url}</loc>" /tmp/sitemap.xml
+          grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+          grep -q "$guide_url" /tmp/heizung-parent.html
+          grep -q '"@type":"Article"' /tmp/heizung-parent.html
+          grep -q '/kosten/heizung' /tmp/heizung-parent.html
+          grep -q '/kosten/heizung/berlin' /tmp/heizung-parent.html
+          grep -q 'gewerk=heizung' /tmp/heizung-parent.html
+          grep -q 'leistung=standardflachheizkoerper-austauschen-inkl-montage' /tmp/heizung-parent.html
+          ! grep -qi 'noindex' /tmp/heizung-parent.html
+
+          children=(
+            heizkoerper-austauschen-kosten
+            fussbodenheizung-kosten
+            hydraulischer-abgleich-kosten
+            heizungspumpe-tauschen-kosten
+          )
+
+          for child in "${children[@]}"; do
+            grep -q "/ratgeber/${child}" /tmp/heizung-parent.html || { echo "Heizung parent missing child: ${child}"; exit 1; }
+          done
+
+          echo "Verified Heizung parent guide and ${#children[@]} new child links"
+
+      - name: Verify new Heizung guide runtime contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --location \
+              --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 \
+              -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' \
+              -H 'User-Agent: BauKostenRadar-CI/1.0' \
+              "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+
+          guides=$(cat <<'EOF'
+          heizkoerper-austauschen-kosten|standardflachheizkoerper-austauschen-inkl-montage
+          fussbodenheizung-kosten|fussbodenheizung-im-altbau-nachruesten
+          hydraulischer-abgleich-kosten|hydraulischer-abgleich-einfamilienhaus
+          heizungspumpe-tauschen-kosten|heizungspumpe-gegen-hocheffizienzpumpe-tauschen
+          EOF
+          )
+
+          checked=0
+          while IFS='|' read -r guide item; do
+            guide="${guide#${guide%%[![:space:]]*}}"
+            [ -n "$guide" ] || continue
+
+            guide_url="https://baukostenradar.de/ratgeber/${guide}"
+            output="/tmp/new-heizung-${guide}.html"
+
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "New Heizung guide missing in sitemap: ${guide}"; exit 1; }
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "New Heizung guide missing from hub: ${guide}"; exit 1; }
+
+            fetch "$guide_url" "$output"
+            grep -q "$guide_url" "$output"
+            grep -q '"@type":"Article"' "$output"
+            grep -q '/ratgeber/heizung-erneuern-kosten' "$output" || { echo "${guide} missing Heizung parent link"; exit 1; }
+            grep -q '/kosten/heizung' "$output"
+            grep -q '/kosten/heizung/berlin' "$output"
+            grep -q 'gewerk=heizung' "$output"
+            grep -q "leistung=${item}" "$output" || { echo "${guide} missing exact calculator preset ${item}"; exit 1; }
+            grep -q "/kosten/heizung/leistung/${item}" "$output" || { echo "${guide} missing primary price-detail link ${item}"; exit 1; }
+            ! grep -qi 'noindex' "$output"
+
+            checked=$((checked + 1))
+          done <<< "$guides"
+
+          test "$checked" -eq 4
+          grep -q '/ratgeber/fussbodenheizung-100-qm-kosten' /tmp/new-heizung-fussbodenheizung-kosten.html
+          grep -q '/kosten/heizung/leistung/heizungspumpe-plus-hydraulischer-abgleich' /tmp/new-heizung-hydraulischer-abgleich-kosten.html
+          grep -q '/kosten/heizung/leistung/schlamm-oder-magnetabscheider-inkl-installation' /tmp/new-heizung-heizungspumpe-tauschen-kosten.html
+
+          echo "Verified ${checked} new Heizung guide runtime contracts"
+
+      - name: Verify legacy Heizung guide continuity
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --location \
+              --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 \
+              -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' \
+              -H 'User-Agent: BauKostenRadar-CI/1.0' \
+              "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+
+          guides=(
+            fussbodenheizung-100-qm-kosten
+            gasheizung-austauschen-kosten
+            heizkoerper-montieren-kosten
+            thermostat-installieren-kosten
+            heizungswartung-kosten
+          )
+
+          for guide in "${guides[@]}"; do
+            guide_url="https://baukostenradar.de/ratgeber/${guide}"
+            output="/tmp/legacy-heizung-${guide}.html"
+
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Legacy Heizung guide missing in sitemap: ${guide}"; exit 1; }
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "Legacy Heizung guide missing from hub: ${guide}"; exit 1; }
+            fetch "$guide_url" "$output"
+            grep -q "$guide_url" "$output"
+            grep -q '"@type":"Article"' "$output"
+            grep -q '/kosten/heizung' "$output"
+            ! grep -qi 'noindex' "$output"
+          done
+
+          echo "Verified ${#guides[@]} legacy Heizung guide URLs"
