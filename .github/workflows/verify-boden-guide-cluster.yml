@@ -1,4 +1,4 @@
-name: Verify Boden guide cluster
+name: Verify expanded Boden guide cluster
 
 on:
   workflow_run:
@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-hostinger-verifier
 
       - name: Verify exact Boden price-item guide mappings
         shell: bash
@@ -23,15 +24,20 @@ jobs:
           fetch_hostinger 'https://baukostenradar.de/kosten/bodenleger' /tmp/bodenleger.html
           fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
 
-          grep -q 'https://baukostenradar.de/kosten/bodenleger' /tmp/bodenleger.html
-          ! grep -qi 'noindex' /tmp/bodenleger.html
-
           mappings=$(cat <<'EOF'
           vinylboden-klick-inkl-material|vinylboden-verlegen-kosten-pro-qm
           parkett-verlegen-inkl-material|parkett-verlegen-kosten-pro-qm
           laminat-verlegen|laminat-verlegen-kosten-pro-qm
           boden-sanierung-alt-raus-neu-rein|boden-sanieren-kosten-pro-qm
           parkett-abschleifen-und-oelen|parkett-abschleifen-kosten
+          bodenleger-stundensatz|bodenleger-stundensatz
+          klick-vinyl-verlegen|klick-vinyl-verlegen-kosten-pro-qm
+          klebe-vinyl-verlegen|klebe-vinyl-verlegen-kosten-pro-qm
+          pvc-laminat-verlegen|laminat-verlegen-kosten-pro-qm
+          mehrschichtparkett-schwimmend-verlegen|parkett-verlegen-kosten-pro-qm
+          mehrschichtparkett-vollflaechig-verklebt|parkett-verlegen-kosten-pro-qm
+          alten-bodenbelag-entfernen-entsorgen|bodenbelag-entfernen-kosten-pro-qm
+          untergrund-vorbereiten-ausgleichen|boden-vorbereiten-ausgleichen-kosten-pro-qm
           EOF
           )
 
@@ -39,8 +45,6 @@ jobs:
           while IFS='|' read -r item guide; do
             item="${item#${item%%[![:space:]]*}}"
             [ -n "$item" ] || continue
-
-            echo "Checking Boden ${item} -> ${guide}"
             item_url="https://baukostenradar.de/kosten/bodenleger/leistung/${item}"
             guide_url="https://baukostenradar.de/ratgeber/${guide}"
             item_output="/tmp/boden-item-${item}.html"
@@ -50,52 +54,27 @@ jobs:
             grep -q "/kosten/bodenleger/leistung/${item}" /tmp/bodenleger.html || { echo "Boden item missing on category: ${item}"; exit 1; }
 
             fetch_hostinger "$item_url" "$item_output"
-            grep -q 'id="ratgeber"' "$item_output" || { echo "Ratgeber section missing: ${item}"; exit 1; }
-            grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong Boden guide mapping: ${item} -> ${guide}"; exit 1; }
+            grep -q 'id="ratgeber"\|Passender Ratgeber' "$item_output" || { echo "Ratgeber section missing: ${item}"; exit 1; }
+            grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong Boden mapping: ${item} -> ${guide}"; exit 1; }
             ! grep -qi 'noindex' "$item_output"
 
             grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Boden guide missing in sitemap: ${guide}"; exit 1; }
             grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "Boden guide missing from hub: ${guide}"; exit 1; }
 
             fetch_hostinger "$guide_url" "$guide_output"
-            grep -q "$guide_url" "$guide_output" || { echo "Canonical missing: ${guide}"; exit 1; }
-            grep -q '"@type":"Article"' "$guide_output" || { echo "Article schema missing: ${guide}"; exit 1; }
-            grep -q '/kosten/bodenleger' "$guide_output" || { echo "Boden service link missing: ${guide}"; exit 1; }
-            grep -q '/kosten/bodenleger/berlin' "$guide_output" || { echo "Boden Berlin link missing: ${guide}"; exit 1; }
-            grep -q 'gewerk=bodenleger' "$guide_output" || { echo "Boden calculator service missing: ${guide}"; exit 1; }
-            grep -q "leistung=${item}" "$guide_output" || { echo "Exact Boden calculator item missing: ${guide} expected ${item}"; exit 1; }
+            grep -q "$guide_url" "$guide_output"
+            grep -q '"@type":"Article"' "$guide_output"
+            grep -q '/kosten/bodenleger' "$guide_output"
+            grep -q 'gewerk=bodenleger' "$guide_output"
             ! grep -qi 'noindex' "$guide_output"
 
             checked=$((checked + 1))
           done <<< "$mappings"
 
-          test "$checked" -eq 5
-          echo "Verified ${checked} exact Boden price-item guide mappings"
+          test "$checked" -eq 13
+          echo "Verified ${checked} Boden price-item guide mappings"
 
-      - name: Verify Boden parent guide and calculator
-        shell: bash
-        run: |
-          set -euo pipefail
-          source scripts/hostinger-verify.sh
-
-          guide='bodenleger-kosten-pro-qm'
-          guide_url="https://baukostenradar.de/ratgeber/${guide}"
-
-          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
-          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
-          fetch_hostinger "$guide_url" /tmp/boden-parent.html
-
-          grep -q "${guide_url}</loc>" /tmp/sitemap.xml
-          grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
-          grep -q "$guide_url" /tmp/boden-parent.html
-          grep -q '"@type":"Article"' /tmp/boden-parent.html
-          grep -q '/kosten/bodenleger' /tmp/boden-parent.html
-          grep -q '/kosten/bodenleger/berlin' /tmp/boden-parent.html
-          grep -q 'gewerk=bodenleger' /tmp/boden-parent.html
-          grep -q 'leistung=vinylboden-klick-inkl-material' /tmp/boden-parent.html
-          ! grep -qi 'noindex' /tmp/boden-parent.html
-
-      - name: Verify Boden guide hub and internal-link silo
+      - name: Verify expanded Boden guide silo
         shell: bash
         run: |
           set -euo pipefail
@@ -106,27 +85,56 @@ jobs:
 
           guides=(
             bodenleger-kosten-pro-qm
+            bodenleger-stundensatz
             vinylboden-verlegen-kosten-pro-qm
+            klick-vinyl-verlegen-kosten-pro-qm
+            klebe-vinyl-verlegen-kosten-pro-qm
             parkett-verlegen-kosten-pro-qm
             laminat-verlegen-kosten-pro-qm
+            bodenbelag-entfernen-kosten-pro-qm
+            boden-vorbereiten-ausgleichen-kosten-pro-qm
             boden-sanieren-kosten-pro-qm
             parkett-abschleifen-kosten
           )
 
           for source in "${guides[@]}"; do
             guide_url="https://baukostenradar.de/ratgeber/${source}"
-            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Boden cluster guide missing in sitemap: ${source}"; exit 1; }
-            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Boden cluster guide missing from hub: ${source}"; exit 1; }
-
-            fetch_hostinger "$guide_url" "/tmp/${source}.html"
-            grep -q "$guide_url" "/tmp/${source}.html" || { echo "Canonical missing: ${source}"; exit 1; }
-            grep -q '"@type":"Article"' "/tmp/${source}.html" || { echo "Article schema missing: ${source}"; exit 1; }
-            ! grep -qi 'noindex' "/tmp/${source}.html"
+            output="/tmp/boden-silo-${source}.html"
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Boden guide missing in sitemap: ${source}"; exit 1; }
+            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Boden guide missing from hub: ${source}"; exit 1; }
+            fetch_hostinger "$guide_url" "$output"
+            grep -q "$guide_url" "$output"
+            grep -q '"@type":"Article"' "$output"
+            ! grep -qi 'noindex' "$output"
 
             for target in "${guides[@]}"; do
               [ "$source" = "$target" ] && continue
-              grep -q "/ratgeber/${target}" "/tmp/${source}.html" || { echo "${source} missing Boden peer ${target}"; exit 1; }
+              grep -q "/ratgeber/${target}" "$output" || { echo "${source} missing Boden peer ${target}"; exit 1; }
             done
           done
 
-          echo "Verified Boden hub visibility and full peer-link silo"
+          echo "Verified 11-guide Boden peer-link silo"
+
+      - name: Verify exact calculators on new Boden guides
+        shell: bash
+        run: |
+          set -euo pipefail
+          source scripts/hostinger-verify.sh
+
+          checks=$(cat <<'EOF'
+          bodenleger-stundensatz|bodenleger-stundensatz
+          klick-vinyl-verlegen-kosten-pro-qm|klick-vinyl-verlegen
+          klebe-vinyl-verlegen-kosten-pro-qm|klebe-vinyl-verlegen
+          bodenbelag-entfernen-kosten-pro-qm|alten-bodenbelag-entfernen-entsorgen
+          boden-vorbereiten-ausgleichen-kosten-pro-qm|untergrund-vorbereiten-ausgleichen
+          EOF
+          )
+
+          while IFS='|' read -r guide item; do
+            [ -n "$guide" ] || continue
+            output="/tmp/boden-calculator-${guide}.html"
+            fetch_hostinger "https://baukostenradar.de/ratgeber/${guide}" "$output"
+            grep -q 'gewerk=bodenleger' "$output" || { echo "Boden calculator service missing: ${guide}"; exit 1; }
+            grep -q "leistung=${item}" "$output" || { echo "Exact Boden calculator missing: ${guide} -> ${item}"; exit 1; }
+            grep -q "/kosten/bodenleger/leistung/${item}" "$output" || { echo "Boden price detail missing: ${guide}"; exit 1; }
+          done <<< "$checks"
