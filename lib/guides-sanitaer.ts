@@ -20,7 +20,7 @@ export const sanitaerGuides: Guide[] = [
           headers: ["WC-Arbeit", "Richtwert 2026", "Voraussetzung"],
           rows: [
             { cells: ["Stand-WC 1:1 tauschen inkl. Keramik", "300-700 €", "Anschlüsse bleiben nutzbar"], href: "/kosten/sanitaer/leistung/stand-wc-1-1-tauschen-inkl-keramik" },
-            { cells: ["Stand-WC inkl. neuem Spülkasten", "450-900 €", "bestehender Standort"], href: "/kosten/sanitaer/leistung/stand-wc-inkl-neuem-spuelkasten" },
+            { cells: ["Stand-WC inkl. neuem Spülkasten", "450-900 €", "bestehender Standort"], href: "/kosten/sanitaer/leistung/stand-wc-mit-neuem-aufputzspuelkasten-tauschen" },
             { cells: ["Wand-WC tauschen", "500-900 €", "Vorwandelement vorhanden"], href: "/kosten/sanitaer/leistung/wand-wc-tauschen-bei-vorhandenem-vorwandelement" },
           ],
         },
@@ -52,7 +52,7 @@ export const sanitaerGuides: Guide[] = [
     ],
     related: [
       { label: "Stand-WC 1:1 Preisdetail", href: "/kosten/sanitaer/leistung/stand-wc-1-1-tauschen-inkl-keramik" },
-      { label: "Stand-WC mit Spülkasten Preisdetail", href: "/kosten/sanitaer/leistung/stand-wc-inkl-neuem-spuelkasten" },
+      { label: "Stand-WC mit Spülkasten Preisdetail", href: "/kosten/sanitaer/leistung/stand-wc-mit-neuem-aufputzspuelkasten-tauschen" },
       { label: "Wand-WC Preisdetail", href: "/kosten/sanitaer/leistung/wand-wc-tauschen-bei-vorhandenem-vorwandelement" },
       { label: "Sanitär Kosten", href: "/ratgeber/sanitaer-kosten" },
       { label: "Sanitär-Preisverzeichnis", href: "/kosten/sanitaer" },
