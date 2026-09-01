@@ -27,6 +27,12 @@ const silos: Record<string, GuideSilo> = {
     calculatorLabel: "Türblatt-Tausch berechnen",
     regionalMode: "service",
   },
+  "perimeterdaemmung-keller-kosten": {
+    serviceSlugs: ["kellerbau"],
+    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "kellerbau", itemSlug: "perimeterdaemmung-keller-komplett" }),
+    calculatorLabel: "Perimeterdämmung berechnen",
+    regionalMode: "service",
+  },
   "sanitaer-anfahrt-kosten": {
     serviceSlugs: ["sanitaer"],
     calculatorHref: handwerkerCalculatorHref({ serviceSlug: "sanitaer", itemSlug: "sanitaer-anfahrt" }),

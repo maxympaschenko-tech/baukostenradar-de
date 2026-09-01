@@ -7,57 +7,25 @@ import {
 export type { PriceGuideLink } from "./price-guide-links-kitchen-expansion";
 
 const abrissExpansionItems: Record<string, PriceGuideLink> = {
-  "hausabriss-standard-je-quadratmeter": {
-    href: "/ratgeber/haus-abreissen-kosten",
-    title: "Hausabriss pro m²: Kosten 2026",
-    cta: "Hausabriss-Ratgeber öffnen",
-  },
-  "hausabriss-mit-keller": {
-    href: "/ratgeber/haus-abreissen-kosten",
-    title: "Hausabriss mit Keller: Kosten 2026",
-    cta: "Hausabriss-Ratgeber öffnen",
-  },
-  "hausabriss-mit-schadstoffbelastung": {
-    href: "/ratgeber/haus-abreissen-kosten",
-    title: "Hausabriss mit Schadstoffen: Kosten 2026",
-    cta: "Hausabriss-Ratgeber öffnen",
-  },
-  "entkernung-und-vorarbeiten": {
-    href: "/ratgeber/innenabbruch-einfamilienhaus-kosten",
-    title: "Entkernung und Vorarbeiten: Kosten 2026",
-    cta: "Innenabbruch-Ratgeber öffnen",
-  },
-  "schadstoffgutachten-vor-abriss": {
-    href: "/ratgeber/haus-abreissen-kosten",
-    title: "Schadstoffgutachten vor Abriss: Kosten 2026",
-    cta: "Hausabriss-Ratgeber öffnen",
-  },
-  "abrissgenehmigung-oder-anzeige": {
-    href: "/ratgeber/haus-abreissen-kosten",
-    title: "Abrissgenehmigung oder Anzeige: Kosten 2026",
-    cta: "Hausabriss-Ratgeber öffnen",
-  },
-  "bauschutt-entsorgen": {
-    href: "/ratgeber/bauschutt-entsorgen-kosten",
-    title: "Bauschutt entsorgen: Kosten 2026",
-    cta: "Entsorgungs-Ratgeber öffnen",
-  },
-  "bauschuttcontainer-5-kubikmeter-komplett": {
-    href: "/ratgeber/bauschutt-entsorgen-kosten",
-    title: "5-m³-Bauschuttcontainer: Kosten 2026",
-    cta: "Entsorgungs-Ratgeber öffnen",
-  },
-  "baumischabfallcontainer-5-kubikmeter-komplett": {
-    href: "/ratgeber/bauschutt-entsorgen-kosten",
-    title: "5-m³-Baumischabfallcontainer: Kosten 2026",
-    cta: "Entsorgungs-Ratgeber öffnen",
-  },
-  "bauabfall-kombisack-1-kubikmeter": {
-    href: "/ratgeber/bauschutt-entsorgen-kosten",
-    title: "1-m³-Bauabfall-Kombisack: Kosten 2026",
-    cta: "Entsorgungs-Ratgeber öffnen",
-  },
+  "hausabriss-standard-je-quadratmeter": { href: "/ratgeber/haus-abreissen-kosten", title: "Hausabriss pro m²: Kosten 2026", cta: "Hausabriss-Ratgeber öffnen" },
+  "hausabriss-mit-keller": { href: "/ratgeber/haus-abreissen-kosten", title: "Hausabriss mit Keller: Kosten 2026", cta: "Hausabriss-Ratgeber öffnen" },
+  "hausabriss-mit-schadstoffbelastung": { href: "/ratgeber/haus-abreissen-kosten", title: "Hausabriss mit Schadstoffen: Kosten 2026", cta: "Hausabriss-Ratgeber öffnen" },
+  "entkernung-und-vorarbeiten": { href: "/ratgeber/innenabbruch-einfamilienhaus-kosten", title: "Entkernung und Vorarbeiten: Kosten 2026", cta: "Innenabbruch-Ratgeber öffnen" },
+  "schadstoffgutachten-vor-abriss": { href: "/ratgeber/haus-abreissen-kosten", title: "Schadstoffgutachten vor Abriss: Kosten 2026", cta: "Hausabriss-Ratgeber öffnen" },
+  "abrissgenehmigung-oder-anzeige": { href: "/ratgeber/haus-abreissen-kosten", title: "Abrissgenehmigung oder Anzeige: Kosten 2026", cta: "Hausabriss-Ratgeber öffnen" },
+  "bauschutt-entsorgen": { href: "/ratgeber/bauschutt-entsorgen-kosten", title: "Bauschutt entsorgen: Kosten 2026", cta: "Entsorgungs-Ratgeber öffnen" },
+  "bauschuttcontainer-5-kubikmeter-komplett": { href: "/ratgeber/bauschutt-entsorgen-kosten", title: "5-m³-Bauschuttcontainer: Kosten 2026", cta: "Entsorgungs-Ratgeber öffnen" },
+  "baumischabfallcontainer-5-kubikmeter-komplett": { href: "/ratgeber/bauschutt-entsorgen-kosten", title: "5-m³-Baumischabfallcontainer: Kosten 2026", cta: "Entsorgungs-Ratgeber öffnen" },
+  "bauabfall-kombisack-1-kubikmeter": { href: "/ratgeber/bauschutt-entsorgen-kosten", title: "1-m³-Bauabfall-Kombisack: Kosten 2026", cta: "Entsorgungs-Ratgeber öffnen" },
 };
+
+const perimeterItems = new Set([
+  "perimeterdaemmung-keller-komplett",
+  "xps-perimeterdaemmung-keller",
+  "schaumglas-perimeterdaemmung-keller",
+  "kleber-und-befestigung-perimeterdaemmung",
+  "verlegung-perimeterdaemmung-fachbetrieb",
+]);
 
 export function getServiceGuideLink(serviceSlug: string): PriceGuideLink {
   return getKitchenServiceGuideLink(serviceSlug);
@@ -74,6 +42,14 @@ export function getPriceGuideLink(options: {
       href: "/ratgeber/tuerblatt-tauschen-kosten",
       title: "Türblatt tauschen: Kosten 2026",
       cta: "Türblatt-Ratgeber öffnen",
+    };
+  }
+
+  if (options.serviceSlug === "kellerbau" && perimeterItems.has(options.itemSlug)) {
+    return {
+      href: "/ratgeber/perimeterdaemmung-keller-kosten",
+      title: `${options.itemName}: Kosten 2026`,
+      cta: "Perimeterdämmung-Ratgeber öffnen",
     };
   }
 

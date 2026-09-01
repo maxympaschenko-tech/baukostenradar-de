@@ -43,5 +43,14 @@ export const guideGroups: readonly GuideGroup[] = bodenGuideGroups.map((group) =
       slugs,
     };
   }
+  if (group.eyebrow === "Kellerbau & Unterkellerung") {
+    const slugs = group.slugs.includes("perimeterdaemmung-keller-kosten") ? group.slugs : [...group.slugs, "perimeterdaemmung-keller-kosten"];
+    return {
+      ...group,
+      title: "Kellerbau, Weiße Wanne und Perimeterdämmung kalkulieren",
+      description: "Kellerbaukosten 2026 nach Bauweise, Größe und Ausbaustufe sowie Erdarbeiten, Weiße Wanne und Perimeterdämmung vergleichen.",
+      slugs,
+    };
+  }
   return group;
 });
