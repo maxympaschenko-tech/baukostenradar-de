@@ -33,6 +33,12 @@ const silos: Record<string, GuideSilo> = {
     calculatorLabel: "Perimeterdämmung berechnen",
     regionalMode: "service",
   },
+  "carport-fundament-kosten": {
+    serviceSlugs: ["carport"],
+    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "carport", itemSlug: "carport-fundamente-komplett" }),
+    calculatorLabel: "Carport-Fundament berechnen",
+    regionalMode: "service",
+  },
   "sanitaer-anfahrt-kosten": {
     serviceSlugs: ["sanitaer"],
     calculatorHref: handwerkerCalculatorHref({ serviceSlug: "sanitaer", itemSlug: "sanitaer-anfahrt" }),

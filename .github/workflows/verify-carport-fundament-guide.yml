@@ -1,0 +1,89 @@
+name: Verify Carport Fundament guide
+
+on:
+  workflow_run:
+    workflows: ["Hostinger production ready"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-carport-fundament-guide:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-hostinger-verifier
+
+      - name: Verify Carport Fundament mappings and runtime contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --location "$1" -o "$2"
+          }
+
+          guide='carport-fundament-kosten'
+          guide_url="https://baukostenradar.de/ratgeber/${guide}"
+          items=(
+            carport-fundamente-komplett
+            carport-punktfundament
+          )
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/kosten/carport' /tmp/carport.html
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          fetch "$guide_url" /tmp/guide.html
+
+          grep -q "${guide_url}</loc>" /tmp/sitemap.xml
+          grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+          grep -q "$guide_url" /tmp/guide.html
+          grep -q '"@type":"Article"' /tmp/guide.html
+          grep -q '/kosten/carport' /tmp/guide.html
+          grep -q '/kosten/carport/berlin' /tmp/guide.html
+          grep -q 'gewerk=carport' /tmp/guide.html
+          grep -q 'leistung=carport-fundamente-komplett' /tmp/guide.html
+          grep -q '600-2.000' /tmp/guide.html
+          grep -q '100-250' /tmp/guide.html
+          ! grep -qi 'noindex' /tmp/guide.html
+
+          checked=0
+          for item in "${items[@]}"; do
+            item_url="https://baukostenradar.de/kosten/carport/leistung/${item}"
+            output="/tmp/${item}.html"
+            grep -q "${item_url}</loc>" /tmp/sitemap.xml
+            grep -q "/kosten/carport/leistung/${item}" /tmp/carport.html
+            fetch "$item_url" "$output"
+            grep -q 'id="ratgeber"' "$output"
+            grep -q "/ratgeber/${guide}" "$output" || { echo "Wrong Carport Fundament mapping for ${item}"; exit 1; }
+            ! grep -qi 'noindex' "$output"
+            checked=$((checked + 1))
+          done
+
+          test "$checked" -eq 2
+          echo "Verified ${checked} Carport Fundament price-item mappings"
+
+      - name: Verify seven-guide Garage and Carport peer silo
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          guides=(
+            garage-bauen-kosten
+            fertiggarage-kosten
+            massivgarage-kosten
+            garagenfundament-kosten-pro-qm
+            garagentor-einbauen-kosten
+            carport-kosten
+            carport-fundament-kosten
+          )
+
+          for source in "${guides[@]}"; do
+            curl -sS --fail --location "https://baukostenradar.de/ratgeber/${source}" -o "/tmp/${source}.html"
+            for target in "${guides[@]}"; do
+              [ "$source" = "$target" ] && continue
+              grep -q "/ratgeber/${target}" "/tmp/${source}.html" || { echo "${source} missing Garage/Carport peer ${target}"; exit 1; }
+            done
+          done
+
+          echo "Verified seven-guide Garage and Carport peer silo"

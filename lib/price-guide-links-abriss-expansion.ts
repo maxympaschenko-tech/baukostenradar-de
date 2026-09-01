@@ -27,6 +27,11 @@ const perimeterItems = new Set([
   "verlegung-perimeterdaemmung-fachbetrieb",
 ]);
 
+const carportFoundationItems = new Set([
+  "carport-fundamente-komplett",
+  "carport-punktfundament",
+]);
+
 export function getServiceGuideLink(serviceSlug: string): PriceGuideLink {
   return getKitchenServiceGuideLink(serviceSlug);
 }
@@ -50,6 +55,14 @@ export function getPriceGuideLink(options: {
       href: "/ratgeber/perimeterdaemmung-keller-kosten",
       title: `${options.itemName}: Kosten 2026`,
       cta: "Perimeterdämmung-Ratgeber öffnen",
+    };
+  }
+
+  if (options.serviceSlug === "carport" && carportFoundationItems.has(options.itemSlug)) {
+    return {
+      href: "/ratgeber/carport-fundament-kosten",
+      title: `${options.itemName}: Kosten 2026`,
+      cta: "Carport-Fundament-Ratgeber öffnen",
     };
   }
 

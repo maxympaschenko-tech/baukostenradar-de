@@ -52,5 +52,14 @@ export const guideGroups: readonly GuideGroup[] = bodenGuideGroups.map((group) =
       slugs,
     };
   }
+  if (group.eyebrow === "Garage & Carport") {
+    const slugs = group.slugs.includes("carport-fundament-kosten") ? group.slugs : [...group.slugs, "carport-fundament-kosten"];
+    return {
+      ...group,
+      title: "Garage, Carport, Fundamente und Tore kalkulieren",
+      description: "Garagen- und Carportkosten 2026 für Fertig- und Massivgarage, Garagenfundament, Carport und Carport-Punktfundamente sowie Garagentore vergleichen.",
+      slugs,
+    };
+  }
   return group;
 });
