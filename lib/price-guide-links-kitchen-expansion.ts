@@ -1,10 +1,10 @@
 import {
-  getPriceGuideLink as getCurrentPriceGuideLink,
-  getServiceGuideLink as getCurrentServiceGuideLink,
+  getPriceGuideLink as getSanitaerTradesPriceGuideLink,
+  getServiceGuideLink as getSanitaerTradesServiceGuideLink,
   type PriceGuideLink,
-} from "./price-guide-links-current";
+} from "./price-guide-links-sanitaer-trades";
 
-export type { PriceGuideLink } from "./price-guide-links-current";
+export type { PriceGuideLink } from "./price-guide-links-sanitaer-trades";
 
 const kitchenExpansionItems: Record<string, PriceGuideLink> = {
   "arbeitsplatte-gerade-bis-3-m-montieren": {
@@ -40,7 +40,7 @@ const kitchenExpansionItems: Record<string, PriceGuideLink> = {
 };
 
 export function getServiceGuideLink(serviceSlug: string): PriceGuideLink {
-  return getCurrentServiceGuideLink(serviceSlug);
+  return getSanitaerTradesServiceGuideLink(serviceSlug);
 }
 
 export function getPriceGuideLink(options: {
@@ -52,5 +52,5 @@ export function getPriceGuideLink(options: {
   if (options.serviceSlug === "kueche" && kitchenExpansionItems[options.itemSlug]) {
     return kitchenExpansionItems[options.itemSlug];
   }
-  return getCurrentPriceGuideLink(options);
+  return getSanitaerTradesPriceGuideLink(options);
 }

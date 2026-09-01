@@ -13,7 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-hostinger-verifier
-      - name: Verify all kitchen price items and guide mappings
+
+      - name: Verify 13 kitchen price-item guide mappings
         shell: bash
         run: |
           set -euo pipefail
@@ -26,22 +27,28 @@ jobs:
           ! grep -qi 'noindex' /tmp/kueche.html
 
           mappings=$(cat <<'EOF'
-          kuechen-renovierung-ohne-moebel|kueche-10-qm-renovieren-kosten
-          kuechenfronten-austauschen-oder-lackieren|kuechenfronten-erneuern-kosten
-          neue-arbeitsplatte|kuechenarbeitsplatte-kosten
-          neue-elektrogeraete|kueche-elektrogeraete-kosten
-          fliesenspiegel-erneuern|fliesenspiegel-erneuern-kosten
-          komplett-neue-einbaukueche|einbaukueche-kosten
-          premium-kueche-mit-umbau|premium-kueche-umbau-kosten
+          kuechen-renovierung-ohne-moebel|kueche-10-qm-renovieren-kosten|kuechen-renovierung-ohne-moebel
+          kuechenfronten-austauschen-oder-lackieren|kuechenfronten-erneuern-kosten|kuechenfronten-austauschen-oder-lackieren
+          neue-arbeitsplatte|kuechenarbeitsplatte-kosten|neue-arbeitsplatte
+          neue-elektrogeraete|kueche-elektrogeraete-kosten|neue-elektrogeraete
+          fliesenspiegel-erneuern|fliesenspiegel-erneuern-kosten|fliesenspiegel-erneuern
+          komplett-neue-einbaukueche|einbaukueche-kosten|komplett-neue-einbaukueche
+          premium-kueche-mit-umbau|premium-kueche-umbau-kosten|premium-kueche-mit-umbau
+          arbeitsplatte-gerade-bis-3-m-montieren|kuechenarbeitsplatte-kosten|neue-arbeitsplatte
+          arbeitsplatte-l-kueche-mit-eckverbindung-montieren|kuechenarbeitsplatte-kosten|neue-arbeitsplatte
+          ausschnitt-fuer-spuele-oder-kochfeld|kuechenarbeitsplatte-kosten|neue-arbeitsplatte
+          alte-arbeitsplatte-demontieren-und-entsorgen|kuechenarbeitsplatte-kosten|neue-arbeitsplatte
+          naturstein-oder-quarzkomposit-arbeitsplatte-inkl-montage|kuechenarbeitsplatte-kosten|neue-arbeitsplatte
+          einstiegs-kuechenzeile-mit-geraeten-ohne-montage|einbaukueche-kosten|komplett-neue-einbaukueche
           EOF
           )
 
           checked=0
-          while IFS='|' read -r item guide; do
+          while IFS='|' read -r item guide calculator_item; do
             item="${item#${item%%[![:space:]]*}}"
             [ -n "$item" ] || continue
 
-            echo "Checking Küche ${item} -> ${guide}"
+            echo "Checking Küche ${item} -> ${guide} (calculator ${calculator_item})"
             item_url="https://baukostenradar.de/kosten/kueche/leistung/${item}"
             guide_url="https://baukostenradar.de/ratgeber/${guide}"
             item_output="/tmp/kueche-item-${item}.html"
@@ -64,13 +71,14 @@ jobs:
             grep -q '/kosten/kueche' "$guide_output" || { echo "Kitchen service link missing: ${guide}"; exit 1; }
             grep -q '/kosten/kueche/berlin' "$guide_output" || { echo "Kitchen Berlin link missing: ${guide}"; exit 1; }
             grep -q 'gewerk=kueche' "$guide_output" || { echo "Kitchen calculator missing: ${guide}"; exit 1; }
-            grep -q "leistung=${item}" "$guide_output" || { echo "Exact calculator item missing: ${guide} expected ${item}"; exit 1; }
+            grep -q "leistung=${calculator_item}" "$guide_output" || { echo "Primary calculator item missing: ${guide} expected ${calculator_item}"; exit 1; }
             ! grep -qi 'noindex' "$guide_output"
 
             checked=$((checked + 1))
           done <<< "$mappings"
 
-          test "$checked" -eq 7
+          test "$checked" -eq 13
+          echo "Verified ${checked} kitchen price-item guide mappings"
 
       - name: Verify kitchen internal-link silo
         shell: bash
@@ -89,8 +97,14 @@ jobs:
 
           for source in "${guides[@]}"; do
             curl -sS --fail "https://baukostenradar.de/ratgeber/${source}" -o "/tmp/${source}.html"
+            grep -q '"@type":"Article"' "/tmp/${source}.html"
+            ! grep -qi 'noindex' "/tmp/${source}.html"
+
             for target in "${guides[@]}"; do
               [ "$source" = "$target" ] && continue
               grep -q "/ratgeber/${target}" "/tmp/${source}.html" || { echo "${source} missing kitchen peer ${target}"; exit 1; }
             done
           done
+
+          test "${#guides[@]}" -eq 7
+          echo "Verified ${#guides[@]} kitchen guides and full peer-link silo"
