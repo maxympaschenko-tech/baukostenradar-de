@@ -37,6 +37,28 @@ const trockenbauPeers: Peer[] = [
   { slug: "verspachtelung-q4-kosten-pro-qm", label: "Verspachtelung Q4 Kosten", href: "/ratgeber/verspachtelung-q4-kosten-pro-qm" },
 ];
 
+const abrissPeers: Peer[] = [
+  { slug: "haus-abreissen-kosten", label: "Haus abreißen Kosten", href: "/ratgeber/haus-abreissen-kosten" },
+  { slug: "abbruch-kosten-pro-m3", label: "Abbruch Kosten pro m³", href: "/ratgeber/abbruch-kosten-pro-m3" },
+  { slug: "innenabbruch-einfamilienhaus-kosten", label: "Innenabbruch Einfamilienhaus Kosten", href: "/ratgeber/innenabbruch-einfamilienhaus-kosten" },
+  { slug: "industriehalle-abbrechen-kosten-pro-qm", label: "Industriehalle abbrechen Kosten", href: "/ratgeber/industriehalle-abbrechen-kosten-pro-qm" },
+  { slug: "bauschuttcontainer-30-m3-kosten", label: "30-m³-Bauschuttcontainer Kosten", href: "/ratgeber/bauschuttcontainer-30-m3-kosten" },
+  { slug: "bauschutt-entsorgen-kosten", label: "Bauschutt entsorgen Kosten", href: "/ratgeber/bauschutt-entsorgen-kosten" },
+];
+
+const abrissDetailLinks: Record<string, GuideSupplementalLink[]> = {
+  "haus-abreissen-kosten": [
+    { label: "Hausabriss Standard pro m²", href: "/kosten/abriss-entsorgung/leistung/hausabriss-standard-je-quadratmeter" },
+    { label: "Hausabriss mit Keller", href: "/kosten/abriss-entsorgung/leistung/hausabriss-mit-keller" },
+    { label: "Hausabriss mit Schadstoffbelastung", href: "/kosten/abriss-entsorgung/leistung/hausabriss-mit-schadstoffbelastung" },
+    { label: "Schadstoffgutachten vor Abriss", href: "/kosten/abriss-entsorgung/leistung/schadstoffgutachten-vor-abriss" },
+    { label: "Abrissgenehmigung oder Anzeige", href: "/kosten/abriss-entsorgung/leistung/abrissgenehmigung-oder-anzeige" },
+  ],
+  "innenabbruch-einfamilienhaus-kosten": [
+    { label: "Entkernung und Vorarbeiten", href: "/kosten/abriss-entsorgung/leistung/entkernung-und-vorarbeiten" },
+  ],
+};
+
 function addPeers(base: GuideSupplementalLink[], slug: string, peers: Peer[]) {
   const slugs = new Set(peers.map((peer) => peer.slug));
   if (!slugs.has(slug)) return base;
@@ -46,7 +68,13 @@ function addPeers(base: GuideSupplementalLink[], slug: string, peers: Peer[]) {
   ].filter((link, index, links) => links.findIndex((candidate) => candidate.href === link.href) === index);
 }
 
+function addDetails(base: GuideSupplementalLink[], slug: string) {
+  const details = abrissDetailLinks[slug] ?? [];
+  return [...base, ...details].filter((link, index, links) => links.findIndex((candidate) => candidate.href === link.href) === index);
+}
+
 export function withSupplementalGuideLinks(slug: string, related: GuideSupplementalLink[]): GuideSupplementalLink[] {
   const base = withBodenSupplementalGuideLinks(slug, related);
-  return addPeers(addPeers(base, slug, sanitaerPeers), slug, trockenbauPeers);
+  const withPeers = addPeers(addPeers(addPeers(base, slug, sanitaerPeers), slug, trockenbauPeers), slug, abrissPeers);
+  return addDetails(withPeers, slug);
 }

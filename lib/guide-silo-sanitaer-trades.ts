@@ -15,6 +15,12 @@ const silos: Record<string, GuideSilo> = {
     calculatorLabel: "Spanndecke berechnen",
     regionalMode: "service",
   },
+  "bauschutt-entsorgen-kosten": {
+    serviceSlugs: ["abriss-entsorgung"],
+    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "abriss-entsorgung", itemSlug: "bauschutt-entsorgen" }),
+    calculatorLabel: "Bauschutt entsorgen berechnen",
+    regionalMode: "service",
+  },
   "sanitaer-anfahrt-kosten": {
     serviceSlugs: ["sanitaer"],
     calculatorHref: handwerkerCalculatorHref({ serviceSlug: "sanitaer", itemSlug: "sanitaer-anfahrt" }),

@@ -25,5 +25,14 @@ export const guideGroups: readonly GuideGroup[] = bodenGuideGroups.map((group) =
       slugs,
     };
   }
+  if (group.eyebrow === "Abriss & Entsorgung") {
+    const slugs = group.slugs.includes("bauschutt-entsorgen-kosten") ? group.slugs : [...group.slugs, "bauschutt-entsorgen-kosten"];
+    return {
+      ...group,
+      title: "Rückbau, Hausabriss, Bauschutt und Entsorgung kalkulieren",
+      description: "Hausabriss, Innenabbruch, Industrieabbruch sowie Bauschutt und Bauabfall nach m³, Container und Sack mit aktuellen 2026-Richtwerten vergleichen.",
+      slugs,
+    };
+  }
   return group;
 });

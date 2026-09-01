@@ -16,7 +16,7 @@
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/lib/pricing": ["./lib/catalog-tueren.ts"],
-      "@/lib/price-guide-links": ["./lib/price-guide-links-kitchen-expansion.ts"],
+      "@/lib/price-guide-links": ["./lib/price-guide-links-abriss-expansion.ts"],
       "@/lib/all-guides": ["./lib/all-guides-sanitaer-trades.ts"],
       "@/lib/guide-groups": ["./lib/guide-groups-sanitaer-trades.ts"],
       "@/lib/guide-silo": ["./lib/guide-silo-sanitaer-trades.ts"],
