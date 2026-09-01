@@ -23,4 +23,4 @@ export const sanitaerGuideSilos = {
     itemSlug: "badewanne-durch-duschkabine-ersetzen-komplett",
     calculatorLabel: "Wanne-zu-Dusche-Umbau berechnen",
   },
-} as const;
+};
