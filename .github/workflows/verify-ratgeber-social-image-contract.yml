@@ -1,0 +1,70 @@
+name: Verify Ratgeber social image contract
+
+on:
+  pull_request:
+    paths:
+      - 'app/ratgeber/**/opengraph-image.tsx'
+      - 'app/ratgeber/**/twitter-image.tsx'
+      - 'lib/social-image.tsx'
+      - '.github/workflows/verify-ratgeber-social-images.yml'
+      - '.github/workflows/verify-ratgeber-social-image-contract.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'app/ratgeber/**/opengraph-image.tsx'
+      - 'app/ratgeber/**/twitter-image.tsx'
+      - 'lib/social-image.tsx'
+      - '.github/workflows/verify-ratgeber-social-images.yml'
+      - '.github/workflows/verify-ratgeber-social-image-contract.yml'
+  workflow_dispatch:
+
+jobs:
+  verify-ratgeber-social-image-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify source-backed social image routes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          og='app/ratgeber/[slug]/opengraph-image.tsx'
+          twitter='app/ratgeber/[slug]/twitter-image.tsx'
+          helper='lib/social-image.tsx'
+          live='.github/workflows/verify-ratgeber-social-images.yml'
+
+          for route in "$og" "$twitter"; do
+            grep -Fq 'createGuideSocialImage(guide.h1)' "$route"
+            grep -Fq 'export const size = socialImageSize' "$route"
+            grep -Fq 'export const contentType = socialImageContentType' "$route"
+            grep -Fq 'getAnyGuide(slug)' "$route"
+          done
+
+          grep -Fq 'width: 1200' "$helper"
+          grep -Fq 'height: 630' "$helper"
+          grep -Fq 'export const socialImageContentType = "image/png"' "$helper"
+          grep -Fq 'new ImageResponse' "$helper"
+
+          # Full dynamic PNG downloads must never return to the automatic
+          # Hostinger production cascade. They are allowed only in the
+          # workflow_dispatch-only manual renderer smoke step.
+          python - "$live" <<'PY'
+          from pathlib import Path
+          import sys
+
+          text = Path(sys.argv[1]).read_text(encoding='utf-8')
+          marker = '- name: Verify representative PNG renderer manually'
+          if marker not in text:
+              raise SystemExit('Missing manual social-image renderer smoke step')
+
+          automatic, manual = text.split(marker, 1)
+          if '/usr/bin/curl' in automatic or 'fetch_image()' in automatic:
+              raise SystemExit('Automatic production social-image verification fetches PNG bodies')
+          if 'if:' not in manual or 'workflow_dispatch' not in manual:
+              raise SystemExit('PNG renderer smoke is not workflow_dispatch-only')
+          if '/usr/bin/curl' not in manual or 'image/png' not in manual:
+              raise SystemExit('Manual renderer smoke no longer validates PNG output')
+          PY
+
+          echo 'Ratgeber social image source and gating contract verified'
