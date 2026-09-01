@@ -1,4 +1,4 @@
-name: Verify Sanitär guide cluster
+name: Verify expanded Sanitär guide cluster
 
 on:
   workflow_run:
@@ -18,23 +18,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
-          fetch() {
-            curl -sS --fail --location \
-              --retry 5 --retry-delay 3 --retry-all-errors \
-              --connect-timeout 15 --max-time 60 \
-              -H 'Cache-Control: no-cache' \
-              -H 'Pragma: no-cache' \
-              -H 'User-Agent: BauKostenRadar-CI/1.0' \
-              "$1" -o "$2"
-          }
-
-          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
-          fetch 'https://baukostenradar.de/kosten/sanitaer' /tmp/sanitaer.html
-          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
-
-          grep -q 'https://baukostenradar.de/kosten/sanitaer' /tmp/sanitaer.html
-          ! grep -qi 'noindex' /tmp/sanitaer.html
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch_hostinger 'https://baukostenradar.de/kosten/sanitaer' /tmp/sanitaer.html
+          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
 
           mappings=$(cat <<'EOF'
           sanitaerobjekte-armaturen-fuer-8-m2-bad|sanitaerobjekte-bad-kosten
@@ -46,6 +34,16 @@ jobs:
           bodengleiche-dusche-inkl-abdichtung-ablauf-und-verfliesung|bodengleiche-dusche-kosten
           klassische-duschwanne-komplett-einbauen|bodengleiche-dusche-kosten
           badewanne-durch-duschkabine-ersetzen-komplett|badewanne-durch-dusche-ersetzen-kosten
+          sanitaer-anfahrt|sanitaer-anfahrt-kosten
+          wasserhahn-montieren|wasserhahn-montieren-kosten
+          wc-montieren|wc-austauschen-kosten
+          spuelkasten-reparieren|spuelkasten-reparieren-kosten
+          waschbecken-montieren|waschbecken-montieren-kosten
+          dusche-einbauen|dusche-einbauen-kosten
+          badewanne-einbauen|badewanne-einbauen-kosten
+          rohrverstopfung-beseitigen|rohrverstopfung-beseitigen-kosten
+          haenge-wc-modern-inkl-montage|wc-austauschen-kosten
+          waschtisch-armatur-inkl-montage|wasserhahn-montieren-kosten
           EOF
           )
 
@@ -53,7 +51,6 @@ jobs:
           while IFS='|' read -r item guide; do
             item="${item#${item%%[![:space:]]*}}"
             [ -n "$item" ] || continue
-
             item_url="https://baukostenradar.de/kosten/sanitaer/leistung/${item}"
             guide_url="https://baukostenradar.de/ratgeber/${guide}"
             item_output="/tmp/sanitaer-item-${item}.html"
@@ -61,163 +58,95 @@ jobs:
 
             grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Sanitär item missing in sitemap: ${item}"; exit 1; }
             grep -q "/kosten/sanitaer/leistung/${item}" /tmp/sanitaer.html || { echo "Sanitär item missing on category: ${item}"; exit 1; }
-
-            fetch "$item_url" "$item_output"
-            grep -q 'Passender Ratgeber' "$item_output"
-            grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong Sanitär guide mapping: ${item} -> ${guide}"; exit 1; }
+            fetch_hostinger "$item_url" "$item_output"
+            grep -q 'Passender Ratgeber\|id="ratgeber"' "$item_output" || { echo "Ratgeber block missing: ${item}"; exit 1; }
+            grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong Sanitär mapping: ${item} -> ${guide}"; exit 1; }
             ! grep -qi 'noindex' "$item_output"
 
             grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Sanitär guide missing in sitemap: ${guide}"; exit 1; }
-            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "Sanitär guide missing from Ratgeber hub: ${guide}"; exit 1; }
-
-            fetch "$guide_url" "$guide_output"
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "Sanitär guide missing from hub: ${guide}"; exit 1; }
+            fetch_hostinger "$guide_url" "$guide_output"
             grep -q "$guide_url" "$guide_output"
             grep -q '"@type":"Article"' "$guide_output"
             grep -q '/kosten/sanitaer' "$guide_output"
             ! grep -qi 'noindex' "$guide_output"
-
             checked=$((checked + 1))
           done <<< "$mappings"
 
-          test "$checked" -eq 9
-          echo "Verified ${checked} exact Sanitär price-item guide mappings"
+          test "$checked" -eq 19
+          echo "Verified ${checked} Sanitär price-item guide mappings"
 
-      - name: Verify Sanitär parent guide and new child silo
+      - name: Verify 14-guide Sanitär peer silo
         shell: bash
         run: |
           set -euo pipefail
+          source scripts/hostinger-verify.sh
 
-          fetch() {
-            curl -sS --fail --location \
-              --retry 5 --retry-delay 3 --retry-all-errors \
-              --connect-timeout 15 --max-time 60 \
-              -H 'Cache-Control: no-cache' \
-              -H 'Pragma: no-cache' \
-              -H 'User-Agent: BauKostenRadar-CI/1.0' \
-              "$1" -o "$2"
-          }
-
-          guide='sanitaer-kosten'
-          guide_url="https://baukostenradar.de/ratgeber/${guide}"
-
-          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
-          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
-          fetch "$guide_url" /tmp/sanitaer-parent.html
-
-          grep -q "${guide_url}</loc>" /tmp/sitemap.xml
-          grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
-          grep -q "$guide_url" /tmp/sanitaer-parent.html
-          grep -q '"@type":"Article"' /tmp/sanitaer-parent.html
-          grep -q '/kosten/sanitaer' /tmp/sanitaer-parent.html
-          grep -q '/kosten/sanitaer/berlin' /tmp/sanitaer-parent.html
-          grep -q 'gewerk=sanitaer' /tmp/sanitaer-parent.html
-          grep -q 'leistung=sanitaerobjekte-armaturen-fuer-8-m2-bad' /tmp/sanitaer-parent.html
-          ! grep -qi 'noindex' /tmp/sanitaer-parent.html
-
-          children=(
-            wc-austauschen-kosten
-            dusch-wc-kosten
-            bodengleiche-dusche-kosten
-            badewanne-durch-dusche-ersetzen-kosten
-          )
-
-          for child in "${children[@]}"; do
-            grep -q "/ratgeber/${child}" /tmp/sanitaer-parent.html || { echo "Sanitär parent missing child: ${child}"; exit 1; }
-          done
-
-          echo "Verified Sanitär parent guide and ${#children[@]} new child links"
-
-      - name: Verify new Sanitär guide runtime contracts
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          fetch() {
-            curl -sS --fail --location \
-              --retry 5 --retry-delay 3 --retry-all-errors \
-              --connect-timeout 15 --max-time 60 \
-              -H 'Cache-Control: no-cache' \
-              -H 'Pragma: no-cache' \
-              -H 'User-Agent: BauKostenRadar-CI/1.0' \
-              "$1" -o "$2"
-          }
-
-          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
-          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
-
-          guides=$(cat <<'EOF'
-          wc-austauschen-kosten|stand-wc-1-1-tauschen-inkl-keramik
-          dusch-wc-kosten|dusch-wc-einbauen
-          bodengleiche-dusche-kosten|bodengleiche-dusche-inkl-abdichtung-ablauf-und-verfliesung
-          badewanne-durch-dusche-ersetzen-kosten|badewanne-durch-duschkabine-ersetzen-komplett
-          EOF
-          )
-
-          checked=0
-          while IFS='|' read -r guide item; do
-            guide="${guide#${guide%%[![:space:]]*}}"
-            [ -n "$guide" ] || continue
-
-            guide_url="https://baukostenradar.de/ratgeber/${guide}"
-            output="/tmp/new-sanitaer-${guide}.html"
-
-            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "New Sanitär guide missing in sitemap: ${guide}"; exit 1; }
-            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "New Sanitär guide missing from hub: ${guide}"; exit 1; }
-
-            fetch "$guide_url" "$output"
-            grep -q "$guide_url" "$output"
-            grep -q '"@type":"Article"' "$output"
-            grep -q '/ratgeber/sanitaer-kosten' "$output" || { echo "${guide} missing Sanitär parent link"; exit 1; }
-            grep -q '/kosten/sanitaer' "$output"
-            grep -q '/kosten/sanitaer/berlin' "$output"
-            grep -q 'gewerk=sanitaer' "$output"
-            grep -q "leistung=${item}" "$output" || { echo "${guide} missing exact calculator preset ${item}"; exit 1; }
-            grep -q "/kosten/sanitaer/leistung/${item}" "$output" || { echo "${guide} missing primary price-detail link ${item}"; exit 1; }
-            ! grep -qi 'noindex' "$output"
-
-            checked=$((checked + 1))
-          done <<< "$guides"
-
-          test "$checked" -eq 4
-
-          grep -q '/kosten/sanitaer/leistung/klassische-duschwanne-komplett-einbauen' /tmp/new-sanitaer-bodengleiche-dusche-kosten.html
-          grep -q 'Sanitär- und Badsanierungs-Richtwert nicht vermischen' /tmp/new-sanitaer-bodengleiche-dusche-kosten.html
-          grep -q '/ratgeber/bodengleiche-dusche-kosten' /tmp/new-sanitaer-badewanne-durch-dusche-ersetzen-kosten.html
-
-          echo "Verified ${checked} new Sanitär guide runtime contracts and scope guard"
-
-      - name: Verify legacy Sanitär guide peer links
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          fetch() {
-            curl -sS --fail --location \
-              --retry 5 --retry-delay 3 --retry-all-errors \
-              --connect-timeout 15 --max-time 60 \
-              -H 'Cache-Control: no-cache' \
-              -H 'Pragma: no-cache' \
-              -H 'User-Agent: BauKostenRadar-CI/1.0' \
-              "$1" -o "$2"
-          }
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
 
           guides=(
             sanitaer-kosten
+            sanitaer-anfahrt-kosten
+            wasserhahn-montieren-kosten
+            waschbecken-montieren-kosten
+            wc-austauschen-kosten
+            spuelkasten-reparieren-kosten
+            dusch-wc-kosten
+            dusche-einbauen-kosten
+            bodengleiche-dusche-kosten
+            badewanne-einbauen-kosten
+            badewanne-durch-dusche-ersetzen-kosten
+            rohrverstopfung-beseitigen-kosten
             sanitaerobjekte-bad-kosten
             bad-entkernen-kosten
           )
 
           for source in "${guides[@]}"; do
             guide_url="https://baukostenradar.de/ratgeber/${source}"
-            fetch "$guide_url" "/tmp/legacy-${source}.html"
-            grep -q "$guide_url" "/tmp/legacy-${source}.html"
-            grep -q '"@type":"Article"' "/tmp/legacy-${source}.html"
-            ! grep -qi 'noindex' "/tmp/legacy-${source}.html"
+            output="/tmp/sanitaer-silo-${source}.html"
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Sanitär guide missing in sitemap: ${source}"; exit 1; }
+            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Sanitär guide missing from hub: ${source}"; exit 1; }
+            fetch_hostinger "$guide_url" "$output"
+            grep -q "$guide_url" "$output"
+            grep -q '"@type":"Article"' "$output"
+            ! grep -qi 'noindex' "$output"
 
             for target in "${guides[@]}"; do
               [ "$source" = "$target" ] && continue
-              grep -q "/ratgeber/${target}" "/tmp/legacy-${source}.html" || { echo "${source} missing legacy Sanitär peer ${target}"; exit 1; }
+              grep -q "/ratgeber/${target}" "$output" || { echo "${source} missing Sanitär peer ${target}"; exit 1; }
             done
           done
 
-          echo "Verified legacy Sanitär peer-link silo"
+          echo "Verified 14-guide Sanitär peer-link silo"
+
+      - name: Verify exact calculators on new Sanitär guides
+        shell: bash
+        run: |
+          set -euo pipefail
+          source scripts/hostinger-verify.sh
+
+          checks=$(cat <<'EOF'
+          sanitaer-anfahrt-kosten|sanitaer-anfahrt
+          wasserhahn-montieren-kosten|wasserhahn-montieren
+          spuelkasten-reparieren-kosten|spuelkasten-reparieren
+          waschbecken-montieren-kosten|waschbecken-montieren
+          dusche-einbauen-kosten|dusche-einbauen
+          badewanne-einbauen-kosten|badewanne-einbauen
+          rohrverstopfung-beseitigen-kosten|rohrverstopfung-beseitigen
+          EOF
+          )
+
+          while IFS='|' read -r guide item; do
+            [ -n "$guide" ] || continue
+            output="/tmp/sanitaer-calculator-${guide}.html"
+            fetch_hostinger "https://baukostenradar.de/ratgeber/${guide}" "$output"
+            grep -q 'gewerk=sanitaer' "$output" || { echo "Sanitär calculator service missing: ${guide}"; exit 1; }
+            grep -q "leistung=${item}" "$output" || { echo "Exact Sanitär calculator missing: ${guide} -> ${item}"; exit 1; }
+            grep -q "/kosten/sanitaer/leistung/${item}" "$output" || { echo "Sanitär price-detail missing: ${guide}"; exit 1; }
+          done <<< "$checks"
+
+          grep -q '/kosten/sanitaer/leistung/waschtisch-armatur-inkl-montage' /tmp/sanitaer-calculator-wasserhahn-montieren-kosten.html
+          grep -q '/ratgeber/bodengleiche-dusche-kosten' /tmp/sanitaer-calculator-dusche-einbauen-kosten.html
+
+          echo "Verified 7 new Sanitär calculator presets and scope links"
