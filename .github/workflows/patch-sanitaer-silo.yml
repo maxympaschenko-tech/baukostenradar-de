@@ -1,0 +1,84 @@
+name: Patch Sanitär guide silo
+
+on:
+  push:
+    branches: [seo/sanitaer-guide-silo]
+    paths:
+      - '.github/workflows/patch-sanitaer-silo.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: seo/sanitaer-guide-silo
+          fetch-depth: 0
+
+      - name: Patch guide aggregators
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              if text.count(old) != 1:
+                  raise SystemExit(f'{path}: expected exactly one replacement target, found {text.count(old)}')
+              p.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          replace_once(
+              'lib/all-guides.ts',
+              'import { demolitionGuides } from "@/lib/guides-demolition";\n',
+              'import { demolitionGuides } from "@/lib/guides-demolition";\nimport { sanitaerGuides } from "@/lib/guides-sanitaer";\n',
+          )
+          replace_once(
+              'lib/all-guides.ts',
+              '  "sanitaer-kosten": [\n    { label: "Sanitärobjekte und Armaturen Kosten", href: "/ratgeber/sanitaerobjekte-bad-kosten" },\n  ],',
+              '  "sanitaer-kosten": [\n    { label: "Sanitärobjekte und Armaturen Kosten", href: "/ratgeber/sanitaerobjekte-bad-kosten" },\n    { label: "WC austauschen Kosten", href: "/ratgeber/wc-austauschen-kosten" },\n    { label: "Dusch-WC Kosten", href: "/ratgeber/dusch-wc-kosten" },\n    { label: "Bodengleiche Dusche Kosten", href: "/ratgeber/bodengleiche-dusche-kosten" },\n    { label: "Badewanne durch Dusche ersetzen", href: "/ratgeber/badewanne-durch-dusche-ersetzen-kosten" },\n  ],',
+          )
+          replace_once(
+              'lib/all-guides.ts',
+              '  ...demolitionGuides,\n];',
+              '  ...demolitionGuides,\n  ...sanitaerGuides,\n];',
+          )
+
+          replace_once(
+              'lib/guide-groups.ts',
+              '    title: "Sanitärkosten, Badausstattung und Rückbau kalkulieren",\n    description: "Sanitärkosten als eigenes Gewerk einordnen, Sanitärobjekte und Armaturen für ein typisches Bad kalkulieren und Demontage samt Entsorgung des Altbads separat vergleichen.",\n    slugs: ["sanitaer-kosten", "sanitaerobjekte-bad-kosten", "bad-entkernen-kosten"],',
+              '    title: "Sanitärkosten, WC und Dusche konkret kalkulieren",\n    description: "Sanitärkosten als eigenes Gewerk einordnen und konkrete 2026-Richtwerte für WC-Austausch, Dusch-WC, bodengleiche Dusche, Wanne-zu-Dusche-Umbau sowie Sanitärobjekte und Rückbau vergleichen.",\n    slugs: ["sanitaer-kosten", "wc-austauschen-kosten", "dusch-wc-kosten", "bodengleiche-dusche-kosten", "badewanne-durch-dusche-ersetzen-kosten", "sanitaerobjekte-bad-kosten", "bad-entkernen-kosten"],',
+          )
+
+          replace_once(
+              'lib/guide-silo.ts',
+              'import { tertiaryOpportunitySilos } from "@/lib/guide-silo-opportunities-tertiary";\n',
+              'import { tertiaryOpportunitySilos } from "@/lib/guide-silo-opportunities-tertiary";\nimport { sanitaerGuideSilos } from "@/lib/guide-silo-sanitaer";\n',
+          )
+          replace_once(
+              'lib/guide-silo.ts',
+              '}> = {\n  "einfahrt-pflastern-kosten": {',
+              '}> = {\n  ...sanitaerGuideSilos,\n  "einfahrt-pflastern-kosten": {',
+          )
+
+          replace_once(
+              'lib/price-guide-links.ts',
+              'import { quinaryItemGuideOverrides } from "@/lib/price-guide-links-quinary";\n',
+              'import { quinaryItemGuideOverrides } from "@/lib/price-guide-links-quinary";\nimport { sanitaerItemGuideOverrides } from "@/lib/price-guide-links-sanitaer";\n',
+          )
+          replace_once(
+              'lib/price-guide-links.ts',
+              '  return quinaryItemGuideOverrides[key]\n    ?? itemGuideOverrides[key]\n',
+              '  return sanitaerItemGuideOverrides[key]\n    ?? quinaryItemGuideOverrides[key]\n    ?? itemGuideOverrides[key]\n',
+          )
+          PY
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add lib/all-guides.ts lib/guide-groups.ts lib/guide-silo.ts lib/price-guide-links.ts
+          git commit -m 'Integrate Sanitär guide silo'
+          git push origin HEAD:seo/sanitaer-guide-silo
