@@ -15,6 +15,7 @@ import { scenarioGuides } from "@/lib/guides-scenarios";
 import { catalogScenarioGuides } from "@/lib/guides-catalog-scenarios";
 import { currentCatalogGuides } from "@/lib/guides-current-catalog";
 import { demolitionGuides } from "@/lib/guides-demolition";
+import { sanitaerGuides } from "@/lib/guides-sanitaer";
 
 const primaryClusterLinks: Record<string, Array<{ label: string; href: string }>> = {
   "sanierungskosten-pro-qm": [
@@ -174,6 +175,10 @@ const specialistClusterLinks: Record<string, Array<{ label: string; href: string
   ],
   "sanitaer-kosten": [
     { label: "Sanitärobjekte und Armaturen Kosten", href: "/ratgeber/sanitaerobjekte-bad-kosten" },
+    { label: "WC austauschen Kosten", href: "/ratgeber/wc-austauschen-kosten" },
+    { label: "Dusch-WC Kosten", href: "/ratgeber/dusch-wc-kosten" },
+    { label: "Bodengleiche Dusche Kosten", href: "/ratgeber/bodengleiche-dusche-kosten" },
+    { label: "Badewanne durch Dusche ersetzen", href: "/ratgeber/badewanne-durch-dusche-ersetzen-kosten" },
   ],
   "daemmung-kosten-pro-qm": [
     { label: "Fassadendämmung Kosten pro m²", href: "/ratgeber/fassadendaemmung-kosten-pro-qm" },
@@ -300,6 +305,7 @@ export const allGuides = [
   ...legacyGuides.filter((guide) => !deprecatedCatalogGuideSlugs.has(guide.slug)),
   ...currentCatalogGuides,
   ...demolitionGuides,
+  ...sanitaerGuides,
 ];
 
 export function getAnyGuide(slug: string) {
