@@ -3,12 +3,14 @@ import { sanitaerTradesExpansionGuidesA } from "./guides-sanitaer-trades-expansi
 import { sanitaerTradesExpansionGuidesB } from "./guides-sanitaer-trades-expansion-b";
 import { spanndeckeGuide } from "./guide-spanndecke";
 import { bauschuttEntsorgenGuide } from "./guide-bauschutt-entsorgen";
+import { tuerblattTauschenGuide } from "./guide-tuerblatt-tauschen";
 
 const expansionGuides = [
   ...sanitaerTradesExpansionGuidesA,
   ...sanitaerTradesExpansionGuidesB,
   spanndeckeGuide,
   bauschuttEntsorgenGuide,
+  tuerblattTauschenGuide,
 ];
 const expansionSlugs = new Set(expansionGuides.map((guide) => guide.slug));
 const baseWithoutDuplicates = bodenGuides.filter((guide) => !expansionSlugs.has(guide.slug));

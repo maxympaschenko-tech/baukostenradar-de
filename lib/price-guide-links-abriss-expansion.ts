@@ -69,6 +69,14 @@ export function getPriceGuideLink(options: {
   itemName: string;
   unit: string;
 }): PriceGuideLink {
+  if (options.serviceSlug === "tueren" && options.itemSlug === "tuerblatt-tauschen-montage") {
+    return {
+      href: "/ratgeber/tuerblatt-tauschen-kosten",
+      title: "Türblatt tauschen: Kosten 2026",
+      cta: "Türblatt-Ratgeber öffnen",
+    };
+  }
+
   if (options.serviceSlug === "abriss-entsorgung" && abrissExpansionItems[options.itemSlug]) {
     return abrissExpansionItems[options.itemSlug];
   }

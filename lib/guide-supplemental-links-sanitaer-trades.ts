@@ -46,6 +46,15 @@ const abrissPeers: Peer[] = [
   { slug: "bauschutt-entsorgen-kosten", label: "Bauschutt entsorgen Kosten", href: "/ratgeber/bauschutt-entsorgen-kosten" },
 ];
 
+const tuerenPeers: Peer[] = [
+  { slug: "innentueren-kosten", label: "Innentüren Kosten", href: "/ratgeber/innentueren-kosten" },
+  { slug: "tuerblatt-tauschen-kosten", label: "Türblatt tauschen Kosten", href: "/ratgeber/tuerblatt-tauschen-kosten" },
+  { slug: "tuerzarge-einbauen-kosten", label: "Türzarge einbauen Kosten", href: "/ratgeber/tuerzarge-einbauen-kosten" },
+  { slug: "haustuer-material-kosten", label: "Haustür Material Kosten", href: "/ratgeber/haustuer-material-kosten" },
+  { slug: "haustuer-zusatzausstattung-kosten", label: "Haustür Ausstattung Kosten", href: "/ratgeber/haustuer-zusatzausstattung-kosten" },
+  { slug: "schiebetuer-einbauen-kosten", label: "Schiebetür einbauen Kosten", href: "/ratgeber/schiebetuer-einbauen-kosten" },
+];
+
 const abrissDetailLinks: Record<string, GuideSupplementalLink[]> = {
   "haus-abreissen-kosten": [
     { label: "Hausabriss Standard pro m²", href: "/kosten/abriss-entsorgung/leistung/hausabriss-standard-je-quadratmeter" },
@@ -75,6 +84,10 @@ function addDetails(base: GuideSupplementalLink[], slug: string) {
 
 export function withSupplementalGuideLinks(slug: string, related: GuideSupplementalLink[]): GuideSupplementalLink[] {
   const base = withBodenSupplementalGuideLinks(slug, related);
-  const withPeers = addPeers(addPeers(addPeers(base, slug, sanitaerPeers), slug, trockenbauPeers), slug, abrissPeers);
+  const withPeers = addPeers(
+    addPeers(addPeers(addPeers(base, slug, sanitaerPeers), slug, trockenbauPeers), slug, abrissPeers),
+    slug,
+    tuerenPeers,
+  );
   return addDetails(withPeers, slug);
 }

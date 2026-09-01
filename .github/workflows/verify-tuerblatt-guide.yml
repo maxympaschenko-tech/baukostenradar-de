@@ -1,0 +1,75 @@
+name: Verify Türblatt guide
+
+on:
+  workflow_run:
+    workflows: ["Hostinger production ready"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  verify-tuerblatt-guide:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-hostinger-verifier
+
+      - name: Verify Türblatt exact mapping and runtime contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --location "$1" -o "$2"
+          }
+
+          item='tuerblatt-tauschen-montage'
+          guide='tuerblatt-tauschen-kosten'
+          item_url="https://baukostenradar.de/kosten/tueren/leistung/${item}"
+          guide_url="https://baukostenradar.de/ratgeber/${guide}"
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/kosten/tueren' /tmp/tueren.html
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          fetch "$item_url" /tmp/item.html
+          fetch "$guide_url" /tmp/guide.html
+
+          grep -q "${item_url}</loc>" /tmp/sitemap.xml
+          grep -q "${guide_url}</loc>" /tmp/sitemap.xml
+          grep -q "/kosten/tueren/leistung/${item}" /tmp/tueren.html
+          grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+
+          grep -q 'id="ratgeber"' /tmp/item.html
+          grep -q "/ratgeber/${guide}" /tmp/item.html
+          ! grep -qi 'noindex' /tmp/item.html
+
+          grep -q "$guide_url" /tmp/guide.html
+          grep -q '"@type":"Article"' /tmp/guide.html
+          grep -q '/kosten/tueren' /tmp/guide.html
+          grep -q '/kosten/tueren/berlin' /tmp/guide.html
+          grep -q 'gewerk=tueren' /tmp/guide.html
+          grep -q 'leistung=tuerblatt-tauschen-montage' /tmp/guide.html
+          grep -q '/kosten/tueren/leistung/tuerblatt-tauschen-montage' /tmp/guide.html
+          grep -q '80-150' /tmp/guide.html
+          ! grep -qi 'noindex' /tmp/guide.html
+
+      - name: Verify Türen peer links include Türblatt guide
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          peers=(
+            innentueren-kosten
+            tuerzarge-einbauen-kosten
+            haustuer-material-kosten
+            haustuer-zusatzausstattung-kosten
+            schiebetuer-einbauen-kosten
+          )
+
+          for peer in "${peers[@]}"; do
+            fetch_url="https://baukostenradar.de/ratgeber/${peer}"
+            curl -sS --fail --location "$fetch_url" -o "/tmp/${peer}.html"
+            grep -q '/ratgeber/tuerblatt-tauschen-kosten' "/tmp/${peer}.html" || { echo "${peer} missing Türblatt peer link"; exit 1; }
+          done
+
+          echo "Verified Türblatt guide and ${#peers[@]} Türen peer links"

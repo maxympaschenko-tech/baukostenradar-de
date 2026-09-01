@@ -34,5 +34,14 @@ export const guideGroups: readonly GuideGroup[] = bodenGuideGroups.map((group) =
       slugs,
     };
   }
+  if (group.eyebrow === "Türen & Haustüren") {
+    const slugs = group.slugs.includes("tuerblatt-tauschen-kosten") ? group.slugs : [...group.slugs, "tuerblatt-tauschen-kosten"];
+    return {
+      ...group,
+      title: "Innentüren, Türblätter, Zargen, Haustüren und Schiebetüren kalkulieren",
+      description: "Türenkosten 2026 für Innentüren, Türblattausch, Zargen, Haustüren nach Material und Ausstattung sowie Schiebetüren vergleichen.",
+      slugs,
+    };
+  }
   return group;
 });

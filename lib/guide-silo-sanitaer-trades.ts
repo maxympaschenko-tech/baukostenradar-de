@@ -21,6 +21,12 @@ const silos: Record<string, GuideSilo> = {
     calculatorLabel: "Bauschutt entsorgen berechnen",
     regionalMode: "service",
   },
+  "tuerblatt-tauschen-kosten": {
+    serviceSlugs: ["tueren"],
+    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "tueren", itemSlug: "tuerblatt-tauschen-montage" }),
+    calculatorLabel: "Türblatt-Tausch berechnen",
+    regionalMode: "service",
+  },
   "sanitaer-anfahrt-kosten": {
     serviceSlugs: ["sanitaer"],
     calculatorHref: handwerkerCalculatorHref({ serviceSlug: "sanitaer", itemSlug: "sanitaer-anfahrt" }),
