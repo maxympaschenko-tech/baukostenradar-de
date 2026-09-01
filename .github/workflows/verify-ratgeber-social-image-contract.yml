@@ -3,16 +3,16 @@ name: Verify Ratgeber social image contract
 on:
   pull_request:
     paths:
-      - 'app/ratgeber/[slug]/opengraph-image.tsx'
-      - 'app/ratgeber/[slug]/twitter-image.tsx'
+      - 'app/ratgeber/**/opengraph-image.tsx'
+      - 'app/ratgeber/**/twitter-image.tsx'
       - 'lib/social-image.tsx'
       - '.github/workflows/verify-ratgeber-social-images.yml'
       - '.github/workflows/verify-ratgeber-social-image-contract.yml'
   push:
     branches: [main]
     paths:
-      - 'app/ratgeber/[slug]/opengraph-image.tsx'
-      - 'app/ratgeber/[slug]/twitter-image.tsx'
+      - 'app/ratgeber/**/opengraph-image.tsx'
+      - 'app/ratgeber/**/twitter-image.tsx'
       - 'lib/social-image.tsx'
       - '.github/workflows/verify-ratgeber-social-images.yml'
       - '.github/workflows/verify-ratgeber-social-image-contract.yml'
@@ -61,7 +61,7 @@ jobs:
           automatic, manual = text.split(marker, 1)
           if '/usr/bin/curl' in automatic or 'fetch_image()' in automatic:
               raise SystemExit('Automatic production social-image verification fetches PNG bodies')
-          if "if: ${{ github.event_name == 'workflow_dispatch' }}" not in manual:
+          if 'if:' not in manual or 'workflow_dispatch' not in manual:
               raise SystemExit('PNG renderer smoke is not workflow_dispatch-only')
           if '/usr/bin/curl' not in manual or 'image/png' not in manual:
               raise SystemExit('Manual renderer smoke no longer validates PNG output')
