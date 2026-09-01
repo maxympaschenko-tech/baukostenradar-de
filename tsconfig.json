@@ -16,11 +16,11 @@
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/lib/pricing": ["./lib/catalog-tueren.ts"],
-      "@/lib/price-guide-links": ["./lib/price-guide-links-fliesen.ts"],
-      "@/lib/all-guides": ["./lib/all-guides-fliesen.ts"],
-      "@/lib/guide-groups": ["./lib/guide-groups-fliesen.ts"],
-      "@/lib/guide-silo": ["./lib/guide-silo-fliesen.ts"],
-      "@/lib/guide-supplemental-links": ["./lib/guide-supplemental-links-fliesen.ts"],
+      "@/lib/price-guide-links": ["./lib/price-guide-links-elektriker.ts"],
+      "@/lib/all-guides": ["./lib/all-guides-elektriker.ts"],
+      "@/lib/guide-groups": ["./lib/guide-groups-elektriker.ts"],
+      "@/lib/guide-silo": ["./lib/guide-silo-elektriker.ts"],
+      "@/lib/guide-supplemental-links": ["./lib/guide-supplemental-links-elektriker.ts"],
       "@/*": ["./*"]
     }
   },
