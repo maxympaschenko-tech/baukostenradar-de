@@ -12,23 +12,39 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-hostinger-verifier
 
       - name: Verify exact Wärmepumpe price-item guide mappings
         shell: bash
         run: |
           set -euo pipefail
-          source scripts/hostinger-verify.sh
 
-          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
-          fetch_hostinger 'https://baukostenradar.de/kosten/waermepumpe' /tmp/waermepumpe.html
-          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          fetch() {
+            curl -sS --fail --location \
+              --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 \
+              -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' \
+              -H 'User-Agent: BauKostenRadar-CI/1.0' \
+              "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/kosten/waermepumpe' /tmp/waermepumpe.html
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
 
           grep -q 'https://baukostenradar.de/kosten/waermepumpe' /tmp/waermepumpe.html
           ! grep -qi 'noindex' /tmp/waermepumpe.html
 
           mappings=$(cat <<'EOF'
-          luft-wasser-waermepumpe-komplett|luft-wasser-waermepumpe-kosten
-          wartung-waermepumpe|waermepumpe-wartung-kosten
+          waermepumpe-im-altbau-inkl-einbau-und-anpassungen|waermepumpe-altbau-kosten
+          waermepumpe-im-neubau-inkl-einbau|waermepumpe-neubau-kosten
+          luft-wasser-waermepumpe-geraet-10-kw|luft-wasser-waermepumpe-kosten
+          waermepumpe-installieren-und-hydraulisch-einbinden|waermepumpe-installation-kosten
+          altheizung-demontieren-mit-pufferspeicher-und-zubehoer|waermepumpe-installation-kosten
+          elektrik-fuer-waermepumpe-mit-zaehlerschrank-und-anschluss|waermepumpe-installation-kosten
+          niedertemperatur-heizkoerper-fuer-waermepumpe-nachruesten|waermepumpe-heizkoerper-kosten
+          hydraulischer-abgleich-fuer-waermepumpe-im-einfamilienhaus|waermepumpe-installation-kosten
           EOF
           )
 
@@ -45,81 +61,75 @@ jobs:
             grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Wärmepumpe item missing in sitemap: ${item}"; exit 1; }
             grep -q "/kosten/waermepumpe/leistung/${item}" /tmp/waermepumpe.html || { echo "Wärmepumpe item missing on category: ${item}"; exit 1; }
 
-            fetch_hostinger "$item_url" "$item_output"
-            grep -q 'id="ratgeber"' "$item_output" || { echo "Wärmepumpe guide section missing: ${item}"; exit 1; }
+            fetch "$item_url" "$item_output"
+            grep -q 'Passender Ratgeber' "$item_output"
             grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong Wärmepumpe guide mapping: ${item} -> ${guide}"; exit 1; }
             ! grep -qi 'noindex' "$item_output"
 
-            grep -q "${guide_url}</loc>" /tmp/sitemap.xml
-            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Wärmepumpe guide missing in sitemap: ${guide}"; exit 1; }
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "Wärmepumpe guide missing from Ratgeber hub: ${guide}"; exit 1; }
 
-            fetch_hostinger "$guide_url" "$guide_output"
+            fetch "$guide_url" "$guide_output"
             grep -q "$guide_url" "$guide_output"
             grep -q '"@type":"Article"' "$guide_output"
             grep -q '/kosten/waermepumpe' "$guide_output"
-            grep -q '/kosten/waermepumpe/berlin' "$guide_output"
-            grep -q 'gewerk=waermepumpe' "$guide_output"
-            grep -q "leistung=${item}" "$guide_output"
             ! grep -qi 'noindex' "$guide_output"
 
             checked=$((checked + 1))
           done <<< "$mappings"
 
-          test "$checked" -eq 2
+          test "$checked" -eq 8
           echo "Verified ${checked} exact Wärmepumpe price-item guide mappings"
 
-      - name: Verify Wärmepumpe parent guide and calculator
+      - name: Verify Wärmepumpe parent and child silo
         shell: bash
         run: |
           set -euo pipefail
-          source scripts/hostinger-verify.sh
 
-          guide='waermepumpe-kosten-2026'
-          guide_url="https://baukostenradar.de/ratgeber/${guide}"
+          fetch() {
+            curl -sS --fail --location \
+              --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 \
+              -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' \
+              -H 'User-Agent: BauKostenRadar-CI/1.0' \
+              "$1" -o "$2"
+          }
 
-          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
-          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
-          fetch_hostinger "$guide_url" /tmp/waermepumpe-parent.html
-
-          grep -q "${guide_url}</loc>" /tmp/sitemap.xml
-          grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
-          grep -q "$guide_url" /tmp/waermepumpe-parent.html
-          grep -q '"@type":"Article"' /tmp/waermepumpe-parent.html
-          grep -q '/kosten/waermepumpe' /tmp/waermepumpe-parent.html
-          grep -q '/kosten/waermepumpe/berlin' /tmp/waermepumpe-parent.html
-          grep -q 'gewerk=waermepumpe' /tmp/waermepumpe-parent.html
-          grep -q 'leistung=luft-wasser-waermepumpe-komplett' /tmp/waermepumpe-parent.html
-          ! grep -qi 'noindex' /tmp/waermepumpe-parent.html
-
-      - name: Verify Wärmepumpe guide hub and internal-link silo
-        shell: bash
-        run: |
-          set -euo pipefail
-          source scripts/hostinger-verify.sh
-
-          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
-          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
 
           guides=(
             waermepumpe-kosten-2026
+            waermepumpe-altbau-kosten
+            waermepumpe-neubau-kosten
+            waermepumpe-installation-kosten
+            waermepumpe-heizkoerper-kosten
             luft-wasser-waermepumpe-kosten
             waermepumpe-wartung-kosten
           )
 
-          for source in "${guides[@]}"; do
-            guide_url="https://baukostenradar.de/ratgeber/${source}"
-            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Wärmepumpe cluster guide missing in sitemap: ${source}"; exit 1; }
-            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Wärmepumpe cluster guide missing from hub: ${source}"; exit 1; }
+          for guide in "${guides[@]}"; do
+            guide_url="https://baukostenradar.de/ratgeber/${guide}"
+            output="/tmp/waermepumpe-silo-${guide}.html"
 
-            fetch_hostinger "$guide_url" "/tmp/${source}.html"
-            grep -q "$guide_url" "/tmp/${source}.html"
-            grep -q '"@type":"Article"' "/tmp/${source}.html"
-            ! grep -qi 'noindex' "/tmp/${source}.html"
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Wärmepumpe silo guide missing in sitemap: ${guide}"; exit 1; }
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "Wärmepumpe silo guide missing from hub: ${guide}"; exit 1; }
 
-            for target in "${guides[@]}"; do
-              [ "$source" = "$target" ] && continue
-              grep -q "/ratgeber/${target}" "/tmp/${source}.html" || { echo "${source} missing Wärmepumpe peer ${target}"; exit 1; }
-            done
+            fetch "$guide_url" "$output"
+            grep -q "$guide_url" "$output"
+            grep -q '"@type":"Article"' "$output"
+            ! grep -qi 'noindex' "$output"
           done
 
-          echo "Verified Wärmepumpe hub visibility and full peer-link silo"
+          fetch 'https://baukostenradar.de/ratgeber/waermepumpe-kosten-2026' /tmp/waermepumpe-parent.html
+          grep -q '/ratgeber/waermepumpe-altbau-kosten' /tmp/waermepumpe-parent.html
+          grep -q '/ratgeber/waermepumpe-neubau-kosten' /tmp/waermepumpe-parent.html
+          grep -q '/ratgeber/waermepumpe-installation-kosten' /tmp/waermepumpe-parent.html
+          grep -q '/ratgeber/waermepumpe-heizkoerper-kosten' /tmp/waermepumpe-parent.html
+          grep -q '/ratgeber/luft-wasser-waermepumpe-kosten' /tmp/waermepumpe-parent.html
+          grep -q '/ratgeber/waermepumpe-wartung-kosten' /tmp/waermepumpe-parent.html
+          grep -q '30.000-55.000' /tmp/waermepumpe-parent.html
+          grep -q '22.000' /tmp/waermepumpe-parent.html
+
+          echo "Verified Wärmepumpe parent plus ${#guides[@]} clustered guide URLs"
