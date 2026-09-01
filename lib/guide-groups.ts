@@ -20,9 +20,9 @@ export const guideGroups: readonly GuideGroup[] = [
   },
   {
     eyebrow: "Sanitär & Badausstattung",
-    title: "Sanitärkosten, Badausstattung und Rückbau kalkulieren",
-    description: "Sanitärkosten als eigenes Gewerk einordnen, Sanitärobjekte und Armaturen für ein typisches Bad kalkulieren und Demontage samt Entsorgung des Altbads separat vergleichen.",
-    slugs: ["sanitaer-kosten", "sanitaerobjekte-bad-kosten", "bad-entkernen-kosten"],
+    title: "Sanitärkosten, WC und Dusche konkret kalkulieren",
+    description: "Sanitärkosten als eigenes Gewerk einordnen und konkrete 2026-Richtwerte für WC-Austausch, Dusch-WC, bodengleiche Dusche, Wanne-zu-Dusche-Umbau sowie Sanitärobjekte und Rückbau vergleichen.",
+    slugs: ["sanitaer-kosten", "wc-austauschen-kosten", "dusch-wc-kosten", "bodengleiche-dusche-kosten", "badewanne-durch-dusche-ersetzen-kosten", "sanitaerobjekte-bad-kosten", "bad-entkernen-kosten"],
   },
   {
     eyebrow: "Konkrete Projektgrößen",

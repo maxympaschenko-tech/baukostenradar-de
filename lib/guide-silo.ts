@@ -1,5 +1,6 @@
 import { handwerkerCalculatorHref } from "@/lib/calculator-links";
 import { tertiaryOpportunitySilos } from "@/lib/guide-silo-opportunities-tertiary";
+import { sanitaerGuideSilos } from "@/lib/guide-silo-sanitaer";
 import { regions, services } from "@/lib/pricing";
 
 export type GuideSilo = {
@@ -17,6 +18,7 @@ const opportunitySilos: Record<string, {
   itemSlug: string;
   calculatorLabel: string;
 }> = {
+  ...sanitaerGuideSilos,
   "einfahrt-pflastern-kosten": {
     serviceSlugs: ["garten"],
     serviceSlug: "garten",

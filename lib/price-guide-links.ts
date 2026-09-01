@@ -1,4 +1,5 @@
 import { quinaryItemGuideOverrides } from "@/lib/price-guide-links-quinary";
+import { sanitaerItemGuideOverrides } from "@/lib/price-guide-links-sanitaer";
 
 export type PriceGuideLink = {
   href: string;
@@ -466,7 +467,8 @@ export function getPriceGuideLink(options: {
   }
 
   const key = `${serviceSlug}:${itemSlug}`;
-  return quinaryItemGuideOverrides[key]
+  return sanitaerItemGuideOverrides[key]
+    ?? quinaryItemGuideOverrides[key]
     ?? itemGuideOverrides[key]
     ?? getServiceGuideLink(serviceSlug);
 }
