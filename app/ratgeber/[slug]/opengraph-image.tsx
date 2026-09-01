@@ -7,6 +7,7 @@ import {
   socialImageSize,
 } from "@/lib/social-image";
 
+export const dynamic = "force-static";
 export const alt = guideSocialImageAlt;
 export const size = socialImageSize;
 export const contentType = socialImageContentType;

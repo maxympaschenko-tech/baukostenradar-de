@@ -35,6 +35,7 @@ jobs:
           live='.github/workflows/verify-ratgeber-social-images.yml'
 
           for route in "$og" "$twitter"; do
+            grep -Fq 'export const dynamic = "force-static"' "$route"
             grep -Fq 'createGuideSocialImage(guide.h1)' "$route"
             grep -Fq 'export const size = socialImageSize' "$route"
             grep -Fq 'export const contentType = socialImageContentType' "$route"
@@ -46,9 +47,10 @@ jobs:
           grep -Fq 'export const socialImageContentType = "image/png"' "$helper"
           grep -Fq 'new ImageResponse' "$helper"
 
-          # Full dynamic PNG downloads must never return to the automatic
-          # Hostinger production cascade. They are allowed only in the
-          # workflow_dispatch-only manual renderer smoke step.
+          # Full PNG downloads must never return to the automatic Hostinger
+          # production cascade. They are allowed only in the workflow_dispatch-
+          # only manual renderer smoke step. The image routes themselves are
+          # forced static so social crawlers do not depend on runtime rendering.
           python - "$live" <<'PY'
           from pathlib import Path
           import sys
@@ -67,4 +69,4 @@ jobs:
               raise SystemExit('Manual renderer smoke no longer validates PNG output')
           PY
 
-          echo 'Ratgeber social image source and gating contract verified'
+          echo 'Ratgeber social image source, static-route and gating contract verified'
