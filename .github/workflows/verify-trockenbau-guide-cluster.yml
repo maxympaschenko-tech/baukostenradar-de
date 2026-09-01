@@ -18,17 +18,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
           fetch() {
-            curl -sS --fail --location \
-              --retry 5 --retry-delay 3 --retry-all-errors \
-              --connect-timeout 15 --max-time 60 \
-              -H 'Cache-Control: no-cache' \
-              -H 'Pragma: no-cache' \
-              -H 'User-Agent: BauKostenRadar-CI/1.0' \
-              "$1" -o "$2"
+            curl -sS --fail --location --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' \
+              -H 'User-Agent: BauKostenRadar-CI/1.0' "$1" -o "$2"
           }
-
           fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
           fetch 'https://baukostenradar.de/kosten/trockenbau' /tmp/trockenbau.html
           fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
@@ -42,6 +36,7 @@ jobs:
           vorsatzschale|vorsatzschale-kosten-pro-qm
           decke-abhaengen|decke-abhaengen-kosten-pro-qm
           dachschraege-verkleiden|dachschraege-verkleiden-kosten-pro-qm
+          spanndecke|spanndecke-kosten-pro-qm
           verspachtelung-q3|verspachtelung-q3-kosten-pro-qm
           EOF
           )
@@ -54,49 +49,36 @@ jobs:
             guide_url="https://baukostenradar.de/ratgeber/${guide}"
             item_output="/tmp/trockenbau-item-${item}.html"
             guide_output="/tmp/trockenbau-guide-${guide}.html"
-
             grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Trockenbau item missing in sitemap: ${item}"; exit 1; }
             grep -q "/kosten/trockenbau/leistung/${item}" /tmp/trockenbau.html || { echo "Trockenbau item missing on category: ${item}"; exit 1; }
-
             fetch "$item_url" "$item_output"
             grep -q 'Passender Ratgeber' "$item_output"
             grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong Trockenbau mapping: ${item} -> ${guide}"; exit 1; }
             ! grep -qi 'noindex' "$item_output"
-
             grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Trockenbau guide missing in sitemap: ${guide}"; exit 1; }
             grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "Trockenbau guide missing from hub: ${guide}"; exit 1; }
-
             fetch "$guide_url" "$guide_output"
             grep -q "$guide_url" "$guide_output"
             grep -q '"@type":"Article"' "$guide_output"
             grep -q '/kosten/trockenbau' "$guide_output"
             grep -q 'gewerk=trockenbau' "$guide_output"
             ! grep -qi 'noindex' "$guide_output"
-
             checked=$((checked + 1))
           done <<< "$mappings"
-
-          test "$checked" -eq 9
+          test "$checked" -eq 10
           echo "Verified ${checked} exact Trockenbau price-item guide mappings"
 
-      - name: Verify expanded Trockenbau guide silo
+      - name: Verify 10-guide Trockenbau silo
         shell: bash
         run: |
           set -euo pipefail
-
           fetch() {
-            curl -sS --fail --location \
-              --retry 5 --retry-delay 3 --retry-all-errors \
-              --connect-timeout 15 --max-time 60 \
-              -H 'Cache-Control: no-cache' \
-              -H 'Pragma: no-cache' \
-              -H 'User-Agent: BauKostenRadar-CI/1.0' \
-              "$1" -o "$2"
+            curl -sS --fail --location --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' \
+              -H 'User-Agent: BauKostenRadar-CI/1.0' "$1" -o "$2"
           }
-
           fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
           fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
-
           guides=(
             trockenbau-kosten-pro-qm
             trockenbauer-stundensatz
@@ -105,10 +87,10 @@ jobs:
             vorsatzschale-kosten-pro-qm
             decke-abhaengen-kosten-pro-qm
             dachschraege-verkleiden-kosten-pro-qm
+            spanndecke-kosten-pro-qm
             verspachtelung-q3-kosten-pro-qm
             verspachtelung-q4-kosten-pro-qm
           )
-
           for source in "${guides[@]}"; do
             guide_url="https://baukostenradar.de/ratgeber/${source}"
             output="/tmp/trockenbau-silo-${source}.html"
@@ -118,41 +100,33 @@ jobs:
             grep -q "$guide_url" "$output"
             grep -q '"@type":"Article"' "$output"
             ! grep -qi 'noindex' "$output"
-
             for target in "${guides[@]}"; do
               [ "$source" = "$target" ] && continue
               grep -q "/ratgeber/${target}" "$output" || { echo "${source} missing Trockenbau peer ${target}"; exit 1; }
             done
           done
-
-          test "${#guides[@]}" -eq 9
+          test "${#guides[@]}" -eq 10
           echo "Verified ${#guides[@]} Trockenbau guides and full peer-link silo"
 
-      - name: Verify new Trockenbau calculator presets and price anchors
+      - name: Verify Trockenbau calculator presets and price anchors
         shell: bash
         run: |
           set -euo pipefail
-
           fetch() {
-            curl -sS --fail --location \
-              --retry 5 --retry-delay 3 --retry-all-errors \
-              --connect-timeout 15 --max-time 60 \
-              -H 'Cache-Control: no-cache' \
-              -H 'Pragma: no-cache' \
-              -H 'User-Agent: BauKostenRadar-CI/1.0' \
-              "$1" -o "$2"
+            curl -sS --fail --location --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' \
+              -H 'User-Agent: BauKostenRadar-CI/1.0' "$1" -o "$2"
           }
-
           checks=$(cat <<'EOF'
           trockenbauer-stundensatz|trockenbauer-stundensatz|45-70
           trennwand-holz-kosten-pro-qm|trennwand-aus-holz|50-90
           vorsatzschale-kosten-pro-qm|vorsatzschale|30-60
           decke-abhaengen-kosten-pro-qm|decke-abhaengen|40-90
           dachschraege-verkleiden-kosten-pro-qm|dachschraege-verkleiden|40-80
+          spanndecke-kosten-pro-qm|spanndecke|120-130
           verspachtelung-q3-kosten-pro-qm|verspachtelung-q3|8-15
           EOF
           )
-
           checked=0
           while IFS='|' read -r guide preset price_token; do
             guide="${guide#${guide%%[![:space:]]*}}"
@@ -161,8 +135,8 @@ jobs:
             fetch "https://baukostenradar.de/ratgeber/${guide}" "$output"
             grep -q "leistung=${preset}" "$output" || { echo "Missing calculator preset ${preset} on ${guide}"; exit 1; }
             grep -q "$price_token" "$output" || { echo "Missing price anchor ${price_token} on ${guide}"; exit 1; }
+            grep -q "/kosten/trockenbau/leistung/${preset}" "$output" || { echo "Missing price detail ${preset} on ${guide}"; exit 1; }
             checked=$((checked + 1))
           done <<< "$checks"
-
-          test "$checked" -eq 6
-          echo "Verified ${checked} new Trockenbau calculator presets and price anchors"
+          test "$checked" -eq 7
+          echo "Verified ${checked} Trockenbau calculator presets and price anchors"

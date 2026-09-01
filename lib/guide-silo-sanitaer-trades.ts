@@ -9,6 +9,12 @@ import {
 export type { GuideSilo } from "./guide-silo-boden";
 
 const silos: Record<string, GuideSilo> = {
+  "spanndecke-kosten-pro-qm": {
+    serviceSlugs: ["trockenbau"],
+    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "trockenbau", itemSlug: "spanndecke" }),
+    calculatorLabel: "Spanndecke berechnen",
+    regionalMode: "service",
+  },
   "sanitaer-anfahrt-kosten": {
     serviceSlugs: ["sanitaer"],
     calculatorHref: handwerkerCalculatorHref({ serviceSlug: "sanitaer", itemSlug: "sanitaer-anfahrt" }),

@@ -1,8 +1,9 @@
 import { allGuides as bodenGuides } from "./all-guides-boden";
 import { sanitaerTradesExpansionGuidesA } from "./guides-sanitaer-trades-expansion-a";
 import { sanitaerTradesExpansionGuidesB } from "./guides-sanitaer-trades-expansion-b";
+import { spanndeckeGuide } from "./guide-spanndecke";
 
-const expansionGuides = [...sanitaerTradesExpansionGuidesA, ...sanitaerTradesExpansionGuidesB];
+const expansionGuides = [...sanitaerTradesExpansionGuidesA, ...sanitaerTradesExpansionGuidesB, spanndeckeGuide];
 const expansionSlugs = new Set(expansionGuides.map((guide) => guide.slug));
 const baseWithoutDuplicates = bodenGuides.filter((guide) => !expansionSlugs.has(guide.slug));
 
