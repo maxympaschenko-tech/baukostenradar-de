@@ -16,10 +16,11 @@
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/lib/pricing": ["./lib/catalog-tueren.ts"],
-      "@/lib/price-guide-links": ["./lib/price-guide-links-waermepumpe.ts"],
-      "@/lib/all-guides": ["./lib/all-guides-waermepumpe.ts"],
-      "@/lib/guide-groups": ["./lib/guide-groups-waermepumpe.ts"],
-      "@/lib/guide-silo": ["./lib/guide-silo-waermepumpe.ts"],
+      "@/lib/price-guide-links": ["./lib/price-guide-links-photovoltaik.ts"],
+      "@/lib/all-guides": ["./lib/all-guides-photovoltaik.ts"],
+      "@/lib/guide-groups": ["./lib/guide-groups-photovoltaik.ts"],
+      "@/lib/guide-silo": ["./lib/guide-silo-photovoltaik.ts"],
+      "@/lib/guide-supplemental-links": ["./lib/guide-supplemental-links-photovoltaik.ts"],
       "@/*": ["./*"]
     }
   },

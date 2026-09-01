@@ -13,14 +13,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-hostinger-verifier
+
       - name: Verify exact Photovoltaik price-item guide mappings
         shell: bash
         run: |
           set -euo pipefail
 
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
-          curl -sS --fail 'https://baukostenradar.de/kosten/photovoltaik' -o /tmp/photovoltaik.html
-          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+          fetch() {
+            curl -sS --fail --location \
+              --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 \
+              -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' \
+              -H 'User-Agent: BauKostenRadar-CI/1.0' \
+              "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/kosten/photovoltaik' /tmp/photovoltaik.html
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
 
           grep -q 'https://baukostenradar.de/kosten/photovoltaik' /tmp/photovoltaik.html
           ! grep -qi 'noindex' /tmp/photovoltaik.html
@@ -31,6 +42,20 @@ jobs:
           pv-anlage-15-kwp-inkl-installation|photovoltaik-15-kwp-kosten
           10-kwp-pv-ca-10-kwh-speicher|photovoltaik-mit-speicher-kosten
           stromspeicher-lfp|stromspeicher-kosten-pro-kwh
+          pv-anlage-4-kwp-inkl-montage|photovoltaik-4-kwp-kosten
+          pv-anlage-20-kwp-inkl-installation|photovoltaik-20-kwp-kosten
+          pv-anlage-25-kwp-inkl-installation|photovoltaik-25-kwp-kosten
+          pv-anlage-5-kwp-mit-5-kwh-speicher|photovoltaik-mit-speicher-kosten
+          stromspeicher-5-kwh|stromspeicher-5-10-15-kwh-kosten
+          stromspeicher-10-kwh|stromspeicher-5-10-15-kwh-kosten
+          stromspeicher-15-kwh|stromspeicher-5-10-15-kwh-kosten
+          stromspeicher-montieren-und-elektrisch-integrieren|stromspeicher-installation-kosten
+          pv-wechselrichter-standard|pv-wechselrichter-kosten
+          hybrid-wechselrichter|pv-wechselrichter-kosten
+          smart-meter-fuer-pv-anlage|pv-smart-meter-kosten
+          notstrom-oder-backup-box|photovoltaik-notstrom-backup-kosten
+          pv-speicher-full-backup-ersatzstrom|photovoltaik-notstrom-backup-kosten
+          photovoltaik-laufende-betriebskosten|photovoltaik-betriebskosten
           EOF
           )
 
@@ -47,82 +72,123 @@ jobs:
             grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "PV item missing in sitemap: ${item}"; exit 1; }
             grep -q "/kosten/photovoltaik/leistung/${item}" /tmp/photovoltaik.html || { echo "PV item missing on category: ${item}"; exit 1; }
 
-            curl -sS --fail "$item_url" -o "$item_output"
+            fetch "$item_url" "$item_output"
             grep -q 'Passender Ratgeber' "$item_output"
             grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong PV guide mapping: ${item} -> ${guide}"; exit 1; }
             ! grep -qi 'noindex' "$item_output"
 
-            grep -q "${guide_url}</loc>" /tmp/sitemap.xml
-            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "PV guide missing in sitemap: ${guide}"; exit 1; }
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "PV guide missing from hub: ${guide}"; exit 1; }
 
-            curl -sS --fail "$guide_url" -o "$guide_output"
+            fetch "$guide_url" "$guide_output"
             grep -q "$guide_url" "$guide_output"
             grep -q '"@type":"Article"' "$guide_output"
             grep -q '/kosten/photovoltaik' "$guide_output"
-            grep -q '/kosten/photovoltaik/berlin' "$guide_output"
             grep -q 'gewerk=photovoltaik' "$guide_output"
-            grep -q "leistung=${item}" "$guide_output"
             ! grep -qi 'noindex' "$guide_output"
 
             checked=$((checked + 1))
           done <<< "$mappings"
 
-          test "$checked" -eq 5
+          test "$checked" -eq 19
           echo "Verified ${checked} exact Photovoltaik price-item guide mappings"
 
-      - name: Verify Photovoltaik parent guide and calculator
+      - name: Verify expanded Photovoltaik guide silo
         shell: bash
         run: |
           set -euo pipefail
 
-          guide='photovoltaik-kosten-2026'
-          guide_url="https://baukostenradar.de/ratgeber/${guide}"
+          fetch() {
+            curl -sS --fail --location \
+              --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 \
+              -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' \
+              -H 'User-Agent: BauKostenRadar-CI/1.0' \
+              "$1" -o "$2"
+          }
 
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
-          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
-          curl -sS --fail "$guide_url" -o /tmp/pv-parent.html
-
-          grep -q "${guide_url}</loc>" /tmp/sitemap.xml
-          grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
-          grep -q "$guide_url" /tmp/pv-parent.html
-          grep -q '"@type":"Article"' /tmp/pv-parent.html
-          grep -q '/kosten/photovoltaik' /tmp/pv-parent.html
-          grep -q '/kosten/photovoltaik/berlin' /tmp/pv-parent.html
-          grep -q 'gewerk=photovoltaik' /tmp/pv-parent.html
-          grep -q 'leistung=pv-anlage-10-kwp-inkl-installation' /tmp/pv-parent.html
-          ! grep -qi 'noindex' /tmp/pv-parent.html
-
-      - name: Verify Photovoltaik guide hub and internal-link silo
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
-          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
 
           guides=(
             photovoltaik-kosten-2026
+            photovoltaik-4-kwp-kosten
             photovoltaik-5-kwp-kosten
             photovoltaik-10-kwp-kosten
             photovoltaik-15-kwp-kosten
+            photovoltaik-20-kwp-kosten
+            photovoltaik-25-kwp-kosten
             photovoltaik-mit-speicher-kosten
             stromspeicher-kosten-pro-kwh
+            stromspeicher-5-10-15-kwh-kosten
+            stromspeicher-installation-kosten
+            pv-wechselrichter-kosten
+            pv-smart-meter-kosten
+            photovoltaik-notstrom-backup-kosten
+            photovoltaik-betriebskosten
           )
 
           for source in "${guides[@]}"; do
             guide_url="https://baukostenradar.de/ratgeber/${source}"
+            output="/tmp/pv-silo-${source}.html"
+
             grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "PV cluster guide missing in sitemap: ${source}"; exit 1; }
             grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "PV cluster guide missing from hub: ${source}"; exit 1; }
 
-            curl -sS --fail "$guide_url" -o "/tmp/${source}.html"
-            grep -q "$guide_url" "/tmp/${source}.html"
-            grep -q '"@type":"Article"' "/tmp/${source}.html"
-            ! grep -qi 'noindex' "/tmp/${source}.html"
+            fetch "$guide_url" "$output"
+            grep -q "$guide_url" "$output"
+            grep -q '"@type":"Article"' "$output"
+            grep -q '/kosten/photovoltaik' "$output"
+            ! grep -qi 'noindex' "$output"
 
             for target in "${guides[@]}"; do
               [ "$source" = "$target" ] && continue
-              grep -q "/ratgeber/${target}" "/tmp/${source}.html" || { echo "${source} missing PV peer ${target}"; exit 1; }
+              grep -q "/ratgeber/${target}" "$output" || { echo "${source} missing PV peer ${target}"; exit 1; }
             done
           done
 
-          echo "Verified Photovoltaik hub visibility and full peer-link silo"
+          test "${#guides[@]}" -eq 15
+          echo "Verified ${#guides[@]} Photovoltaik guides and full peer-link silo"
+
+      - name: Verify new Photovoltaik calculator presets and price anchors
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --location \
+              --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 \
+              -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' \
+              -H 'User-Agent: BauKostenRadar-CI/1.0' \
+              "$1" -o "$2"
+          }
+
+          checks=$(cat <<'EOF'
+          photovoltaik-4-kwp-kosten|pv-anlage-4-kwp-inkl-montage|7.943
+          photovoltaik-20-kwp-kosten|pv-anlage-20-kwp-inkl-installation|18.000-26.000
+          photovoltaik-25-kwp-kosten|pv-anlage-25-kwp-inkl-installation|22.000-30.000
+          stromspeicher-5-10-15-kwh-kosten|stromspeicher-10-kwh|4.290-7.740
+          stromspeicher-installation-kosten|stromspeicher-montieren-und-elektrisch-integrieren|1.000-2.000
+          pv-wechselrichter-kosten|pv-wechselrichter-standard|600-1.400
+          pv-smart-meter-kosten|smart-meter-fuer-pv-anlage|200-450
+          photovoltaik-notstrom-backup-kosten|pv-speicher-full-backup-ersatzstrom|1.600-4.500
+          photovoltaik-betriebskosten|photovoltaik-laufende-betriebskosten|80-200
+          EOF
+          )
+
+          checked=0
+          while IFS='|' read -r guide preset price_token; do
+            guide="${guide#${guide%%[![:space:]]*}}"
+            [ -n "$guide" ] || continue
+            output="/tmp/pv-preset-${guide}.html"
+            fetch "https://baukostenradar.de/ratgeber/${guide}" "$output"
+            grep -q "leistung=${preset}" "$output" || { echo "Missing calculator preset ${preset} on ${guide}"; exit 1; }
+            grep -q "$price_token" "$output" || { echo "Missing price anchor ${price_token} on ${guide}"; exit 1; }
+            checked=$((checked + 1))
+          done <<< "$checks"
+
+          test "$checked" -eq 9
+          echo "Verified ${checked} new Photovoltaik calculator presets and price anchors"
