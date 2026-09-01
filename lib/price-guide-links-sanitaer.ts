@@ -10,7 +10,7 @@ export const sanitaerItemGuideOverrides: Record<string, SanitaerPriceGuideLink> 
     title: "WC austauschen: Kosten für Stand-WC und Wand-WC",
     cta: "WC-Austausch-Ratgeber öffnen",
   },
-  "sanitaer:stand-wc-inkl-neuem-spuelkasten": {
+  "sanitaer:stand-wc-mit-neuem-aufputzspuelkasten-tauschen": {
     href: "/ratgeber/wc-austauschen-kosten",
     title: "WC austauschen: Kosten für Stand-WC und Wand-WC",
     cta: "WC-Austausch-Ratgeber öffnen",
