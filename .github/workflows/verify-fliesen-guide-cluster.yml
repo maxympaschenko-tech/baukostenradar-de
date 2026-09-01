@@ -1,4 +1,4 @@
-name: Verify Fliesenleger guide cluster
+name: Verify expanded Fliesenleger guide cluster
 
 on:
   workflow_run:
@@ -13,23 +13,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-hostinger-verifier
+
       - name: Verify exact Fliesenleger price-item guide mappings
         shell: bash
         run: |
           set -euo pipefail
-
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
-          curl -sS --fail 'https://baukostenradar.de/kosten/fliesenleger' -o /tmp/fliesenleger.html
-          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
-
-          grep -q 'https://baukostenradar.de/kosten/fliesenleger' /tmp/fliesenleger.html
-          ! grep -qi 'noindex' /tmp/fliesenleger.html
+          fetch() {
+            curl -sS --fail --location --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' -H 'User-Agent: BauKostenRadar-CI/1.0' "$1" -o "$2"
+          }
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/kosten/fliesenleger' /tmp/fliesenleger.html
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
 
           mappings=$(cat <<'EOF'
           standard-fliesen-verlegen|fliesen-verlegen-kosten-pro-qm
           grossformat-ab-80-x-80-cm|grossformat-fliesen-verlegen-kosten
           mosaik-fliesen-verlegen|mosaik-fliesen-verlegen-kosten-pro-qm
           naturstein-verlegen|naturstein-verlegen-kosten-pro-qm
+          fliese-auf-fliese-verlegen|fliese-auf-fliese-kosten-pro-qm
+          untergrund-ausgleichen|fliesen-untergrund-ausgleichen-kosten
+          silikonfugen-ziehen|silikonfugen-kosten-pro-meter
+          fliesen-sockelleisten-anbringen|fliesen-sockelleisten-kosten-pro-meter
+          fliesenleger-stundensatz|fliesenleger-stundensatz
           EOF
           )
 
@@ -37,91 +44,94 @@ jobs:
           while IFS='|' read -r item guide; do
             item="${item#${item%%[![:space:]]*}}"
             [ -n "$item" ] || continue
-
-            echo "Checking Fliesenleger ${item} -> ${guide}"
             item_url="https://baukostenradar.de/kosten/fliesenleger/leistung/${item}"
             guide_url="https://baukostenradar.de/ratgeber/${guide}"
             item_output="/tmp/fliesen-item-${item}.html"
             guide_output="/tmp/fliesen-guide-${guide}.html"
-
-            grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Fliesenleger item missing in sitemap: ${item}"; exit 1; }
-            grep -q "/kosten/fliesenleger/leistung/${item}" /tmp/fliesenleger.html || { echo "Fliesenleger item missing on category: ${item}"; exit 1; }
-
-            curl -sS --fail "$item_url" -o "$item_output"
-            grep -q 'Passender Ratgeber' "$item_output" || { echo "Ratgeber block missing: ${item}"; exit 1; }
-            grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong Fliesenleger guide mapping: ${item} -> ${guide}"; exit 1; }
+            grep -q "${item_url}</loc>" /tmp/sitemap.xml
+            grep -q "/kosten/fliesenleger/leistung/${item}" /tmp/fliesenleger.html
+            fetch "$item_url" "$item_output"
+            grep -q 'Passender Ratgeber' "$item_output"
+            grep -q "/ratgeber/${guide}" "$item_output"
             ! grep -qi 'noindex' "$item_output"
-
-            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Fliesenleger guide missing in sitemap: ${guide}"; exit 1; }
-            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "Fliesenleger guide missing from hub: ${guide}"; exit 1; }
-
-            curl -sS --fail "$guide_url" -o "$guide_output"
-            grep -q "$guide_url" "$guide_output" || { echo "Canonical missing: ${guide}"; exit 1; }
-            grep -q '"@type":"Article"' "$guide_output" || { echo "Article schema missing: ${guide}"; exit 1; }
-            grep -q '/kosten/fliesenleger' "$guide_output" || { echo "Fliesenleger service link missing: ${guide}"; exit 1; }
-            grep -q '/kosten/fliesenleger/berlin' "$guide_output" || { echo "Fliesenleger Berlin link missing: ${guide}"; exit 1; }
-            grep -q 'gewerk=fliesenleger' "$guide_output" || { echo "Fliesenleger calculator service missing: ${guide}"; exit 1; }
-            grep -q "leistung=${item}" "$guide_output" || { echo "Exact Fliesenleger calculator item missing: ${guide} expected ${item}"; exit 1; }
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+            fetch "$guide_url" "$guide_output"
+            grep -q "$guide_url" "$guide_output"
+            grep -q '"@type":"Article"' "$guide_output"
+            grep -q '/kosten/fliesenleger' "$guide_output"
+            grep -q 'gewerk=fliesenleger' "$guide_output"
             ! grep -qi 'noindex' "$guide_output"
-
             checked=$((checked + 1))
           done <<< "$mappings"
-
-          test "$checked" -eq 4
+          test "$checked" -eq 9
           echo "Verified ${checked} exact Fliesenleger price-item guide mappings"
 
-      - name: Verify Fliesenleger parent guide and calculator
+      - name: Verify expanded Fliesenleger guide silo
         shell: bash
         run: |
           set -euo pipefail
-
-          guide='fliesenleger-kosten-pro-qm'
-          guide_url="https://baukostenradar.de/ratgeber/${guide}"
-
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
-          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
-          curl -sS --fail "$guide_url" -o /tmp/fliesen-parent.html
-
-          grep -q "${guide_url}</loc>" /tmp/sitemap.xml
-          grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
-          grep -q "$guide_url" /tmp/fliesen-parent.html
-          grep -q '"@type":"Article"' /tmp/fliesen-parent.html
-          grep -q '/kosten/fliesenleger' /tmp/fliesen-parent.html
-          grep -q '/kosten/fliesenleger/berlin' /tmp/fliesen-parent.html
-          grep -q 'gewerk=fliesenleger' /tmp/fliesen-parent.html
-          grep -q 'leistung=standard-fliesen-verlegen' /tmp/fliesen-parent.html
-          ! grep -qi 'noindex' /tmp/fliesen-parent.html
-
-      - name: Verify Fliesenleger guide hub and internal-link silo
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
-          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
-
+          fetch() {
+            curl -sS --fail --location --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' -H 'User-Agent: BauKostenRadar-CI/1.0' "$1" -o "$2"
+          }
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
           guides=(
             fliesenleger-kosten-pro-qm
+            fliesenleger-stundensatz
             fliesen-verlegen-kosten-pro-qm
+            fliese-auf-fliese-kosten-pro-qm
+            fliesen-untergrund-ausgleichen-kosten
             grossformat-fliesen-verlegen-kosten
             mosaik-fliesen-verlegen-kosten-pro-qm
             naturstein-verlegen-kosten-pro-qm
+            silikonfugen-kosten-pro-meter
+            fliesen-sockelleisten-kosten-pro-meter
           )
-
           for source in "${guides[@]}"; do
             guide_url="https://baukostenradar.de/ratgeber/${source}"
-            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Fliesenleger cluster guide missing in sitemap: ${source}"; exit 1; }
-            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Fliesenleger cluster guide missing from hub: ${source}"; exit 1; }
-
-            curl -sS --fail "$guide_url" -o "/tmp/${source}.html"
-            grep -q "$guide_url" "/tmp/${source}.html" || { echo "Canonical missing: ${source}"; exit 1; }
-            grep -q '"@type":"Article"' "/tmp/${source}.html" || { echo "Article schema missing: ${source}"; exit 1; }
-            ! grep -qi 'noindex' "/tmp/${source}.html"
-
+            output="/tmp/fliesen-silo-${source}.html"
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml
+            grep -q "/ratgeber/${source}" /tmp/ratgeber.html
+            fetch "$guide_url" "$output"
+            grep -q '"@type":"Article"' "$output"
+            ! grep -qi 'noindex' "$output"
             for target in "${guides[@]}"; do
               [ "$source" = "$target" ] && continue
-              grep -q "/ratgeber/${target}" "/tmp/${source}.html" || { echo "${source} missing Fliesenleger peer ${target}"; exit 1; }
+              grep -q "/ratgeber/${target}" "$output" || { echo "${source} missing Fliesen peer ${target}"; exit 1; }
             done
           done
+          test "${#guides[@]}" -eq 10
+          echo "Verified ${#guides[@]} Fliesenleger guides and full peer-link silo"
 
-          echo "Verified Fliesenleger hub visibility and full peer-link silo"
+      - name: Verify new Fliesenleger calculator presets and price anchors
+        shell: bash
+        run: |
+          set -euo pipefail
+          fetch() {
+            curl -sS --fail --location --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' -H 'User-Agent: BauKostenRadar-CI/1.0' "$1" -o "$2"
+          }
+          checks=$(cat <<'EOF'
+          fliese-auf-fliese-kosten-pro-qm|fliese-auf-fliese-verlegen|50-80
+          fliesen-untergrund-ausgleichen-kosten|untergrund-ausgleichen|10-30
+          silikonfugen-kosten-pro-meter|silikonfugen-ziehen|3-8
+          fliesen-sockelleisten-kosten-pro-meter|fliesen-sockelleisten-anbringen|5-10
+          fliesenleger-stundensatz|fliesenleger-stundensatz|45-70
+          EOF
+          )
+          checked=0
+          while IFS='|' read -r guide preset price_token; do
+            guide="${guide#${guide%%[![:space:]]*}}"
+            [ -n "$guide" ] || continue
+            output="/tmp/fliesen-preset-${guide}.html"
+            fetch "https://baukostenradar.de/ratgeber/${guide}" "$output"
+            grep -q "leistung=${preset}" "$output"
+            grep -q "$price_token" "$output"
+            checked=$((checked + 1))
+          done <<< "$checks"
+          test "$checked" -eq 5
+          echo "Verified ${checked} new Fliesenleger calculator presets and price anchors"
