@@ -61,5 +61,14 @@ export const guideGroups: readonly GuideGroup[] = bodenGuideGroups.map((group) =
       slugs,
     };
   }
+  if (group.eyebrow === "Pool & Schwimmbad") {
+    const slugs = group.slugs.includes("pooltechnik-kosten") ? group.slugs : [...group.slugs, "pooltechnik-kosten"];
+    return {
+      ...group,
+      title: "Poolbau, Poolarten, Erdarbeiten, Technik und Betriebskosten kalkulieren",
+      description: "Poolkosten 2026 für GFK- und Betonpool, Erdarbeiten, Filteranlage, Poolpumpe, Verrohrung sowie laufende Betriebskosten vergleichen.",
+      slugs,
+    };
+  }
   return group;
 });

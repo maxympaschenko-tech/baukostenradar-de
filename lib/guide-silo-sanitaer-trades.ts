@@ -39,6 +39,12 @@ const silos: Record<string, GuideSilo> = {
     calculatorLabel: "Carport-Fundament berechnen",
     regionalMode: "service",
   },
+  "pooltechnik-kosten": {
+    serviceSlugs: ["poolbau"],
+    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "poolbau", itemSlug: "filteranlage" }),
+    calculatorLabel: "Pooltechnik berechnen",
+    regionalMode: "service",
+  },
   "sanitaer-anfahrt-kosten": {
     serviceSlugs: ["sanitaer"],
     calculatorHref: handwerkerCalculatorHref({ serviceSlug: "sanitaer", itemSlug: "sanitaer-anfahrt" }),

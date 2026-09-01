@@ -32,6 +32,12 @@ const carportFoundationItems = new Set([
   "carport-punktfundament",
 ]);
 
+const pooltechnikItems = new Set([
+  "filteranlage",
+  "poolpumpe",
+  "verrohrung-skimmer-und-duesen",
+]);
+
 export function getServiceGuideLink(serviceSlug: string): PriceGuideLink {
   return getKitchenServiceGuideLink(serviceSlug);
 }
@@ -63,6 +69,14 @@ export function getPriceGuideLink(options: {
       href: "/ratgeber/carport-fundament-kosten",
       title: `${options.itemName}: Kosten 2026`,
       cta: "Carport-Fundament-Ratgeber öffnen",
+    };
+  }
+
+  if (options.serviceSlug === "poolbau" && pooltechnikItems.has(options.itemSlug)) {
+    return {
+      href: "/ratgeber/pooltechnik-kosten",
+      title: `${options.itemName}: Kosten 2026`,
+      cta: "Pooltechnik-Ratgeber öffnen",
     };
   }
 
