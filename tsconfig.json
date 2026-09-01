@@ -16,11 +16,11 @@
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/lib/pricing": ["./lib/catalog-tueren.ts"],
-      "@/lib/price-guide-links": ["./lib/price-guide-links-maler.ts"],
-      "@/lib/all-guides": ["./lib/all-guides-maler.ts"],
-      "@/lib/guide-groups": ["./lib/guide-groups-maler.ts"],
-      "@/lib/guide-silo": ["./lib/guide-silo-maler.ts"],
-      "@/lib/guide-supplemental-links": ["./lib/guide-supplemental-links-maler.ts"],
+      "@/lib/price-guide-links": ["./lib/price-guide-links-trockenbau.ts"],
+      "@/lib/all-guides": ["./lib/all-guides-trockenbau.ts"],
+      "@/lib/guide-groups": ["./lib/guide-groups-trockenbau.ts"],
+      "@/lib/guide-silo": ["./lib/guide-silo-trockenbau.ts"],
+      "@/lib/guide-supplemental-links": ["./lib/guide-supplemental-links-trockenbau.ts"],
       "@/*": ["./*"]
     }
   },

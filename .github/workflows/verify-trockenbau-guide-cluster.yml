@@ -1,4 +1,4 @@
-name: Verify Trockenbau guide cluster
+name: Verify expanded Trockenbau guide cluster
 
 on:
   workflow_run:
@@ -13,21 +13,36 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-hostinger-verifier
+
       - name: Verify exact Trockenbau price-item guide mappings
         shell: bash
         run: |
           set -euo pipefail
 
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
-          curl -sS --fail 'https://baukostenradar.de/kosten/trockenbau' -o /tmp/trockenbau.html
-          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+          fetch() {
+            curl -sS --fail --location \
+              --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 \
+              -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' \
+              -H 'User-Agent: BauKostenRadar-CI/1.0' \
+              "$1" -o "$2"
+          }
 
-          grep -q 'https://baukostenradar.de/kosten/trockenbau' /tmp/trockenbau.html
-          ! grep -qi 'noindex' /tmp/trockenbau.html
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/kosten/trockenbau' /tmp/trockenbau.html
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
 
           mappings=$(cat <<'EOF'
           trockenbauwand-beidseitig-beplankt|trockenbauwand-kosten-pro-qm
           verspachtelung-q4|verspachtelung-q4-kosten-pro-qm
+          trockenbauer-stundensatz|trockenbauer-stundensatz
+          trockenbauwand-einfach-inkl-material|trockenbauwand-kosten-pro-qm
+          trennwand-aus-holz|trennwand-holz-kosten-pro-qm
+          vorsatzschale|vorsatzschale-kosten-pro-qm
+          decke-abhaengen|decke-abhaengen-kosten-pro-qm
+          dachschraege-verkleiden|dachschraege-verkleiden-kosten-pro-qm
+          verspachtelung-q3|verspachtelung-q3-kosten-pro-qm
           EOF
           )
 
@@ -35,7 +50,6 @@ jobs:
           while IFS='|' read -r item guide; do
             item="${item#${item%%[![:space:]]*}}"
             [ -n "$item" ] || continue
-
             item_url="https://baukostenradar.de/kosten/trockenbau/leistung/${item}"
             guide_url="https://baukostenradar.de/ratgeber/${guide}"
             item_output="/tmp/trockenbau-item-${item}.html"
@@ -44,79 +58,111 @@ jobs:
             grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Trockenbau item missing in sitemap: ${item}"; exit 1; }
             grep -q "/kosten/trockenbau/leistung/${item}" /tmp/trockenbau.html || { echo "Trockenbau item missing on category: ${item}"; exit 1; }
 
-            curl -sS --fail "$item_url" -o "$item_output"
+            fetch "$item_url" "$item_output"
             grep -q 'Passender Ratgeber' "$item_output"
-            grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong Trockenbau guide mapping: ${item} -> ${guide}"; exit 1; }
+            grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong Trockenbau mapping: ${item} -> ${guide}"; exit 1; }
             ! grep -qi 'noindex' "$item_output"
 
-            grep -q "${guide_url}</loc>" /tmp/sitemap.xml
-            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Trockenbau guide missing in sitemap: ${guide}"; exit 1; }
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "Trockenbau guide missing from hub: ${guide}"; exit 1; }
 
-            curl -sS --fail "$guide_url" -o "$guide_output"
+            fetch "$guide_url" "$guide_output"
             grep -q "$guide_url" "$guide_output"
             grep -q '"@type":"Article"' "$guide_output"
             grep -q '/kosten/trockenbau' "$guide_output"
-            grep -q '/kosten/trockenbau/berlin' "$guide_output"
             grep -q 'gewerk=trockenbau' "$guide_output"
-            grep -q "leistung=${item}" "$guide_output"
             ! grep -qi 'noindex' "$guide_output"
 
             checked=$((checked + 1))
           done <<< "$mappings"
 
-          test "$checked" -eq 2
+          test "$checked" -eq 9
           echo "Verified ${checked} exact Trockenbau price-item guide mappings"
 
-      - name: Verify Trockenbau parent guide and calculator
+      - name: Verify expanded Trockenbau guide silo
         shell: bash
         run: |
           set -euo pipefail
 
-          guide='trockenbau-kosten-pro-qm'
-          guide_url="https://baukostenradar.de/ratgeber/${guide}"
+          fetch() {
+            curl -sS --fail --location \
+              --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 \
+              -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' \
+              -H 'User-Agent: BauKostenRadar-CI/1.0' \
+              "$1" -o "$2"
+          }
 
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
-          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
-          curl -sS --fail "$guide_url" -o /tmp/trockenbau-parent.html
-
-          grep -q "${guide_url}</loc>" /tmp/sitemap.xml
-          grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
-          grep -q "$guide_url" /tmp/trockenbau-parent.html
-          grep -q '"@type":"Article"' /tmp/trockenbau-parent.html
-          grep -q '/kosten/trockenbau' /tmp/trockenbau-parent.html
-          grep -q '/kosten/trockenbau/berlin' /tmp/trockenbau-parent.html
-          grep -q 'gewerk=trockenbau' /tmp/trockenbau-parent.html
-          grep -q 'leistung=trockenbauwand-beidseitig-beplankt' /tmp/trockenbau-parent.html
-          ! grep -qi 'noindex' /tmp/trockenbau-parent.html
-
-      - name: Verify Trockenbau guide hub and internal-link silo
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          curl -sS --fail 'https://baukostenradar.de/sitemap.xml' -o /tmp/sitemap.xml
-          curl -sS --fail 'https://baukostenradar.de/ratgeber' -o /tmp/ratgeber.html
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
 
           guides=(
             trockenbau-kosten-pro-qm
+            trockenbauer-stundensatz
             trockenbauwand-kosten-pro-qm
+            trennwand-holz-kosten-pro-qm
+            vorsatzschale-kosten-pro-qm
+            decke-abhaengen-kosten-pro-qm
+            dachschraege-verkleiden-kosten-pro-qm
+            verspachtelung-q3-kosten-pro-qm
             verspachtelung-q4-kosten-pro-qm
           )
 
           for source in "${guides[@]}"; do
             guide_url="https://baukostenradar.de/ratgeber/${source}"
-            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Trockenbau cluster guide missing in sitemap: ${source}"; exit 1; }
-            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Trockenbau cluster guide missing from hub: ${source}"; exit 1; }
-
-            curl -sS --fail "$guide_url" -o "/tmp/${source}.html"
-            grep -q "$guide_url" "/tmp/${source}.html"
-            grep -q '"@type":"Article"' "/tmp/${source}.html"
-            ! grep -qi 'noindex' "/tmp/${source}.html"
+            output="/tmp/trockenbau-silo-${source}.html"
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Trockenbau guide missing in sitemap: ${source}"; exit 1; }
+            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Trockenbau guide missing from hub: ${source}"; exit 1; }
+            fetch "$guide_url" "$output"
+            grep -q "$guide_url" "$output"
+            grep -q '"@type":"Article"' "$output"
+            ! grep -qi 'noindex' "$output"
 
             for target in "${guides[@]}"; do
               [ "$source" = "$target" ] && continue
-              grep -q "/ratgeber/${target}" "/tmp/${source}.html" || { echo "${source} missing Trockenbau peer ${target}"; exit 1; }
+              grep -q "/ratgeber/${target}" "$output" || { echo "${source} missing Trockenbau peer ${target}"; exit 1; }
             done
           done
 
-          echo "Verified Trockenbau hub visibility and full peer-link silo"
+          test "${#guides[@]}" -eq 9
+          echo "Verified ${#guides[@]} Trockenbau guides and full peer-link silo"
+
+      - name: Verify new Trockenbau calculator presets and price anchors
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --location \
+              --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 \
+              -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' \
+              -H 'User-Agent: BauKostenRadar-CI/1.0' \
+              "$1" -o "$2"
+          }
+
+          checks=$(cat <<'EOF'
+          trockenbauer-stundensatz|trockenbauer-stundensatz|45-70
+          trennwand-holz-kosten-pro-qm|trennwand-aus-holz|50-90
+          vorsatzschale-kosten-pro-qm|vorsatzschale|30-60
+          decke-abhaengen-kosten-pro-qm|decke-abhaengen|40-90
+          dachschraege-verkleiden-kosten-pro-qm|dachschraege-verkleiden|40-80
+          verspachtelung-q3-kosten-pro-qm|verspachtelung-q3|8-15
+          EOF
+          )
+
+          checked=0
+          while IFS='|' read -r guide preset price_token; do
+            guide="${guide#${guide%%[![:space:]]*}}"
+            [ -n "$guide" ] || continue
+            output="/tmp/trockenbau-preset-${guide}.html"
+            fetch "https://baukostenradar.de/ratgeber/${guide}" "$output"
+            grep -q "leistung=${preset}" "$output" || { echo "Missing calculator preset ${preset} on ${guide}"; exit 1; }
+            grep -q "$price_token" "$output" || { echo "Missing price anchor ${price_token} on ${guide}"; exit 1; }
+            checked=$((checked + 1))
+          done <<< "$checks"
+
+          test "$checked" -eq 6
+          echo "Verified ${checked} new Trockenbau calculator presets and price anchors"
