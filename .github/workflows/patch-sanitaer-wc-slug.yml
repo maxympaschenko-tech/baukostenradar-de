@@ -25,7 +25,6 @@ jobs:
           files=(
             lib/guides-sanitaer.ts
             lib/price-guide-links-sanitaer.ts
-            .github/workflows/verify-sanitaer-guide-cluster.yml
           )
 
           for file in "${files[@]}"; do
