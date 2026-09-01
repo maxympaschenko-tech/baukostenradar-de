@@ -16,11 +16,11 @@
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/lib/pricing": ["./lib/catalog-tueren.ts"],
-      "@/lib/price-guide-links": ["./lib/price-guide-links-photovoltaik.ts"],
-      "@/lib/all-guides": ["./lib/all-guides-photovoltaik.ts"],
-      "@/lib/guide-groups": ["./lib/guide-groups-photovoltaik.ts"],
-      "@/lib/guide-silo": ["./lib/guide-silo-photovoltaik.ts"],
-      "@/lib/guide-supplemental-links": ["./lib/guide-supplemental-links-photovoltaik.ts"],
+      "@/lib/price-guide-links": ["./lib/price-guide-links-garten.ts"],
+      "@/lib/all-guides": ["./lib/all-guides-garten.ts"],
+      "@/lib/guide-groups": ["./lib/guide-groups-garten.ts"],
+      "@/lib/guide-silo": ["./lib/guide-silo-garten.ts"],
+      "@/lib/guide-supplemental-links": ["./lib/guide-supplemental-links-garten.ts"],
       "@/*": ["./*"]
     }
   },

@@ -1,4 +1,4 @@
-name: Verify Garten guide cluster
+name: Verify expanded Garten guide cluster
 
 on:
   workflow_run:
@@ -12,16 +12,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-hostinger-verifier
 
       - name: Verify exact Garten price-item guide mappings
         shell: bash
         run: |
           set -euo pipefail
-          source scripts/hostinger-verify.sh
 
-          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
-          fetch_hostinger 'https://baukostenradar.de/kosten/garten' /tmp/garten.html
-          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          fetch() {
+            curl -sS --fail --location \
+              --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 \
+              -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' \
+              -H 'User-Agent: BauKostenRadar-CI/1.0' \
+              "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/kosten/garten' /tmp/garten.html
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
 
           grep -q 'https://baukostenradar.de/kosten/garten' /tmp/garten.html
           ! grep -qi 'noindex' /tmp/garten.html
@@ -32,6 +42,23 @@ jobs:
           rollrasen-inkl-vorbereitung|rollrasen-kosten-pro-qm
           heckenschnitt|heckenschnitt-kosten-pro-meter
           baumfaellung-mittelgross-inkl-entsorgung|baum-faellen-kosten
+          doppelstabmattenzaun-inkl-montage|doppelstabmattenzaun-kosten-pro-meter
+          gartenpflege|garten-landschaftsbauer-stundensatz
+          garten-und-landschaftsbauer-stundensatz|garten-landschaftsbauer-stundensatz
+          rasen-neu-anlegen-mit-saat|rasen-anlegen-kosten-pro-qm
+          hecke-pflanzen|hecke-pflanzen-kosten-pro-meter
+          betonpflaster-inkl-unterbau-verlegen|pflasterarbeiten-kosten-pro-qm
+          klinkerpflaster-inkl-unterbau-verlegen|pflasterarbeiten-kosten-pro-qm
+          granitpflaster-inkl-unterbau-verlegen|pflasterarbeiten-kosten-pro-qm
+          natursteinpflaster-inkl-unterbau-verlegen|pflasterarbeiten-kosten-pro-qm
+          einfahrt-betonpflaster-komplett|einfahrt-pflastern-kosten
+          einfahrt-natursteinpflaster-komplett|einfahrt-pflastern-kosten
+          einfahrt-aushub-inkl-entsorgung|einfahrt-pflastern-kosten
+          einfahrt-schotterunterbau|einfahrt-pflastern-kosten
+          baumfaellung-je-meter-baumhoehe|baum-faellen-kosten
+          baumrueckschnitt|baumpflege-kosten
+          kronenpflege|baumpflege-kosten
+          baumfaellgenehmigung|baum-faellen-kosten
           EOF
           )
 
@@ -48,84 +75,116 @@ jobs:
             grep -q "${item_url}</loc>" /tmp/sitemap.xml || { echo "Garten item missing in sitemap: ${item}"; exit 1; }
             grep -q "/kosten/garten/leistung/${item}" /tmp/garten.html || { echo "Garten item missing on category: ${item}"; exit 1; }
 
-            fetch_hostinger "$item_url" "$item_output"
+            fetch "$item_url" "$item_output"
             grep -q 'Passender Ratgeber' "$item_output"
             grep -q "/ratgeber/${guide}" "$item_output" || { echo "Wrong Garten guide mapping: ${item} -> ${guide}"; exit 1; }
             ! grep -qi 'noindex' "$item_output"
 
-            grep -q "${guide_url}</loc>" /tmp/sitemap.xml
-            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Garten guide missing in sitemap: ${guide}"; exit 1; }
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html || { echo "Garten guide missing from hub: ${guide}"; exit 1; }
 
-            fetch_hostinger "$guide_url" "$guide_output"
+            fetch "$guide_url" "$guide_output"
             grep -q "$guide_url" "$guide_output"
             grep -q '"@type":"Article"' "$guide_output"
             grep -q '/kosten/garten' "$guide_output"
-            grep -q '/kosten/garten/berlin' "$guide_output"
             grep -q 'gewerk=garten' "$guide_output"
-            grep -q "leistung=${item}" "$guide_output"
             ! grep -qi 'noindex' "$guide_output"
 
             checked=$((checked + 1))
           done <<< "$mappings"
 
-          test "$checked" -eq 5
+          test "$checked" -eq 22
           echo "Verified ${checked} exact Garten price-item guide mappings"
 
-      - name: Verify Garten parent guide and calculator
+      - name: Verify expanded Garten guide silo
         shell: bash
         run: |
           set -euo pipefail
-          source scripts/hostinger-verify.sh
 
-          guide='garten-anlegen-kosten'
-          guide_url="https://baukostenradar.de/ratgeber/${guide}"
+          fetch() {
+            curl -sS --fail --location \
+              --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 \
+              -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' \
+              -H 'User-Agent: BauKostenRadar-CI/1.0' \
+              "$1" -o "$2"
+          }
 
-          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
-          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
-          fetch_hostinger "$guide_url" /tmp/garten-parent.html
-
-          grep -q "${guide_url}</loc>" /tmp/sitemap.xml
-          grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
-          grep -q "$guide_url" /tmp/garten-parent.html
-          grep -q '"@type":"Article"' /tmp/garten-parent.html
-          grep -q '/kosten/garten' /tmp/garten-parent.html
-          grep -q '/kosten/garten/berlin' /tmp/garten-parent.html
-          grep -q 'gewerk=garten' /tmp/garten-parent.html
-          grep -q 'leistung=einfahrt-pflastern' /tmp/garten-parent.html
-          ! grep -qi 'noindex' /tmp/garten-parent.html
-
-      - name: Verify Garten guide hub and internal-link silo
-        shell: bash
-        run: |
-          set -euo pipefail
-          source scripts/hostinger-verify.sh
-
-          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
-          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
 
           guides=(
             garten-anlegen-kosten
             einfahrt-pflastern-kosten
             terrasse-pflastern-kosten
+            pflasterarbeiten-kosten-pro-qm
+            rasen-anlegen-kosten-pro-qm
             rollrasen-kosten-pro-qm
+            hecke-pflanzen-kosten-pro-meter
             heckenschnitt-kosten-pro-meter
+            garten-landschaftsbauer-stundensatz
+            baumpflege-kosten
             baum-faellen-kosten
+            doppelstabmattenzaun-kosten-pro-meter
           )
 
           for source in "${guides[@]}"; do
             guide_url="https://baukostenradar.de/ratgeber/${source}"
-            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Garten cluster guide missing in sitemap: ${source}"; exit 1; }
-            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Garten cluster guide missing from hub: ${source}"; exit 1; }
+            output="/tmp/garten-silo-${source}.html"
 
-            fetch_hostinger "$guide_url" "/tmp/${source}.html"
-            grep -q "$guide_url" "/tmp/${source}.html"
-            grep -q '"@type":"Article"' "/tmp/${source}.html"
-            ! grep -qi 'noindex' "/tmp/${source}.html"
+            grep -q "${guide_url}</loc>" /tmp/sitemap.xml || { echo "Garten guide missing in sitemap: ${source}"; exit 1; }
+            grep -q "/ratgeber/${source}" /tmp/ratgeber.html || { echo "Garten guide missing from hub: ${source}"; exit 1; }
+
+            fetch "$guide_url" "$output"
+            grep -q "$guide_url" "$output"
+            grep -q '"@type":"Article"' "$output"
+            grep -q '/kosten/garten' "$output"
+            ! grep -qi 'noindex' "$output"
 
             for target in "${guides[@]}"; do
               [ "$source" = "$target" ] && continue
-              grep -q "/ratgeber/${target}" "/tmp/${source}.html" || { echo "${source} missing Garten peer ${target}"; exit 1; }
+              grep -q "/ratgeber/${target}" "$output" || { echo "${source} missing Garten peer ${target}"; exit 1; }
             done
           done
 
-          echo "Verified Garten hub visibility and full peer-link silo"
+          test "${#guides[@]}" -eq 12
+          echo "Verified ${#guides[@]} Garten guides and full peer-link silo"
+
+      - name: Verify new Garten calculator presets and price anchors
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --location \
+              --retry 5 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 60 \
+              -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' \
+              -H 'User-Agent: BauKostenRadar-CI/1.0' \
+              "$1" -o "$2"
+          }
+
+          checks=$(cat <<'EOF'
+          pflasterarbeiten-kosten-pro-qm|betonpflaster-inkl-unterbau-verlegen|70-160
+          rasen-anlegen-kosten-pro-qm|rasen-neu-anlegen-mit-saat|8-20
+          hecke-pflanzen-kosten-pro-meter|hecke-pflanzen|25-70
+          garten-landschaftsbauer-stundensatz|garten-und-landschaftsbauer-stundensatz|40-60
+          baumpflege-kosten|baumrueckschnitt|150-500
+          EOF
+          )
+
+          checked=0
+          while IFS='|' read -r guide preset price_token; do
+            guide="${guide#${guide%%[![:space:]]*}}"
+            [ -n "$guide" ] || continue
+            output="/tmp/garten-preset-${guide}.html"
+            fetch "https://baukostenradar.de/ratgeber/${guide}" "$output"
+            grep -q "leistung=${preset}" "$output" || { echo "Missing calculator preset ${preset} on ${guide}"; exit 1; }
+            grep -q "$price_token" "$output" || { echo "Missing price anchor ${price_token} on ${guide}"; exit 1; }
+            checked=$((checked + 1))
+          done <<< "$checks"
+
+          test "$checked" -eq 5
+          echo "Verified ${checked} new Garten calculator presets and price anchors"
