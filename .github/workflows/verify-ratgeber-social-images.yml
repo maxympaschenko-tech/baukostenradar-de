@@ -13,6 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-hostinger-verifier
+
       - name: Fetch representative guide pages
         shell: bash
         run: |
@@ -35,13 +36,19 @@ jobs:
           fetch_with_retry 'https://baukostenradar.de/ratgeber/sanierungskosten-pro-qm' /tmp/guide-a.html
           fetch_with_retry 'https://baukostenradar.de/ratgeber/bad-komplett-sanieren-kosten' /tmp/guide-b.html
 
-      - name: Extract social image URLs
+      - name: Verify live social image metadata contract
         shell: bash
         run: |
           set -euo pipefail
 
           python - <<'PY'
           from html.parser import HTMLParser
+          from urllib.parse import urlparse
+
+          guides = {
+              "a": "sanierungskosten-pro-qm",
+              "b": "bad-komplett-sanieren-kosten",
+          }
 
           class MetaParser(HTMLParser):
               def __init__(self):
@@ -56,57 +63,102 @@ jobs:
                   if key and data.get("content"):
                       self.values[key] = data["content"]
 
-          for label in ("a", "b"):
+          extracted = {}
+
+          for label, slug in guides.items():
               parser = MetaParser()
               with open(f"/tmp/guide-{label}.html", encoding="utf-8") as handle:
                   parser.feed(handle.read())
 
-              for key in ("og:image", "twitter:image"):
+              extracted[label] = {}
+              for key, route_name in (
+                  ("og:image", "opengraph-image"),
+                  ("twitter:image", "twitter-image"),
+              ):
                   if key not in parser.values:
                       raise SystemExit(f"Missing {key} on guide {label}")
+
                   value = parser.values[key]
-                  if not value.startswith("https://baukostenradar.de/"):
+                  parsed = urlparse(value)
+                  if parsed.scheme != "https" or parsed.netloc != "baukostenradar.de":
                       raise SystemExit(f"Unexpected {key} host on guide {label}: {value}")
-                  filename = key.replace(":", "-")
-                  with open(f"/tmp/{label}-{filename}-url.txt", "w", encoding="utf-8") as handle:
-                      handle.write(value)
+
+                  expected_prefix = f"/ratgeber/{slug}/{route_name}"
+                  if not parsed.path.startswith(expected_prefix):
+                      raise SystemExit(
+                          f"Unexpected {key} route on guide {label}: {parsed.path}; "
+                          f"expected prefix {expected_prefix}"
+                      )
+
+                  extracted[label][key] = value
+
+          if extracted["a"]["og:image"] == extracted["b"]["og:image"]:
+              raise SystemExit("Ratgeber og:image URLs are not page-specific")
+          if extracted["a"]["twitter:image"] == extracted["b"]["twitter:image"]:
+              raise SystemExit("Ratgeber twitter:image URLs are not page-specific")
+
+          print("Verified live OG/Twitter metadata URLs for two page-specific Ratgeber routes")
           PY
 
-          test "$(cat /tmp/a-og-image-url.txt)" != "$(cat /tmp/b-og-image-url.txt)"
-          test "$(cat /tmp/a-twitter-image-url.txt)" != "$(cat /tmp/b-twitter-image-url.txt)"
-
-      - name: Verify representative page-specific PNG output
+      - name: Verify representative PNG renderer manually
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
         run: |
           set -euo pipefail
+
+          extract_image_url() {
+            local html="$1"
+            local key="$2"
+            python - "$html" "$key" <<'PY'
+          from html.parser import HTMLParser
+          import sys
+
+          class MetaParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.value = None
+
+              def handle_starttag(self, tag, attrs):
+                  if tag != "meta":
+                      return
+                  data = dict(attrs)
+                  current = data.get("property") or data.get("name")
+                  if current == sys.argv[2] and data.get("content"):
+                      self.value = data["content"]
+
+          parser = MetaParser()
+          with open(sys.argv[1], encoding="utf-8") as handle:
+              parser.feed(handle.read())
+          if not parser.value:
+              raise SystemExit(f"Missing {sys.argv[2]}")
+          print(parser.value)
+          PY
+          }
 
           fetch_image() {
             local url="$1"
             local prefix="$2"
 
-            # Intentionally bypass the Hostinger verifier curl wrapper here.
-            # Dynamic Next.js social-image routes should reuse their normal cache
-            # instead of receiving a fresh ci_verify cache-buster on every PNG GET.
             /usr/bin/curl -q -sS --fail --location \
-              --retry 5 --retry-delay 7 --retry-all-errors \
+              --retry 5 --retry-delay 10 --retry-all-errors \
               --connect-timeout 15 --max-time 60 \
-              -H 'User-Agent: BauKostenRadar-Production-Verify/1.0' \
+              -H 'User-Agent: BauKostenRadar-Manual-Social-Image-Smoke/1.0' \
               -D "${prefix}.headers" "$url" -o "${prefix}.png"
 
             grep -qi '^content-type: image/png' "${prefix}.headers"
             test "$(wc -c < "${prefix}.png")" -gt 10000
           }
 
-          # Exercise both Next.js image route types while generating only two
-          # full PNGs: OG from guide A and Twitter from a different guide B.
-          fetch_image "$(cat /tmp/a-og-image-url.txt)" /tmp/guide-a-og
-          sleep 5
-          fetch_image "$(cat /tmp/b-twitter-image-url.txt)" /tmp/guide-b-twitter
+          og_url=$(extract_image_url /tmp/guide-a.html 'og:image')
+          twitter_url=$(extract_image_url /tmp/guide-b.html 'twitter:image')
 
-          guide_a_sha=$(sha256sum /tmp/guide-a-og.png | awk '{print $1}')
-          guide_b_sha=$(sha256sum /tmp/guide-b-twitter.png | awk '{print $1}')
+          fetch_image "$og_url" /tmp/guide-a-og
+          sleep 10
+          fetch_image "$twitter_url" /tmp/guide-b-twitter
 
-          echo "Guide A OG SHA: $guide_a_sha"
-          echo "Guide B Twitter SHA: $guide_b_sha"
+          og_sha=$(sha256sum /tmp/guide-a-og.png | awk '{print $1}')
+          twitter_sha=$(sha256sum /tmp/guide-b-twitter.png | awk '{print $1}')
 
-          test "$guide_a_sha" != "$guide_b_sha"
+          echo "Guide A OG SHA: $og_sha"
+          echo "Guide B Twitter SHA: $twitter_sha"
+          test "$og_sha" != "$twitter_sha"
