@@ -13,7 +13,7 @@ const daemmungPeers: Peer[] = [
   { slug: "innendaemmung-kosten-pro-qm", label: "Innendämmung Kosten", href: "/ratgeber/innendaemmung-kosten-pro-qm" },
   { slug: "zwischensparrendaemmung-kosten-pro-qm", label: "Zwischensparrendämmung Kosten", href: "/ratgeber/zwischensparrendaemmung-kosten-pro-qm" },
   { slug: "aufsparrendaemmung-kosten-pro-qm", label: "Aufsparrendämmung Kosten", href: "/ratgeber/aufsparrendaemmung-kosten-pro-qm" },
-  { slug: "kellerdeckendaemmung-kosten-pro-qm", label: "Kellerdeckendämmung Kosten", href: "/ratgeber/kellerdeckendaemmung-kosten-pro-qm" },
+  { slug: "daemmung-kellerdecke-kosten-pro-qm", label: "Kellerdecke dämmen Kosten", href: "/ratgeber/daemmung-kellerdecke-kosten-pro-qm" },
 ];
 
 function addPeers(base: GuideSupplementalLink[], slug: string, peers: Peer[]) {

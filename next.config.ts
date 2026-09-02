@@ -117,6 +117,11 @@ const nextConfig: NextConfig = {
         destination: "/ratgeber/estrich-100-qm-kosten",
         permanent: true,
       },
+      {
+        source: "/ratgeber/kellerdeckendaemmung-kosten-pro-qm",
+        destination: "/ratgeber/daemmung-kellerdecke-kosten-pro-qm",
+        permanent: true,
+      },
     ];
   },
 };

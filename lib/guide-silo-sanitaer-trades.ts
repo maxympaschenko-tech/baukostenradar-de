@@ -45,7 +45,7 @@ const silos: Record<string, GuideSilo> = {
     calculatorLabel: "Pooltechnik berechnen",
     regionalMode: "service",
   },
-  "kellerdeckendaemmung-kosten-pro-qm": {
+  "daemmung-kellerdecke-kosten-pro-qm": {
     serviceSlugs: ["daemmung"],
     calculatorHref: handwerkerCalculatorHref({ serviceSlug: "daemmung", itemSlug: "kellerdeckendaemmung-inkl-montage" }),
     calculatorLabel: "Kellerdeckendämmung berechnen",

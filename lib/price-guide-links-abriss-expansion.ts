@@ -89,9 +89,9 @@ export function getPriceGuideLink(options: {
 
   if (options.serviceSlug === "daemmung" && kellerdeckendaemmungItems.has(options.itemSlug)) {
     return {
-      href: "/ratgeber/kellerdeckendaemmung-kosten-pro-qm",
+      href: "/ratgeber/daemmung-kellerdecke-kosten-pro-qm",
       title: `${options.itemName}: Kosten 2026`,
-      cta: "Kellerdeckendämmungs-Ratgeber öffnen",
+      cta: "Kellerdecken-Ratgeber öffnen",
     };
   }
 

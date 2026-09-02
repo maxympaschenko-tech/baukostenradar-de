@@ -71,7 +71,7 @@ export const guideGroups: readonly GuideGroup[] = bodenGuideGroups.map((group) =
     };
   }
   if (group.eyebrow === "Dämmung & Gebäudehülle") {
-    const slugs = group.slugs.includes("kellerdeckendaemmung-kosten-pro-qm") ? group.slugs : [...group.slugs, "kellerdeckendaemmung-kosten-pro-qm"];
+    const slugs = group.slugs.includes("daemmung-kellerdecke-kosten-pro-qm") ? group.slugs : [...group.slugs, "daemmung-kellerdecke-kosten-pro-qm"];
     return {
       ...group,
       title: "Dämmkosten für Fassade, Dach und Kellerdecke kalkulieren",

@@ -1,19 +1,19 @@
 import type { Guide } from "./guides";
 
 export const kellerdeckendaemmungGuide: Guide = {
-  slug: "kellerdeckendaemmung-kosten-pro-qm",
-  title: "Kellerdeckendämmung Kosten pro m² 2026",
-  h1: "Kellerdeckendämmung: Kosten pro m² 2026 nach Verfahren",
-  description: "Kellerdeckendämmung Kosten 2026: Standard inkl. Montage etwa 40-100 €/m², Einblasdämmung 15-30 €/m², Sprühdämmung 20-50 €/m² und Aufbau von oben 50-150 €/m².",
+  slug: "daemmung-kellerdecke-kosten-pro-qm",
+  title: "Kellerdecke dämmen Kosten pro m² 2026",
+  h1: "Kellerdecke dämmen: Kosten 2026 pro m² nach Verfahren",
+  description: "Kellerdecke dämmen Kosten 2026: Standard inkl. Montage etwa 40-100 €/m², Einblasdämmung 15-30 €/m², Sprühdämmung 20-50 €/m² und Dämmung von oben 50-150 €/m².",
   eyebrow: "Kellerdeckendämmung 2026",
-  intro: "Die Kellerdeckendämmung reduziert Wärmeverluste zwischen unbeheiztem Keller und Erdgeschoss. Je nach Deckenaufbau kann die Dämmung klassisch von unten montiert, eingeblasen, aufgesprüht oder bei einer Sanierung von oben mit neuem Bodenaufbau hergestellt werden. Deshalb unterscheiden sich die Kosten je Quadratmeter deutlich.",
+  intro: "Eine gedämmte Kellerdecke reduziert Wärmeverluste zwischen unbeheiztem Keller und Erdgeschoss. Je nach Deckenaufbau kann die Dämmung klassisch von unten montiert, eingeblasen, aufgesprüht oder bei einer Sanierung von oben mit neuem Bodenaufbau hergestellt werden. Deshalb unterscheiden sich die Kosten je Quadratmeter deutlich.",
   keyFact: "Standard inklusive Montage etwa 40-100 €/m²; Einblasdämmung 15-30 €/m²; Sprühdämmung 20-50 €/m²; Dämmung von oben mit Bodenbelag 50-150 €/m².",
   sections: [
     {
       heading: "Was kostet eine Kellerdeckendämmung 2026?",
       paragraphs: [
         "Für eine klassische Kellerdeckendämmung inklusive Montage liegt die aktuelle BauKostenRadar-Orientierung bei etwa 40 bis 100 Euro pro Quadratmeter. Dämmstoff, Befestigung und vorhandene Leitungen beeinflussen den konkreten Aufwand.",
-        "co2online nennt für geeignete Hohlraumkonstruktionen eine Einblasdämmung von etwa 15 bis 30 Euro pro Quadratmeter und für Sprühdämmung etwa 20 bis 50 Euro pro Quadratmeter. Eine Dämmung von oben mit neuem Bodenbelag ist mit etwa 50 bis 150 Euro pro Quadratmeter deutlich aufwendiger.",
+        "Die hinterlegte co2online-Quelle nennt für geeignete Hohlraumkonstruktionen eine Einblasdämmung von etwa 15 bis 30 Euro pro Quadratmeter und für Sprühdämmung etwa 20 bis 50 Euro pro Quadratmeter. Eine Dämmung von oben mit Bodenbelag liegt als aufwendigere Variante bei etwa 50 bis 150 Euro pro Quadratmeter.",
       ],
       table: {
         headers: ["Verfahren", "Richtwert 2026"],
@@ -46,7 +46,7 @@ export const kellerdeckendaemmungGuide: Guide = {
     },
   ],
   faqs: [
-    { question: "Was kostet Kellerdeckendämmung pro m²?", answer: "Für eine klassische Kellerdeckendämmung inklusive Montage liegt die aktuelle Orientierung bei etwa 40 bis 100 Euro pro Quadratmeter." },
+    { question: "Was kostet Kellerdecke dämmen pro m² 2026?", answer: "Für eine klassische Kellerdeckendämmung inklusive Montage liegt die aktuelle Orientierung bei etwa 40 bis 100 Euro pro Quadratmeter." },
     { question: "Was kostet eine Einblasdämmung der Kellerdecke?", answer: "Bei einer geeigneten Hohlraumkonstruktion liegt die Orientierung bei etwa 15 bis 30 Euro pro Quadratmeter." },
     { question: "Was kostet Sprühdämmung an der Kellerdecke?", answer: "Für Sprühdämmung liegt die aktuelle Orientierung bei etwa 20 bis 50 Euro pro Quadratmeter." },
     { question: "Was kostet Kellerdeckendämmung von oben?", answer: "Mit Bodenaufbau beziehungsweise Bodenbelag liegt die Orientierung bei etwa 50 bis 150 Euro pro Quadratmeter." },

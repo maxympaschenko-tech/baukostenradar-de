@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-hostinger-verifier
 
-      - name: Verify Kellerdeckendämmung mappings and runtime contracts
+      - name: Verify canonical Kellerdeckendämmung mappings and redirect
         shell: bash
         run: |
           set -euo pipefail
@@ -23,8 +23,10 @@ jobs:
             curl -sS --fail --location "$1" -o "$2"
           }
 
-          guide='kellerdeckendaemmung-kosten-pro-qm'
+          guide='daemmung-kellerdecke-kosten-pro-qm'
+          duplicate='kellerdeckendaemmung-kosten-pro-qm'
           guide_url="https://baukostenradar.de/ratgeber/${guide}"
+          duplicate_url="https://baukostenradar.de/ratgeber/${duplicate}"
           items=(
             kellerdeckendaemmung-inkl-montage
             kellerdeckendaemmung-von-oben-mit-bodenbelag
@@ -38,7 +40,9 @@ jobs:
           fetch "$guide_url" /tmp/guide.html
 
           grep -q "${guide_url}</loc>" /tmp/sitemap.xml
+          ! grep -q "https://baukostenradar.de/ratgeber/${duplicate}</loc>" /tmp/sitemap.xml
           grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+          ! grep -q "/ratgeber/${duplicate}" /tmp/ratgeber.html
           grep -q "$guide_url" /tmp/guide.html
           grep -q '"@type":"Article"' /tmp/guide.html
           grep -q '/kosten/daemmung' /tmp/guide.html
@@ -50,6 +54,17 @@ jobs:
           grep -q '20-50' /tmp/guide.html
           grep -q '50-150' /tmp/guide.html
           ! grep -qi 'noindex' /tmp/guide.html
+
+          redirect_status=$(curl -sS -o /dev/null -w '%{http_code}' "$duplicate_url")
+          case "$redirect_status" in
+            301|308) ;;
+            *) echo "Duplicate guide did not permanently redirect: HTTP ${redirect_status}"; exit 1 ;;
+          esac
+          redirect_location=$(curl -sSI "$duplicate_url" | tr -d '\r' | awk 'tolower($1) == "location:" { print $2; exit }')
+          case "$redirect_location" in
+            '/ratgeber/daemmung-kellerdecke-kosten-pro-qm'|'https://baukostenradar.de/ratgeber/daemmung-kellerdecke-kosten-pro-qm') ;;
+            *) echo "Unexpected duplicate redirect location: ${redirect_location}"; exit 1 ;;
+          esac
 
           checked=0
           for item in "${items[@]}"; do
@@ -65,7 +80,7 @@ jobs:
           done
 
           test "$checked" -eq 4
-          echo "Verified ${checked} Kellerdeckendämmung price-item mappings"
+          echo "Verified canonical Kellerdeckendämmung guide, redirect and ${checked} price-item mappings"
 
       - name: Verify six-guide Dämmung peer silo
         shell: bash
@@ -78,7 +93,7 @@ jobs:
             innendaemmung-kosten-pro-qm
             zwischensparrendaemmung-kosten-pro-qm
             aufsparrendaemmung-kosten-pro-qm
-            kellerdeckendaemmung-kosten-pro-qm
+            daemmung-kellerdecke-kosten-pro-qm
           )
 
           for source in "${guides[@]}"; do
