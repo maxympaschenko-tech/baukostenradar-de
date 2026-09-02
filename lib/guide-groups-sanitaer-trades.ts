@@ -70,5 +70,14 @@ export const guideGroups: readonly GuideGroup[] = bodenGuideGroups.map((group) =
       slugs,
     };
   }
+  if (group.eyebrow === "Dämmung & Gebäudehülle") {
+    const slugs = group.slugs.includes("kellerdeckendaemmung-kosten-pro-qm") ? group.slugs : [...group.slugs, "kellerdeckendaemmung-kosten-pro-qm"];
+    return {
+      ...group,
+      title: "Dämmkosten für Fassade, Dach und Kellerdecke kalkulieren",
+      description: "Dämmkosten 2026 für WDVS, Innendämmung, Zwischen- und Aufsparrendämmung sowie Kellerdeckendämmung nach Verfahren mit aktuellen Richtwerten vergleichen.",
+      slugs,
+    };
+  }
   return group;
 });

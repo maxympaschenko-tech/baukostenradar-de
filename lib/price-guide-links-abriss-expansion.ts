@@ -38,6 +38,13 @@ const pooltechnikItems = new Set([
   "verrohrung-skimmer-und-duesen",
 ]);
 
+const kellerdeckendaemmungItems = new Set([
+  "kellerdeckendaemmung-inkl-montage",
+  "kellerdeckendaemmung-von-oben-mit-bodenbelag",
+  "kellerdecke-per-einblasdaemmung",
+  "kellerdecke-per-spruehdaemmung",
+]);
+
 export function getServiceGuideLink(serviceSlug: string): PriceGuideLink {
   return getKitchenServiceGuideLink(serviceSlug);
 }
@@ -77,6 +84,14 @@ export function getPriceGuideLink(options: {
       href: "/ratgeber/pooltechnik-kosten",
       title: `${options.itemName}: Kosten 2026`,
       cta: "Pooltechnik-Ratgeber öffnen",
+    };
+  }
+
+  if (options.serviceSlug === "daemmung" && kellerdeckendaemmungItems.has(options.itemSlug)) {
+    return {
+      href: "/ratgeber/kellerdeckendaemmung-kosten-pro-qm",
+      title: `${options.itemName}: Kosten 2026`,
+      cta: "Kellerdeckendämmungs-Ratgeber öffnen",
     };
   }
 

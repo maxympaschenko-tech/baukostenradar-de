@@ -20,7 +20,7 @@
       "@/lib/all-guides": ["./lib/all-guides-sanitaer-trades.ts"],
       "@/lib/guide-groups": ["./lib/guide-groups-sanitaer-trades.ts"],
       "@/lib/guide-silo": ["./lib/guide-silo-sanitaer-trades.ts"],
-      "@/lib/guide-supplemental-links": ["./lib/guide-supplemental-links-pooltechnik-expansion.ts"],
+      "@/lib/guide-supplemental-links": ["./lib/guide-supplemental-links-daemmung-expansion.ts"],
       "@/*": ["./*"]
     }
   },
