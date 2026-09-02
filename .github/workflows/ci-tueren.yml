@@ -151,7 +151,7 @@ jobs:
             'zarge-eingangstuer-montieren|tuerzarge-einbauen-kosten'
             'zimmertuer-standardmass-reine-montage|innentueren-kosten'
             'zimmertuer-inklusive-tuerelement-und-einbau|innentueren-kosten'
-            'tuerblatt-tauschen-montage|innentueren-kosten'
+            'tuerblatt-tauschen-montage|tuerblatt-tauschen-kosten'
             'tuerblatt-standardausfuehrung|innentueren-kosten'
             'cpl-tuerblatt|innentueren-kosten'
             'echtholzfurnier-tuerblatt|innentueren-kosten'

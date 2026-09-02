@@ -127,8 +127,8 @@ jobs:
           check_item carport 'einzelcarport-komplett-mit-aufbau' 'carport-kosten'
           check_item carport 'doppelcarport-komplett-mit-aufbau' 'carport-kosten'
           check_item carport 'carport-integrierter-geraeteraum-aufpreis' 'carport-kosten'
-          check_item carport 'carport-fundamente-komplett' 'garagenfundament-kosten-pro-qm'
-          check_item carport 'carport-punktfundament' 'garagenfundament-kosten-pro-qm'
+          check_item carport 'carport-fundamente-komplett' 'carport-fundament-kosten'
+          check_item carport 'carport-punktfundament' 'carport-fundament-kosten'
           check_item carport 'carport-stellflaeche-pflaster-schotterrasen-oder-betonplatte' 'carport-kosten'
           check_item carport 'carport-satteldach-aufpreis' 'carport-kosten'
 
