@@ -57,6 +57,11 @@ const sockeldaemmungItems = new Set([
   "sockeldaemmung-einfamilienhaus-komplett",
 ]);
 
+const geschossdeckeItems = new Set([
+  "oberste-geschossdecke-daemmen-nicht-begehbar",
+  "oberste-geschossdecke-daemmen-begehbar",
+]);
+
 export function getServiceGuideLink(serviceSlug: string): PriceGuideLink {
   return getKitchenServiceGuideLink(serviceSlug);
 }
@@ -120,6 +125,14 @@ export function getPriceGuideLink(options: {
       href: "/ratgeber/sockeldaemmung-kosten",
       title: `${options.itemName}: Kosten 2026`,
       cta: "Sockeldämmung-Ratgeber öffnen",
+    };
+  }
+
+  if (options.serviceSlug === "daemmung" && geschossdeckeItems.has(options.itemSlug)) {
+    return {
+      href: "/ratgeber/daemmung-oberste-geschossdecke-kosten-pro-qm",
+      title: `${options.itemName}: Kosten 2026`,
+      cta: "Geschossdecken-Ratgeber öffnen",
     };
   }
 

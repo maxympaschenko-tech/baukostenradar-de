@@ -57,6 +57,12 @@ const silos: Record<string, GuideSilo> = {
     calculatorLabel: "Sockeldämmung berechnen",
     regionalMode: "service",
   },
+  "daemmung-oberste-geschossdecke-kosten-pro-qm": {
+    serviceSlugs: ["daemmung"],
+    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "daemmung", itemSlug: "oberste-geschossdecke-daemmen-begehbar" }),
+    calculatorLabel: "Oberste Geschossdecke berechnen",
+    regionalMode: "service",
+  },
   "sanitaer-anfahrt-kosten": {
     serviceSlugs: ["sanitaer"],
     calculatorHref: handwerkerCalculatorHref({ serviceSlug: "sanitaer", itemSlug: "sanitaer-anfahrt" }),

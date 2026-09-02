@@ -71,15 +71,19 @@ export const guideGroups: readonly GuideGroup[] = bodenGuideGroups.map((group) =
     };
   }
   if (group.eyebrow === "Dämmung & Gebäudehülle") {
-    const additions = ["daemmung-kellerdecke-kosten-pro-qm", "sockeldaemmung-kosten"];
+    const additions = [
+      "daemmung-kellerdecke-kosten-pro-qm",
+      "sockeldaemmung-kosten",
+      "daemmung-oberste-geschossdecke-kosten-pro-qm",
+    ];
     const slugs = [...group.slugs];
     for (const slug of additions) {
       if (!slugs.includes(slug)) slugs.push(slug);
     }
     return {
       ...group,
-      title: "Dämmkosten für Fassade, Dach, Sockel und Kellerdecke kalkulieren",
-      description: "Dämmkosten 2026 für WDVS, Innendämmung, Zwischen- und Aufsparrendämmung, Sockeldämmung sowie Kellerdeckendämmung nach Verfahren mit aktuellen Richtwerten vergleichen.",
+      title: "Dämmkosten für Fassade, Dach, Geschossdecke, Sockel und Kellerdecke kalkulieren",
+      description: "Dämmkosten 2026 für WDVS, Innendämmung, Zwischen- und Aufsparrendämmung, oberste Geschossdecke, Sockeldämmung sowie Kellerdeckendämmung mit aktuellen Richtwerten vergleichen.",
       slugs,
     };
   }
