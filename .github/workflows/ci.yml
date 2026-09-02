@@ -179,9 +179,9 @@ jobs:
           check_pool_item 'betonpool-8-x-4-m-komplett' 'betonpool-kosten'
           check_pool_item 'edelstahlpool-6-x-3-m' 'pool-bauen-kosten'
           check_pool_item 'naturpool-oder-schwimmteich' 'pool-bauen-kosten'
-          check_pool_item 'filteranlage' 'pool-bauen-kosten'
-          check_pool_item 'poolpumpe' 'pool-bauen-kosten'
-          check_pool_item 'verrohrung-skimmer-und-duesen' 'pool-bauen-kosten'
+          check_pool_item 'filteranlage' 'pooltechnik-kosten'
+          check_pool_item 'poolpumpe' 'pooltechnik-kosten'
+          check_pool_item 'verrohrung-skimmer-und-duesen' 'pooltechnik-kosten'
           check_pool_item 'poolbetrieb-jaehrlich' 'pool-betriebskosten'
           check_pool_item 'poolbetrieb-beheizt-intensiv-jaehrlich' 'pool-betriebskosten'
 
