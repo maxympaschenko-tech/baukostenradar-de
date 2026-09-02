@@ -75,6 +75,7 @@ export const guideGroups: readonly GuideGroup[] = bodenGuideGroups.map((group) =
       "daemmung-kellerdecke-kosten-pro-qm",
       "sockeldaemmung-kosten",
       "daemmung-oberste-geschossdecke-kosten-pro-qm",
+      "kerndaemmung-kosten-pro-qm",
     ];
     const slugs = [...group.slugs];
     for (const slug of additions) {
@@ -83,7 +84,7 @@ export const guideGroups: readonly GuideGroup[] = bodenGuideGroups.map((group) =
     return {
       ...group,
       title: "Dämmkosten für Fassade, Dach, Geschossdecke, Sockel und Kellerdecke kalkulieren",
-      description: "Dämmkosten 2026 für WDVS, Innendämmung, Zwischen- und Aufsparrendämmung, oberste Geschossdecke, Sockeldämmung sowie Kellerdeckendämmung mit aktuellen Richtwerten vergleichen.",
+      description: "Dämmkosten 2026 für WDVS, Kerndämmung, Innendämmung, Zwischen- und Aufsparrendämmung, oberste Geschossdecke, Sockeldämmung sowie Kellerdeckendämmung mit aktuellen Richtwerten vergleichen.",
       slugs,
     };
   }

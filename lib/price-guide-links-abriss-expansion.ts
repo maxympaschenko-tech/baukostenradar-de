@@ -104,6 +104,14 @@ export function getPriceGuideLink(options: {
     };
   }
 
+  if ((options.serviceSlug === "daemmung" || options.serviceSlug === "fassade") && options.itemSlug === "kerndaemmung-einblasdaemmung-fassade") {
+    return {
+      href: "/ratgeber/kerndaemmung-kosten-pro-qm",
+      title: `${options.itemName}: Kosten 2026`,
+      cta: "Kerndämmung-Ratgeber öffnen",
+    };
+  }
+
   if (options.serviceSlug === "daemmung" && kellerdeckendaemmungItems.has(options.itemSlug)) {
     return {
       href: "/ratgeber/daemmung-kellerdecke-kosten-pro-qm",

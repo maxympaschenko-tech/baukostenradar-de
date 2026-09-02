@@ -10,6 +10,7 @@ import { pooltechnikGuide } from "./guide-pooltechnik";
 import { kellerdeckendaemmungGuide } from "./guide-kellerdeckendaemmung";
 import { fassadendaemmungWdvsGuide } from "./guide-fassadendaemmung-wdvs";
 import { sockeldaemmungGuide } from "./guide-sockeldaemmung";
+import { kerndaemmungGuide } from "./guide-kerndaemmung";
 
 const expansionGuides = [
   ...sanitaerTradesExpansionGuidesA,
@@ -23,6 +24,7 @@ const expansionGuides = [
   kellerdeckendaemmungGuide,
   fassadendaemmungWdvsGuide,
   sockeldaemmungGuide,
+  kerndaemmungGuide,
 ];
 const expansionSlugs = new Set(expansionGuides.map((guide) => guide.slug));
 const baseWithoutDuplicates = bodenGuides.filter((guide) => !expansionSlugs.has(guide.slug));

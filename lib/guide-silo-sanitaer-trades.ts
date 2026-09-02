@@ -63,6 +63,12 @@ const silos: Record<string, GuideSilo> = {
     calculatorLabel: "Oberste Geschossdecke berechnen",
     regionalMode: "service",
   },
+  "kerndaemmung-kosten-pro-qm": {
+    serviceSlugs: ["daemmung", "fassade"],
+    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "daemmung", itemSlug: "kerndaemmung-einblasdaemmung-fassade" }),
+    calculatorLabel: "Kerndämmung berechnen",
+    regionalMode: "service",
+  },
   "sanitaer-anfahrt-kosten": {
     serviceSlugs: ["sanitaer"],
     calculatorHref: handwerkerCalculatorHref({ serviceSlug: "sanitaer", itemSlug: "sanitaer-anfahrt" }),

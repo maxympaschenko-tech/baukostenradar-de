@@ -10,6 +10,7 @@ type Peer = GuideSupplementalLink & { slug: string };
 const daemmungPeers: Peer[] = [
   { slug: "daemmung-kosten-pro-qm", label: "Dämmung Kosten pro m²", href: "/ratgeber/daemmung-kosten-pro-qm" },
   { slug: "fassadendaemmung-kosten-pro-qm", label: "Fassadendämmung Kosten", href: "/ratgeber/fassadendaemmung-kosten-pro-qm" },
+  { slug: "kerndaemmung-kosten-pro-qm", label: "Kerndämmung Kosten", href: "/ratgeber/kerndaemmung-kosten-pro-qm" },
   { slug: "innendaemmung-kosten-pro-qm", label: "Innendämmung Kosten", href: "/ratgeber/innendaemmung-kosten-pro-qm" },
   { slug: "zwischensparrendaemmung-kosten-pro-qm", label: "Zwischensparrendämmung Kosten", href: "/ratgeber/zwischensparrendaemmung-kosten-pro-qm" },
   { slug: "aufsparrendaemmung-kosten-pro-qm", label: "Aufsparrendämmung Kosten", href: "/ratgeber/aufsparrendaemmung-kosten-pro-qm" },

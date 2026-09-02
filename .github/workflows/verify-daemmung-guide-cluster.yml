@@ -35,6 +35,7 @@ jobs:
           wdvs-mit-eps-styropor|fassadendaemmung-kosten-pro-qm
           wdvs-mit-mineralwolle|fassadendaemmung-kosten-pro-qm
           wdvs-mit-holzfaser|fassadendaemmung-kosten-pro-qm
+          kerndaemmung-einblasdaemmung-fassade|kerndaemmung-kosten-pro-qm
           innendaemmung|innendaemmung-kosten-pro-qm
           dachdaemmung-zwischensparren|zwischensparrendaemmung-kosten-pro-qm
           dachdaemmung-aufsparren|aufsparrendaemmung-kosten-pro-qm
@@ -82,8 +83,40 @@ jobs:
             checked=$((checked + 1))
           done <<< "$mappings"
 
-          test "$checked" -eq 15
+          test "$checked" -eq 16
           echo "Verified ${checked} exact Dämmung price-item guide mappings"
+
+      - name: Verify cross-service Kerndämmung canonical routing
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          item='kerndaemmung-einblasdaemmung-fassade'
+          guide='kerndaemmung-kosten-pro-qm'
+          guide_url="https://baukostenradar.de/ratgeber/${guide}"
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch 'https://baukostenradar.de/kosten/fassade' /tmp/fassade.html
+          fetch "https://baukostenradar.de/kosten/fassade/leistung/${item}" /tmp/fassade-kerndaemmung.html
+          fetch "$guide_url" /tmp/kerndaemmung-guide.html
+
+          grep -q "https://baukostenradar.de/kosten/fassade/leistung/${item}</loc>" /tmp/sitemap.xml
+          grep -q "/kosten/fassade/leistung/${item}" /tmp/fassade.html
+          grep -q 'Passender Ratgeber' /tmp/fassade-kerndaemmung.html
+          grep -q "/ratgeber/${guide}" /tmp/fassade-kerndaemmung.html
+          ! grep -qi 'noindex' /tmp/fassade-kerndaemmung.html
+
+          grep -q '/kosten/fassade/leistung/kerndaemmung-einblasdaemmung-fassade' /tmp/kerndaemmung-guide.html
+          grep -q '/kosten/daemmung/leistung/kerndaemmung-einblasdaemmung-fassade' /tmp/kerndaemmung-guide.html
+          grep -q '/kosten/fassade' /tmp/kerndaemmung-guide.html
+          grep -q '15-30' /tmp/kerndaemmung-guide.html
+          grep -q '25-60' /tmp/kerndaemmung-guide.html
+
+          echo "Verified Fassade and Dämmung Kerndämmung pages share one canonical guide"
 
       - name: Verify WDVS, Geschossdecke, Sockel and canonical Kellerdecke ranges
         shell: bash
@@ -162,7 +195,7 @@ jobs:
           grep -q 'leistung=fassadendaemmung-wdvs' /tmp/daemmung-parent.html
           ! grep -qi 'noindex' /tmp/daemmung-parent.html
 
-      - name: Verify eight-guide Dämmung hub and internal-link silo
+      - name: Verify nine-guide Dämmung hub and internal-link silo
         shell: bash
         run: |
           set -euo pipefail
@@ -177,6 +210,7 @@ jobs:
           guides=(
             daemmung-kosten-pro-qm
             fassadendaemmung-kosten-pro-qm
+            kerndaemmung-kosten-pro-qm
             innendaemmung-kosten-pro-qm
             zwischensparrendaemmung-kosten-pro-qm
             aufsparrendaemmung-kosten-pro-qm
@@ -201,4 +235,4 @@ jobs:
             done
           done
 
-          echo "Verified eight-guide Dämmung hub visibility and full peer-link silo"
+          echo "Verified nine-guide Dämmung hub visibility and full peer-link silo"
