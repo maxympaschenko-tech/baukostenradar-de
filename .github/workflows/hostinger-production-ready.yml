@@ -29,10 +29,11 @@ jobs:
             EXPECTED_SHA=""
           fi
 
-          # A commit that only changes GitHub automation does not alter the
-          # deployed Next.js application. Waiting for /api/version to expose
-          # that SHA would therefore create a false production timeout.
-          if [[ -n "$EXPECTED_SHA" ]]; then
+          # Workflow-only commits do not create a new Hostinger application
+          # version. Resolve through any consecutive .github-only commits to
+          # the latest deploy-relevant ancestor instead of returning success
+          # before that application commit is actually live.
+          while [[ -n "$EXPECTED_SHA" ]]; do
             commit_json=$(curl -sS --fail \
               -H "Authorization: Bearer $GH_TOKEN" \
               -H 'Accept: application/vnd.github+json' \
@@ -43,10 +44,19 @@ jobs:
               2>/dev/null || echo 0)
 
             if [[ "$changed_count" -gt 0 && "$deploy_relevant_count" -eq 0 ]]; then
-              echo "Workflow-only commit $EXPECTED_SHA; no Hostinger application rollout is required."
-              exit 0
+              parent_sha=$(printf '%s' "$commit_json" | jq -r '.parents[0].sha // empty' 2>/dev/null || true)
+              if [[ -z "$parent_sha" ]]; then
+                echo "Workflow-only commit $EXPECTED_SHA has no parent application commit to verify."
+                EXPECTED_SHA=""
+                break
+              fi
+              echo "Workflow-only commit $EXPECTED_SHA; verifying deploy-relevant ancestor chain from $parent_sha."
+              EXPECTED_SHA="$parent_sha"
+              continue
             fi
-          fi
+
+            break
+          done
 
           for i in $(seq 1 60); do
             code=$(curl -sS -o /tmp/version.json -w '%{http_code}' --connect-timeout 10 --max-time 20 'https://baukostenradar.de/api/version' || true)
