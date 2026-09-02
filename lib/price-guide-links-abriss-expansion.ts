@@ -52,6 +52,11 @@ const wdvsItems = new Set([
   "wdvs-mit-holzfaser",
 ]);
 
+const sockeldaemmungItems = new Set([
+  "sockeldaemmung",
+  "sockeldaemmung-einfamilienhaus-komplett",
+]);
+
 export function getServiceGuideLink(serviceSlug: string): PriceGuideLink {
   return getKitchenServiceGuideLink(serviceSlug);
 }
@@ -107,6 +112,14 @@ export function getPriceGuideLink(options: {
       href: "/ratgeber/fassadendaemmung-kosten-pro-qm",
       title: `${options.itemName}: Kosten 2026`,
       cta: "WDVS-Ratgeber öffnen",
+    };
+  }
+
+  if (options.serviceSlug === "daemmung" && sockeldaemmungItems.has(options.itemSlug)) {
+    return {
+      href: "/ratgeber/sockeldaemmung-kosten",
+      title: `${options.itemName}: Kosten 2026`,
+      cta: "Sockeldämmung-Ratgeber öffnen",
     };
   }
 

@@ -51,6 +51,12 @@ const silos: Record<string, GuideSilo> = {
     calculatorLabel: "Kellerdeckendämmung berechnen",
     regionalMode: "service",
   },
+  "sockeldaemmung-kosten": {
+    serviceSlugs: ["daemmung"],
+    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "daemmung", itemSlug: "sockeldaemmung" }),
+    calculatorLabel: "Sockeldämmung berechnen",
+    regionalMode: "service",
+  },
   "sanitaer-anfahrt-kosten": {
     serviceSlugs: ["sanitaer"],
     calculatorHref: handwerkerCalculatorHref({ serviceSlug: "sanitaer", itemSlug: "sanitaer-anfahrt" }),
