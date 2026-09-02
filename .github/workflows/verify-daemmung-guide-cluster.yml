@@ -13,6 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-hostinger-verifier
+
       - name: Verify exact Dämmung price-item guide mappings
         shell: bash
         run: |
@@ -31,9 +32,16 @@ jobs:
 
           mappings=$(cat <<'EOF'
           fassadendaemmung-wdvs|fassadendaemmung-kosten-pro-qm
+          wdvs-mit-eps-styropor|fassadendaemmung-kosten-pro-qm
+          wdvs-mit-mineralwolle|fassadendaemmung-kosten-pro-qm
+          wdvs-mit-holzfaser|fassadendaemmung-kosten-pro-qm
           innendaemmung|innendaemmung-kosten-pro-qm
           dachdaemmung-zwischensparren|zwischensparrendaemmung-kosten-pro-qm
           dachdaemmung-aufsparren|aufsparrendaemmung-kosten-pro-qm
+          kellerdeckendaemmung-inkl-montage|daemmung-kellerdecke-kosten-pro-qm
+          kellerdeckendaemmung-von-oben-mit-bodenbelag|daemmung-kellerdecke-kosten-pro-qm
+          kellerdecke-per-einblasdaemmung|daemmung-kellerdecke-kosten-pro-qm
+          kellerdecke-per-spruehdaemmung|daemmung-kellerdecke-kosten-pro-qm
           EOF
           )
 
@@ -70,8 +78,45 @@ jobs:
             checked=$((checked + 1))
           done <<< "$mappings"
 
-          test "$checked" -eq 4
+          test "$checked" -eq 11
           echo "Verified ${checked} exact Dämmung price-item guide mappings"
+
+      - name: Verify WDVS material ranges and canonical Kellerdecke redirect
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            curl -sS --fail --retry 3 --retry-delay 2 --retry-all-errors --connect-timeout 15 --max-time 45 "$1" -o "$2"
+          }
+
+          fetch 'https://baukostenradar.de/ratgeber/fassadendaemmung-kosten-pro-qm' /tmp/wdvs.html
+          grep -q '100-150' /tmp/wdvs.html
+          grep -q '120-180' /tmp/wdvs.html
+          grep -q '140-200' /tmp/wdvs.html
+          grep -q '/kosten/daemmung/leistung/wdvs-mit-eps-styropor' /tmp/wdvs.html
+          grep -q '/kosten/daemmung/leistung/wdvs-mit-mineralwolle' /tmp/wdvs.html
+          grep -q '/kosten/daemmung/leistung/wdvs-mit-holzfaser' /tmp/wdvs.html
+
+          fetch 'https://baukostenradar.de/ratgeber/daemmung-kellerdecke-kosten-pro-qm' /tmp/kellerdecke.html
+          grep -q '40-100' /tmp/kellerdecke.html
+          grep -q '15-30' /tmp/kellerdecke.html
+          grep -q '20-50' /tmp/kellerdecke.html
+          grep -q '50-150' /tmp/kellerdecke.html
+
+          fetch 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          ! grep -q 'https://baukostenradar.de/ratgeber/kellerdeckendaemmung-kosten-pro-qm</loc>' /tmp/sitemap.xml
+
+          duplicate='https://baukostenradar.de/ratgeber/kellerdeckendaemmung-kosten-pro-qm'
+          status=$(curl -sS -o /dev/null -w '%{http_code}' "$duplicate")
+          case "$status" in 301|308) ;; *) echo "Duplicate Kellerdecke URL is not a permanent redirect: HTTP ${status}"; exit 1 ;; esac
+          location=$(curl -sSI "$duplicate" | tr -d '\r' | awk 'tolower($1) == "location:" { print $2; exit }')
+          case "$location" in
+            '/ratgeber/daemmung-kellerdecke-kosten-pro-qm'|'https://baukostenradar.de/ratgeber/daemmung-kellerdecke-kosten-pro-qm') ;;
+            *) echo "Unexpected Kellerdecke redirect location: ${location}"; exit 1 ;;
+          esac
+
+          echo "Verified WDVS material ranges and canonical Kellerdecke redirect"
 
       - name: Verify Dämmung parent guide and calculator
         shell: bash
@@ -99,7 +144,7 @@ jobs:
           grep -q 'leistung=fassadendaemmung-wdvs' /tmp/daemmung-parent.html
           ! grep -qi 'noindex' /tmp/daemmung-parent.html
 
-      - name: Verify Dämmung guide hub and internal-link silo
+      - name: Verify six-guide Dämmung hub and internal-link silo
         shell: bash
         run: |
           set -euo pipefail
@@ -117,6 +162,7 @@ jobs:
             innendaemmung-kosten-pro-qm
             zwischensparrendaemmung-kosten-pro-qm
             aufsparrendaemmung-kosten-pro-qm
+            daemmung-kellerdecke-kosten-pro-qm
           )
 
           for source in "${guides[@]}"; do
@@ -135,4 +181,4 @@ jobs:
             done
           done
 
-          echo "Verified Dämmung hub visibility and full peer-link silo"
+          echo "Verified six-guide Dämmung hub visibility and full peer-link silo"

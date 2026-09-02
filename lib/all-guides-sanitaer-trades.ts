@@ -8,6 +8,7 @@ import { perimeterdaemmungKellerGuide } from "./guide-perimeterdaemmung-keller";
 import { carportFundamentGuide } from "./guide-carport-fundament";
 import { pooltechnikGuide } from "./guide-pooltechnik";
 import { kellerdeckendaemmungGuide } from "./guide-kellerdeckendaemmung";
+import { fassadendaemmungWdvsGuide } from "./guide-fassadendaemmung-wdvs";
 
 const expansionGuides = [
   ...sanitaerTradesExpansionGuidesA,
@@ -19,6 +20,7 @@ const expansionGuides = [
   carportFundamentGuide,
   pooltechnikGuide,
   kellerdeckendaemmungGuide,
+  fassadendaemmungWdvsGuide,
 ];
 const expansionSlugs = new Set(expansionGuides.map((guide) => guide.slug));
 const baseWithoutDuplicates = bodenGuides.filter((guide) => !expansionSlugs.has(guide.slug));

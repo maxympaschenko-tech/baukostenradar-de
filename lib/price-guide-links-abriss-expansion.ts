@@ -45,6 +45,13 @@ const kellerdeckendaemmungItems = new Set([
   "kellerdecke-per-spruehdaemmung",
 ]);
 
+const wdvsItems = new Set([
+  "fassadendaemmung-wdvs",
+  "wdvs-mit-eps-styropor",
+  "wdvs-mit-mineralwolle",
+  "wdvs-mit-holzfaser",
+]);
+
 export function getServiceGuideLink(serviceSlug: string): PriceGuideLink {
   return getKitchenServiceGuideLink(serviceSlug);
 }
@@ -92,6 +99,14 @@ export function getPriceGuideLink(options: {
       href: "/ratgeber/daemmung-kellerdecke-kosten-pro-qm",
       title: `${options.itemName}: Kosten 2026`,
       cta: "Kellerdecken-Ratgeber öffnen",
+    };
+  }
+
+  if (options.serviceSlug === "daemmung" && wdvsItems.has(options.itemSlug)) {
+    return {
+      href: "/ratgeber/fassadendaemmung-kosten-pro-qm",
+      title: `${options.itemName}: Kosten 2026`,
+      cta: "WDVS-Ratgeber öffnen",
     };
   }
 
