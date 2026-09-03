@@ -11,11 +11,10 @@ _hostinger_verify_startup_jitter() {
     return 0
   fi
 
-  # Dozens of workflow_run verifiers are released by the same production gate.
-  # Spread their first live request over three minutes so Hostinger is not hit
-  # by an artificial CI connection storm. The marker keeps later fetches in the
-  # same workflow run from sleeping again.
-  local delay=$((RANDOM % 181))
+  # Automatic post-deploy verification is intentionally kept small. Retain a
+  # short jitter for manually dispatched legacy verifiers so several manual
+  # checks do not hit Hostinger in the same second.
+  local delay=$((RANDOM % 31))
   echo "Hostinger verifier startup jitter: ${delay}s"
   sleep "$delay"
   : > "$marker"
@@ -23,10 +22,15 @@ _hostinger_verify_startup_jitter() {
 
 _hostinger_verify_url() {
   local url="$1"
-  local attempt="$2"
   local separator='?'
+  local cache_key="${HOSTINGER_VERIFY_CACHE_KEY:-${GITHUB_SHA:-local}}"
   [[ "$url" == *'?'* ]] && separator='&'
-  printf '%s%sci_verify=%s' "$url" "$separator" "${GITHUB_RUN_ID:-local}-${GITHUB_RUN_ATTEMPT:-1}-${attempt}-${RANDOM}"
+
+  # One deterministic cache key per commit keeps a verification fresh after a
+  # deploy while allowing repeated checks of the same URL to share the reverse
+  # proxy/CDN cache. The previous per-request random key multiplied backend
+  # traffic across dozens of workflow_run jobs.
+  printf '%s%sci_verify=%s' "$url" "$separator" "$cache_key"
 }
 
 fetch_hostinger() {
@@ -38,13 +42,11 @@ fetch_hostinger() {
   _hostinger_verify_startup_jitter
 
   for ((attempt=1; attempt<=attempts; attempt++)); do
-    request_url="$(_hostinger_verify_url "$url" "$attempt")"
+    request_url="$(_hostinger_verify_url "$url")"
     if curl -sS --fail \
       --retry 2 --retry-delay 2 --retry-all-errors \
       --connect-timeout 15 --max-time 45 \
-      -H 'Cache-Control: no-cache, no-store, max-age=0' \
-      -H 'Pragma: no-cache' \
-      -H 'User-Agent: BauKostenRadar-Production-Verify/1.0' \
+      -H 'User-Agent: BauKostenRadar-Production-Verify/1.1' \
       "$request_url" \
       -o "$output"; then
       return 0
@@ -68,12 +70,10 @@ fetch_hostinger_redirect() {
   _hostinger_verify_startup_jitter
 
   for ((attempt=1; attempt<=attempts; attempt++)); do
-    request_url="$(_hostinger_verify_url "$url" "$attempt")"
+    request_url="$(_hostinger_verify_url "$url")"
     if result="$(curl -sS \
       --connect-timeout 15 --max-time 45 \
-      -H 'Cache-Control: no-cache, no-store, max-age=0' \
-      -H 'Pragma: no-cache' \
-      -H 'User-Agent: BauKostenRadar-Production-Verify/1.0' \
+      -H 'User-Agent: BauKostenRadar-Production-Verify/1.1' \
       -o /dev/null -w '%{http_code} %{redirect_url}' \
       "$request_url")"; then
       status="${result%% *}"
