@@ -10,6 +10,7 @@ import { quaternaryOpportunityGuides } from "@/lib/guides-opportunities-quaterna
 import { quinaryOpportunityGuides } from "@/lib/guides-opportunities-quinary";
 import { senaryOpportunityGuides } from "@/lib/guides-opportunities-senary";
 import { septenaryOpportunityGuides } from "@/lib/guides-opportunities-septenary";
+import { octonaryOpportunityGuides } from "@/lib/guides-opportunities-octonary";
 import { comparisonGuides } from "@/lib/guides-comparisons";
 import { scenarioGuides } from "@/lib/guides-scenarios";
 import { catalogScenarioGuides } from "@/lib/guides-catalog-scenarios";
@@ -296,6 +297,7 @@ const legacyGuides = [
   ...quinaryOpportunityGuides,
   ...senaryOpportunityGuides,
   ...septenaryOpportunityGuides,
+  ...octonaryOpportunityGuides,
   ...comparisonGuides,
   ...scenarioGuides,
   ...enrichedCatalogScenarioGuides,
