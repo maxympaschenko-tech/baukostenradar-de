@@ -1,0 +1,81 @@
+name: Hostinger post-deploy smoke
+
+on:
+  workflow_run:
+    workflows: ["Hostinger deploy gate"]
+    types: [completed]
+  workflow_dispatch:
+
+concurrency:
+  group: hostinger-postdeploy-smoke
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Verify production availability and core SEO surfaces
+        shell: bash
+        env:
+          HOSTINGER_VERIFY_CACHE_KEY: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: |
+          set -euo pipefail
+          source scripts/hostinger-verify.sh
+
+          fetch_hostinger 'https://baukostenradar.de/' /tmp/home.html
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch_hostinger 'https://baukostenradar.de/kosten' /tmp/kosten.html
+          fetch_hostinger 'https://baukostenradar.de/rechner' /tmp/rechner.html
+          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          fetch_hostinger 'https://baukostenradar.de/staedte' /tmp/staedte.html
+
+          for page in /tmp/home.html /tmp/kosten.html /tmp/rechner.html /tmp/ratgeber.html /tmp/staedte.html; do
+            test -s "$page"
+            ! grep -qi 'noindex' "$page"
+          done
+
+          grep -q '<title>' /tmp/home.html
+          grep -q 'https://baukostenradar.de/' /tmp/home.html
+          grep -q 'https://baukostenradar.de/ratgeber' /tmp/sitemap.xml
+          grep -q 'https://baukostenradar.de/kosten' /tmp/sitemap.xml
+          grep -q 'https://baukostenradar.de/rechner' /tmp/sitemap.xml
+
+      - name: Verify active Dämmung cluster
+        shell: bash
+        env:
+          HOSTINGER_VERIFY_CACHE_KEY: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: |
+          set -euo pipefail
+          source scripts/hostinger-verify.sh
+
+          guides=(
+            'untersparrendaemmung-kosten-pro-qm'
+            'einblasdaemmung-geschossdecke-kosten-pro-qm'
+            'perimeterdaemmung-kosten-pro-qm'
+          )
+
+          fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
+          fetch_hostinger 'https://baukostenradar.de/ratgeber' /tmp/ratgeber.html
+          fetch_hostinger 'https://baukostenradar.de/kosten/daemmung' /tmp/daemmung.html
+
+          for guide in "${guides[@]}"; do
+            url="https://baukostenradar.de/ratgeber/${guide}"
+            file="/tmp/${guide}.html"
+            fetch_hostinger "$url" "$file"
+            grep -q "${url}</loc>" /tmp/sitemap.xml
+            grep -q "/ratgeber/${guide}" /tmp/ratgeber.html
+            grep -q '"@type":"Article"' "$file"
+            grep -q '/kosten/daemmung' "$file"
+            ! grep -qi 'noindex' "$file"
+          done
+
+          grep -q '/ratgeber/untersparrendaemmung-kosten-pro-qm' /tmp/daemmung.html
+          grep -q '/ratgeber/einblasdaemmung-geschossdecke-kosten-pro-qm' /tmp/daemmung.html
+          grep -q '/ratgeber/perimeterdaemmung-kosten-pro-qm' /tmp/daemmung.html
+
+          echo 'Production smoke test passed for core pages and active Dämmung cluster.'
