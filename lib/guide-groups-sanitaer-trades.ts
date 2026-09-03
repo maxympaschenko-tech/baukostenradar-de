@@ -79,6 +79,7 @@ export const guideGroups: readonly GuideGroup[] = bodenGuideGroups.map((group) =
       "untersparrendaemmung-kosten-pro-qm",
       "flachdach-warmdaemmung-kosten-pro-qm",
       "flachdach-kaltdaemmung-kosten-pro-qm",
+      "flachdach-warmdach-oder-kaltdach-kosten",
       "perimeterdaemmung-kosten-pro-qm",
       "einblasdaemmung-geschossdecke-kosten-pro-qm",
     ];
