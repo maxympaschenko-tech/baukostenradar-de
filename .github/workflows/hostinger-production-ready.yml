@@ -1,4 +1,4 @@
-name: Hostinger production ready
+name: Hostinger deploy gate
 
 on:
   workflow_run:
