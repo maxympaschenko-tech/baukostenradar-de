@@ -38,13 +38,16 @@ jobs:
           kerndaemmung-einblasdaemmung-fassade|kerndaemmung-kosten-pro-qm
           innendaemmung|innendaemmung-kosten-pro-qm
           dachdaemmung-zwischensparren|zwischensparrendaemmung-kosten-pro-qm
+          dachdaemmung-untersparren|untersparrendaemmung-kosten-pro-qm
           dachdaemmung-aufsparren|aufsparrendaemmung-kosten-pro-qm
           oberste-geschossdecke-daemmen-nicht-begehbar|daemmung-oberste-geschossdecke-kosten-pro-qm
           oberste-geschossdecke-daemmen-begehbar|daemmung-oberste-geschossdecke-kosten-pro-qm
+          einblasdaemmung-oberste-geschossdecke|einblasdaemmung-geschossdecke-kosten-pro-qm
           kellerdeckendaemmung-inkl-montage|daemmung-kellerdecke-kosten-pro-qm
           kellerdeckendaemmung-von-oben-mit-bodenbelag|daemmung-kellerdecke-kosten-pro-qm
           kellerdecke-per-einblasdaemmung|daemmung-kellerdecke-kosten-pro-qm
           kellerdecke-per-spruehdaemmung|daemmung-kellerdecke-kosten-pro-qm
+          perimeterdaemmung-kellerwand|perimeterdaemmung-kosten-pro-qm
           sockeldaemmung|sockeldaemmung-kosten
           sockeldaemmung-einfamilienhaus-komplett|sockeldaemmung-kosten
           EOF
@@ -83,7 +86,7 @@ jobs:
             checked=$((checked + 1))
           done <<< "$mappings"
 
-          test "$checked" -eq 16
+          test "$checked" -eq 19
           echo "Verified ${checked} exact Dämmung price-item guide mappings"
 
       - name: Verify cross-service Kerndämmung canonical routing
@@ -118,7 +121,7 @@ jobs:
 
           echo "Verified Fassade and Dämmung Kerndämmung pages share one canonical guide"
 
-      - name: Verify WDVS, Geschossdecke, Sockel and canonical Kellerdecke ranges
+      - name: Verify focused insulation ranges and exact calculators
         shell: bash
         run: |
           set -euo pipefail
@@ -135,12 +138,27 @@ jobs:
           grep -q '/kosten/daemmung/leistung/wdvs-mit-mineralwolle' /tmp/wdvs.html
           grep -q '/kosten/daemmung/leistung/wdvs-mit-holzfaser' /tmp/wdvs.html
 
+          fetch 'https://baukostenradar.de/ratgeber/untersparrendaemmung-kosten-pro-qm' /tmp/untersparren.html
+          grep -q '30-80' /tmp/untersparren.html
+          grep -q '/kosten/daemmung/leistung/dachdaemmung-untersparren' /tmp/untersparren.html
+          grep -q 'leistung=dachdaemmung-untersparren' /tmp/untersparren.html
+
           fetch 'https://baukostenradar.de/ratgeber/daemmung-oberste-geschossdecke-kosten-pro-qm' /tmp/geschossdecke.html
           grep -q '20-35' /tmp/geschossdecke.html
           grep -q '40-80' /tmp/geschossdecke.html
           grep -q '/kosten/daemmung/leistung/oberste-geschossdecke-daemmen-nicht-begehbar' /tmp/geschossdecke.html
           grep -q '/kosten/daemmung/leistung/oberste-geschossdecke-daemmen-begehbar' /tmp/geschossdecke.html
           grep -q 'leistung=oberste-geschossdecke-daemmen-begehbar' /tmp/geschossdecke.html
+
+          fetch 'https://baukostenradar.de/ratgeber/einblasdaemmung-geschossdecke-kosten-pro-qm' /tmp/einblas-geschossdecke.html
+          grep -q '25-50' /tmp/einblas-geschossdecke.html
+          grep -q '/kosten/daemmung/leistung/einblasdaemmung-oberste-geschossdecke' /tmp/einblas-geschossdecke.html
+          grep -q 'leistung=einblasdaemmung-oberste-geschossdecke' /tmp/einblas-geschossdecke.html
+
+          fetch 'https://baukostenradar.de/ratgeber/perimeterdaemmung-kosten-pro-qm' /tmp/perimeter.html
+          grep -q '55-90' /tmp/perimeter.html
+          grep -q '/kosten/daemmung/leistung/perimeterdaemmung-kellerwand' /tmp/perimeter.html
+          grep -q 'leistung=perimeterdaemmung-kellerwand' /tmp/perimeter.html
 
           fetch 'https://baukostenradar.de/ratgeber/sockeldaemmung-kosten' /tmp/sockel.html
           grep -q '60-120' /tmp/sockel.html
@@ -167,7 +185,7 @@ jobs:
             *) echo "Unexpected Kellerdecke redirect location: ${location}"; exit 1 ;;
           esac
 
-          echo "Verified WDVS, Geschossdecke, Sockeldämmung and canonical Kellerdecke ranges"
+          echo "Verified focused insulation ranges, exact calculators and canonical Kellerdecke"
 
       - name: Verify Dämmung parent guide and calculator
         shell: bash
@@ -195,7 +213,7 @@ jobs:
           grep -q 'leistung=fassadendaemmung-wdvs' /tmp/daemmung-parent.html
           ! grep -qi 'noindex' /tmp/daemmung-parent.html
 
-      - name: Verify nine-guide Dämmung hub and internal-link silo
+      - name: Verify twelve-guide Dämmung hub and internal-link silo
         shell: bash
         run: |
           set -euo pipefail
@@ -213,9 +231,12 @@ jobs:
             kerndaemmung-kosten-pro-qm
             innendaemmung-kosten-pro-qm
             zwischensparrendaemmung-kosten-pro-qm
+            untersparrendaemmung-kosten-pro-qm
             aufsparrendaemmung-kosten-pro-qm
             daemmung-oberste-geschossdecke-kosten-pro-qm
+            einblasdaemmung-geschossdecke-kosten-pro-qm
             daemmung-kellerdecke-kosten-pro-qm
+            perimeterdaemmung-kosten-pro-qm
             sockeldaemmung-kosten
           )
 
@@ -235,4 +256,4 @@ jobs:
             done
           done
 
-          echo "Verified nine-guide Dämmung hub visibility and full peer-link silo"
+          echo "Verified twelve-guide Dämmung hub visibility and full peer-link silo"
