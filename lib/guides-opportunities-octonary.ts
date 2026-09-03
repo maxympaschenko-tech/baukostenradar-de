@@ -123,4 +123,62 @@ export const octonaryOpportunityGuides: Guide[] = [
       { label: "Kaltdach-Dämmung berechnen", href: "/rechner/handwerkerkosten?gewerk=daemmung&leistung=flachdachdaemmung-kaltdach" },
     ],
   },
+  {
+    slug: "flachdach-warmdach-oder-kaltdach-kosten",
+    title: "Warmdach oder Kaltdach Kosten 2026: Flachdach-Dämmung im Vergleich",
+    h1: "Warmdach oder Kaltdach: Kosten der Flachdach-Dämmung 2026 vergleichen",
+    description: "Warmdach oder Kaltdach 2026: Dämmkosten pro m², Beispielbudgets für 100 m², Konstruktionsunterschiede und wichtige Punkte für den Angebotsvergleich.",
+    eyebrow: "Flachdach-Vergleich 2026",
+    intro: "Warmdach und Kaltdach unterscheiden sich nicht nur beim Preis, sondern vor allem im konstruktiven Aufbau. Die BauKostenRadar-Richtwerte zeigen die Budgetspanne der hinterlegten Dämmpositionen; welche Konstruktion für ein konkretes Dach sinnvoll ist, muss aus Bestand, Feuchteschutz und Sanierungsziel abgeleitet werden.",
+    keyFact: "Warmdach-Dämmung etwa 100-180 €/m², Kaltdach-Dämmung etwa 90-160 €/m² bei den hinterlegten 20-cm-Ausführungen",
+    sections: [
+      {
+        heading: "Wie unterscheiden sich Warmdach- und Kaltdach-Kosten pro m²?",
+        paragraphs: [
+          "Für die Flachdachdämmung als Warmdach führt BauKostenRadar etwa 100 bis 180 Euro pro Quadratmeter. Für die Flachdachdämmung als Kaltdach sind etwa 90 bis 160 Euro pro Quadratmeter hinterlegt. Beide Positionen beziehen sich in der Datenbasis auf 20 cm Dämmstärke.",
+          "Bei 100 m² Flachdachfläche ergibt das rechnerisch etwa 10.000 bis 18.000 Euro für die Warmdach-Dämmposition und ungefähr 9.000 bis 16.000 Euro für die Kaltdach-Dämmposition. Diese Spannen sind Budgetorientierungen und keine vollständigen Dachsanierungspauschalen.",
+        ],
+        table: {
+          headers: ["Konstruktion", "Richtwert pro m²", "100 m² Beispiel"],
+          rows: [
+            { cells: ["Warmdach, 20 cm", "100-180 €/m²", "10.000-18.000 €"] },
+            { cells: ["Kaltdach, 20 cm", "90-160 €/m²", "9.000-16.000 €"] },
+          ],
+        },
+      },
+      {
+        heading: "Warum entscheidet nicht der niedrigere Quadratmeterpreis?",
+        paragraphs: ["Die beiden Dachaufbauten funktionieren konstruktiv unterschiedlich. Deshalb ist die Preiszeile nur ein Teil der Entscheidung."],
+        bullets: [
+          "Beim Warmdach gibt es keine belüftete Ebene zwischen Dämmung und Dachhaut.",
+          "Beim Kaltdach ist eine funktionsfähige Lüftungsebene Bestandteil des Konzepts.",
+          "Bestand, Feuchteschutz und vorhandene Anschlusshöhen können die Sanierungsvariante begrenzen.",
+          "Rückbau, Abdichtung, Gefälle, Attika und Entwässerung können zusätzliche Kostenblöcke bilden.",
+          "Ein Umbau von einer Konstruktionsart zur anderen verändert mehr als nur die Dämmposition.",
+        ],
+      },
+      {
+        heading: "So sollten Angebote für ein Flachdach verglichen werden",
+        paragraphs: [
+          "Für einen belastbaren Angebotsvergleich sollten Dämmstoff, Dämmstärke, Schichtenaufbau, Luftdichtheit beziehungsweise Dampfbremse und die Behandlung der Dachabdichtung möglichst eindeutig beschrieben sein.",
+          "Zusätzlich sollten Rückbau, Entsorgung, Gefälle, Dachabläufe, Attika, Durchdringungen, Gerüst- oder Sicherungsaufwand und eventuelle Reparaturen getrennt erkennbar sein. Erst dann lässt sich beurteilen, ob zwei Angebote tatsächlich denselben Leistungsumfang abdecken.",
+        ],
+      },
+    ],
+    faqs: [
+      { question: "Was ist 2026 günstiger: Warmdach oder Kaltdach?", answer: "In der BauKostenRadar-Datenbasis liegt die hinterlegte Kaltdach-Dämmposition mit etwa 90 bis 160 €/m² unter der Warmdach-Position mit etwa 100 bis 180 €/m². Daraus lässt sich jedoch nicht automatisch die technisch oder insgesamt günstigere Sanierungsvariante ableiten." },
+      { question: "Was kostet Warmdach-Dämmung bei 100 m²?", answer: "Mit dem hinterlegten Richtwert ergeben sich ungefähr 10.000 bis 18.000 Euro für die Dämmposition." },
+      { question: "Was kostet Kaltdach-Dämmung bei 100 m²?", answer: "Mit dem hinterlegten Richtwert ergeben sich ungefähr 9.000 bis 16.000 Euro für die Dämmposition." },
+      { question: "Sind Abdichtung und Rückbau in diesen Vergleichswerten enthalten?", answer: "Die Werte dienen als Orientierung für die hinterlegten Dämmpositionen. Ob Abdichtung, Rückbau und weitere Nebenarbeiten enthalten sind, muss im jeweiligen Angebot geprüft werden." },
+    ],
+    related: [
+      { label: "Warmdach Dämmung Kosten", href: "/ratgeber/flachdach-warmdaemmung-kosten-pro-qm" },
+      { label: "Kaltdach Dämmung Kosten", href: "/ratgeber/flachdach-kaltdaemmung-kosten-pro-qm" },
+      { label: "Warmdach Preisdetail", href: "/kosten/daemmung/leistung/flachdachdaemmung-warmdach" },
+      { label: "Kaltdach Preisdetail", href: "/kosten/daemmung/leistung/flachdachdaemmung-kaltdach" },
+      { label: "Dämmung Kosten pro m²", href: "/ratgeber/daemmung-kosten-pro-qm" },
+      { label: "Dämmung Preisverzeichnis", href: "/kosten/daemmung" },
+      { label: "Dach sanieren Kosten pro m²", href: "/ratgeber/dach-sanieren-kosten-pro-qm" },
+    ],
+  },
 ];
