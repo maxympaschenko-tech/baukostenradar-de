@@ -69,6 +69,24 @@ const silos: Record<string, GuideSilo> = {
     calculatorLabel: "Kerndämmung berechnen",
     regionalMode: "service",
   },
+  "untersparrendaemmung-kosten-pro-qm": {
+    serviceSlugs: ["daemmung", "dachsanierung"],
+    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "daemmung", itemSlug: "dachdaemmung-untersparren" }),
+    calculatorLabel: "Untersparrendämmung berechnen",
+    regionalMode: "service",
+  },
+  "perimeterdaemmung-kosten-pro-qm": {
+    serviceSlugs: ["daemmung", "kellerabdichtung"],
+    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "daemmung", itemSlug: "perimeterdaemmung-kellerwand" }),
+    calculatorLabel: "Perimeterdämmung pro m² berechnen",
+    regionalMode: "service",
+  },
+  "einblasdaemmung-geschossdecke-kosten-pro-qm": {
+    serviceSlugs: ["daemmung"],
+    calculatorHref: handwerkerCalculatorHref({ serviceSlug: "daemmung", itemSlug: "einblasdaemmung-oberste-geschossdecke" }),
+    calculatorLabel: "Einblasdämmung berechnen",
+    regionalMode: "service",
+  },
   "sanitaer-anfahrt-kosten": {
     serviceSlugs: ["sanitaer"],
     calculatorHref: handwerkerCalculatorHref({ serviceSlug: "sanitaer", itemSlug: "sanitaer-anfahrt" }),
