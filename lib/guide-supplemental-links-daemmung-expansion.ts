@@ -17,6 +17,7 @@ const daemmungPeers: Peer[] = [
   { slug: "aufsparrendaemmung-kosten-pro-qm", label: "Aufsparrendämmung Kosten", href: "/ratgeber/aufsparrendaemmung-kosten-pro-qm" },
   { slug: "flachdach-warmdaemmung-kosten-pro-qm", label: "Warmdach Dämmung Kosten", href: "/ratgeber/flachdach-warmdaemmung-kosten-pro-qm" },
   { slug: "flachdach-kaltdaemmung-kosten-pro-qm", label: "Kaltdach Dämmung Kosten", href: "/ratgeber/flachdach-kaltdaemmung-kosten-pro-qm" },
+  { slug: "flachdach-warmdach-oder-kaltdach-kosten", label: "Warmdach oder Kaltdach vergleichen", href: "/ratgeber/flachdach-warmdach-oder-kaltdach-kosten" },
   { slug: "daemmung-oberste-geschossdecke-kosten-pro-qm", label: "Oberste Geschossdecke dämmen Kosten", href: "/ratgeber/daemmung-oberste-geschossdecke-kosten-pro-qm" },
   { slug: "einblasdaemmung-geschossdecke-kosten-pro-qm", label: "Einblasdämmung Geschossdecke Kosten", href: "/ratgeber/einblasdaemmung-geschossdecke-kosten-pro-qm" },
   { slug: "daemmung-kellerdecke-kosten-pro-qm", label: "Kellerdecke dämmen Kosten", href: "/ratgeber/daemmung-kellerdecke-kosten-pro-qm" },
