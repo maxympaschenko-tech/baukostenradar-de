@@ -59,6 +59,7 @@ jobs:
             'perimeterdaemmung-kosten-pro-qm'
             'flachdach-warmdaemmung-kosten-pro-qm'
             'flachdach-kaltdaemmung-kosten-pro-qm'
+            'flachdach-warmdach-oder-kaltdach-kosten'
           )
 
           fetch_hostinger 'https://baukostenradar.de/sitemap.xml' /tmp/sitemap.xml
@@ -81,5 +82,6 @@ jobs:
           grep -q '/ratgeber/perimeterdaemmung-kosten-pro-qm' /tmp/daemmung.html
           grep -q '/ratgeber/flachdach-warmdaemmung-kosten-pro-qm' /tmp/daemmung.html
           grep -q '/ratgeber/flachdach-kaltdaemmung-kosten-pro-qm' /tmp/daemmung.html
+          grep -q '/ratgeber/flachdach-warmdach-oder-kaltdach-kosten' /tmp/daemmung.html
 
           echo 'Production smoke test passed for core pages and active Dämmung cluster.'
