@@ -1,0 +1,26 @@
+name: CI guide link integrity
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-guide-link-integrity-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Verify internal Ratgeber links resolve to guide definitions
+        run: node scripts/verify-guide-link-integrity.mjs
