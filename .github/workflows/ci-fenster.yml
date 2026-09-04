@@ -1,10 +1,7 @@
 name: CI Fenster cluster
 
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ci-fenster-${{ github.ref }}
