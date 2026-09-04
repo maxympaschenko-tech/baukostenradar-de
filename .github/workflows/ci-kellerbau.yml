@@ -1,10 +1,7 @@
 name: CI Kellerbau cluster
 
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ci-kellerbau-${{ github.ref }}
