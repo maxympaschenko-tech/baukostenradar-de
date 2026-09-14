@@ -1,5 +1,5 @@
 import { readdir, readFile } from "node:fs/promises";
-import { basename, join, relative } from "node:path";
+import { join, relative } from "node:path";
 import process from "node:process";
 
 const root = process.cwd();
@@ -17,7 +17,7 @@ async function walk(dir) {
 }
 
 const files = await walk(libRoot);
-const guideSlugs = new Set();
+const guideDefinitions = new Map();
 const references = new Map();
 
 for (const file of files) {
@@ -33,7 +33,9 @@ for (const file of files) {
 
   if (isGuideDefinitionModule) {
     for (const match of source.matchAll(/\bslug:\s*["']([a-z0-9-]+)["']/g)) {
-      guideSlugs.add(match[1]);
+      const slug = match[1];
+      if (!guideDefinitions.has(slug)) guideDefinitions.set(slug, []);
+      guideDefinitions.get(slug).push(short);
     }
   }
 
@@ -44,6 +46,20 @@ for (const file of files) {
   }
 }
 
+const duplicateDefinitions = [...guideDefinitions.entries()]
+  .filter(([, sourceFiles]) => sourceFiles.length > 1)
+  .sort(([a], [b]) => a.localeCompare(b));
+
+if (duplicateDefinitions.length) {
+  console.error(`Found ${duplicateDefinitions.length} duplicate Ratgeber slug definition(s):`);
+  for (const [slug, sourceFiles] of duplicateDefinitions) {
+    console.error(`- /ratgeber/${slug}`);
+    for (const file of sourceFiles.sort()) console.error(`    defined in ${file}`);
+  }
+  process.exit(1);
+}
+
+const guideSlugs = new Set(guideDefinitions.keys());
 const missing = [...references.entries()]
   .filter(([slug]) => !guideSlugs.has(slug))
   .sort(([a], [b]) => a.localeCompare(b));
@@ -57,4 +73,4 @@ if (missing.length) {
   process.exit(1);
 }
 
-console.log(`Guide link integrity OK: ${guideSlugs.size} guide slugs cover ${references.size} internal Ratgeber targets.`);
+console.log(`Guide integrity OK: ${guideSlugs.size} unique guide slugs cover ${references.size} internal Ratgeber targets; no duplicate slug definitions found.`);
