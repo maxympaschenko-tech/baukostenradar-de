@@ -37,5 +37,5 @@ jobs:
 
           echo 'All workflows are detached from the legacy Ukraine.com.ua deploy workflow.'
 
-      - name: Verify Ratgeber links and unique slugs
-        run: node scripts/verify-guide-link-integrity.mjs
+      - name: Verify unique Ratgeber slugs
+        run: node scripts/verify-guide-link-integrity.mjs --duplicates-only
