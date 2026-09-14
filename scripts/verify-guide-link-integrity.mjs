@@ -4,6 +4,7 @@ import process from "node:process";
 
 const root = process.cwd();
 const libRoot = join(root, "lib");
+const duplicatesOnly = process.argv.includes("--duplicates-only");
 
 async function walk(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
@@ -60,6 +61,12 @@ if (duplicateDefinitions.length) {
 }
 
 const guideSlugs = new Set(guideDefinitions.keys());
+
+if (duplicatesOnly) {
+  console.log(`Guide slug integrity OK: ${guideSlugs.size} unique guide slugs; no duplicate definitions found.`);
+  process.exit(0);
+}
+
 const missing = [...references.entries()]
   .filter(([slug]) => !guideSlugs.has(slug))
   .sort(([a], [b]) => a.localeCompare(b));
