@@ -122,6 +122,11 @@ const nextConfig: NextConfig = {
         destination: "/ratgeber/daemmung-kellerdecke-kosten-pro-qm",
         permanent: true,
       },
+      {
+        source: "/ratgeber/perimeterdaemmung-keller-kosten",
+        destination: "/ratgeber/perimeterdaemmung-kosten-pro-qm",
+        permanent: true,
+      },
     ];
   },
 };
