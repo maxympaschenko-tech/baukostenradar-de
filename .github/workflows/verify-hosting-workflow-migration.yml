@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   verify-hosting-workflow-migration:
-    name: Reject legacy Ukraine.com.ua deploy triggers
+    name: Lightweight repository safeguards
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -36,3 +36,6 @@ jobs:
           fi
 
           echo 'All workflows are detached from the legacy Ukraine.com.ua deploy workflow.'
+
+      - name: Verify Ratgeber links and unique slugs
+        run: node scripts/verify-guide-link-integrity.mjs
