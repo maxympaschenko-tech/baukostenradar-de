@@ -1,9 +1,8 @@
 name: Hostinger deploy gate
 
 on:
-  workflow_run:
-    workflows: ["CI"]
-    types: [completed]
+  push:
+    branches: ["main"]
   workflow_dispatch:
 
 concurrency:
@@ -12,7 +11,6 @@ concurrency:
 
 jobs:
   wait-for-production:
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -20,14 +18,10 @@ jobs:
       - name: Wait for Hostinger to serve the expected commit
         shell: bash
         env:
-          EXPECTED_SHA: ${{ github.event.workflow_run.head_sha }}
+          EXPECTED_SHA: ${{ github.sha }}
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            EXPECTED_SHA=""
-          fi
 
           # Workflow-only commits do not create a new Hostinger application
           # version. Resolve through any consecutive .github-only commits to
