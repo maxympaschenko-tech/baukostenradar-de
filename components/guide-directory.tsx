@@ -89,9 +89,9 @@ export function GuideDirectory({ groups }: { groups: GuideDirectoryGroup[] }) {
             <label className={styles.topicField}>
               <span>Themenbereich</span>
               <select value={topic} onChange={(event) => setTopic(event.target.value)}>
-                <option value="all">Alle Themenbereiche</option>
+                <option value="all">Alle Themenbereiche ({totalGuideCount})</option>
                 {groups.map((group) => (
-                  <option value={group.id} key={group.id}>{group.eyebrow}</option>
+                  <option value={group.id} key={group.id}>{group.eyebrow} ({group.guides.length})</option>
                 ))}
               </select>
             </label>
@@ -116,9 +116,21 @@ export function GuideDirectory({ groups }: { groups: GuideDirectoryGroup[] }) {
           </div>
 
           <nav className={styles.topicLinks} aria-label="Schnellnavigation Themenbereiche">
+            <button
+              type="button"
+              aria-pressed={topic === "all"}
+              onClick={() => setTopic("all")}
+            >
+              Alle Themen ({totalGuideCount})
+            </button>
             {groups.map((group) => (
-              <button type="button" key={group.id} onClick={() => setTopic(group.id)}>
-                {group.eyebrow}
+              <button
+                type="button"
+                key={group.id}
+                aria-pressed={topic === group.id}
+                onClick={() => setTopic(group.id)}
+              >
+                {group.eyebrow} ({group.guides.length})
               </button>
             ))}
           </nav>
