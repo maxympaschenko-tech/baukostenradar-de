@@ -95,6 +95,12 @@
   background: #f7fafc;
 }
 
+.topicLinks button[aria-pressed="true"] {
+  border-color: var(--primary-2);
+  background: var(--primary-2);
+  color: white;
+}
+
 .directorySection {
   scroll-margin-top: 82px;
 }
