@@ -77,11 +77,11 @@ jobs:
             ! grep -qi 'noindex' "$file"
           done
 
-          grep -q '/ratgeber/untersparrendaemmung-kosten-pro-qm' /tmp/daemmung.html
-          grep -q '/ratgeber/einblasdaemmung-geschossdecke-kosten-pro-qm' /tmp/daemmung.html
-          grep -q '/ratgeber/perimeterdaemmung-kosten-pro-qm' /tmp/daemmung.html
-          grep -q '/ratgeber/flachdach-warmdaemmung-kosten-pro-qm' /tmp/daemmung.html
-          grep -q '/ratgeber/flachdach-kaltdaemmung-kosten-pro-qm' /tmp/daemmung.html
-          grep -q '/ratgeber/flachdach-warmdach-oder-kaltdach-kosten' /tmp/daemmung.html
+          # The service overview intentionally links to the central Dämmung guide;
+          # specialized guide links live in the Ratgeber directory and on the
+          # matching price-detail pages instead of overcrowding this overview.
+          grep -q '/ratgeber/daemmung-kosten-pro-qm' /tmp/daemmung.html
+          grep -q 'Flachdachdämmung Warmdach' /tmp/daemmung.html
+          grep -q 'Flachdachdämmung Kaltdach' /tmp/daemmung.html
 
           echo 'Production smoke test passed for core pages and active Dämmung cluster.'
