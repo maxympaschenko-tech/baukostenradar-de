@@ -6,17 +6,32 @@ import {
 
 export type { PriceGuideLink } from "./price-guide-links-abriss-expansion";
 
-function markAsRatgeber(link: PriceGuideLink): PriceGuideLink {
-  if (!link.href.startsWith("/ratgeber/") || link.title.includes("Ratgeber")) return link;
+const canonicalRatgeberHrefs: Record<string, string> = {
+  "/ratgeber/tuer-lackieren-kosten": "/ratgeber/6-innentueren-austauschen-kosten",
+  "/ratgeber/anhydritestrich-kosten-pro-qm": "/ratgeber/fliessestrich-kosten-pro-qm",
+  "/ratgeber/gussasphaltestrich-kosten-pro-qm": "/ratgeber/estrich-100-qm-kosten",
+  "/ratgeber/sichtestrich-kosten-pro-qm": "/ratgeber/estrich-100-qm-kosten",
+  "/ratgeber/estrich-zement-oder-anhydrit-kosten": "/ratgeber/estrich-100-qm-kosten",
+  "/ratgeber/kellerdeckendaemmung-kosten-pro-qm": "/ratgeber/daemmung-kellerdecke-kosten-pro-qm",
+  "/ratgeber/perimeterdaemmung-keller-kosten": "/ratgeber/perimeterdaemmung-kosten-pro-qm",
+};
+
+function normalizeGuideLink(link: PriceGuideLink): PriceGuideLink {
+  const href = canonicalRatgeberHrefs[link.href] ?? link.href;
+
+  if (!href.startsWith("/ratgeber/")) {
+    return href === link.href ? link : { ...link, href };
+  }
 
   return {
     ...link,
-    title: `Ratgeber: ${link.title}`,
+    href,
+    title: link.title.includes("Ratgeber") ? link.title : `Ratgeber: ${link.title}`,
   };
 }
 
 export function getServiceGuideLink(serviceSlug: string): PriceGuideLink {
-  return markAsRatgeber(getBaseServiceGuideLink(serviceSlug));
+  return normalizeGuideLink(getBaseServiceGuideLink(serviceSlug));
 }
 
 export function getPriceGuideLink(options: {
@@ -25,5 +40,5 @@ export function getPriceGuideLink(options: {
   itemName: string;
   unit: string;
 }): PriceGuideLink {
-  return markAsRatgeber(getBasePriceGuideLink(options));
+  return normalizeGuideLink(getBasePriceGuideLink(options));
 }
