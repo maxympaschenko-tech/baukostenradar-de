@@ -45,6 +45,15 @@ const garageGuideSilos: Record<string, GuideSilo> = {
     calculatorLabel: "Garagenvarianten berechnen",
     regionalMode: "service",
   },
+  "garage-oder-carport-kosten": {
+    serviceSlugs: ["garage", "carport"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "carport",
+      itemSlug: "einzelcarport-komplett-mit-aufbau",
+    }),
+    calculatorLabel: "Garage oder Carport kalkulieren",
+    regionalMode: "service",
+  },
   "garagenfundament-kosten-pro-qm": {
     serviceSlugs: ["garage", "carport", "maurer"],
     calculatorHref: handwerkerCalculatorHref({
