@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { GuideDirectory, type GuideDirectoryGroup } from "@/components/guide-directory";
 import { allGuides } from "@/lib/all-guides";
-import { guideGroups } from "@/lib/guide-groups-sanitaer-trades";
+import { guideGroups } from "@/lib/guide-groups";
 import { siteConfig } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
