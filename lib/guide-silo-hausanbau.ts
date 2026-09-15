@@ -36,6 +36,15 @@ const hausanbauGuideSilos: Record<string, GuideSilo> = {
     calculatorLabel: "Anbau-Bauweise berechnen",
     regionalMode: "service",
   },
+  "hausanbau-oder-dachaufstockung-kosten": {
+    serviceSlugs: ["hausanbau", "dachausbau"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "hausanbau",
+      itemSlug: "hausanbau-schluesselfertig-massiv",
+    }),
+    calculatorLabel: "Wohnraumerweiterung vergleichen",
+    regionalMode: "service",
+  },
   "hausanbau-rohbau-fundament-kosten": {
     serviceSlugs: ["hausanbau", "maurer"],
     calculatorHref: handwerkerCalculatorHref({
