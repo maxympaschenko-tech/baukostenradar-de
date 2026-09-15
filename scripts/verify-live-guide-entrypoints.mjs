@@ -52,6 +52,52 @@ if (!priceGuideSource.includes('from "./price-guide-links-abriss-expansion"') ||
   process.exit(1);
 }
 
+const decisionRegistrations = [
+  ["all-guides-garage.ts", "guide-fertiggarage-massivgarage-vergleich"],
+  ["all-guides-pool.ts", "guide-gfk-betonpool-vergleich"],
+  ["all-guides-terrace-cover.ts", "guide-terrassendach-glas-kunststoff-vergleich"],
+  ["all-guides-wintergarten.ts", "guide-kalt-wohnwintergarten-vergleich"],
+];
+
+for (const [fileName, expectedImport] of decisionRegistrations) {
+  const source = await readFile(join(root, "lib", fileName), "utf8");
+  if (!source.includes(expectedImport)) {
+    console.error(`${fileName} must register decision guide ${expectedImport}.`);
+    process.exit(1);
+  }
+}
+
+const decisionSiloImports = [
+  "guide-fertiggarage-massivgarage-vergleich",
+  "guide-gfk-betonpool-vergleich",
+  "guide-terrassendach-glas-kunststoff-vergleich",
+  "guide-kalt-wohnwintergarten-vergleich",
+];
+for (const expectedImport of decisionSiloImports) {
+  if (!siloSource.includes(expectedImport)) {
+    console.error(`guide-silo-live.ts must route decision guide ${expectedImport}.`);
+    process.exit(1);
+  }
+}
+
+const supplementalDecisionImports = [
+  "guide-gfk-betonpool-vergleich",
+  "guide-terrassendach-glas-kunststoff-vergleich",
+  "guide-kalt-wohnwintergarten-vergleich",
+];
+for (const expectedImport of supplementalDecisionImports) {
+  if (!supplementalSource.includes(expectedImport)) {
+    console.error(`guide-supplemental-links-live.ts must expose decision guide ${expectedImport} to peer links.`);
+    process.exit(1);
+  }
+}
+
+const garageSupplementalSource = await readFile(join(root, "lib", "guide-supplemental-links-carport-expansion.ts"), "utf8");
+if (!garageSupplementalSource.includes("fertiggarage-oder-massivgarage-kosten")) {
+  console.error("Garage supplemental links must expose the Fertiggarage-vs-Massivgarage decision guide.");
+  process.exit(1);
+}
+
 const directoryPage = await readFile(join(root, "app", "ratgeber", "page.tsx"), "utf8");
 if (!directoryPage.includes('from "@/lib/all-guides"') || !directoryPage.includes('from "@/lib/guide-groups"')) {
   console.error("app/ratgeber/page.tsx must consume the live all-guides and guide-groups aliases.");
@@ -75,4 +121,4 @@ for (const requiredImport of requiredDetailImports) {
   }
 }
 
-console.log("Live guide entrypoints OK: registry, directory, silo, supplemental links and price-guide mappings all use merged production aliases.");
+console.log("Live guide entrypoints OK: registry, directory, silo, supplemental links, price-guide mappings and decision-guide registrations all use merged production paths.");
