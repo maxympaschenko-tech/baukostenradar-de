@@ -2,10 +2,12 @@ import {
   withSupplementalGuideLinks as withBaseSupplementalGuideLinks,
   type GuideSupplementalLink,
 } from "./guide-supplemental-links-daemmung-expansion";
+import { fertigkellerMassivkellerVergleichGuide } from "./guide-fertigkeller-massivkeller-vergleich";
 import { gfkBetonpoolVergleichGuide } from "./guide-gfk-betonpool-vergleich";
 import { kaltWohnwintergartenVergleichGuide } from "./guide-kalt-wohnwintergarten-vergleich";
 import { pooltechnikGuide } from "./guide-pooltechnik";
 import { terrassendachGlasKunststoffVergleichGuide } from "./guide-terrassendach-glas-kunststoff-vergleich";
+import { kellerbauGuides } from "./guides-kellerbau";
 import { poolGuides } from "./guides-pool";
 import { terraceCoverGuides } from "./guides-terrace-cover";
 import { wintergartenGuides } from "./guides-wintergarten";
@@ -13,6 +15,15 @@ import { wintergartenGuides } from "./guides-wintergarten";
 export type { GuideSupplementalLink } from "./guide-supplemental-links-daemmung-expansion";
 
 type Peer = GuideSupplementalLink & { slug: string };
+
+const kellerbauPeers: Peer[] = [
+  ...kellerbauGuides,
+  fertigkellerMassivkellerVergleichGuide,
+].map((guide) => ({
+  slug: guide.slug,
+  label: guide.title,
+  href: `/ratgeber/${guide.slug}`,
+}));
 
 const poolPeers: Peer[] = [
   ...poolGuides,
@@ -58,7 +69,8 @@ export function withSupplementalGuideLinks(
   related: GuideSupplementalLink[],
 ): GuideSupplementalLink[] {
   const base = withBaseSupplementalGuideLinks(slug, related);
-  const withPoolPeers = addPeers(base, slug, poolPeers);
+  const withKellerbauPeers = addPeers(base, slug, kellerbauPeers);
+  const withPoolPeers = addPeers(withKellerbauPeers, slug, poolPeers);
   const withTerraceCoverPeers = addPeers(withPoolPeers, slug, terraceCoverPeers);
   return addPeers(withTerraceCoverPeers, slug, wintergartenPeers);
 }
