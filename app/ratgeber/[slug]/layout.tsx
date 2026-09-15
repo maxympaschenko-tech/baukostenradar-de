@@ -7,12 +7,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const guide = getAnyGuide(slug);
   if (!guide) return {};
 
-  return socialMetadata({
+  const sharedMetadata = socialMetadata({
     title: guide.title,
     description: guide.description,
     url: `/ratgeber/${guide.slug}`,
     type: "article",
   });
+
+  return {
+    ...sharedMetadata,
+    title: {
+      default: guide.title,
+      template: "%s – Ratgeber | BauKostenRadar",
+    },
+  };
 }
 
 export default function GuideLayout({ children }: Readonly<{ children: React.ReactNode }>) {
