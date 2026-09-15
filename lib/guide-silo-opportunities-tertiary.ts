@@ -123,6 +123,42 @@ export const tertiaryOpportunitySilos: Record<string, OpportunitySiloConfig> = {
     itemSlug: "dachdaemmung-aufsparren",
     calculatorLabel: "Aufsparrendämmung berechnen",
   },
+  "untersparrendaemmung-kosten-pro-qm": {
+    serviceSlugs: ["daemmung", "dachsanierung"],
+    serviceSlug: "daemmung",
+    itemSlug: "dachdaemmung-untersparren",
+    calculatorLabel: "Untersparrendämmung berechnen",
+  },
+  "flachdach-warmdaemmung-kosten-pro-qm": {
+    serviceSlugs: ["daemmung", "dachsanierung"],
+    serviceSlug: "daemmung",
+    itemSlug: "flachdachdaemmung-warmdach",
+    calculatorLabel: "Warmdach-Dämmung berechnen",
+  },
+  "flachdach-kaltdaemmung-kosten-pro-qm": {
+    serviceSlugs: ["daemmung", "dachsanierung"],
+    serviceSlug: "daemmung",
+    itemSlug: "flachdachdaemmung-kaltdach",
+    calculatorLabel: "Kaltdach-Dämmung berechnen",
+  },
+  "flachdach-warmdach-oder-kaltdach-kosten": {
+    serviceSlugs: ["daemmung", "dachsanierung"],
+    serviceSlug: "daemmung",
+    itemSlug: "flachdachdaemmung-warmdach",
+    calculatorLabel: "Flachdachdämmung berechnen",
+  },
+  "einblasdaemmung-geschossdecke-kosten-pro-qm": {
+    serviceSlugs: ["daemmung"],
+    serviceSlug: "daemmung",
+    itemSlug: "einblasdaemmung-oberste-geschossdecke",
+    calculatorLabel: "Einblasdämmung berechnen",
+  },
+  "perimeterdaemmung-kosten-pro-qm": {
+    serviceSlugs: ["daemmung", "kellerabdichtung"],
+    serviceSlug: "daemmung",
+    itemSlug: "perimeterdaemmung-kellerwand",
+    calculatorLabel: "Perimeterdämmung berechnen",
+  },
   "putzfassade-kosten-pro-qm": {
     serviceSlugs: ["fassade", "maler", "daemmung"],
     serviceSlug: "fassade",
