@@ -29,6 +29,8 @@ export function socialMetadata({
   type = "website",
 }: SocialMetadataInput): Metadata {
   return {
+    title,
+    description,
     alternates: {
       canonical: url,
     },
