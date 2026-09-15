@@ -5,15 +5,30 @@ import { priceItemSlug } from "@/lib/price-slug";
 import { regions, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Handwerkerkosten Rechner 2026",
-  description: `Handwerkerkosten online berechnen: Gewerk, Leistung, Menge und Region auswählen. Mit ${services.reduce((sum, service) => sum + service.priceItems.length, 0)} Preispositionen, Einzelpreisen, Stadtvergleich und Quellen.`,
-  alternates: { canonical: "/rechner/handwerkerkosten" },
-};
+type CalculatorSearchParams = Record<string, string | string[] | undefined>;
+
+const calculatorTitle = "Handwerkerkosten Rechner 2026";
+const calculatorDescription = `Handwerkerkosten online berechnen: Gewerk, Leistung, Menge und Region auswählen. Mit ${services.reduce((sum, service) => sum + service.priceItems.length, 0)} Preispositionen, Einzelpreisen, Stadtvergleich und Quellen.`;
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<CalculatorSearchParams>;
+}): Promise<Metadata> {
+  const query = await searchParams;
+  const hasQueryParameters = Object.values(query).some((value) => value !== undefined);
+
+  return {
+    title: calculatorTitle,
+    description: calculatorDescription,
+    alternates: { canonical: "/rechner/handwerkerkosten" },
+    robots: hasQueryParameters
+      ? { index: false, follow: true }
+      : { index: true, follow: true },
+  };
+}
 
 const featuredServiceSlugs = ["maler", "elektriker", "dachsanierung", "fenster", "heizung", "bodenleger"];
-
-type CalculatorSearchParams = Record<string, string | string[] | undefined>;
 
 function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
@@ -64,11 +79,11 @@ export default async function HandwerkerCostCalculatorPage({
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      name: "Handwerkerkosten Rechner 2026",
+      name: calculatorTitle,
       url: `${base}/rechner/handwerkerkosten`,
       applicationCategory: "FinanceApplication",
       operatingSystem: "Web",
-      description: metadata.description,
+      description: calculatorDescription,
       offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
     },
   ];
