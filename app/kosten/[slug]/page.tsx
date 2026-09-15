@@ -234,7 +234,8 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
   const sourceKeys = [...new Set(service.priceItems.map((item) => item.sourceKey))];
   const leadPrice = service.priceItems[0];
   const relatedServices = getRelatedServices(service.slug, services);
-  const canonicalUrl = `${siteConfig.url.replace(/\/$/, "")}/kosten/${service.slug}`;
+  const baseUrl = siteConfig.url.replace(/\/$/, "");
+  const canonicalUrl = `${baseUrl}/kosten/${service.slug}`;
   const leadItemSlug = priceItemSlug(leadPrice.name);
   const serviceCalculatorUrl = service.slug === "badsanierung"
     ? "/rechner/badsanierungskosten"
@@ -311,7 +312,7 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Startseite", item: siteConfig.url },
-        { "@type": "ListItem", position: 2, name: "Handwerker Kosten", item: `${siteConfig.url.replace(/\/$/, "")}/kosten` },
+        { "@type": "ListItem", position: 2, name: "Handwerker Kosten", item: `${baseUrl}/kosten` },
         { "@type": "ListItem", position: 3, name: service.shortTitle, item: canonicalUrl },
       ],
     },
@@ -325,6 +326,34 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
           "@type": "Answer",
           text: faq.answer,
         },
+      })),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: service.title,
+      url: canonicalUrl,
+      description: service.description,
+      isPartOf: {
+        "@type": "WebSite",
+        name: siteConfig.name,
+        url: baseUrl,
+      },
+      about: {
+        "@type": "Thing",
+        name: `${service.shortTitle} Kosten`,
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: `${service.shortTitle}: Preispositionen 2026`,
+      numberOfItems: service.priceItems.length,
+      itemListElement: service.priceItems.map((item, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: item.name,
+        url: `${canonicalUrl}/leistung/${priceItemSlug(item.name)}`,
       })),
     },
   ];
