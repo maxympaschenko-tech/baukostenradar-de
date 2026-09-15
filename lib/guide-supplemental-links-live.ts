@@ -4,6 +4,7 @@ import {
 } from "./guide-supplemental-links-daemmung-expansion";
 import { fertigkellerMassivkellerVergleichGuide } from "./guide-fertigkeller-massivkeller-vergleich";
 import { gfkBetonpoolVergleichGuide } from "./guide-gfk-betonpool-vergleich";
+import { holzAluTerrassenueberdachungVergleichGuide } from "./guide-holz-alu-terrassenueberdachung-vergleich";
 import { kaltWohnwintergartenVergleichGuide } from "./guide-kalt-wohnwintergarten-vergleich";
 import { pooltechnikGuide } from "./guide-pooltechnik";
 import { terrassendachGlasKunststoffVergleichGuide } from "./guide-terrassendach-glas-kunststoff-vergleich";
@@ -37,6 +38,7 @@ const poolPeers: Peer[] = [
 
 const terraceCoverPeers: Peer[] = [
   ...terraceCoverGuides,
+  holzAluTerrassenueberdachungVergleichGuide,
   terrassendachGlasKunststoffVergleichGuide,
 ].map((guide) => ({
   slug: guide.slug,
