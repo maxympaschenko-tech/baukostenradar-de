@@ -1,10 +1,29 @@
 import {
-  getPriceGuideLink as getBasePriceGuideLink,
-  getServiceGuideLink as getBaseServiceGuideLink,
+  getPriceGuideLink as getLegacyPriceGuideLink,
+  getServiceGuideLink as getLegacyServiceGuideLink,
   type PriceGuideLink,
 } from "./price-guide-links-abriss-expansion";
+import {
+  getPriceGuideLink as getExpandedPriceGuideLink,
+  getServiceGuideLink as getExpandedServiceGuideLink,
+} from "./price-guide-links-kellerbau";
 
 export type { PriceGuideLink } from "./price-guide-links-abriss-expansion";
+
+const expandedServiceSlugs = new Set([
+  "balkon",
+  "garage",
+  "carport",
+  "schornstein",
+  "zaunbau",
+  "poolbau",
+  "terrassenbau",
+  "terrassenueberdachung",
+  "wintergarten",
+  "dachausbau",
+  "hausanbau",
+  "kellerbau",
+]);
 
 const canonicalRatgeberHrefs: Record<string, string> = {
   "/ratgeber/tuer-lackieren-kosten": "/ratgeber/innentuer-lackieren-kosten",
@@ -31,7 +50,10 @@ function normalizeGuideLink(link: PriceGuideLink): PriceGuideLink {
 }
 
 export function getServiceGuideLink(serviceSlug: string): PriceGuideLink {
-  return normalizeGuideLink(getBaseServiceGuideLink(serviceSlug));
+  const link = expandedServiceSlugs.has(serviceSlug)
+    ? getExpandedServiceGuideLink(serviceSlug)
+    : getLegacyServiceGuideLink(serviceSlug);
+  return normalizeGuideLink(link);
 }
 
 export function getPriceGuideLink(options: {
@@ -40,5 +62,8 @@ export function getPriceGuideLink(options: {
   itemName: string;
   unit: string;
 }): PriceGuideLink {
-  return normalizeGuideLink(getBasePriceGuideLink(options));
+  const link = expandedServiceSlugs.has(options.serviceSlug)
+    ? getExpandedPriceGuideLink(options)
+    : getLegacyPriceGuideLink(options);
+  return normalizeGuideLink(link);
 }
