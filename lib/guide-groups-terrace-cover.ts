@@ -10,6 +10,7 @@ const terraceCoverGroup: GuideGroup = {
     "terrassenueberdachung-kosten",
     "holz-terrassenueberdachung-kosten",
     "alu-terrassenueberdachung-kosten",
+    "terrassenueberdachung-holz-oder-alu-kosten",
     "glasdach-terrasse-kosten",
     "terrassendach-glas-oder-kunststoff-kosten",
     "lamellendach-pergola-kosten",
