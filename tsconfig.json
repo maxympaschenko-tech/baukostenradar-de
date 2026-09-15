@@ -20,7 +20,7 @@
       "@/lib/all-guides": ["./lib/all-guides-live.ts"],
       "@/lib/guide-groups": ["./lib/guide-groups-live.ts"],
       "@/lib/guide-silo": ["./lib/guide-silo-live.ts"],
-      "@/lib/guide-supplemental-links": ["./lib/guide-supplemental-links-daemmung-expansion.ts"],
+      "@/lib/guide-supplemental-links": ["./lib/guide-supplemental-links-live.ts"],
       "@/*": ["./*"]
     }
   },
