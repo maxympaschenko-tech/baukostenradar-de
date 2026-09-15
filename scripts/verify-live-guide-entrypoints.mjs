@@ -62,6 +62,7 @@ const decisionRegistrations = [
   ["all-guides-terrace-cover.ts", "guide-holz-alu-terrassenueberdachung-vergleich"],
   ["all-guides-terrace-cover.ts", "guide-terrassendach-glas-kunststoff-vergleich"],
   ["all-guides-wintergarten.ts", "guide-kalt-wohnwintergarten-vergleich"],
+  ["all-guides-wintergarten.ts", "guide-wintergarten-terrassenueberdachung-vergleich"],
 ];
 
 for (const [fileName, expectedImport] of decisionRegistrations) {
@@ -82,6 +83,7 @@ const decisionSiloImports = [
   "guide-holz-alu-terrassenueberdachung-vergleich",
   "guide-terrassendach-glas-kunststoff-vergleich",
   "guide-kalt-wohnwintergarten-vergleich",
+  "guide-wintergarten-terrassenueberdachung-vergleich",
 ];
 for (const expectedImport of decisionSiloImports) {
   if (!siloSource.includes(expectedImport)) {
@@ -98,12 +100,19 @@ const supplementalDecisionImports = [
   "guide-holz-alu-terrassenueberdachung-vergleich",
   "guide-terrassendach-glas-kunststoff-vergleich",
   "guide-kalt-wohnwintergarten-vergleich",
+  "guide-wintergarten-terrassenueberdachung-vergleich",
 ];
 for (const expectedImport of supplementalDecisionImports) {
   if (!supplementalSource.includes(expectedImport)) {
     console.error(`guide-supplemental-links-live.ts must expose decision guide ${expectedImport} to peer links.`);
     process.exit(1);
   }
+}
+
+const wintergartenTerraceCoverPeerOccurrences = supplementalSource.match(/wintergartenTerrassenueberdachungVergleichGuide/g)?.length ?? 0;
+if (wintergartenTerraceCoverPeerOccurrences < 3) {
+  console.error("Wintergarten-vs-Terrassenueberdachung must be imported and linked from both peer clusters.");
+  process.exit(1);
 }
 
 if (!supplementalSource.includes('from "./guides-hausanbau"')) {
