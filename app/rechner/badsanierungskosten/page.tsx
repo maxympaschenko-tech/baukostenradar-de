@@ -5,13 +5,28 @@ import { priceItemSlug } from "@/lib/price-slug";
 import { getService, priceSources, regions } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Badsanierung Kosten Rechner 2026",
-  description: "Badsanierungskosten 2026 nach Badgröße und Region online berechnen. Mit transparentem m²-Richtwert, Regionalfaktor, Einzelpreisen, Quellen und Stadtvergleich.",
-  alternates: { canonical: "/rechner/badsanierungskosten" },
-};
-
 type BathCalculatorSearchParams = Record<string, string | string[] | undefined>;
+
+const calculatorTitle = "Badsanierung Kosten Rechner 2026";
+const calculatorDescription = "Badsanierungskosten 2026 nach Badgröße und Region online berechnen. Mit transparentem m²-Richtwert, Regionalfaktor, Einzelpreisen, Quellen und Stadtvergleich.";
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<BathCalculatorSearchParams>;
+}): Promise<Metadata> {
+  const query = await searchParams;
+  const hasQueryParameters = Object.values(query).some((value) => value !== undefined);
+
+  return {
+    title: calculatorTitle,
+    description: calculatorDescription,
+    alternates: { canonical: "/rechner/badsanierungskosten" },
+    robots: hasQueryParameters
+      ? { index: false, follow: true }
+      : { index: true, follow: true },
+  };
+}
 
 function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
@@ -66,11 +81,11 @@ export default async function BathCostCalculatorPage({
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      name: "Badsanierung Kosten Rechner 2026",
+      name: calculatorTitle,
       url: `${base}/rechner/badsanierungskosten`,
       applicationCategory: "FinanceApplication",
       operatingSystem: "Web",
-      description: metadata.description,
+      description: calculatorDescription,
       offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
     },
     {
