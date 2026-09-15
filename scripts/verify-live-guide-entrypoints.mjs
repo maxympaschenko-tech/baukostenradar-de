@@ -11,6 +11,7 @@ const expectedAliases = {
   "@/lib/guide-groups": "./lib/guide-groups-live.ts",
   "@/lib/guide-silo": "./lib/guide-silo-live.ts",
   "@/lib/guide-supplemental-links": "./lib/guide-supplemental-links-live.ts",
+  "@/lib/price-guide-links": "./lib/price-guide-links-live.ts",
 };
 
 for (const [alias, expected] of Object.entries(expectedAliases)) {
@@ -45,6 +46,12 @@ if (!supplementalSource.includes('from "./guide-supplemental-links-daemmung-expa
   process.exit(1);
 }
 
+const priceGuideSource = await readFile(join(root, "lib", "price-guide-links-live.ts"), "utf8");
+if (!priceGuideSource.includes('from "./price-guide-links-abriss-expansion"') || !priceGuideSource.includes('from "./price-guide-links-kellerbau"')) {
+  console.error("price-guide-links-live.ts must route across both legacy and expanded price-guide branches.");
+  process.exit(1);
+}
+
 const directoryPage = await readFile(join(root, "app", "ratgeber", "page.tsx"), "utf8");
 if (!directoryPage.includes('from "@/lib/all-guides"') || !directoryPage.includes('from "@/lib/guide-groups"')) {
   console.error("app/ratgeber/page.tsx must consume the live all-guides and guide-groups aliases.");
@@ -68,4 +75,4 @@ for (const requiredImport of requiredDetailImports) {
   }
 }
 
-console.log("Live guide entrypoints OK: registry, directory, silo and supplemental links all use merged production aliases.");
+console.log("Live guide entrypoints OK: registry, directory, silo, supplemental links and price-guide mappings all use merged production aliases.");
