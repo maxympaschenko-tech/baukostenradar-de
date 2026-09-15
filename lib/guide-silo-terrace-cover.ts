@@ -36,6 +36,15 @@ const terraceCoverGuideSilos: Record<string, GuideSilo> = {
     calculatorLabel: "Alu-Terrassendach berechnen",
     regionalMode: "service",
   },
+  "terrassenueberdachung-holz-oder-alu-kosten": {
+    serviceSlugs: ["terrassenueberdachung"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "terrassenueberdachung",
+      itemSlug: "holz-terrassenueberdachung-mit-kunststoff-4-x-3-m-wandmontage",
+    }),
+    calculatorLabel: "Holz und Alu vergleichen",
+    regionalMode: "service",
+  },
   "glasdach-terrasse-kosten": {
     serviceSlugs: ["terrassenueberdachung"],
     calculatorHref: handwerkerCalculatorHref({
