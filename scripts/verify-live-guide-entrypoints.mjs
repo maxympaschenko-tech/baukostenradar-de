@@ -55,6 +55,7 @@ if (!priceGuideSource.includes('from "./price-guide-links-abriss-expansion"') ||
 const decisionRegistrations = [
   ["all-guides-dachausbau.ts", "guide-dachgaube-dachfenster-vergleich"],
   ["all-guides-garage.ts", "guide-fertiggarage-massivgarage-vergleich"],
+  ["all-guides-garage.ts", "guide-garage-carport-vergleich"],
   ["all-guides-hausanbau.ts", "guide-hausanbau-dachaufstockung-vergleich"],
   ["all-guides-kellerbau.ts", "guide-fertigkeller-massivkeller-vergleich"],
   ["all-guides-pool.ts", "guide-gfk-betonpool-vergleich"],
@@ -74,6 +75,7 @@ for (const [fileName, expectedImport] of decisionRegistrations) {
 const decisionSiloImports = [
   "guide-dachgaube-dachfenster-vergleich",
   "guide-fertiggarage-massivgarage-vergleich",
+  "guide-garage-carport-vergleich",
   "guide-fertigkeller-massivkeller-vergleich",
   "guide-gfk-betonpool-vergleich",
   "guide-hausanbau-dachaufstockung-vergleich",
@@ -117,6 +119,10 @@ if (!supplementalSource.includes("dachfenster-nachtraeglich-einbauen-kosten")) {
 const garageSupplementalSource = await readFile(join(root, "lib", "guide-supplemental-links-carport-expansion.ts"), "utf8");
 if (!garageSupplementalSource.includes("fertiggarage-oder-massivgarage-kosten")) {
   console.error("Garage supplemental links must expose the Fertiggarage-vs-Massivgarage decision guide.");
+  process.exit(1);
+}
+if (!garageSupplementalSource.includes("garage-oder-carport-kosten")) {
+  console.error("Garage supplemental links must expose the Garage-vs-Carport decision guide.");
   process.exit(1);
 }
 
