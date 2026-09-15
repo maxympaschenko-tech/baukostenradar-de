@@ -52,7 +52,7 @@ function withCurrentPerimeterData(guide: Guide): Guide {
 const guidesBySlug = new Map<string, Guide>();
 
 for (const guide of baseGuides) {
-  if (redirectedLegacyGuideSlugs.has(guide.slug)) continue;
+  if (redirectedLegacyGuideSlugs.has(guide.slug) || guidesBySlug.has(guide.slug)) continue;
   guidesBySlug.set(guide.slug, withCurrentPerimeterData(guide));
 }
 
