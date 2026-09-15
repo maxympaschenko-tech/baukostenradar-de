@@ -8,7 +8,8 @@
     "start": "next start --hostname ${HOST:-127.0.0.1} --port ${PORT:-3000}",
     "typecheck": "tsc --noEmit",
     "verify:guides": "node scripts/verify-guide-link-integrity.mjs",
-    "check": "npm run typecheck && npm run verify:guides"
+    "verify:price-guides": "node scripts/verify-price-guide-links.mjs",
+    "check": "npm run typecheck && npm run verify:guides && npm run verify:price-guides"
   },
   "engines": {
     "node": ">=24.0.0"
