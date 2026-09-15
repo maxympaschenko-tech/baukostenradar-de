@@ -1,9 +1,9 @@
 import {
   withSupplementalGuideLinks as withBaseSupplementalGuideLinks,
   type GuideSupplementalLink,
-} from "./guide-supplemental-links";
+} from "./guide-supplemental-links-base";
 
-export type { GuideSupplementalLink } from "./guide-supplemental-links";
+export type { GuideSupplementalLink } from "./guide-supplemental-links-base";
 
 type PhotovoltaikPeer = GuideSupplementalLink & { slug: string };
 
