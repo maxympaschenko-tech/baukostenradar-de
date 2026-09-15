@@ -6,6 +6,7 @@ import { handwerkerCalculatorHref } from "@/lib/calculator-links";
 import { getServiceGuideLink } from "@/lib/price-guide-links";
 import { priceItemSlug } from "@/lib/price-slug";
 import { getService, priceSources, regions, services } from "@/lib/pricing";
+import { getRelatedServices } from "@/lib/related-services";
 import { siteConfig } from "@/lib/site";
 
 function euro(value: number) {
@@ -232,7 +233,7 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
 
   const sourceKeys = [...new Set(service.priceItems.map((item) => item.sourceKey))];
   const leadPrice = service.priceItems[0];
-  const relatedServices = services.filter((item) => item.slug !== service.slug).slice(0, 5);
+  const relatedServices = getRelatedServices(service.slug, services);
   const canonicalUrl = `${siteConfig.url.replace(/\/$/, "")}/kosten/${service.slug}`;
   const leadItemSlug = priceItemSlug(leadPrice.name);
   const serviceCalculatorUrl = service.slug === "badsanierung"
