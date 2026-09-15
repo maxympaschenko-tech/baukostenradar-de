@@ -36,6 +36,15 @@ const garageGuideSilos: Record<string, GuideSilo> = {
     calculatorLabel: "Massivgarage berechnen",
     regionalMode: "service",
   },
+  "fertiggarage-oder-massivgarage-kosten": {
+    serviceSlugs: ["garage", "maurer"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "garage",
+      itemSlug: "fertiggarage-einzelgarage-grundpreis",
+    }),
+    calculatorLabel: "Garagenvarianten berechnen",
+    regionalMode: "service",
+  },
   "garagenfundament-kosten-pro-qm": {
     serviceSlugs: ["garage", "carport", "maurer"],
     calculatorHref: handwerkerCalculatorHref({
