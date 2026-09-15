@@ -3,10 +3,12 @@ import {
   type GuideSupplementalLink,
 } from "./guide-supplemental-links-daemmung-expansion";
 import { gfkBetonpoolVergleichGuide } from "./guide-gfk-betonpool-vergleich";
+import { kaltWohnwintergartenVergleichGuide } from "./guide-kalt-wohnwintergarten-vergleich";
 import { pooltechnikGuide } from "./guide-pooltechnik";
 import { terrassendachGlasKunststoffVergleichGuide } from "./guide-terrassendach-glas-kunststoff-vergleich";
 import { poolGuides } from "./guides-pool";
 import { terraceCoverGuides } from "./guides-terrace-cover";
+import { wintergartenGuides } from "./guides-wintergarten";
 
 export type { GuideSupplementalLink } from "./guide-supplemental-links-daemmung-expansion";
 
@@ -31,6 +33,15 @@ const terraceCoverPeers: Peer[] = [
   href: `/ratgeber/${guide.slug}`,
 }));
 
+const wintergartenPeers: Peer[] = [
+  ...wintergartenGuides,
+  kaltWohnwintergartenVergleichGuide,
+].map((guide) => ({
+  slug: guide.slug,
+  label: guide.title,
+  href: `/ratgeber/${guide.slug}`,
+}));
+
 function addPeers(base: GuideSupplementalLink[], slug: string, peers: Peer[]) {
   if (!peers.some((peer) => peer.slug === slug)) return base;
 
@@ -48,5 +59,6 @@ export function withSupplementalGuideLinks(
 ): GuideSupplementalLink[] {
   const base = withBaseSupplementalGuideLinks(slug, related);
   const withPoolPeers = addPeers(base, slug, poolPeers);
-  return addPeers(withPoolPeers, slug, terraceCoverPeers);
+  const withTerraceCoverPeers = addPeers(withPoolPeers, slug, terraceCoverPeers);
+  return addPeers(withTerraceCoverPeers, slug, wintergartenPeers);
 }
