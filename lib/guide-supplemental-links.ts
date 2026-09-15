@@ -64,6 +64,17 @@ const fensterGuideLinks: SupplementalGuide[] = [
   { slug: "sicherheitsglas-vsg-fenster-kosten", label: "Fenster mit VSG-Sicherheitsglas Kosten", href: "/ratgeber/sicherheitsglas-vsg-fenster-kosten" },
 ];
 
+const bodenGuideLinks: SupplementalGuide[] = [
+  { slug: "bodenleger-kosten-pro-qm", label: "Bodenleger Kosten pro m²", href: "/ratgeber/bodenleger-kosten-pro-qm" },
+  { slug: "bodenleger-stundensatz", label: "Bodenleger Stundensatz", href: "/ratgeber/bodenleger-stundensatz" },
+  { slug: "boden-sanieren-kosten-pro-qm", label: "Bodensanierung Kosten pro m²", href: "/ratgeber/boden-sanieren-kosten-pro-qm" },
+  { slug: "vinylboden-verlegen-kosten-pro-qm", label: "Vinylboden verlegen Kosten pro m²", href: "/ratgeber/vinylboden-verlegen-kosten-pro-qm" },
+  { slug: "klick-vinyl-verlegen-kosten-pro-qm", label: "Klick-Vinyl verlegen Kosten", href: "/ratgeber/klick-vinyl-verlegen-kosten-pro-qm" },
+  { slug: "klebe-vinyl-verlegen-kosten-pro-qm", label: "Klebe-Vinyl verlegen Kosten", href: "/ratgeber/klebe-vinyl-verlegen-kosten-pro-qm" },
+  { slug: "bodenbelag-entfernen-kosten-pro-qm", label: "Bodenbelag entfernen Kosten", href: "/ratgeber/bodenbelag-entfernen-kosten-pro-qm" },
+  { slug: "boden-vorbereiten-ausgleichen-kosten-pro-qm", label: "Untergrund vorbereiten und ausgleichen", href: "/ratgeber/boden-vorbereiten-ausgleichen-kosten-pro-qm" },
+];
+
 const renovationAreaGuideLinks: SupplementalGuide[] = [
   { slug: "wohnung-renovieren-kosten", label: "Wohnung renovieren Kosten", href: "/ratgeber/wohnung-renovieren-kosten" },
   { slug: "renovierungskosten-haus", label: "Renovierungskosten Haus", href: "/ratgeber/renovierungskosten-haus" },
@@ -109,6 +120,7 @@ const supplementalClusters = [
   abrissGuideLinks,
   heatingGuideLinks,
   fensterGuideLinks,
+  bodenGuideLinks,
   renovationAreaGuideLinks,
   houseRenovationGuideLinks,
   planningCostGuideLinks,
