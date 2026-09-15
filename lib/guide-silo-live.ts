@@ -11,6 +11,7 @@ import { dachausbauGuides } from "./guides-dachausbau-current";
 import { hausanbauGuides } from "./guides-hausanbau";
 import { kellerbauGuides } from "./guides-kellerbau";
 import { fertiggarageMassivgarageVergleichGuide } from "./guide-fertiggarage-massivgarage-vergleich";
+import { terrassendachGlasKunststoffVergleichGuide } from "./guide-terrassendach-glas-kunststoff-vergleich";
 import {
   getGuideSilo as getLegacyGuideSilo,
   type GuideSilo,
@@ -32,6 +33,7 @@ const expandedGuideSlugs = new Set([
   ...hausanbauGuides,
   ...kellerbauGuides,
   fertiggarageMassivgarageVergleichGuide,
+  terrassendachGlasKunststoffVergleichGuide,
 ].map((guide) => guide.slug));
 
 export function getGuideSilo(slug: string): GuideSilo {
