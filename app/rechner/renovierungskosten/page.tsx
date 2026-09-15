@@ -5,11 +5,28 @@ import { priceItemSlug } from "@/lib/price-slug";
 import { regions, renovationModel, services } from "@/lib/pricing";
 import { siteConfig } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Renovierungskosten Rechner 2026",
-  description: "Renovierungskosten 2026 nach Wohnfläche, Sanierungsumfang, Standard und Region kalkulieren. Mit Richtwerten pro m², Gewerken, Stadtvergleich und Ratgebern.",
-  alternates: { canonical: "/rechner/renovierungskosten" },
-};
+type RenovationSearchParams = Record<string, string | string[] | undefined>;
+
+const calculatorTitle = "Renovierungskosten Rechner 2026";
+const calculatorDescription = "Renovierungskosten 2026 nach Wohnfläche, Sanierungsumfang, Standard und Region kalkulieren. Mit Richtwerten pro m², Gewerken, Stadtvergleich und Ratgebern.";
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<RenovationSearchParams>;
+}): Promise<Metadata> {
+  const query = await searchParams;
+  const hasQueryParameters = Object.values(query).some((value) => value !== undefined);
+
+  return {
+    title: calculatorTitle,
+    description: calculatorDescription,
+    alternates: { canonical: "/rechner/renovierungskosten" },
+    robots: hasQueryParameters
+      ? { index: false, follow: true }
+      : { index: true, follow: true },
+  };
+}
 
 const featuredServiceSlugs = ["badsanierung", "elektriker", "dachsanierung", "fenster", "heizung", "bodenleger"];
 
@@ -31,10 +48,7 @@ function parseInitialCondition(value: string | string[] | undefined) {
 export default async function RenovationCalculatorPage({
   searchParams,
 }: {
-  searchParams: Promise<{
-    flaeche?: string | string[];
-    umfang?: string | string[];
-  }>;
+  searchParams: Promise<RenovationSearchParams>;
 }) {
   const resolvedSearchParams = await searchParams;
   const initialArea = parseInitialArea(resolvedSearchParams.flaeche);
@@ -58,11 +72,11 @@ export default async function RenovationCalculatorPage({
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      name: "Renovierungskosten Rechner 2026",
+      name: calculatorTitle,
       url: `${base}/rechner/renovierungskosten`,
       applicationCategory: "FinanceApplication",
       operatingSystem: "Web",
-      description: metadata.description,
+      description: calculatorDescription,
       offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
     },
   ];
