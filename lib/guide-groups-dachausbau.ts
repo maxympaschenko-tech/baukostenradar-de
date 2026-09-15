@@ -10,6 +10,7 @@ const dachausbauGroup: GuideGroup = {
     "dachausbau-kosten",
     "dachboden-ausbauen-kosten-pro-qm",
     "dachgaube-kosten",
+    "dachgaube-oder-dachfenster-kosten",
     "dach-anheben-kosten",
     "dachaufstockung-kosten",
   ],
