@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start --hostname ${HOST:-127.0.0.1} --port ${PORT:-3000}",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "verify:guides": "node scripts/verify-guide-link-integrity.mjs",
+    "check": "npm run typecheck && npm run verify:guides"
   },
   "engines": {
     "node": ">=24.0.0"
