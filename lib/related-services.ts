@@ -42,7 +42,9 @@ export function getRelatedServices(
   allServices: Service[],
   limit = 5,
 ): Service[] {
-  const preferredSlugs = relatedServiceSlugs[serviceSlug] ?? [];
+  const preferredSlugs = relatedServiceSlugs[serviceSlug];
+  if (!preferredSlugs) return [];
+
   const serviceBySlug = new Map(allServices.map((service) => [service.slug, service]));
   const preferred = preferredSlugs
     .map((slug) => serviceBySlug.get(slug))
