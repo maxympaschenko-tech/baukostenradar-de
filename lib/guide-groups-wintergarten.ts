@@ -5,11 +5,12 @@ export type { GuideGroup } from "./guide-groups-terrace-cover";
 const wintergartenGroup: GuideGroup = {
   eyebrow: "Wintergarten & Glasanbau",
   title: "Kaltwintergarten, Wohnwintergarten, Verglasung und Fundament kalkulieren",
-  description: "Wintergartenkosten mit aktuellen 2026-Richtwerten für Kalt-, Mittel- und Warmwintergarten, Rahmenmaterialien, Verglasung, Fundament und technische Ausstattung vergleichen.",
+  description: "Wintergartenkosten mit aktuellen 2026-Richtwerten für Kalt-, Mittel- und Warmwintergarten, direkten Kalt-vs.-Wohnwintergarten-Vergleich, Rahmenmaterialien, Verglasung, Fundament und technische Ausstattung vergleichen.",
   slugs: [
     "wintergarten-kosten",
     "kaltwintergarten-kosten",
     "wohnwintergarten-kosten",
+    "kaltwintergarten-oder-wohnwintergarten-kosten",
     "wintergarten-verglasung-kosten",
     "wintergarten-fundament-kosten",
   ],
