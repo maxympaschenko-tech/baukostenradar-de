@@ -52,10 +52,11 @@ export default async function PriceItemLayout({
   children: React.ReactNode;
   params: Promise<{ slug: string; item: string }>;
 }>) {
-  const { slug } = await params;
+  const { slug, item: itemSlug } = await params;
   const service = getService(slug);
+  const item = service ? getPriceItem(service, itemSlug) : undefined;
 
-  if (!service) return children;
+  if (!service || !item) return children;
 
   const relatedServices = getRelatedServices(service.slug, services);
 
