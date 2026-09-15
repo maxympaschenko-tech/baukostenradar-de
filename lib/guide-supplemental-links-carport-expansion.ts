@@ -11,6 +11,7 @@ const garageCarportPeers: Peer[] = [
   { slug: "garage-bauen-kosten", label: "Garage bauen Kosten", href: "/ratgeber/garage-bauen-kosten" },
   { slug: "fertiggarage-kosten", label: "Fertiggarage Kosten", href: "/ratgeber/fertiggarage-kosten" },
   { slug: "massivgarage-kosten", label: "Massivgarage Kosten", href: "/ratgeber/massivgarage-kosten" },
+  { slug: "fertiggarage-oder-massivgarage-kosten", label: "Fertiggarage oder Massivgarage vergleichen", href: "/ratgeber/fertiggarage-oder-massivgarage-kosten" },
   { slug: "garagenfundament-kosten-pro-qm", label: "Garagenfundament Kosten", href: "/ratgeber/garagenfundament-kosten-pro-qm" },
   { slug: "garagentor-einbauen-kosten", label: "Garagentor einbauen Kosten", href: "/ratgeber/garagentor-einbauen-kosten" },
   { slug: "carport-kosten", label: "Carport Kosten", href: "/ratgeber/carport-kosten" },
