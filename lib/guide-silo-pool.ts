@@ -36,6 +36,15 @@ const poolGuideSilos: Record<string, GuideSilo> = {
     calculatorLabel: "Betonpool berechnen",
     regionalMode: "service",
   },
+  "gfk-pool-oder-betonpool-kosten": {
+    serviceSlugs: ["poolbau"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "poolbau",
+      itemSlug: "gfk-pool-6-x-3-m-komplett",
+    }),
+    calculatorLabel: "Poolvarianten berechnen",
+    regionalMode: "service",
+  },
   "pool-erdarbeiten-kosten": {
     serviceSlugs: ["poolbau"],
     calculatorHref: handwerkerCalculatorHref({
