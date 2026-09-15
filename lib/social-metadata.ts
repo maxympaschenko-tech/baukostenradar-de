@@ -29,6 +29,9 @@ export function socialMetadata({
   type = "website",
 }: SocialMetadataInput): Metadata {
   return {
+    alternates: {
+      canonical: url,
+    },
     openGraph: {
       type,
       locale: "de_DE",
