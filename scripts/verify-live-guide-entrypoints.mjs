@@ -56,6 +56,7 @@ const decisionRegistrations = [
   ["all-guides-garage.ts", "guide-fertiggarage-massivgarage-vergleich"],
   ["all-guides-kellerbau.ts", "guide-fertigkeller-massivkeller-vergleich"],
   ["all-guides-pool.ts", "guide-gfk-betonpool-vergleich"],
+  ["all-guides-terrace-cover.ts", "guide-holz-alu-terrassenueberdachung-vergleich"],
   ["all-guides-terrace-cover.ts", "guide-terrassendach-glas-kunststoff-vergleich"],
   ["all-guides-wintergarten.ts", "guide-kalt-wohnwintergarten-vergleich"],
 ];
@@ -72,6 +73,7 @@ const decisionSiloImports = [
   "guide-fertiggarage-massivgarage-vergleich",
   "guide-fertigkeller-massivkeller-vergleich",
   "guide-gfk-betonpool-vergleich",
+  "guide-holz-alu-terrassenueberdachung-vergleich",
   "guide-terrassendach-glas-kunststoff-vergleich",
   "guide-kalt-wohnwintergarten-vergleich",
 ];
@@ -85,6 +87,7 @@ for (const expectedImport of decisionSiloImports) {
 const supplementalDecisionImports = [
   "guide-fertigkeller-massivkeller-vergleich",
   "guide-gfk-betonpool-vergleich",
+  "guide-holz-alu-terrassenueberdachung-vergleich",
   "guide-terrassendach-glas-kunststoff-vergleich",
   "guide-kalt-wohnwintergarten-vergleich",
 ];
