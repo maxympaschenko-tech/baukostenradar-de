@@ -10,6 +10,7 @@ const expectedAliases = {
   "@/lib/all-guides": "./lib/all-guides-live.ts",
   "@/lib/guide-groups": "./lib/guide-groups-live.ts",
   "@/lib/guide-silo": "./lib/guide-silo-live.ts",
+  "@/lib/guide-supplemental-links": "./lib/guide-supplemental-links-live.ts",
 };
 
 for (const [alias, expected] of Object.entries(expectedAliases)) {
@@ -38,6 +39,12 @@ if (!siloSource.includes('from "./guide-silo-sanitaer-trades"') || !siloSource.i
   process.exit(1);
 }
 
+const supplementalSource = await readFile(join(root, "lib", "guide-supplemental-links-live.ts"), "utf8");
+if (!supplementalSource.includes('from "./guide-supplemental-links-daemmung-expansion"') || !supplementalSource.includes('from "./guides-terrace-cover"')) {
+  console.error("guide-supplemental-links-live.ts must extend the legacy supplemental chain with expanded guide peers.");
+  process.exit(1);
+}
+
 const directoryPage = await readFile(join(root, "app", "ratgeber", "page.tsx"), "utf8");
 if (!directoryPage.includes('from "@/lib/all-guides"') || !directoryPage.includes('from "@/lib/guide-groups"')) {
   console.error("app/ratgeber/page.tsx must consume the live all-guides and guide-groups aliases.");
@@ -61,4 +68,4 @@ for (const requiredImport of requiredDetailImports) {
   }
 }
 
-console.log("Live guide entrypoints OK: registry, directory and silo routes all use merged production aliases.");
+console.log("Live guide entrypoints OK: registry, directory, silo and supplemental links all use merged production aliases.");
