@@ -45,6 +45,15 @@ const wintergartenGuideSilos: Record<string, GuideSilo> = {
     calculatorLabel: "Wintergartenvarianten berechnen",
     regionalMode: "service",
   },
+  "wintergarten-oder-terrassenueberdachung-kosten": {
+    serviceSlugs: ["wintergarten", "terrassenueberdachung"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "wintergarten",
+      itemSlug: "kaltwintergarten-komplettpreis-inklusive-montage",
+    }),
+    calculatorLabel: "Wintergarten oder Terrassendach kalkulieren",
+    regionalMode: "service",
+  },
   "wintergarten-verglasung-kosten": {
     serviceSlugs: ["wintergarten"],
     calculatorHref: handwerkerCalculatorHref({
