@@ -291,6 +291,76 @@ const scenarioGuideByService: Record<string, { label: string; href: string; desc
     href: "/ratgeber/kueche-10-qm-renovieren-kosten",
     description: "Eine 10-m²-Küche ohne Möbel kalkulieren und weitere Küchenpositionen einordnen.",
   },
+  kellerabdichtung: {
+    label: "Kellerabdichtung innen Kosten 2026",
+    href: "/ratgeber/kellerabdichtung-innen-kosten-pro-qm",
+    description: "Innenabdichtung als Alternative oder Ergänzung zur Außenabdichtung pro m² einordnen.",
+  },
+  balkon: {
+    label: "Balkon abdichten Kosten 2026",
+    href: "/ratgeber/balkon-abdichten-kosten-pro-qm",
+    description: "Abdichtung, Untergrund und Folgekosten einer Balkonsanierung gezielt vergleichen.",
+  },
+  garage: {
+    label: "Garagenfundament Kosten 2026",
+    href: "/ratgeber/garagenfundament-kosten-pro-qm",
+    description: "Fundament, Erdarbeiten und Zusatzkosten separat vom Garagenaufbau kalkulieren.",
+  },
+  carport: {
+    label: "Fundament für Garage und Carport 2026",
+    href: "/ratgeber/garagenfundament-kosten-pro-qm",
+    description: "Punkt- und Plattenfundamente als eigenen Kostenblock vor der Montage einordnen.",
+  },
+  schornstein: {
+    label: "Edelstahlschornstein nachrüsten Kosten 2026",
+    href: "/ratgeber/edelstahlschornstein-nachruesten-kosten",
+    description: "Außenliegende Edelstahl-Nachrüstung als Alternative zur Bestandssanierung vergleichen.",
+  },
+  zaunbau: {
+    label: "Doppelstabmattenzaun Kosten 2026",
+    href: "/ratgeber/doppelstabmattenzaun-kosten-pro-meter",
+    description: "Material, Pfosten und Montage für einen häufig gewählten Metallzaun pro Meter kalkulieren.",
+  },
+  poolbau: {
+    label: "Pool-Erdarbeiten Kosten 2026",
+    href: "/ratgeber/pool-erdarbeiten-kosten",
+    description: "Aushub, Abtransport und Baugrund als eigenen Kostenblock vor dem Beckenbau kalkulieren.",
+  },
+  terrassenbau: {
+    label: "Terrassen-Unterbau Kosten 2026",
+    href: "/ratgeber/terrasse-unterbau-kosten",
+    description: "Untergrund, Fundament und Aufbauhöhe vor der Wahl des Terrassenbelags kalkulieren.",
+  },
+  terrassenueberdachung: {
+    label: "Glasdach Terrasse Kosten 2026",
+    href: "/ratgeber/glasdach-terrasse-kosten",
+    description: "VSG-Glas, Konstruktion und Montage als hochwertige Überdachungsvariante vergleichen.",
+  },
+  wintergarten: {
+    label: "Wintergarten Fundament Kosten 2026",
+    href: "/ratgeber/wintergarten-fundament-kosten",
+    description: "Fundament und Bodenaufbau als separaten Kostenblock des Wintergartenprojekts prüfen.",
+  },
+  dachausbau: {
+    label: "Dachgaube Kosten 2026",
+    href: "/ratgeber/dachgaube-kosten",
+    description: "Mehr Raum und Belichtung durch eine Gaube inklusive Statik und Einbau einordnen.",
+  },
+  hausanbau: {
+    label: "Hausanbau 20, 30 oder 50 m² Kosten 2026",
+    href: "/ratgeber/hausanbau-20-30-50-qm-kosten",
+    description: "Projektgrößen vergleichen und den Einfluss zusätzlicher Wohnfläche auf das Gesamtbudget sehen.",
+  },
+  kellerbau: {
+    label: "Fertigkeller Kosten 2026",
+    href: "/ratgeber/fertigkeller-kosten",
+    description: "Fertigkeller als eigene Bauweise mit Ausbaustufen und Zusatzkosten vergleichen.",
+  },
+  "abriss-entsorgung": {
+    label: "Bauschutt entsorgen Kosten 2026",
+    href: "/ratgeber/bauschutt-entsorgen-kosten",
+    description: "Container, Entsorgung und Stofftrennung als eigenen Abriss-Kostenblock kalkulieren.",
+  },
 };
 
 export function generateStaticParams() {
@@ -386,7 +456,7 @@ export default async function CostPage({ params }: { params: Promise<{ slug: str
     },
     {
       question: `Sind die ${service.shortTitle}-Preise bei BauKostenRadar aktuell?`,
-      answer: "Ja. Die auf dieser Seite verwendeten Quellen wurden zuletzt im August 2026 geprüft. Jede Preisposition ist einer öffentlich nachvollziehbaren Quelle zugeordnet.",
+      answer: "Die Aktualität lässt sich direkt prüfen: Jede auf dieser Seite verwendete Quelle ist mit ihrem individuellen Prüfdatum ausgewiesen, und jede Preisposition ist einer öffentlich nachvollziehbaren Quelle zugeordnet.",
     },
   ];
 
