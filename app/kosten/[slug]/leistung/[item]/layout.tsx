@@ -28,12 +28,19 @@ export async function generateMetadata({
 
   const title = `${item.name} Kosten 2026`;
   const description = `${item.name} 2026: Richtwert ${priceRange(item.low, item.high)} ${item.unit}. Mit Beispielrechnungen, Stadtvergleich, Kostentreibern, Angebots-Check und Quelle.`;
-
-  return socialMetadata({
+  const sharedMetadata = socialMetadata({
     title,
     description,
     url: `/kosten/${service.slug}/leistung/${itemSlug}`,
   });
+
+  return {
+    ...sharedMetadata,
+    title: {
+      default: title,
+      template: "%s – Preis & Rechner | BauKostenRadar",
+    },
+  };
 }
 
 export default function PriceItemLayout({ children }: Readonly<{ children: React.ReactNode }>) {
