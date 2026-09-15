@@ -36,6 +36,15 @@ const dachausbauGuideSilos: Record<string, GuideSilo> = {
     calculatorLabel: "Dachgaube berechnen",
     regionalMode: "service",
   },
+  "dachgaube-oder-dachfenster-kosten": {
+    serviceSlugs: ["dachausbau", "dachsanierung", "fenster"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "dachausbau",
+      itemSlug: "standard-fertiggaube",
+    }),
+    calculatorLabel: "Gaube und Dachfenster vergleichen",
+    regionalMode: "service",
+  },
   "dach-anheben-kosten": {
     serviceSlugs: ["dachausbau", "dachsanierung", "maurer"],
     calculatorHref: handwerkerCalculatorHref({
