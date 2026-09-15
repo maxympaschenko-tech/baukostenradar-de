@@ -4,7 +4,6 @@ import process from "node:process";
 
 const root = process.cwd();
 const duplicatesOnly = process.argv.includes("--duplicates-only");
-const registryFile = join(root, "lib", "all-guides.ts");
 
 async function exists(file) {
   try {
@@ -34,6 +33,25 @@ async function resolveImport(fromFile, specifier) {
   return null;
 }
 
+async function resolveActiveGuideRegistry() {
+  const tsconfig = JSON.parse(await readFile(join(root, "tsconfig.json"), "utf8"));
+  const configured = tsconfig?.compilerOptions?.paths?.["@/lib/all-guides"]?.[0];
+  if (!configured) return join(root, "lib", "all-guides.ts");
+
+  const normalized = configured.replace(/^\.\//, "");
+  const candidates = [
+    resolve(root, normalized),
+    resolve(root, `${normalized}.ts`),
+    resolve(root, `${normalized}.tsx`),
+  ];
+
+  for (const candidate of candidates) {
+    if (await exists(candidate)) return candidate;
+  }
+
+  throw new Error(`Configured @/lib/all-guides target does not exist: ${configured}`);
+}
+
 async function collectReachableFiles(entryFile) {
   const queue = [entryFile];
   const visited = new Set();
@@ -55,26 +73,45 @@ async function collectReachableFiles(entryFile) {
   return [...visited];
 }
 
-function getDeprecatedCatalogSlugs(source) {
-  const match = source.match(/const\s+deprecatedCatalogGuideSlugs\s*=\s*new\s+Set\s*\(\s*\[([\s\S]*?)\]\s*\)/);
+function getSetSlugs(source, setName) {
+  const escapedName = setName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = new RegExp(
+    `const\\s+${escapedName}\\s*=\\s*new\\s+Set\\s*\\(\\s*\\[([\\s\\S]*?)\\]\\s*\\)`,
+  );
+  const match = source.match(pattern);
   if (!match) return new Set();
 
   return new Set([...match[1].matchAll(/["']([a-z0-9-]+)["']/g)].map((item) => item[1]));
 }
 
+const registryFile = await resolveActiveGuideRegistry();
 const registrySource = await readFile(registryFile, "utf8");
-const deprecatedCatalogGuideSlugs = getDeprecatedCatalogSlugs(registrySource);
 const files = await collectReachableFiles(registryFile);
+const redirectedLegacyGuideSlugs = getSetSlugs(registrySource, "redirectedLegacyGuideSlugs");
+const runtimeDedupesSlugs =
+  registrySource.includes("guidesBySlug.has(") && registrySource.includes("guidesBySlug.set(");
+
+const nextConfigSource = await readFile(join(root, "next.config.ts"), "utf8");
+const configuredRatgeberRedirects = new Set(
+  [...nextConfigSource.matchAll(/source:\s*["']\/ratgeber\/([a-z0-9-]+)["']/g)].map((match) => match[1]),
+);
+
+const unprotectedLegacySlugs = [...redirectedLegacyGuideSlugs].filter(
+  (slug) => !configuredRatgeberRedirects.has(slug),
+);
+
+if (unprotectedLegacySlugs.length) {
+  console.error("Active guide registry filters legacy slug(s) without a matching Ratgeber redirect:");
+  for (const slug of unprotectedLegacySlugs.sort()) console.error(`- /ratgeber/${slug}`);
+  process.exit(1);
+}
+
 const guideDefinitions = new Map();
 const references = new Map();
 
 for (const file of files) {
   const source = await readFile(file, "utf8");
   const short = relative(root, file);
-
-  // Only modules reachable from lib/all-guides.ts are part of the live guide
-  // registry. This intentionally ignores old standalone guide files that are
-  // no longer imported anywhere but may still remain in the repository.
   const isGuideDefinitionModule =
     source.includes("sections:") && source.includes("faqs:") && source.includes("related:");
 
@@ -94,10 +131,10 @@ for (const file of files) {
 }
 
 const duplicateDefinitions = [...guideDefinitions.entries()]
-  .filter(([slug, sourceFiles]) => sourceFiles.length > 1 && !deprecatedCatalogGuideSlugs.has(slug))
+  .filter(([slug, sourceFiles]) => sourceFiles.length > 1 && !redirectedLegacyGuideSlugs.has(slug))
   .sort(([a], [b]) => a.localeCompare(b));
 
-if (duplicateDefinitions.length) {
+if (duplicateDefinitions.length && !runtimeDedupesSlugs) {
   console.error(`Found ${duplicateDefinitions.length} duplicate active Ratgeber slug definition(s):`);
   for (const [slug, sourceFiles] of duplicateDefinitions) {
     console.error(`- /ratgeber/${slug}`);
@@ -106,28 +143,51 @@ if (duplicateDefinitions.length) {
   process.exit(1);
 }
 
-const guideSlugs = new Set(guideDefinitions.keys());
+const activeGuideSlugs = new Set(
+  [...guideDefinitions.keys()].filter((slug) => !redirectedLegacyGuideSlugs.has(slug)),
+);
 
 if (duplicatesOnly) {
+  const dedupeNote = duplicateDefinitions.length
+    ? `; ${duplicateDefinitions.length} duplicate source definition(s) are neutralized by the active first-wins registry`
+    : "; no duplicate source definitions found";
   console.log(
-    `Guide slug integrity OK: ${guideSlugs.size} active guide slugs across ${files.length} reachable modules; no duplicate active definitions found.`,
+    `Guide slug integrity OK: ${activeGuideSlugs.size} active guide slugs across ${files.length} reachable modules${dedupeNote}.`,
   );
   process.exit(0);
 }
 
-const missing = [...references.entries()]
-  .filter(([slug]) => !guideSlugs.has(slug))
+const brokenReferences = [...references.entries()]
+  .filter(([slug]) => !activeGuideSlugs.has(slug) && !redirectedLegacyGuideSlugs.has(slug))
   .sort(([a], [b]) => a.localeCompare(b));
 
-if (missing.length) {
-  console.error(`Found ${missing.length} active internal Ratgeber link target(s) without a guide definition:`);
-  for (const [slug, sourceFiles] of missing) {
+if (brokenReferences.length) {
+  console.error(`Found ${brokenReferences.length} internal Ratgeber link target(s) without an active guide or redirect:`);
+  for (const [slug, sourceFiles] of brokenReferences) {
     console.error(`- /ratgeber/${slug}`);
     for (const file of [...sourceFiles].sort()) console.error(`    referenced by ${file}`);
   }
   process.exit(1);
 }
 
+const legacyReferences = [...references.entries()]
+  .filter(([slug]) => redirectedLegacyGuideSlugs.has(slug))
+  .sort(([a], [b]) => a.localeCompare(b));
+
+if (legacyReferences.length) {
+  console.warn(
+    `Guide integrity warning: ${legacyReferences.length} redirected legacy Ratgeber target(s) still appear in reachable source modules. They resolve by 301, but direct-link cleanup is recommended.`,
+  );
+  for (const [slug, sourceFiles] of legacyReferences) {
+    console.warn(`- /ratgeber/${slug}`);
+    for (const file of [...sourceFiles].sort()) console.warn(`    referenced by ${file}`);
+  }
+}
+
+const registryLabel = relative(root, registryFile);
+const duplicateNote = duplicateDefinitions.length
+  ? ` Runtime first-wins dedupe neutralizes ${duplicateDefinitions.length} duplicate source definition(s).`
+  : "";
 console.log(
-  `Guide integrity OK: ${guideSlugs.size} active guide slugs cover ${references.size} active internal Ratgeber targets; no duplicate active definitions found.`,
+  `Guide integrity OK for ${registryLabel}: ${activeGuideSlugs.size} active guide slugs cover ${references.size} reachable Ratgeber targets; all filtered legacy slugs have redirects.${duplicateNote}`,
 );
