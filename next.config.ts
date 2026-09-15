@@ -59,7 +59,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/kosten/tueren/leistung/tuer-lackieren-mit-zarge",
-        destination: "/kosten/tueren",
+        destination: "/kosten/maler/leistung/innentuer-inkl-zarge-lackieren",
         permanent: true,
       },
       {
