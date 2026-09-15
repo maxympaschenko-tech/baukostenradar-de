@@ -26,8 +26,8 @@ export async function generateMetadata({
   const item = getPriceItem(service, itemSlug);
   if (!item) return {};
 
-  const title = `${item.name} Kosten 2026`;
-  const description = `${item.name} 2026: Richtwert ${priceRange(item.low, item.high)} ${item.unit}. Mit Beispielrechnungen, Stadtvergleich, Kostentreibern, Angebots-Check und Quelle.`;
+  const title = `${item.name} Preis 2026`;
+  const description = `${item.name}: konkreter Preis-Richtwert ${priceRange(item.low, item.high)} ${item.unit}. Preisdetail mit Rechner, Beispielmengen, Stadtmodell, Kostentreibern, Angebotscheck und Quelle.`;
   const sharedMetadata = socialMetadata({
     title,
     description,
