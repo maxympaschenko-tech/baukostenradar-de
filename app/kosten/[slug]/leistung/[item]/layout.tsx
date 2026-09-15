@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getPriceItem } from "@/lib/price-slug";
-import { getService } from "@/lib/pricing";
+import { getService, services } from "@/lib/pricing";
+import { getRelatedServices } from "@/lib/related-services";
 import { socialMetadata } from "@/lib/social-metadata";
 
 function euro(value: number) {
@@ -43,6 +45,46 @@ export async function generateMetadata({
   };
 }
 
-export default function PriceItemLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return children;
+export default async function PriceItemLayout({
+  children,
+  params,
+}: Readonly<{
+  children: React.ReactNode;
+  params: Promise<{ slug: string; item: string }>;
+}>) {
+  const { slug } = await params;
+  const service = getService(slug);
+
+  if (!service) return children;
+
+  const relatedServices = getRelatedServices(service.slug, services);
+
+  return (
+    <>
+      {children}
+      {relatedServices.length > 0 ? (
+        <section className="section sectionTight" aria-labelledby="related-trades-heading">
+          <div className="shell">
+            <div className="contentCard">
+              <span className="eyebrow">Verwandte Gewerke</span>
+              <h2 id="related-trades-heading">Welche Arbeiten gehören häufig zum selben Projekt?</h2>
+              <p>
+                Bei {service.shortTitle}-Projekten greifen mehrere Gewerke oft direkt ineinander. Die folgenden
+                Preisbereiche helfen, angrenzende Arbeiten früh im Gesamtbudget zu berücksichtigen.
+              </p>
+              <div className="sourceList">
+                {relatedServices.map((relatedService) => (
+                  <Link key={relatedService.slug} href={`/kosten/${relatedService.slug}`}>
+                    <strong>{relatedService.shortTitle} Kosten 2026</strong>
+                    <span>{relatedService.description}</span>
+                  </Link>
+                ))}
+              </div>
+              <Link className="textLink" href="/kosten">Alle Handwerkerpreise ansehen →</Link>
+            </div>
+          </div>
+        </section>
+      ) : null}
+    </>
+  );
 }
