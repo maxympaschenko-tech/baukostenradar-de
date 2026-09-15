@@ -8,7 +8,7 @@ export type { GuideSupplementalLink } from "./guide-supplemental-links-pooltechn
 type Peer = GuideSupplementalLink & { slug: string };
 
 const canonicalRatgeberHrefs: Record<string, string> = {
-  "/ratgeber/tuer-lackieren-kosten": "/ratgeber/6-innentueren-austauschen-kosten",
+  "/ratgeber/tuer-lackieren-kosten": "/ratgeber/innentuer-lackieren-kosten",
   "/ratgeber/anhydritestrich-kosten-pro-qm": "/ratgeber/fliessestrich-kosten-pro-qm",
   "/ratgeber/gussasphaltestrich-kosten-pro-qm": "/ratgeber/estrich-100-qm-kosten",
   "/ratgeber/sichtestrich-kosten-pro-qm": "/ratgeber/estrich-100-qm-kosten",
