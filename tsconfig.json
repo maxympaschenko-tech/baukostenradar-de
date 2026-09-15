@@ -15,9 +15,9 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/lib/pricing": ["./lib/catalog-tueren.ts"],
+      "@/lib/pricing": ["./lib/catalog-current.ts"],
       "@/lib/price-guide-links": ["./lib/price-guide-links-abriss-expansion.ts"],
-      "@/lib/all-guides": ["./lib/all-guides-sanitaer-trades.ts"],
+      "@/lib/all-guides": ["./lib/all-guides-live.ts"],
       "@/lib/guide-groups": ["./lib/guide-groups-sanitaer-trades.ts"],
       "@/lib/guide-silo": ["./lib/guide-silo-sanitaer-trades.ts"],
       "@/lib/guide-supplemental-links": ["./lib/guide-supplemental-links-daemmung-expansion.ts"],
