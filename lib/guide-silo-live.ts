@@ -10,6 +10,7 @@ import { wintergartenGuides } from "./guides-wintergarten";
 import { dachausbauGuides } from "./guides-dachausbau-current";
 import { hausanbauGuides } from "./guides-hausanbau";
 import { kellerbauGuides } from "./guides-kellerbau";
+import { dachgaubeDachfensterVergleichGuide } from "./guide-dachgaube-dachfenster-vergleich";
 import { fertiggarageMassivgarageVergleichGuide } from "./guide-fertiggarage-massivgarage-vergleich";
 import { fertigkellerMassivkellerVergleichGuide } from "./guide-fertigkeller-massivkeller-vergleich";
 import { gfkBetonpoolVergleichGuide } from "./guide-gfk-betonpool-vergleich";
@@ -36,6 +37,7 @@ const expandedGuideSlugs = new Set([
   ...dachausbauGuides,
   ...hausanbauGuides,
   ...kellerbauGuides,
+  dachgaubeDachfensterVergleichGuide,
   fertiggarageMassivgarageVergleichGuide,
   fertigkellerMassivkellerVergleichGuide,
   gfkBetonpoolVergleichGuide,
