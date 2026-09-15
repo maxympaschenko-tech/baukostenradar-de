@@ -36,6 +36,15 @@ const kellerbauGuideSilos: Record<string, GuideSilo> = {
     calculatorLabel: "Massivkeller berechnen",
     regionalMode: "service",
   },
+  "fertigkeller-oder-massivkeller-kosten": {
+    serviceSlugs: ["kellerbau", "maurer"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "kellerbau",
+      itemSlug: "fertigkeller-standard",
+    }),
+    calculatorLabel: "Kellerbau vergleichen",
+    regionalMode: "service",
+  },
   "keller-80-100-120-qm-kosten": {
     serviceSlugs: ["kellerbau"],
     calculatorHref: handwerkerCalculatorHref({
