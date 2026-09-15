@@ -19,6 +19,7 @@ import { hausanbauDachaufstockungVergleichGuide } from "./guide-hausanbau-dachau
 import { holzAluTerrassenueberdachungVergleichGuide } from "./guide-holz-alu-terrassenueberdachung-vergleich";
 import { kaltWohnwintergartenVergleichGuide } from "./guide-kalt-wohnwintergarten-vergleich";
 import { terrassendachGlasKunststoffVergleichGuide } from "./guide-terrassendach-glas-kunststoff-vergleich";
+import { wintergartenTerrassenueberdachungVergleichGuide } from "./guide-wintergarten-terrassenueberdachung-vergleich";
 import {
   getGuideSilo as getLegacyGuideSilo,
   type GuideSilo,
@@ -48,6 +49,7 @@ const expandedGuideSlugs = new Set([
   holzAluTerrassenueberdachungVergleichGuide,
   kaltWohnwintergartenVergleichGuide,
   terrassendachGlasKunststoffVergleichGuide,
+  wintergartenTerrassenueberdachungVergleichGuide,
 ].map((guide) => guide.slug));
 
 export function getGuideSilo(slug: string): GuideSilo {
