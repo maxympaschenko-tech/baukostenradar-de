@@ -1,11 +1,21 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const indexableContentRoots = ["/kosten", "/ratgeber", "/rechner", "/staedte"] as const;
+const indexableContentRoots = [
+  "/",
+  "/kosten",
+  "/ratgeber",
+  "/rechner",
+  "/staedte",
+  "/ueber-uns",
+  "/quellen",
+  "/methodik",
+  "/kontakt",
+] as const;
 
 function isIndexableContentPath(pathname: string) {
   return indexableContentRoots.some(
-    (root) => pathname === root || pathname.startsWith(`${root}/`),
+    (root) => pathname === root || (root !== "/" && pathname.startsWith(`${root}/`)),
   );
 }
 
@@ -26,9 +36,14 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/",
     "/kosten/:path*",
     "/ratgeber/:path*",
     "/rechner/:path*",
     "/staedte/:path*",
+    "/ueber-uns",
+    "/quellen",
+    "/methodik",
+    "/kontakt",
   ],
 };
