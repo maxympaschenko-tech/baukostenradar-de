@@ -45,6 +45,15 @@ const terraceCoverGuideSilos: Record<string, GuideSilo> = {
     calculatorLabel: "Terrassen-Glasdach berechnen",
     regionalMode: "service",
   },
+  "terrassendach-glas-oder-kunststoff-kosten": {
+    serviceSlugs: ["terrassenueberdachung"],
+    calculatorHref: handwerkerCalculatorHref({
+      serviceSlug: "terrassenueberdachung",
+      itemSlug: "vsg-klarglas-terrassendach",
+    }),
+    calculatorLabel: "Dachmaterial vergleichen",
+    regionalMode: "service",
+  },
   "lamellendach-pergola-kosten": {
     serviceSlugs: ["terrassenueberdachung", "terrassenbau"],
     calculatorHref: handwerkerCalculatorHref({
