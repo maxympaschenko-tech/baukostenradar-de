@@ -94,7 +94,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/ratgeber/tuer-lackieren-kosten",
-        destination: "/ratgeber/6-innentueren-austauschen-kosten",
+        destination: "/ratgeber/innentuer-lackieren-kosten",
         permanent: true,
       },
       {
