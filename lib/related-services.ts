@@ -46,13 +46,8 @@ export function getRelatedServices(
   if (!preferredSlugs) return [];
 
   const serviceBySlug = new Map(allServices.map((service) => [service.slug, service]));
-  const preferred = preferredSlugs
+  return preferredSlugs
     .map((slug) => serviceBySlug.get(slug))
-    .filter((service): service is Service => Boolean(service));
-  const preferredSet = new Set(preferred.map((service) => service.slug));
-  const fallback = allServices.filter(
-    (service) => service.slug !== serviceSlug && !preferredSet.has(service.slug),
-  );
-
-  return [...preferred, ...fallback].slice(0, limit);
+    .filter((service): service is Service => Boolean(service))
+    .slice(0, limit);
 }
