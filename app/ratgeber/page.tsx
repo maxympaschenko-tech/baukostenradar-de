@@ -13,8 +13,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/ratgeber" },
 };
 
+const uniqueGuides = [...new Map(allGuides.map((guide) => [guide.slug, guide])).values()];
+
 function guideBySlug(slug: string) {
-  return allGuides.find((guide) => guide.slug === slug);
+  return uniqueGuides.find((guide) => guide.slug === slug);
 }
 
 function groupId(value: string) {
@@ -63,7 +65,7 @@ function buildDirectoryGroups(): GuideDirectoryGroup[] {
     })
     .filter((group) => group.guides.length > 0);
 
-  const remainingGuides = allGuides
+  const remainingGuides = uniqueGuides
     .filter((guide) => !usedSlugs.has(guide.slug))
     .map(directoryGuide);
 
@@ -101,8 +103,8 @@ export default function GuidesPage() {
       description: metadata.description,
       mainEntity: {
         "@type": "ItemList",
-        numberOfItems: allGuides.length,
-        itemListElement: allGuides.map((guide, index) => ({
+        numberOfItems: uniqueGuides.length,
+        itemListElement: uniqueGuides.map((guide, index) => ({
           "@type": "ListItem",
           position: index + 1,
           name: guide.title,
@@ -130,7 +132,7 @@ export default function GuidesPage() {
             Renovierung, Sanierung und Handwerkerleistungen in Deutschland.
           </p>
           <div className="heroFacts">
-            <span><strong>{allGuides.length}</strong> ausführliche Ratgeber</span>
+            <span><strong>{uniqueGuides.length}</strong> ausführliche Ratgeber</span>
             <span><strong>{directoryGroups.length}</strong> Themenbereiche</span>
             <span><strong>2026</strong> aktueller Datenstand</span>
           </div>
