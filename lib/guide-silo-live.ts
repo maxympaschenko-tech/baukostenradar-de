@@ -11,6 +11,7 @@ import { dachausbauGuides } from "./guides-dachausbau-current";
 import { hausanbauGuides } from "./guides-hausanbau";
 import { kellerbauGuides } from "./guides-kellerbau";
 import { fertiggarageMassivgarageVergleichGuide } from "./guide-fertiggarage-massivgarage-vergleich";
+import { fertigkellerMassivkellerVergleichGuide } from "./guide-fertigkeller-massivkeller-vergleich";
 import { gfkBetonpoolVergleichGuide } from "./guide-gfk-betonpool-vergleich";
 import { kaltWohnwintergartenVergleichGuide } from "./guide-kalt-wohnwintergarten-vergleich";
 import { terrassendachGlasKunststoffVergleichGuide } from "./guide-terrassendach-glas-kunststoff-vergleich";
@@ -35,6 +36,7 @@ const expandedGuideSlugs = new Set([
   ...hausanbauGuides,
   ...kellerbauGuides,
   fertiggarageMassivgarageVergleichGuide,
+  fertigkellerMassivkellerVergleichGuide,
   gfkBetonpoolVergleichGuide,
   kaltWohnwintergartenVergleichGuide,
   terrassendachGlasKunststoffVergleichGuide,
