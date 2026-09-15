@@ -52,6 +52,18 @@ const heatingGuideLinks: SupplementalGuide[] = [
   { slug: "heizungswartung-kosten", label: "Heizungswartung Kosten", href: "/ratgeber/heizungswartung-kosten" },
 ];
 
+const fensterGuideLinks: SupplementalGuide[] = [
+  { slug: "fenster-austauschen-kosten-haus", label: "Fenster austauschen Kosten", href: "/ratgeber/fenster-austauschen-kosten-haus" },
+  { slug: "20-fenster-austauschen-kosten", label: "20 Fenster austauschen Kosten", href: "/ratgeber/20-fenster-austauschen-kosten" },
+  { slug: "fenstereinbau-kosten", label: "Fenstereinbau Kosten", href: "/ratgeber/fenstereinbau-kosten" },
+  { slug: "fenster-rahmenmaterial-kosten", label: "Fenster Rahmenmaterial Kosten", href: "/ratgeber/fenster-rahmenmaterial-kosten" },
+  { slug: "fenster-2-fach-verglasung-kosten", label: "Fenster 2-fach Verglasung Kosten", href: "/ratgeber/fenster-2-fach-verglasung-kosten" },
+  { slug: "fenster-3-fach-verglasung-kosten", label: "Fenster 3-fach Verglasung Kosten", href: "/ratgeber/fenster-3-fach-verglasung-kosten" },
+  { slug: "waermeschutzfenster-kosten", label: "Wärmeschutzfenster Kosten", href: "/ratgeber/waermeschutzfenster-kosten" },
+  { slug: "schallschutzfenster-kosten", label: "Schallschutzfenster Kosten", href: "/ratgeber/schallschutzfenster-kosten" },
+  { slug: "sicherheitsglas-vsg-fenster-kosten", label: "Fenster mit VSG-Sicherheitsglas Kosten", href: "/ratgeber/sicherheitsglas-vsg-fenster-kosten" },
+];
+
 const renovationAreaGuideLinks: SupplementalGuide[] = [
   { slug: "wohnung-renovieren-kosten", label: "Wohnung renovieren Kosten", href: "/ratgeber/wohnung-renovieren-kosten" },
   { slug: "renovierungskosten-haus", label: "Renovierungskosten Haus", href: "/ratgeber/renovierungskosten-haus" },
@@ -96,6 +108,7 @@ const supplementalClusters = [
   estrichGuideLinks,
   abrissGuideLinks,
   heatingGuideLinks,
+  fensterGuideLinks,
   renovationAreaGuideLinks,
   houseRenovationGuideLinks,
   planningCostGuideLinks,
