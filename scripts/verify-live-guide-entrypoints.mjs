@@ -55,6 +55,7 @@ if (!priceGuideSource.includes('from "./price-guide-links-abriss-expansion"') ||
 const decisionRegistrations = [
   ["all-guides-dachausbau.ts", "guide-dachgaube-dachfenster-vergleich"],
   ["all-guides-garage.ts", "guide-fertiggarage-massivgarage-vergleich"],
+  ["all-guides-hausanbau.ts", "guide-hausanbau-dachaufstockung-vergleich"],
   ["all-guides-kellerbau.ts", "guide-fertigkeller-massivkeller-vergleich"],
   ["all-guides-pool.ts", "guide-gfk-betonpool-vergleich"],
   ["all-guides-terrace-cover.ts", "guide-holz-alu-terrassenueberdachung-vergleich"],
@@ -75,6 +76,7 @@ const decisionSiloImports = [
   "guide-fertiggarage-massivgarage-vergleich",
   "guide-fertigkeller-massivkeller-vergleich",
   "guide-gfk-betonpool-vergleich",
+  "guide-hausanbau-dachaufstockung-vergleich",
   "guide-holz-alu-terrassenueberdachung-vergleich",
   "guide-terrassendach-glas-kunststoff-vergleich",
   "guide-kalt-wohnwintergarten-vergleich",
@@ -90,6 +92,7 @@ const supplementalDecisionImports = [
   "guide-dachgaube-dachfenster-vergleich",
   "guide-fertigkeller-massivkeller-vergleich",
   "guide-gfk-betonpool-vergleich",
+  "guide-hausanbau-dachaufstockung-vergleich",
   "guide-holz-alu-terrassenueberdachung-vergleich",
   "guide-terrassendach-glas-kunststoff-vergleich",
   "guide-kalt-wohnwintergarten-vergleich",
@@ -99,6 +102,11 @@ for (const expectedImport of supplementalDecisionImports) {
     console.error(`guide-supplemental-links-live.ts must expose decision guide ${expectedImport} to peer links.`);
     process.exit(1);
   }
+}
+
+if (!supplementalSource.includes('from "./guides-hausanbau"')) {
+  console.error("Hausanbau supplemental links must expose the Hausanbau cluster to cross-service decision guides.");
+  process.exit(1);
 }
 
 if (!supplementalSource.includes("dachfenster-nachtraeglich-einbauen-kosten")) {
