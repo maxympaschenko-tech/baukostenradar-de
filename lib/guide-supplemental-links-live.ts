@@ -10,6 +10,7 @@ import { holzAluTerrassenueberdachungVergleichGuide } from "./guide-holz-alu-ter
 import { kaltWohnwintergartenVergleichGuide } from "./guide-kalt-wohnwintergarten-vergleich";
 import { pooltechnikGuide } from "./guide-pooltechnik";
 import { terrassendachGlasKunststoffVergleichGuide } from "./guide-terrassendach-glas-kunststoff-vergleich";
+import { wintergartenTerrassenueberdachungVergleichGuide } from "./guide-wintergarten-terrassenueberdachung-vergleich";
 import { dachausbauGuides } from "./guides-dachausbau-current";
 import { hausanbauGuides } from "./guides-hausanbau";
 import { kellerbauGuides } from "./guides-kellerbau";
@@ -76,6 +77,7 @@ const terraceCoverPeers: Peer[] = [
   ...terraceCoverGuides,
   holzAluTerrassenueberdachungVergleichGuide,
   terrassendachGlasKunststoffVergleichGuide,
+  wintergartenTerrassenueberdachungVergleichGuide,
 ].map((guide) => ({
   slug: guide.slug,
   label: guide.title,
@@ -85,6 +87,7 @@ const terraceCoverPeers: Peer[] = [
 const wintergartenPeers: Peer[] = [
   ...wintergartenGuides,
   kaltWohnwintergartenVergleichGuide,
+  wintergartenTerrassenueberdachungVergleichGuide,
 ].map((guide) => ({
   slug: guide.slug,
   label: guide.title,
