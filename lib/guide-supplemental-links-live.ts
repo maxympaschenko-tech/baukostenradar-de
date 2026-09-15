@@ -2,12 +2,14 @@ import {
   withSupplementalGuideLinks as withBaseSupplementalGuideLinks,
   type GuideSupplementalLink,
 } from "./guide-supplemental-links-daemmung-expansion";
+import { dachgaubeDachfensterVergleichGuide } from "./guide-dachgaube-dachfenster-vergleich";
 import { fertigkellerMassivkellerVergleichGuide } from "./guide-fertigkeller-massivkeller-vergleich";
 import { gfkBetonpoolVergleichGuide } from "./guide-gfk-betonpool-vergleich";
 import { holzAluTerrassenueberdachungVergleichGuide } from "./guide-holz-alu-terrassenueberdachung-vergleich";
 import { kaltWohnwintergartenVergleichGuide } from "./guide-kalt-wohnwintergarten-vergleich";
 import { pooltechnikGuide } from "./guide-pooltechnik";
 import { terrassendachGlasKunststoffVergleichGuide } from "./guide-terrassendach-glas-kunststoff-vergleich";
+import { dachausbauGuides } from "./guides-dachausbau-current";
 import { kellerbauGuides } from "./guides-kellerbau";
 import { poolGuides } from "./guides-pool";
 import { terraceCoverGuides } from "./guides-terrace-cover";
@@ -16,6 +18,24 @@ import { wintergartenGuides } from "./guides-wintergarten";
 export type { GuideSupplementalLink } from "./guide-supplemental-links-daemmung-expansion";
 
 type Peer = GuideSupplementalLink & { slug: string };
+
+const dachausbauPeers: Peer[] = [
+  ...dachausbauGuides.map((guide) => ({
+    slug: guide.slug,
+    label: guide.title,
+    href: `/ratgeber/${guide.slug}`,
+  })),
+  {
+    slug: dachgaubeDachfensterVergleichGuide.slug,
+    label: dachgaubeDachfensterVergleichGuide.title,
+    href: `/ratgeber/${dachgaubeDachfensterVergleichGuide.slug}`,
+  },
+  {
+    slug: "dachfenster-nachtraeglich-einbauen-kosten",
+    label: "Dachfenster nachträglich einbauen Kosten 2026",
+    href: "/ratgeber/dachfenster-nachtraeglich-einbauen-kosten",
+  },
+];
 
 const kellerbauPeers: Peer[] = [
   ...kellerbauGuides,
@@ -71,7 +91,8 @@ export function withSupplementalGuideLinks(
   related: GuideSupplementalLink[],
 ): GuideSupplementalLink[] {
   const base = withBaseSupplementalGuideLinks(slug, related);
-  const withKellerbauPeers = addPeers(base, slug, kellerbauPeers);
+  const withDachausbauPeers = addPeers(base, slug, dachausbauPeers);
+  const withKellerbauPeers = addPeers(withDachausbauPeers, slug, kellerbauPeers);
   const withPoolPeers = addPeers(withKellerbauPeers, slug, poolPeers);
   const withTerraceCoverPeers = addPeers(withPoolPeers, slug, terraceCoverPeers);
   return addPeers(withTerraceCoverPeers, slug, wintergartenPeers);
