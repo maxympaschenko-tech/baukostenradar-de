@@ -46,6 +46,7 @@ function serviceLastModified(service: Service) {
 function buildEntries(): SitemapEntry[] {
   const base = siteConfig.url.replace(/\/$/, "");
   const cities = regions.filter((region) => region.value !== "de");
+  const uniqueGuides = [...new Map(allGuides.map((guide) => [guide.slug, guide])).values()];
   const catalogLastModified = latestDate(
     services.flatMap((service) => service.priceItems.map(priceItemLastModified)),
   );
@@ -63,7 +64,7 @@ function buildEntries(): SitemapEntry[] {
     { url: `${base}/quellen`, lastModified: catalogLastModified },
     { url: `${base}/methodik` },
     { url: `${base}/kontakt` },
-    ...allGuides.map((guide) => ({
+    ...uniqueGuides.map((guide) => ({
       url: `${base}/ratgeber/${guide.slug}`,
     })),
     ...services.map((service) => ({
