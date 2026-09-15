@@ -7,6 +7,16 @@ export type { GuideSupplementalLink } from "./guide-supplemental-links-pooltechn
 
 type Peer = GuideSupplementalLink & { slug: string };
 
+const canonicalRatgeberHrefs: Record<string, string> = {
+  "/ratgeber/tuer-lackieren-kosten": "/ratgeber/6-innentueren-austauschen-kosten",
+  "/ratgeber/anhydritestrich-kosten-pro-qm": "/ratgeber/fliessestrich-kosten-pro-qm",
+  "/ratgeber/gussasphaltestrich-kosten-pro-qm": "/ratgeber/estrich-100-qm-kosten",
+  "/ratgeber/sichtestrich-kosten-pro-qm": "/ratgeber/estrich-100-qm-kosten",
+  "/ratgeber/estrich-zement-oder-anhydrit-kosten": "/ratgeber/estrich-100-qm-kosten",
+  "/ratgeber/kellerdeckendaemmung-kosten-pro-qm": "/ratgeber/daemmung-kellerdecke-kosten-pro-qm",
+  "/ratgeber/perimeterdaemmung-keller-kosten": "/ratgeber/perimeterdaemmung-kosten-pro-qm",
+};
+
 const daemmungPeers: Peer[] = [
   { slug: "daemmung-kosten-pro-qm", label: "Dämmung Kosten pro m²", href: "/ratgeber/daemmung-kosten-pro-qm" },
   { slug: "fassadendaemmung-kosten-pro-qm", label: "Fassadendämmung Kosten", href: "/ratgeber/fassadendaemmung-kosten-pro-qm" },
@@ -25,13 +35,23 @@ const daemmungPeers: Peer[] = [
   { slug: "sockeldaemmung-kosten", label: "Sockeldämmung Kosten", href: "/ratgeber/sockeldaemmung-kosten" },
 ];
 
+function normalizeLinks(links: GuideSupplementalLink[]) {
+  return links
+    .map((link) => ({
+      ...link,
+      href: canonicalRatgeberHrefs[link.href] ?? link.href,
+    }))
+    .filter((link, index, items) => items.findIndex((candidate) => candidate.href === link.href) === index);
+}
+
 function addPeers(base: GuideSupplementalLink[], slug: string, peers: Peer[]) {
   const slugs = new Set(peers.map((peer) => peer.slug));
-  if (!slugs.has(slug)) return base;
-  return [
+  if (!slugs.has(slug)) return normalizeLinks(base);
+
+  return normalizeLinks([
     ...base,
     ...peers.filter((peer) => peer.slug !== slug).map(({ label, href }) => ({ label, href })),
-  ].filter((link, index, links) => links.findIndex((candidate) => candidate.href === link.href) === index);
+  ]);
 }
 
 export function withSupplementalGuideLinks(slug: string, related: GuideSupplementalLink[]): GuideSupplementalLink[] {
