@@ -10,6 +10,7 @@ const hausanbauGroup: GuideGroup = {
     "hausanbau-kosten",
     "hausanbau-20-30-50-qm-kosten",
     "hausanbau-massiv-holz-fertigbau-kosten",
+    "hausanbau-oder-dachaufstockung-kosten",
     "hausanbau-rohbau-fundament-kosten",
     "hausanbau-innenausbau-kosten",
   ],
