@@ -13,6 +13,15 @@ BauKostenRadar production runs as a Hostinger Node.js Web App in the German host
 
 Hostinger is connected directly to GitHub and automatically builds and deploys changes pushed to `main`.
 
+## Deployment flow
+
+1. Make the production change directly on `main`.
+2. Push/commit the change to `main`.
+3. Hostinger detects the new revision, builds the Next.js application and deploys it.
+4. Verify the live site, `/robots.txt`, `/sitemap.xml` and `/api/version` after Hostinger has deployed the revision.
+
+GitHub Actions are not part of the BauKostenRadar production deployment path.
+
 ## Required environment
 
 ```env
@@ -20,10 +29,6 @@ NEXT_PUBLIC_SITE_URL=https://baukostenradar.de
 ```
 
 `NEXT_PUBLIC_GIT_SHA` does not need to be maintained manually. During the Next.js build, `next.config.ts` resolves the checked-out Git revision and exposes it to `/api/version`. An explicit environment variable remains supported as an override.
-
-## Production readiness
-
-GitHub Actions workflow `Hostinger production ready` runs after CI succeeds and waits until `/api/version` reports the expected commit or a newer descendant commit. Production verification workflows should depend on this readiness workflow instead of assuming that GitHub CI completion means the Hostinger deployment is already live.
 
 ## DNS and TLS
 
@@ -35,4 +40,4 @@ Use Hostinger deployment history to redeploy a previously known-good application
 
 ## Legacy hosting
 
-The former Ukraine.com.ua deployment workflow and deployment guide were retired after migration to Hostinger. Old server files may temporarily remain as a backup, but they are not part of the production deployment path.
+The former Ukraine.com.ua deployment path was retired after migration to Hostinger. Old server files may temporarily remain as a backup, but they are not part of the production deployment path.
