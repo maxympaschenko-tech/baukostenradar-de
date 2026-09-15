@@ -149,6 +149,90 @@ const costFactorsByService: Record<string, string[]> = {
     "Boden, Wände und Beleuchtung",
     "Qualität der Materialien und Detailausführung",
   ],
+  kellerabdichtung: [
+    "Abdichtung von außen oder innen und gewähltes Verfahren",
+    "Aushubtiefe, Zugänglichkeit und notwendige Erdarbeiten",
+    "Feuchtebild, Risse und Zustand des vorhandenen Mauerwerks",
+    "Drainage, Perimeterdämmung und Wiederherstellung der Außenflächen",
+  ],
+  balkon: [
+    "Balkonfläche und vorhandenes Schadensbild",
+    "Abdichtung, Gefälle und Entwässerung",
+    "Neuer Belag von Beschichtung bis Fliesen oder Platten",
+    "Betonsanierung, Anschlüsse und Arbeiten am Geländer",
+  ],
+  garage: [
+    "Größe und Bauweise von Fertiggarage bis Massivgarage",
+    "Fundament, Erdarbeiten und Beschaffenheit des Baugrunds",
+    "Garagentor, Elektroausstattung und gewünschte Zusatztechnik",
+    "Statik, Genehmigung und Zufahrt für Lieferung oder Montage",
+  ],
+  carport: [
+    "Einzel- oder Doppelcarport sowie Abmessungen",
+    "Material, Dachform und gewünschte Dacheindeckung",
+    "Punktfundamente, Bodenarbeiten und Stellplatzaufbau",
+    "Montageaufwand, Entwässerung und mögliche Genehmigungskosten",
+  ],
+  schornstein: [
+    "Schornsteinhöhe, Querschnitt und eingesetztes Sanierungssystem",
+    "Zustand des Bestands von Versottung bis zu baulichen Schäden",
+    "Dachzugang, Gerüst und notwendige Öffnungsarbeiten",
+    "Anschlussarbeiten sowie Abnahme und Leistungen des Schornsteinfegers",
+  ],
+  zaunbau: [
+    "Zaunlänge, Höhe und gewähltes Material",
+    "Bodenbeschaffenheit und Aufwand für Pfostenfundamente",
+    "Tore, Sichtschutz und Sonderfelder",
+    "Geländeverlauf, Rückbau eines Altzauns und Baustellenzugang",
+  ],
+  poolbau: [
+    "Poolgröße, Beckenart und gewünschte Ausstattung",
+    "Aushub, Abtransport und Bodenbeschaffenheit",
+    "Bodenplatte, Beckenaufbau und Abdichtung",
+    "Filtertechnik, Verrohrung, Elektroarbeiten, Heizung und Abdeckung",
+  ],
+  terrassenbau: [
+    "Terrassenfläche und Belag von Holz oder WPC bis Naturstein",
+    "Unterkonstruktion, Fundament und erforderliche Aufbauhöhe",
+    "Bodenbeschaffenheit, Erdarbeiten und Entsorgung",
+    "Entwässerung, Randanschlüsse, Stufen und Geländer",
+  ],
+  terrassenueberdachung: [
+    "Abmessungen, Material und Art der Dacheindeckung",
+    "Wandmontage oder freistehende Konstruktion",
+    "Fundamente, Statik und Anschlüsse an die Fassade",
+    "Verglasung, Beschattung, Entwässerung und elektrische Ausstattung",
+  ],
+  wintergarten: [
+    "Größe sowie Kaltwintergarten oder beheizter Wohnwintergarten",
+    "Rahmenmaterial, Verglasung und energetischer Standard",
+    "Fundament, Bodenaufbau und Anschlüsse an das Bestandsgebäude",
+    "Beschattung, Lüftung, Heizung, Elektroarbeiten und Genehmigung",
+  ],
+  dachausbau: [
+    "Ausbaufläche, Dachform und vorhandene Raumhöhe",
+    "Dämmung, Luftdichtheit und Trockenbauaufbau",
+    "Dachfenster, Gauben und mögliche statische Eingriffe",
+    "Elektro, Heizung, Sanitär, Boden und gewünschter Ausbaustandard",
+  ],
+  hausanbau: [
+    "Zusätzliche Wohnfläche und gewählte Bauweise",
+    "Fundament, Rohbau und statische Verbindung zum Bestand",
+    "Dach, Fenster, Türen und energetischer Standard",
+    "Innenausbau, Haustechnik, Planung und Genehmigungen",
+  ],
+  kellerbau: [
+    "Kellerfläche, Nutz- oder Wohnkeller und gewünschter Ausbaustandard",
+    "Baugrund, Aushub, Wasserhaltung und Entsorgung",
+    "Bauweise, Bodenplatte und Abdichtungssystem",
+    "Perimeterdämmung, Drainage, Haustechnik und Innenausbau",
+  ],
+  "abriss-entsorgung": [
+    "Gebäudegröße, Bauweise und abzubrechendes Material",
+    "Zugänglichkeit für Maschinen und notwendige Sicherungsmaßnahmen",
+    "Schadstoffe wie Asbest und erforderliche Spezialentsorgung",
+    "Container, Transportwege, Deponiegebühren und Stofftrennung",
+  ],
 };
 
 const scenarioGuideByService: Record<string, { label: string; href: string; description: string }> = {
