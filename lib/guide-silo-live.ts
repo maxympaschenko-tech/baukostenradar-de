@@ -13,6 +13,7 @@ import { kellerbauGuides } from "./guides-kellerbau";
 import { dachgaubeDachfensterVergleichGuide } from "./guide-dachgaube-dachfenster-vergleich";
 import { fertiggarageMassivgarageVergleichGuide } from "./guide-fertiggarage-massivgarage-vergleich";
 import { fertigkellerMassivkellerVergleichGuide } from "./guide-fertigkeller-massivkeller-vergleich";
+import { garageCarportVergleichGuide } from "./guide-garage-carport-vergleich";
 import { gfkBetonpoolVergleichGuide } from "./guide-gfk-betonpool-vergleich";
 import { hausanbauDachaufstockungVergleichGuide } from "./guide-hausanbau-dachaufstockung-vergleich";
 import { holzAluTerrassenueberdachungVergleichGuide } from "./guide-holz-alu-terrassenueberdachung-vergleich";
@@ -41,6 +42,7 @@ const expandedGuideSlugs = new Set([
   dachgaubeDachfensterVergleichGuide,
   fertiggarageMassivgarageVergleichGuide,
   fertigkellerMassivkellerVergleichGuide,
+  garageCarportVergleichGuide,
   gfkBetonpoolVergleichGuide,
   hausanbauDachaufstockungVergleichGuide,
   holzAluTerrassenueberdachungVergleichGuide,
