@@ -11,6 +11,7 @@ const garageGroup: GuideGroup = {
     "fertiggarage-kosten",
     "massivgarage-kosten",
     "fertiggarage-oder-massivgarage-kosten",
+    "garage-oder-carport-kosten",
     "garagenfundament-kosten-pro-qm",
     "garagentor-einbauen-kosten",
     "carport-kosten",
