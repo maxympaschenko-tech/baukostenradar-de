@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getRegion, getService, services } from "@/lib/pricing";
 import { getRelatedServices } from "@/lib/related-services";
+import { siteConfig } from "@/lib/site";
 import { socialMetadata } from "@/lib/social-metadata";
 
 export async function generateMetadata({
@@ -38,9 +39,43 @@ export default async function LocalServiceCostLayout({
   if (!service || !region || region.value === "de") return children;
 
   const relatedServices = getRelatedServices(service.slug, services);
+  const base = siteConfig.url.replace(/\/$/, "");
+  const canonicalUrl = `${base}/kosten/${service.slug}/${region.slug}`;
+  const description = `${service.shortTitle}-Kosten in ${region.label}: modellierte Richtwerte 2026 mit regional angepasster Preistabelle, Quellen und Erklärung des Standortfaktors.`;
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: `${service.shortTitle} Kosten ${region.label} 2026`,
+      url: canonicalUrl,
+      description,
+      isPartOf: {
+        "@type": "WebSite",
+        name: siteConfig.name,
+        url: base,
+      },
+      about: [
+        { "@type": "Thing", name: service.shortTitle },
+        { "@type": "Place", name: region.label },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: `Verwandte Gewerke in ${region.label}`,
+      numberOfItems: relatedServices.length,
+      itemListElement: relatedServices.map((relatedService, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: `${relatedService.shortTitle} Kosten ${region.label} 2026`,
+        url: `${base}/kosten/${relatedService.slug}/${region.slug}`,
+      })),
+    },
+  ];
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       {children}
       {relatedServices.length > 0 ? (
         <section className="section sectionTight" aria-labelledby="local-related-trades-heading">
