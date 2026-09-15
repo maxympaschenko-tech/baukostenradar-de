@@ -1,9 +1,11 @@
 import { allGuides as terraceGuides } from "./all-guides-terrace";
+import { holzAluTerrassenueberdachungVergleichGuide } from "./guide-holz-alu-terrassenueberdachung-vergleich";
 import { terrassendachGlasKunststoffVergleichGuide } from "./guide-terrassendach-glas-kunststoff-vergleich";
 import { terraceCoverGuides } from "./guides-terrace-cover";
 
 const terraceCoverExpansionGuides = [
   ...terraceCoverGuides,
+  holzAluTerrassenueberdachungVergleichGuide,
   terrassendachGlasKunststoffVergleichGuide,
 ];
 const terraceCoverSlugs = new Set(terraceCoverExpansionGuides.map((guide) => guide.slug));
