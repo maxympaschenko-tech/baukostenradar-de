@@ -82,8 +82,8 @@ export function getPriceGuideLink(options: {
 
   if (options.serviceSlug === "kellerbau" && perimeterItems.has(options.itemSlug)) {
     return {
-      href: "/ratgeber/perimeterdaemmung-keller-kosten",
-      title: `${options.itemName}: Kosten 2026`,
+      href: "/ratgeber/perimeterdaemmung-kosten-pro-qm",
+      title: `${options.itemName}: Ratgeber, Planung und Zusatzkosten`,
       cta: "Perimeterdämmung-Ratgeber öffnen",
     };
   }
