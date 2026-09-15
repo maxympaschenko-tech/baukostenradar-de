@@ -5,11 +5,13 @@ import {
 import { dachgaubeDachfensterVergleichGuide } from "./guide-dachgaube-dachfenster-vergleich";
 import { fertigkellerMassivkellerVergleichGuide } from "./guide-fertigkeller-massivkeller-vergleich";
 import { gfkBetonpoolVergleichGuide } from "./guide-gfk-betonpool-vergleich";
+import { hausanbauDachaufstockungVergleichGuide } from "./guide-hausanbau-dachaufstockung-vergleich";
 import { holzAluTerrassenueberdachungVergleichGuide } from "./guide-holz-alu-terrassenueberdachung-vergleich";
 import { kaltWohnwintergartenVergleichGuide } from "./guide-kalt-wohnwintergarten-vergleich";
 import { pooltechnikGuide } from "./guide-pooltechnik";
 import { terrassendachGlasKunststoffVergleichGuide } from "./guide-terrassendach-glas-kunststoff-vergleich";
 import { dachausbauGuides } from "./guides-dachausbau-current";
+import { hausanbauGuides } from "./guides-hausanbau";
 import { kellerbauGuides } from "./guides-kellerbau";
 import { poolGuides } from "./guides-pool";
 import { terraceCoverGuides } from "./guides-terrace-cover";
@@ -31,11 +33,25 @@ const dachausbauPeers: Peer[] = [
     href: `/ratgeber/${dachgaubeDachfensterVergleichGuide.slug}`,
   },
   {
+    slug: hausanbauDachaufstockungVergleichGuide.slug,
+    label: hausanbauDachaufstockungVergleichGuide.title,
+    href: `/ratgeber/${hausanbauDachaufstockungVergleichGuide.slug}`,
+  },
+  {
     slug: "dachfenster-nachtraeglich-einbauen-kosten",
     label: "Dachfenster nachträglich einbauen Kosten 2026",
     href: "/ratgeber/dachfenster-nachtraeglich-einbauen-kosten",
   },
 ];
+
+const hausanbauPeers: Peer[] = [
+  ...hausanbauGuides,
+  hausanbauDachaufstockungVergleichGuide,
+].map((guide) => ({
+  slug: guide.slug,
+  label: guide.title,
+  href: `/ratgeber/${guide.slug}`,
+}));
 
 const kellerbauPeers: Peer[] = [
   ...kellerbauGuides,
@@ -92,7 +108,8 @@ export function withSupplementalGuideLinks(
 ): GuideSupplementalLink[] {
   const base = withBaseSupplementalGuideLinks(slug, related);
   const withDachausbauPeers = addPeers(base, slug, dachausbauPeers);
-  const withKellerbauPeers = addPeers(withDachausbauPeers, slug, kellerbauPeers);
+  const withHausanbauPeers = addPeers(withDachausbauPeers, slug, hausanbauPeers);
+  const withKellerbauPeers = addPeers(withHausanbauPeers, slug, kellerbauPeers);
   const withPoolPeers = addPeers(withKellerbauPeers, slug, poolPeers);
   const withTerraceCoverPeers = addPeers(withPoolPeers, slug, terraceCoverPeers);
   return addPeers(withTerraceCoverPeers, slug, wintergartenPeers);
