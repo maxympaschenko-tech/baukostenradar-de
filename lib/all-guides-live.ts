@@ -1,5 +1,6 @@
 import type { Guide } from "./guides";
-import { allGuides as baseGuides } from "./all-guides-sanitaer-trades";
+import { allGuides as legacyGuides } from "./all-guides-sanitaer-trades";
+import { allGuides as expandedGuides } from "./all-guides-kellerbau";
 
 const redirectedLegacyGuideSlugs = new Set([
   "tuer-lackieren-kosten",
@@ -51,7 +52,7 @@ function withCurrentPerimeterData(guide: Guide): Guide {
 
 const guidesBySlug = new Map<string, Guide>();
 
-for (const guide of baseGuides) {
+for (const guide of [...legacyGuides, ...expandedGuides]) {
   if (redirectedLegacyGuideSlugs.has(guide.slug) || guidesBySlug.has(guide.slug)) continue;
   guidesBySlug.set(guide.slug, withCurrentPerimeterData(guide));
 }
