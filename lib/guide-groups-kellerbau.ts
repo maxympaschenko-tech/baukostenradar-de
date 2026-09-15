@@ -10,6 +10,7 @@ const kellerbauGroup: GuideGroup = {
     "kellerbau-kosten",
     "fertigkeller-kosten",
     "massivkeller-wohnkeller-kosten",
+    "fertigkeller-oder-massivkeller-kosten",
     "keller-80-100-120-qm-kosten",
     "kellerbau-erdarbeiten-weisse-wanne-kosten",
   ],
